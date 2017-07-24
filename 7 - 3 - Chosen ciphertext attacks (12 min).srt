@@ -1,0 +1,982 @@
+1
+00:00:00,000 --> 00:00:03,460
+上节我们定义了认证加密
+In the last segment we defined
+authenticated encryption, but I didn't
+
+2
+00:00:03,460 --> 00:00:06,517
+但我没有真正给大家看，为什么
+认证加密是一种合理的安全观点
+really show you why authenticated
+encryption is the right notion of
+
+3
+00:00:06,517 --> 00:00:09,818
+本节我想告诉大家，认证加密事实上
+security. In this segment I want to show
+you that authenticated encryption in fact
+
+4
+00:00:09,818 --> 00:00:14,431
+是一种很自然的安全观点，我将为大家证实
+is a very natural notion of security and
+I'll do it by showing you that it defends
+
+5
+00:00:14,431 --> 00:00:19,358
+认证加密可以抵抗一种叫做选择密文攻击的强大攻击
+against a very powerful attack called a
+chosen cipher text attack. So in fact we
+
+6
+00:00:19,358 --> 00:00:23,320
+事实上我们已经看到很多选择密文攻击的例子
+already saw a number of examples of a
+chosen cipher text attack so imagine the
+
+7
+00:00:23,320 --> 00:00:27,552
+试想，攻击者有某个他想加密的密文C
+adversary has some cipher text C that
+it wants to decrypt. And what it can do
+
+8
+00:00:27,552 --> 00:00:31,921
+例如，攻击者可以欺骗解密服务器去解密某些密文
+is, for example, fool the decryption
+server into decrypting some cipher text
+
+9
+00:00:31,923 --> 00:00:36,707
+但这些密文还不是C。我们已经看到一些这样的例子
+but not actually the cipher text c. So we
+already saw some examples of that. If you
+
+10
+00:00:36,707 --> 00:00:41,551
+如果大家还记得在本章第一节里，我们看到一个攻击者
+remember in the first segment, we looked
+at an adversary that can submit arbitrary
+
+11
+00:00:41,551 --> 00:00:46,394
+可以提交任意密文，如果明文正好以目标端口25开头
+cipher text, and if the plaintext happened
+to start with destination equals 25, then
+
+12
+00:00:46,394 --> 00:00:50,664
+那么攻击者可以得到他想要的明文
+the adversary is actually given the
+plaintext in the clear. So that's an
+
+13
+00:00:50,664 --> 00:00:55,672
+这例子里攻击者可以获得特定明文的解密结果
+example of an adversary that can obtain
+the decryption of certain cipher texts but
+
+14
+00:00:55,672 --> 00:00:59,966
+但不会是全部的密文。我们看的另一个例子是
+not all cipher texts. Another example we
+saw is an adversary that can learn
+
+15
+00:00:59,966 --> 00:01:04,058
+攻击者可以通过提交密文给解密者来学到明文
+something about the plaintext by
+submitting cipher texts to the decrypter.
+
+16
+00:01:04,058 --> 00:01:08,374
+这个例子里，攻击者提交TCP/IP数据包给解密服务器
+So we have this example where the
+adversary submits encrypted TCP/IP packets
+
+17
+00:01:08,374 --> 00:01:12,623
+如果解密服务器发送ACK包
+to the decryption server, and if the
+decryption server sends back an ACK, the
+
+18
+00:01:12,623 --> 00:01:17,053
+攻击者就知道了解密后的明文有一个有效的校验和
+adversary learns that the decrypted plain
+text had a valid checksum. And otherwise,
+
+19
+00:01:17,053 --> 00:01:21,057
+否则，解密后的明文没有有效的检验和
+the decrypted plain text didn't have a
+valid check sum. So this is, again, an
+
+20
+00:01:21,057 --> 00:01:25,220
+这又是一个选择密文攻击的例子，攻击者提交密文
+example of a chosen cipher text attack,
+where the attacker submits cipher text,
+
+21
+00:01:25,220 --> 00:01:29,680
+可以学到密文解密的一些信息
+and learns something about the decryption
+of that cipher text. So to address this
+
+22
+00:01:29,680 --> 00:01:34,457
+为了解决这种威胁，我们要定义一个非常广义的安全观点
+type of threats, we're gonna define a very
+general notion of security, called chosen
+
+23
+00:01:34,457 --> 00:01:39,060
+叫做选择密文安全。这里，我们赋予攻击者强大的力量
+cipher text security. So here, we're gonna
+give the adversary a lot of power, okay?
+
+24
+00:01:39,060 --> 00:01:43,376
+他既可以进行选择明文攻击，也可以选择密文攻击
+So he can do both chosen plain text
+attack, and a chosen cipher text attack.
+
+25
+00:01:43,376 --> 00:01:47,577
+换句话说，他可以获得他选择的任意信息的加密
+In other words, he can obtain the
+encryption of arbitrary messages of his
+
+26
+00:01:47,577 --> 00:01:52,648
+他可以解密他选择的任意密文，而不是挑战密文
+choice. And he can decrypt any cipher text
+of his choice, other than some challenge
+
+27
+00:01:52,648 --> 00:01:57,501
+如我给大家之前看的，这是一个很保守的
+cipher texts. And as I showed you before,
+this is actually a fairly conservative
+
+28
+00:01:57,501 --> 00:02:01,862
+真实世界的模型。在现实里，攻击者可以经常欺骗解密者
+modeling of real life. In real life,
+often, the attacker can fool the, the
+
+29
+00:02:01,862 --> 00:02:06,961
+让解密者去解密特定的密文，但不是所有的密文
+decrypter, into decrypting certain cipher
+texts for the attacker, but not all cipher
+
+30
+00:02:06,961 --> 00:02:10,986
+那么这个模型是，攻击者有特定的密文想解密
+texts. So the model here is that the
+attacker has a certain cipher text that it
+
+31
+00:02:10,986 --> 00:02:14,992
+它可以与解密者互动
+wants to decrypt. It can interact with
+the decrypter by issuing these chosen
+
+32
+00:02:14,992 --> 00:02:18,749
+向解密者发送这些选择密文的询问，解密各种密文
+cipher text queries to the decrypter.
+Namely, to decrypt various cipher text
+
+33
+00:02:18,749 --> 00:02:22,706
+除了挑战密文。然后攻击者的目标是
+other than the challenge cipher text. And
+then the adversary's goal is to break
+
+34
+00:02:22,706 --> 00:02:27,149
+破坏挑战密文的语义安全。大家注意到
+semantic security of the challenge cipher
+text. So you notice that we're giving the
+
+35
+00:02:27,149 --> 00:02:31,164
+我们给了攻击者强大的力量。我们问如何破坏语义安全
+adversary a lot of power. And all we're
+asking you to do is break semantic
+
+36
+00:02:31,164 --> 00:02:35,036
+设计出能够对抗这样的攻击者的系统
+security. So it's going to be fairly
+difficult to design systems that are
+
+37
+00:02:35,036 --> 00:02:38,663
+是非常困难的。不过我们将会给出答案
+secure against such adversaries.
+Nevertheless, we're going to do it. So
+
+38
+00:02:38,663 --> 00:02:42,828
+那么我们来更精确地定义选择密文安全
+let's define the chosen cipher text
+security model more precisely. So, as
+
+39
+00:02:42,828 --> 00:02:47,224
+通常，我们有一个密码(E,D)。我们将定义两个实验
+usual, we have a cipher (E, D). And we're
+gonna define two experiments, experiment
+
+40
+00:02:47,224 --> 00:02:51,447
+实验0和实验1。大家应该对此很熟悉了
+zero and experiment one. So this should
+look somewhat familiar by now. The
+
+41
+00:02:51,447 --> 00:02:56,017
+挑战者开始时选择一个随机密钥
+challenger is gonna start off by choosing
+a random key. And now the adversary is
+
+42
+00:02:56,017 --> 00:03:00,587
+现在攻击者提交询问给挑战者。每个询问
+可以是两种类型中的一种
+gonna submit queries to this challenger.
+Every query can be one of two types. It
+
+43
+00:03:00,587 --> 00:03:05,123
+它可以是选择明文询问，或者是选择密文询问
+can be a chosen plain text query, or it
+can be a chosen cipher text query. So a
+
+44
+00:03:05,123 --> 00:03:09,851
+我们知道，一个选择明文询问中
+chosen plain text query, as we already
+know. Basically, the adversary submits two
+
+45
+00:03:09,851 --> 00:03:14,724
+攻击者提交两个信息M0和M1，它们的长度相同
+messages, M zero and M1. They have to be
+the same length. And the adversary
+
+46
+00:03:14,724 --> 00:03:19,870
+在实验0中，攻击者收到M0的加密结果，或者是
+receives the encryption of either M zero
+if we're in experiment zero, or M1, if we're
+
+47
+00:03:19,870 --> 00:03:23,991
+在实验1中，攻击者收到M1的加密结果。
+攻击者收到左边或右边的加密结果
+in experiment one. So he receives the
+encryption of the left or the right
+
+48
+00:03:23,991 --> 00:03:27,845
+取决于我们是在实验0还是实验1中
+depending on whether we were in experiment
+zero or in experiment one. The second type
+
+49
+00:03:27,845 --> 00:03:32,323
+第二种询问更为有趣。其中攻击者提交他选择的任意密文
+of query is the more interesting one. This
+is where the adversary submits an arbitrary
+
+50
+00:03:32,323 --> 00:03:37,026
+他获得密文的解密
+cipher text of his choice and what he gets
+back is the decryption of that cipher
+
+51
+00:03:37,026 --> 00:03:41,994
+大家注意攻击者可以获得他选择的任意密文的解密结果
+text. So you notice the adverary's allowed
+to <b><u>decrypt</u></b> arbitrary cipher texts of his
+(此处decrypt有歧义，注意攻击者不能自己解密)
+
+52
+00:03:41,994 --> 00:03:47,237
+唯一的限制是，他的密文不是选择明文攻击的询问中
+choice. The only restriction is that the
+cipher text is not one of the cipher texts
+
+53
+00:03:47,237 --> 00:03:52,318
+他所获得的密文之一。当然这不合理
+that were obtained as a result of a CPA
+query. And of course this wouldn't be fair
+
+54
+00:03:52,318 --> 00:03:57,338
+因为攻击者可以通过CPA询问，轻松获得密文
+otherwise, because the attacker can simply
+take one cipher text that was obtained
+
+55
+00:03:57,338 --> 00:04:01,538
+得到的是M0或M1的加密结果
+from a CPA query. That's gonna to be
+either the encryption of M0 or the
+
+56
+00:04:01,538 --> 00:04:06,604
+如果攻击者可以提交特定密文的CCA询问
+encryption of M1. If he could submit a CCA
+query for that particular cipher text, he
+
+57
+00:04:06,604 --> 00:04:12,024
+他会获得M0或M1作为答复，这样攻击者就会知道
+will in response either obtain M0 or M1,
+and then he'll know whether he is in experiment
+
+58
+00:04:12,024 --> 00:04:17,003
+他是在实验0还是实验1了。这不合理。所以我们说
+zero or experiment one. So this wouldn't
+be fair. So we say that the CPA cipher
+
+59
+00:04:17,003 --> 00:04:21,656
+攻击者收到的CPA密文都是挑战密文
+texts that he received are the challenge
+cipher texts. And he's allowed to decrypt
+
+60
+00:04:21,656 --> 00:04:26,460
+攻击者允许获得任何他选择的密文的解密结果，
+这些挑战密文除外
+any cipher texts of his choice, other than
+these challenge cipher texts. And as
+
+61
+00:04:26,460 --> 00:04:30,815
+通常，攻击者的目标是确定他是在实验0，还是实验1
+usual, his goal is to determine whether
+he's in experiment zero, or in experiment
+
+62
+00:04:30,815 --> 00:04:35,376
+我要强调，这是一个极为强大的攻击者
+one. So I'm gonna emphasize again, that
+this is an extremely powerful adversary.
+
+63
+00:04:35,376 --> 00:04:39,878
+他可以获得除了挑战密文外，任意密文的解密结果
+One that can decrypt any cipher text of
+his choice, other than the challenge
+
+64
+00:04:39,878 --> 00:04:44,029
+但他依然不能区分他是在实验0或实验1中
+cipher text. And still, he can't
+distinguish whether he is in experiment
+
+65
+00:04:44,029 --> 00:04:48,806
+通常，我们说密码是CCA安全的
+zero, or in experiment one. So, as usual,
+we say that the cipher is CCA secure,
+
+66
+00:04:48,806 --> 00:04:52,757
+选择密文安全的，如果攻击者在实验0和实验1中
+chosen cipher text secure, if the
+adversary behaves the same in experiment
+
+67
+00:04:52,757 --> 00:04:57,621
+表现一致。他无法区分这两个实验
+zero as it does in experiment one. Namely, it
+cannot distinguish the two experiments. So
+
+68
+00:04:57,621 --> 00:05:02,075
+那么我们从一个简单例子开始，来证明事实上
+let's start with a simple example, and
+show that, in fact, CBC with a random IV,
+
+69
+00:05:02,075 --> 00:05:06,763
+带随机IV的CBC不是CCA安全的，不是选择密文安全的
+is not CCA secure, is not secure against
+chosen cipher text attacks. So let's see
+
+70
+00:05:06,763 --> 00:05:10,173
+我们看这是为什么。攻击者在一开始
+why that's the case. So what the
+adversary's gonna start by doing, he's
+
+71
+00:05:10,173 --> 00:05:15,553
+他提交两个不同的明文M0和M1
+gonna simply submit two distinct messages,
+M0 and M1. And let's just pretend that
+
+72
+00:05:15,553 --> 00:05:20,055
+我们假定这两个信息都是单个分组的，然后攻击者
+these messages are one block messages. And
+what he's gonna get back is the CBC
+
+73
+00:05:20,055 --> 00:05:24,846
+会获得M0或M1的加密结果。大家注意密文只有一个分组
+encryption of either M0 or
+M1. You notice the cipher text only has
+
+74
+00:05:24,846 --> 00:05:29,348
+因为明文只有一个分组长
+one block, because the plain texts were
+only one block long. Now what is the
+
+75
+00:05:29,348 --> 00:05:34,685
+攻击者要怎么做？他要修改这个得到的密文C
+attacker gonna do? Well, he's gonna modify
+this cipher text C that he was given into
+
+76
+00:05:34,685 --> 00:05:39,958
+变成C'，仅仅是改变了IV。他将IV异或1
+C prime simply by changing the IV. Okay?
+So he just takes the IV and XORs it with
+
+77
+00:05:39,958 --> 00:05:44,910
+完事了。给一个新的不同于C的密文C'
+one. That's it. This gives a new cipher
+text, C prime, which is different from C
+
+78
+00:05:44,910 --> 00:05:49,989
+因此攻击者完全可以提交C'，作为他的
+and as a result it's perfectly valid for
+the adversary to submit C prime as its
+
+79
+00:05:49,989 --> 00:05:55,134
+选择密文攻击的询问。他让挑战者为他解密C'
+chosen cipher text query. So he
+asks the challenger please decrypt this C
+
+80
+00:05:55,134 --> 00:05:59,727
+由于C'不等于C，挑战者必须解密C'
+prime for me. The challenger, because c
+prime is not equal to c, must decrypt c
+
+81
+00:05:59,727 --> 00:06:04,307
+现在我们看到，解密C'会发生什么？
+prime. And now let's see, what happens
+when he decrypts C prime? Well, what's the
+
+82
+00:06:04,307 --> 00:06:09,497
+C'的解密是什么？大家记得第一节里
+decryption of c prime, let me ask you. So
+you probably remember from the first
+
+83
+00:06:09,497 --> 00:06:14,657
+如果我们把IV异或1，明文也会异或1
+segment that if we xor the IV by one, that
+simply xors the plaintext by one. So now
+
+84
+00:06:14,657 --> 00:06:20,997
+现在，攻击者收到了M0异或1，或是M1异或1
+that adversary received M0 xor one, or M1
+xor one, and now he can perfectly tell
+
+85
+00:06:20,997 --> 00:06:25,435
+攻击者就完全可以确定他在实验0，还是在实验1
+whether he's in experiment zero and, or in
+experiment one. So the advantage of this
+
+86
+00:06:25,435 --> 00:06:30,075
+攻击者的优势是1，因为他可以轻松确定他在哪个实验
+adversary is basically one, because he can
+very easily tell which experiment he's in.
+
+87
+00:06:30,075 --> 00:06:34,922
+因此它可以赢得这个选择密文安全的游戏
+And as a result he can win the chosen
+cipher text security game. So if you think
+
+88
+00:06:34,922 --> 00:06:39,337
+大家想一想，会看出这个攻击游戏抓住了
+about it for a second, you'll see that
+this attack game exactly captured the first
+
+89
+00:06:39,337 --> 00:06:43,696
+我们看过的第一个主动攻击，攻击者稍微改变一点他得到的密文
+active attack that we saw, where the
+adversary slightly changed the cipher text
+
+90
+00:06:43,696 --> 00:06:47,614
+然后他让解密者为他解密
+that he was given. And then he got the
+decrypter to decrypt it for him. And
+
+91
+00:06:47,614 --> 00:06:51,918
+因此，攻击者可以窃听本不该给他的信息
+therefore, he was able to eavesdrop on
+messages that were not intended for the
+
+92
+00:06:51,918 --> 00:06:56,479
+那么我想再次强调，这个选择密文攻击
+adversary. So I wanna emphasize again that
+this chosen cipher text game really does
+
+93
+00:06:56,479 --> 00:07:00,863
+在现实中确实会发生，攻击者可以提交密文给解密者
+come up in real life, where the adversary
+can submit cipher texts to the decrypter
+
+94
+00:07:00,863 --> 00:07:05,193
+解密者可以透露明文的信息
+and the decrypter can reveal information
+about the plain text, or it can give the
+
+95
+00:07:05,193 --> 00:07:09,465
+或者干脆给攻击者特定密文对应的明文，
+但其他密文不能给明文
+plain text outright to the adversary for
+certain cipher texts but not others. So
+
+96
+00:07:09,465 --> 00:07:13,571
+这是一个非常自然的安全观点。问题是
+this is a very natural notion of security,
+and the question is, how do we design
+
+97
+00:07:13,571 --> 00:07:17,795
+我们如何设计CCA安全的加密系统？我说，
+我们之前定义的这个认证加密的观点
+crypto-systems that are CCA secure? So I
+claim that this authenticated encryption
+
+98
+00:07:17,795 --> 00:07:21,875
+已经蕴涵了选择密文安全
+notion that we defined before actually
+implies chosen cipher text security, and
+
+99
+00:07:21,875 --> 00:07:25,887
+这也是为什么认证加密的观点如此自然
+this is why authenticated encryption is
+such a natural concept. Okay? So the
+
+100
+00:07:25,887 --> 00:07:30,733
+这个定理说，如果密码能提供认证加密
+theorem basically says, well, if you give
+me a cipher that provides authenticated
+
+101
+00:07:30,733 --> 00:07:35,041
+这个密码就可以抵抗选择密文攻击
+encryption, the cipher can withstand
+chosen cipher text attacks. And more
+
+102
+00:07:35,041 --> 00:07:39,767
+更精确地，这个定理说了如下事实。
+如果我们有一个攻击者，提交了q个询问
+precisely, the theorem says the following.
+If we have an adversary that issues Q
+
+103
+00:07:39,778 --> 00:07:44,374
+换句话说，最多q个CPA询问和q个CCA询问
+queries, in other words, at most, q CPA
+queries and q chosen cipher text queries,
+
+104
+00:07:44,374 --> 00:07:49,160
+那么有两个有效的攻击者B1和B2，满足这个不等式
+then there are two efficient adversaries,
+B1 and B2, that satisfy this inequality
+
+105
+00:07:49,160 --> 00:07:53,328
+由于这个机制有认证加密，我们知道
+here. So since the scheme has
+authenticated encryption, we know that
+
+106
+00:07:53,328 --> 00:07:58,052
+这个量是可忽略的，因为它是CPA安全的
+this quantity is negligible because it's
+CPA secure. And we know that this
+
+107
+00:07:58,052 --> 00:08:02,072
+这个量是可忽略的，因为加密机制有密文完整性
+quantity is negligible because the
+encryption scheme has cipher text
+
+108
+00:08:02,072 --> 00:08:06,210
+因此，由于两项都是可忽略的
+integrity. And as a result, since both
+terms are negligible we know that
+
+109
+00:08:06,210 --> 00:08:10,857
+攻击者赢得CCA游戏的优势也是可忽略的
+adversary's advantage in winning the CCA
+game is also negligible. So let's prove
+
+110
+00:08:10,857 --> 00:08:14,947
+我们来证明这个定理。这个定理容易证明
+this theorem. It's actually a very simple
+theorem to prove. And so let's just do it
+
+111
+00:08:14,947 --> 00:08:20,581
+我们用图像来证明它。这里我们有两份CCA游戏
+as proof by pictures. Okay, so here we
+have two copies of the CCA game, so this
+
+112
+00:08:20,581 --> 00:08:25,190
+这个是实验0，下面这个是实验1
+would be experiment zero. And the bottom
+one is experiment one. You can see the
+
+113
+00:08:25,190 --> 00:08:29,783
+大家可以看到，攻击者提交CPA询问和CCA询问
+adversary's issuing CPA queries, and he's
+issuing CCA queries, and at the end he
+
+114
+00:08:29,783 --> 00:08:34,954
+最后他输出一个特定的猜测b，记为b'
+outputs, you know, a certain guess b,
+let's call it b prime, and our goal is to
+
+115
+00:08:34,954 --> 00:08:38,926
+我们的目标是证明这个b'在两种情况下都是不可区分的
+show that this b prime is
+indistinguishable in both cases. In other
+
+116
+00:08:38,926 --> 00:08:43,247
+换句话说，上面这个游戏中b'=1的概率
+words, probability that b prime is equal
+to one in the top game is the same as the
+
+117
+00:08:43,247 --> 00:08:47,586
+与下面这个游戏中b'=1的概率是一样的
+probability that b prime is equal to one
+in the bottom game. Okay, so the way we're
+
+118
+00:08:47,586 --> 00:08:50,903
+我们如下证明之。首先，我们稍微改变一下挑战者
+gonna do it is the following. Well, first
+of all, we're gonna change the challenger
+
+119
+00:08:50,903 --> 00:08:55,761
+不再输出CCA询问的解密
+a little bit, so that instead of actually
+outputting the decryption of CCA queries,
+
+120
+00:08:55,761 --> 00:09:01,128
+攻击者会输出符号⊥
+the challenger is just gonna always output
+bottom. So every time the adversary
+
+121
+00:09:01,128 --> 00:09:05,652
+每次攻击者提交一个CCA询问，挑战者都说符号⊥
+submits a CCA query, the challenger says
+bottom. And I claim that these two
+
+122
+00:09:05,652 --> 00:09:08,773
+我说这两个游戏事实上是不可区分的。换句话说
+games are, in fact, indistinguishable. In
+other words, the adversary can't
+
+123
+00:09:08,773 --> 00:09:13,650
+攻击者不能区分这两个游戏，原因很简单
+distinguish these two games, for the
+simple reason that, because the scheme has
+
+124
+00:09:13,650 --> 00:09:17,722
+因为机制有密文完整性，攻击者不能产生一个密文
+cipher text integrity, the adversary
+simply cannot create a cipher text that's
+
+125
+00:09:17,722 --> 00:09:24,197
+不是从C1到C_i-1中的，可以解密到不是符号⊥的其他东西
+not in C1 to C_i-1 that decrypts to
+anything other than bottom. That is the
+
+126
+00:09:24,197 --> 00:09:28,777
+这时密文完整性的定义。因此，因为密文完整性
+definition of cipher text integrity. And
+as a result, again, because of cipher text
+
+127
+00:09:28,777 --> 00:09:33,019
+一定有每个攻击者提交的选择密文的询问
+integrity, it must be the case that every
+chosen cipher text query that the
+
+128
+00:09:33,019 --> 00:09:37,430
+得到的都是符号⊥。如果事实上攻击者可以区分
+adversary issues results in bottom. If the
+adversary, in fact, could distinguish
+
+129
+00:09:37,430 --> 00:09:41,898
+左边的游戏和右边的游戏，这意味着
+between the left game and the right game,
+that would mean that at some point he
+
+130
+00:09:41,898 --> 00:09:46,592
+他可以设法提交一个CCA询问，可以解密到不是符号⊥的
+某些东西，这样我们就可以使用这个攻击者
+issued a query that decrypted to something
+other than bottom. And that we could use
+
+131
+00:09:46,592 --> 00:09:50,795
+来破坏机制的密文完整性
+to then break cipher text integrity of the
+scheme. And since the scheme has
+
+132
+00:09:50,795 --> 00:09:54,977
+由于这个机制有密文完整性，左右两个游戏不可区分
+cipher-text integrity, these left and
+right games are indistinguishable. Okay,
+
+133
+00:09:54,977 --> 00:09:59,324
+这一犀利的论断展示了，当有密文完整性时
+so that's kind of acute argument that
+shows that it's very easy to respond to
+
+134
+00:09:59,324 --> 00:10:03,836
+很容易回复选择密文的询问
+chosen cipher-text queries when you have
+cipher-text integrity. And the same thing
+
+135
+00:10:03,836 --> 00:10:07,673
+同样的事情应用在下面这个游戏上，
+我们可以让选择密文攻击的回复
+exactly applies on the bottom, where we
+can simply replace the chosen cipher-text
+
+136
+00:10:07,673 --> 00:10:12,623
+总是符号⊥。很好，现在
+responses by just always saying bottom.
+Okay, very good. But now, since the chosen
+
+137
+00:10:12,623 --> 00:10:17,208
+因为选择密文的询问总是以同样的方式回复
+cipher text queries always respond in the
+same way, they're not giving the adversary
+
+138
+00:10:17,208 --> 00:10:21,574
+不会给攻击者任何的信息。攻击者总是知道
+any information. The adversary always
+knows that we're always gonna just respond
+
+139
+00:10:21,574 --> 00:10:25,668
+我们会以符号⊥回复，所以我们可以去除这些询问了
+with bottom. So we might as well just
+remove these queries, 'cause they don't
+
+140
+00:10:25,668 --> 00:10:29,769
+因为它们不对攻击者提供任何信息
+contribute any information to the
+adversary. But now, once we remove these
+
+141
+00:10:29,769 --> 00:10:34,339
+一旦我们去除了这些询问，剩下的游戏看上去应该很熟悉了
+queries, the resulting game should look
+fairly familiar. The top right game, and
+
+142
+00:10:34,339 --> 00:10:39,144
+右上和右下的游戏是由CPA安全的定义得来的
+the bottom right game are basically the two
+games that come up in the definition of
+
+143
+00:10:39,144 --> 00:10:43,773
+由于这个机制是CPA安全的，我们知道
+CPA security. And as a result, because the
+scheme is CPA secure, we know that the
+
+144
+00:10:43,773 --> 00:10:48,508
+攻击者不能区分上下两个游戏
+adversary can't distinguish the top from
+the bottom. And so now, by this change of
+
+145
+00:10:48,508 --> 00:10:53,165
+通过这段演绎，我们证明了所有这些游戏都是等价的
+reasoning, we've proven that all of these
+games are equivalent. And in particular,
+
+146
+00:10:53,165 --> 00:10:57,022
+特别地，最初的两个游戏也是等价的
+the original two games that we started
+with are also equivalent, and therefore,
+
+147
+00:10:57,022 --> 00:11:02,364
+因此，攻击者不能区分左上和左下
+the adversary can't distinguish the top
+left from the bottom left. And therefore,
+
+148
+00:11:02,364 --> 00:11:06,896
+因此这个机制是CCA安全的。这给大家一些直观感受
+the scheme is CCA secure. So this gives
+you the intuition as to why authenticated
+
+149
+00:11:06,896 --> 00:11:11,236
+为什么认证加密这个概念如此好，因为它蕴涵了
+encryption is such a cool concept. Because
+primarily it implies security against
+
+150
+00:11:11,236 --> 00:11:15,199
+对抗选择密文攻击的安全性。我们说过
+chosen cipher text attacks. Okay, so as we
+said authenticated encryption
+
+151
+00:11:15,199 --> 00:11:19,094
+验证加密确保了私密性。即使攻击者可以解密
+ensures confidentiality. Even if the
+adversary can decrypt a subset of the
+
+152
+00:11:19,094 --> 00:11:23,476
+一个密文子集，更一般地，即使攻击者可以实施
+一个广义的选择密文攻击
+cipher text, and more generally, even if
+he can mount a general chosen cipher text attack,
+
+153
+00:11:23,476 --> 00:11:27,965
+他依然不能破坏系统的语义安全
+he still is not going to be able to break
+semantic security of the system. However,
+
+154
+00:11:27,965 --> 00:11:31,914
+但有两个重要的局限性要记住：首先
+it is important to remember the two
+limitations. First of all, it does not
+
+155
+00:11:31,914 --> 00:11:36,350
+它不能阻止重放攻击。我们必须做些什么
+prevent replay attacks on its own. We're
+going to have to do something in addition
+
+156
+00:11:36,350 --> 00:11:40,785
+以抵抗重放攻击。我们将看到几个例子
+to defend against replay attacks. We're
+going to see several examples where if the
+
+157
+00:11:40,785 --> 00:11:45,221
+如果解密者透露了更多关于为什么密文被拒绝的信息
+decryption engine reveals more information
+about why a cipher text is rejected, it
+
+158
+00:11:45,221 --> 00:11:49,278
+解密者不仅仅输出符号⊥，它还输出更多信息
+doesn't just output bottom, but it
+actually outputs more information, say, by
+
+159
+00:11:49,278 --> 00:11:53,744
+比如说，计时攻击。这就解释了为什么密文被拒绝了
+timing attacks. And that explains why the
+cipher text is rejected. Then in fact that
+
+160
+00:11:53,744 --> 00:11:58,120
+然后事实上，这可以完全摧毁认证加密系统的安全性
+can completely destroy security of the
+authenticated encryption system. So we'll
+
+161
+00:11:58,120 --> 00:12:02,245
+下节我们将看到这样一些可爱的攻击
+see some cute attacks like this in a later
+segment. Okay. So, in the next segment
+
+162
+00:12:02,245 --> 00:12:05,394
+下节我们将组建认证加密系统
+we're gonna turn to constructing
+authenticated encryption systems.

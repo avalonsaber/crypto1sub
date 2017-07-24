@@ -1,0 +1,543 @@
+1
+00:00:00,000 --> 00:00:04,438
+现在我们理解了抗碰撞的哈希函数
+So now that we understand what collision
+resistant hash functions are and we know
+
+2
+00:00:04,438 --> 00:00:08,660
+我们知道了如何去构建它们，我们已经准备好
+去描述非常流行的MAC：HMAC了
+how to construct them, we're ready to
+describe very popular MAC called HMAC. So
+
+3
+00:00:08,660 --> 00:00:12,828
+让我再提一下什么是Merkle-Damgard机制
+let me remind you what the Merkle-Damgard construction is. Basically we have a
+
+4
+00:00:12,828 --> 00:00:17,158
+我们有一个小的压缩函数h，根据h
+我们构建一个大的哈希函数
+small compression function h from which we
+build a large hash function, which is
+
+5
+00:00:17,158 --> 00:00:20,785
+假设压缩函数是抗碰撞的，则大哈希函数也抗碰撞
+collision resistant assuming the
+compression function is collision resistant.
+
+6
+00:00:20,785 --> 00:00:25,169
+本节的问题是，我们能否使用大哈希函数
+The question we're gonna ask
+this segment is can we use the large hash
+
+7
+00:00:25,169 --> 00:00:29,445
+来直接构建MAC，而不依赖PRF呢？
+function to construct a MAC directly
+without having to rely on a PRF. So here's
+
+8
+00:00:29,445 --> 00:00:33,879
+这是第一个想到的点子。假设我给你一个
+the first thing that comes to mind.
+Suppose I give you a Merkle-Damgard hash
+
+9
+00:00:33,879 --> 00:00:38,781
+Merkle-Damgard哈希函数，注意到它把长信息
+哈希成短的摘要
+function so you notice a mapped, it hashes
+large messages into small digests and we
+
+10
+00:00:38,781 --> 00:00:43,742
+我们想把长信息直接转成MAC。首先我们想到
+want to convert that directly into a MAC.
+The first thing that comes to mind is well
+
+11
+00:00:43,742 --> 00:00:48,526
+我们为什么不计算MAC密钥联结上
+待求MAC的信息后的哈希呢？
+why don't we just hash the concatenation
+of the MAC key as long with the message
+
+12
+00:00:48,526 --> 00:00:53,310
+但实际上这是完全不安全的
+that we're trying to MAC? It turns out
+that this is completely insecure so let me
+
+13
+00:00:53,310 --> 00:00:55,329
+我问大家，为什么不安全？
+ask you, why is this is insecure?
+
+14
+00:00:56,036 --> 00:01:01,529
+答案是由于它的标准扩展，如果大家回想Merkle-Damgard机制
+The answer is the standard extension of that, and if you think back to the
+Merkle-Damgard construction, you realize
+
+15
+00:01:01,529 --> 00:01:06,027
+会发现如果我告诉你一个特定信息的标签，换句话说
+that if I tell you the tag of a particular
+message, in other words I tell you the
+
+16
+00:01:06,027 --> 00:01:10,580
+我告诉你在这个点的值。攻击者很容易加上另外一个分组
+value at this point. It's very easy for
+the attacker to just add another block and
+
+17
+00:01:10,580 --> 00:01:15,188
+然后再计算一次压缩函数H
+then compute one more application of the
+compression function H. And now they'll be
+
+18
+00:01:15,188 --> 00:01:19,408
+现在他们可以获得原信息联结上补齐分组的标签
+able to get the tag for the original
+message concatenated the padding block,
+
+19
+00:01:19,408 --> 00:01:23,739
+联结的字W是他们自己加的，因此
+concatenated the word W that they added
+themselves and as a result this is an
+
+20
+00:01:23,739 --> 00:01:27,887
+这是个存在性伪造。是的，这是我们得到的
+existential forgery. Yes, so basically
+this is exactly what we get here. Where
+
+21
+00:01:27,887 --> 00:01:32,497
+在联结补齐分组之后，攻击者可以联结
+after concatenating the padding block, the
+attacker can actually concatenate whatever
+
+22
+00:01:32,497 --> 00:01:36,727
+任何他想要的，他会获得这个组合信息的标签
+he wants and he would get the tag on this
+combined message. So this is totally
+
+23
+00:01:36,727 --> 00:01:41,121
+所以这是完全不安全的，我没法告诉大家
+有多少产品犯了这个错误
+insecure and I cannot tell you how many
+products have actually made this mistake
+
+24
+00:01:41,121 --> 00:01:45,297
+而它们还假设这是个安全的MAC。这个是完全不安全的
+where they assumed that this is a secure
+MAC. This is completely insecure and
+
+25
+00:01:45,297 --> 00:01:49,861
+大家永远不要使用它。有一个标准方法
+should never ever, ever, ever be used.
+Instead there's a standardized method to
+
+26
+00:01:49,861 --> 00:01:54,448
+可把一个抗碰撞的哈希函数转成一个MAC
+convert a collision resistant hash
+function to a MAC and that method is
+
+27
+00:01:54,448 --> 00:01:59,608
+这个标准方法叫做HMAC。特别地，我们可以使用SHA-256
+called HMAC. So in particular we could use
+the SHA-256 hash function to build
+
+28
+00:01:59,608 --> 00:02:04,767
+这一哈希函数来构建MAC。输出256位，事实上
+this MAC. The output is going to be 256
+bits and in fact HMAC is believed to be a
+
+29
+00:02:04,767 --> 00:02:09,609
+人们相信HMAC是一个伪随机函数，所以
+通过SHA-256，我们获得了一个伪随机函数
+pseudo-random function, so in fact out of
+SHA-256 we get a pseudo-random
+
+30
+00:02:09,609 --> 00:02:14,774
+输出256位的信息。那么让我展示这个机制
+function that outputs 256 bit outputs. So
+let me show the construction. Here's the
+
+31
+00:02:14,774 --> 00:02:19,815
+这是用符号表示的机制，它如下工作：
+首先我们取密钥k
+construction in symbols and it works as
+follows. First we take our key k and we
+
+32
+00:02:19,815 --> 00:02:25,112
+然后我们在密钥后面联结一个叫做内部密码本ipad的
+concatenate what's we call an internal pad
+to it, an ipad to it. This makes it into
+
+33
+00:02:25,112 --> 00:02:29,771
+这使它成为Merkle-Damgard机制的一个分组
+one block of the Merkle-Damgard
+construction, so for example this would be
+
+34
+00:02:29,771 --> 00:02:35,251
+比如，对于SHA-256来说将是512位。
+我们把得到的分组附在信息M前面，然后求哈希
+512 bits in the case of SHA-256. We prepend
+this to the message M and then we hash.
+
+35
+00:02:35,251 --> 00:02:40,364
+我们刚刚说了，只做这些是完全不安全的
+Now this by itself we just said is
+completely insecure, however what HMAC
+
+36
+00:02:40,364 --> 00:02:45,896
+不过除此之外，HMAC还取这256位输出
+does in addition, it takes the output,
+which is 256 bits, it prepends to that the
+
+37
+00:02:45,896 --> 00:02:51,569
+计算密钥k与外部密码本opad异或，把异或结果
+附在256位输出的前面
+key again XOR with, what's called the
+outer pad, the opad. This also becomes
+
+38
+00:02:51,569 --> 00:02:56,259
+这也会形成512位，一个分组。然后HMAC取
+这两个分组的哈希值
+512 bits. It's one block. And then it
+hashes the combination of these two to
+
+39
+00:02:56,259 --> 00:03:00,943
+最终得到信息M的标签。这里符号略多
+finally obtain the resulting tag on the
+message M. So it's more rather looking
+
+40
+00:03:00,943 --> 00:03:05,833
+看图更有利于对HMAC的理解
+into some symbols. It's more instructive
+to look at HMAC in pictures. And so you
+
+41
+00:03:05,833 --> 00:03:10,661
+大家可以看到这是两个密钥k异或内部密码本
+can see that here are the two keys k XOR
+inner-pad, which is then fed into the
+
+42
+00:03:10,661 --> 00:03:15,427
+然后交给Merkle-Damgard机制，得到的输出
+Merkle-Damgard chain. And then the
+resulting output of this chain is fed into
+
+43
+00:03:15,427 --> 00:03:20,322
+再交给Merkle-Damgard机制，产生最后的输出
+another Merkle-Damgard chain and finally
+the final output is produced. Okay, so
+
+44
+00:03:20,322 --> 00:03:26,090
+这是HMAC工作的示意图，现在我想证明
+this is how HMAC works in pictures and
+now I want to argue that we've already
+
+45
+00:03:26,090 --> 00:03:31,295
+一些我们已见过的类似的结果。特别地
+seen something very similar to this. In
+particular, if you can think of the
+
+46
+00:03:31,295 --> 00:03:36,868
+如果压缩函数H是PRF，密钥是第一个、上面的输入
+compression function H as a PRF where the
+key is the first, the top inputs, then
+
+47
+00:03:36,868 --> 00:03:42,769
+那么我们这里是在计算PRF H在固定的IV处的值
+what we're actually doing here is we're
+evaluating this PRF H at a fixed IV and
+
+48
+00:03:42,769 --> 00:03:48,817
+结果是一个随机值，我们记为K1
+the result here is a random value which
+we're gonna call K1. And then we apply the
+
+49
+00:03:48,817 --> 00:03:54,792
+然后我们应用Merkle-Damgard链，
+对外部密码本我们可以做同样的事情
+Merkle-Damgard chain and we can do the
+same thing on the outer pad. If you think
+
+50
+00:03:54,792 --> 00:04:00,766
+如果你认为h是PRF，密钥是上面的输入
+of little h as a PRF where the key is the
+upper inputs. Again, we're applying this
+
+51
+00:04:00,766 --> 00:04:06,519
+我们使用不同的密钥，应用这个PRF，计算在固定值IV的值
+PRF using a different key to a fixed value
+IV and as a result, we're gonna get
+
+52
+00:04:06,519 --> 00:04:11,687
+我们得到另外一个结果K2。现在当我们
+使用这些密钥K1和K2来计算HMAC时
+another random value K2. So now when we
+compute HMAC using these keys, K1 and K2,
+
+53
+00:04:11,687 --> 00:04:16,630
+这看上去非常熟悉，这就是NMAC
+this would actually look very familiar
+this is basically NMAC. It's identical to
+
+54
+00:04:16,630 --> 00:04:21,449
+它和我们前一章讨论的NMAC一模一样
+NMAC that we discussed in a previous
+segment. And notice to argue that this is
+(口误：segment->module)
+
+55
+00:04:21,449 --> 00:04:26,267
+为了证明这是NMAC机制，我们必须假设这个压缩函数h
+an NMAC construction we have to assume
+that the compression function, little h,
+
+56
+00:04:26,267 --> 00:04:31,148
+是PRF，密钥是下面的函数输入
+is a PRF where the key is actually the
+lower inputs to the function. Now let me
+
+57
+00:04:31,148 --> 00:04:36,090
+我说这些密码本ipad和opad，它们是固定的常数
+say that these pads, the ipad and the
+opad, these are fixed constants that are
+
+58
+00:04:36,090 --> 00:04:41,156
+在HMAC标准中都给出了。这些仅为512为常数
+specified in the HMAC standard. So these
+are literally just 512 bit constants that
+
+59
+00:04:41,156 --> 00:04:46,166
+永不改变。当我们回头看整个HMAC机制时
+never change. And so when we go back to
+look at the complete HMAC construction,
+
+60
+00:04:46,166 --> 00:04:51,213
+发现HMAC与NMAC的主要不同之处
+you realize that the main difference
+between this and NMAC is that these keys
+
+61
+00:04:51,213 --> 00:04:56,648
+是这些密钥互相是有关联的，大家注意到
+它们只不过是同样的密钥
+here since they are dependent, you notice
+they're both just the same key XORed
+
+62
+00:04:56,648 --> 00:05:02,084
+异或上不同的常数。本质上，密钥K1和K2也是相互关联的
+with different constants. Essentially, the
+keys K1 and K2 are also somewhat dependent
+
+63
+00:05:02,084 --> 00:05:07,325
+因为它们是在同样的固定值IV上应用PRF计算得到的
+because they're computed by applying a PRF
+to the same fixed value, namely IV, but
+
+64
+00:05:07,325 --> 00:05:12,101
+但用相关联的密钥。为了证明K1和K2是伪随机的
+with dependent keys. And so to argue that
+K1 and K2 are pseudo random and
+
+65
+00:05:12,101 --> 00:05:17,224
+且互相独立的，我们必须证明压缩函数
+independent of one another, one has to
+argue that the compression function not
+
+66
+00:05:17,224 --> 00:05:22,282
+不仅当其输入，上面的输入是密钥时，它是PRF
+only is a PRF where when the inputs, the
+top input, is the key inputs, but it's
+
+67
+00:05:22,282 --> 00:05:27,341
+而且当使用关联密钥时，它也是PRF。基于这些假设
+also a PRF when dependent keys are used.
+But under those assumptions, basically the
+
+68
+00:05:27,341 --> 00:05:32,146
+应用对NMAC的一模一样的分析来分析HMAC，我们可以证明
+exact same analysis NMAC would apply to
+HMAC and we would get security argument
+
+69
+00:05:32,146 --> 00:05:36,835
+HMAC是安全的MAC。如我所说，在这些压缩函数h的PRF假设下
+that HMAC is a secure MAC. So as I said,
+HMAC can be proven secure under these PRF
+
+70
+00:05:36,835 --> 00:05:41,582
+可以证明HMAC是安全的。其安全的界定
+assumptions about the compression function
+H. The security bounds are just as they
+
+71
+00:05:41,582 --> 00:05:46,271
+与NMAC一致，换句话说，你不必改变密钥
+are for NMAC, in other words you should
+not have to change the key as long as the
+
+72
+00:05:46,271 --> 00:05:51,289
+只要求MAC的信息数小于输出标签的一半的空间大小
+number of messages you're MAC-ing is
+smaller than the size of the output tag to
+(这样讲有歧义，本质上就是生日攻击里的平方根)
+
+73
+00:05:51,289 --> 00:05:56,527
+对于HMAC与SHA-256，输出空间是2的256次方
+the one-half, but for HMAC SHA-256 the
+output space is 2 to the 256. The square
+
+74
+00:05:56,527 --> 00:06:01,715
+平方根是2的128次方
+root of that would put us at 2 to the
+128. Which means that basically you can
+
+75
+00:06:01,715 --> 00:06:07,334
+这意味着你可以使用HMAC与SHA-256，
+想处理多少信息都可以，而且是始终保持安全的
+use HMAC SHA-256 for as many outputs as you
+want, and you'll always maintain security.
+
+76
+00:06:07,334 --> 00:06:12,704
+最后关于HMAC，我告诉大家，TLS要求
+And as a last point about HMAC I'll tell
+you that TLS Standard actually requires
+
+77
+00:06:12,704 --> 00:06:18,129
+支持HMAC与SHA-196，意味着HMAC由SHA-1函数构建
+that one support HMAC SHA-196 which means that
+HMAC built from the SHA-1 function and
+
+78
+00:06:18,129 --> 00:06:24,342
+并截断到96位。SHA-1输出160位
+truncated to 96 bits. SHA-1 remember
+outputs 160 bits. And we truncated to the
+
+79
+00:06:24,342 --> 00:06:29,414
+我们把它截断到高96位。现在大家可能怀疑，
+记得我们之前说过
+most significant 96 bits. Now you might be
+wondering, remember we said before that
+
+80
+00:06:29,414 --> 00:06:34,236
+SHA-1不再被认为是安全的哈希函数
+SHA-1 is no longer considered a secure
+hash function, so how come we're using
+
+81
+00:06:34,236 --> 00:06:39,016
+那我们怎能在HMAC里使用SHA-1呢？实际上，
+这是没问题的，因为HMAC的安全性分析
+SHA-1 in HMac? Well, it turns out it's
+actually fine. Because HMAC the analysis
+
+82
+00:06:39,016 --> 00:06:44,142
+不需要SHA-1是抗碰撞的
+of HMAC doesn't need SHA-1 to be
+collision resistant. All it needs is that
+
+83
+00:06:44,142 --> 00:06:49,145
+只需要压缩函数SHA-1是PRF，当输入运行是密钥时
+the compression function of SHA-1
+one be a PRF when either input is allowed
+
+84
+00:06:49,145 --> 00:06:52,803
+目前我们知道，这对SHA-1的底层压缩函数也成立
+to be the key. And as far as we know
+that's still correct for the underlying
+
+85
+00:06:52,803 --> 00:06:56,376
+即使它可能不是抗碰撞的
+compression function for SHA-1.
+Even though it might not be collision
+(单轮Merkle-Damgard一般很难做到抗碰撞)
+
+86
+00:06:56,376 --> 00:06:59,994
+我们目前知道，在HMAC中使用SHA-1的压缩函数也是没问题的
+resistant. As far as we know it's still
+fine to use it inside of HMAC. So this is
+
+87
+00:06:59,994 --> 00:07:03,657
+我们对HMAC的讨论完结。下一节我们看
+the end of our discussion of HMAC and in
+our next segment we're going to look at
+
+88
+00:07:03,657 --> 00:07:04,698
+HMAC的计时攻击
+timing attacks on HMAC.

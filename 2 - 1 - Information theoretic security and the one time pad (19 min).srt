@@ -1,0 +1,1418 @@
+1
+00:00:00,000 --> 00:00:04,262
+我们已经看过了历史上的几种密码
+Now that we've seen a few examples of
+historic ciphers, all of which are badly
+【ikamusume酱 译注】
+
+2
+00:00:04,262 --> 00:00:07,130
+它们都可以被严重地破解。
+现在我们要看一些设计得好得多的密码了
+broken, we're going to switch gears and
+talk about ciphers that are much better
+
+3
+00:00:10,122 --> 00:00:13,115
+不过在这之前，我想先准确定义什么是密码
+designed. But before we do that, I want to,
+first of all, define more precisely what a
+
+4
+00:00:13,115 --> 00:00:17,432
+首先，记住密码实际上是由
+cipher is. So first of all, a cipher is
+actually, remember a cipher is made up of
+
+5
+00:00:17,432 --> 00:00:21,694
+两个算法组成的
+它们是加密算法和解密算法
+two algorithms. There's an encryption
+algorithm and a decryption algorithm. But
+
+6
+00:00:21,694 --> 00:00:26,012
+但事实上，密码定义为一个三元组
+全体可能的密钥，
+in fact, a cipher is defined over a
+triple. So the set of all possible keys,
+
+7
+00:00:26,012 --> 00:00:31,292
+记为花体的K，有时我叫它密钥空间
+which I'm going to denote by script K, and
+sometimes I'll call this the key space,
+
+8
+00:00:31,292 --> 00:00:35,968
+密钥空间是全体可能的密钥的集合
+有个全体可能明文的集合
+it's the set of all possible keys. There's
+this set of all possible messages and this
+
+9
+00:00:35,968 --> 00:00:40,365
+还有全体密文的集合。好的
+这个三元组某种意义上定义了
+set of all possible ciphertexts. Okay, so
+this triple in some sense defines the
+
+10
+00:00:40,365 --> 00:00:44,756
+密码的环境。密码本身是
+environment over which the cipher is
+defined. And then the cipher itself is a
+
+11
+00:00:44,756 --> 00:00:49,236
+一对算法E和D。E是加密算法
+pair of efficient algorithms E and D. E is
+the encryption algorithm; D is the
+
+12
+00:00:49,236 --> 00:00:57,762
+D是解密算法。当然，E输入密钥和明文
+输出密文
+decryption algorithm. Of course, E takes
+keys and messages. And outputs ciphertexts.
+
+13
+00:00:57,762 --> 00:01:06,770
+解密算法输入密钥和密文，输出明文
+And the decryption algorithm takes
+keys and ciphertexts. Then outputs messages.
+
+14
+00:01:06,770 --> 00:01:12,282
+只要求这两算法一致
+And the only requirements is that these
+algorithms are consistent. They satisfy
+
+15
+00:01:12,282 --> 00:01:17,933
+它们要满足正确的性质
+所以，对明文空间里的每一条信息
+what's called the correctness property. So
+for every message in the message space.
+
+16
+00:01:17,933 --> 00:01:23,593
+对密钥空间里的每一个密钥
+最好是如果我用密钥K加密明文
+And every key. In the key space, it had
+better be the case that if I encrypt the
+
+17
+00:01:23,593 --> 00:01:29,185
+然后我用同样的密钥K解密
+message with the key K and then I decrypt
+using the same key K I had better get back
+
+18
+00:01:29,185 --> 00:01:34,711
+我最好能回到最初的明文信息
+这个方程就叫
+the original message that I started with.
+So this equation here is what's called the
+
+19
+00:01:34,711 --> 00:01:39,974
+一致性方程，每个密码都要满足它
+consistency equation and every cipher has
+to satisfy it in order to be a cipher
+
+20
+00:01:39,974 --> 00:01:44,970
+否则就没法解密了
+注意一下，我这里给
+otherwise it's not possible to decrypt.
+One thing I wanted to point out is that I
+
+21
+00:01:44,970 --> 00:01:49,782
+“有效”这个词打了引号
+原因是有效这个词
+put the word efficient here in quotes. And
+the reason I do that is because efficient
+
+22
+00:01:49,782 --> 00:01:54,041
+不同人理解不同。如果你倾向理论
+means different things to different
+people. If you're more inclined towards
+
+23
+00:01:54,041 --> 00:01:58,811
+多项式时间就算有效的。那么算法E和D
+theory, efficient means runs in polynomial
+time. So algorithms E and D have to run in
+
+24
+00:01:58,811 --> 00:02:02,842
+必须在多项式时间内完成，
+具体时间取决于输入的规模
+polynomial time in the size of their
+inputs. If you're more practically
+
+25
+00:02:02,842 --> 00:02:07,045
+如果你倾向应用
+在特定时间内完成才算有效
+inclined, efficient means runs within a
+certain time period. So for example,
+
+26
+00:02:07,045 --> 00:02:11,474
+例如，算法E可能需要在一分钟内
+algorithm E might be required to take
+under a minute to encrypt a gigabyte of
+
+27
+00:02:11,474 --> 00:02:16,073
+加密1G的数据。不管是哪个
+“有效”这个词你可以自己
+data. Now either way, the word efficient
+kind of captures both notions and you can
+
+28
+00:02:16,073 --> 00:02:20,158
+来决定如何诠释它
+interpret it in your head whichever way
+you'd like. I'm just going to keep
+
+29
+00:02:20,158 --> 00:02:24,139
+我只是给“有效”打上引号
+referring to it as efficient and put
+quotes in it as I said if you're theory
+
+30
+00:02:24,189 --> 00:02:27,964
+你可以很理论地认为是多项式时间
+inclined think of it as polynomial time,
+otherwise think of it as
+
+31
+00:02:27,964 --> 00:02:32,100
+也可以认为是有时间限制的
+我想说的另一点是关于算法E的
+concrete time constraints. Another comment
+I want to make is in fact algorithm E.
+
+32
+00:02:32,100 --> 00:02:36,455
+E经常是一个随机算法，意思是
+It's often a randomized algorithm. What
+that means is that as your encrypting
+
+33
+00:02:36,455 --> 00:02:40,981
+当你加密信息时，
+算法E自己生成二进制随机数
+messages, algorithm E is gonna generate
+random bits for itself, and it's going to
+
+34
+00:02:40,981 --> 00:02:45,676
+它将使用这些随机数来加密给定的明文信息
+use those random bits to actually encrypt
+the messages that are given to it. On the
+
+35
+00:02:45,676 --> 00:02:50,258
+另一方面，解密算法是确定算法，换句话说
+other hand the decrypting algorithm is
+always deterministic. In other words given
+
+36
+00:02:50,258 --> 00:02:54,558
+密钥和密文输出总是一致的
+the key and the ciphertext output is
+always the same. Doesn't depend on any
+
+37
+00:02:54,558 --> 00:02:58,970
+算法不依赖于任何随机性
+好，我们现在更好地理解了密码
+randomness that's used by the algorithm.
+Okay, so now that we understand what a
+
+38
+00:02:58,970 --> 00:03:03,552
+我想给大家展示安全密码的第一个例子
+cipher is better, I want to kind of show
+you the first example of a secure cipher.
+
+39
+00:03:03,552 --> 00:03:08,364
+它叫做一次性密码本。由Vernam在20世纪初设计
+It's called a one time pad. It was designed
+by Vernam back at the beginning of the
+
+40
+00:03:08,364 --> 00:03:12,724
+在我解释这个密码之前，我们先用
+twentieth century. Before I actually
+explain what the cipher is, let's just
+
+41
+00:03:12,724 --> 00:03:17,383
+刚才介绍的术语来阐述之
+state it in the terminology that we've
+just seen. So the message space for the
+
+42
+00:03:17,383 --> 00:03:22,221
+Vernam密码，即一次性密码本的明文空间
+同其密文空间一样
+Vernam cipher for the one-time pad is the
+same as the ciphertext space which is
+
+43
+00:03:22,221 --> 00:03:27,653
+是全体n位二进制字符串的集合。
+这就是说所有二进制0,1字符串
+just the set of all n bit binary strings.
+This, this just means all sequences of
+
+44
+00:03:27,653 --> 00:03:33,854
+密钥空间和明文空间是一样的
+bits, of zero one characters. The key
+space is basically the same as the message
+
+45
+00:03:33,854 --> 00:03:40,134
+也是所有n位二进制字符串
+space which is again simply the n bit of
+all binary strings. So a key in the one
+
+46
+00:03:40,134 --> 00:03:46,290
+那么一次性密码本的密钥就是一个随机字符串
+它是一随机的二进制序列
+time pad is simply a random big string,
+it's a random sequence of bits. That's as
+
+47
+00:03:46,290 --> 00:03:51,508
+密钥与待加密的明文等长，与明文等长
+long as the message to be encrypted, as
+long as the message. Okay, now that we've
+
+48
+00:03:51,508 --> 00:03:56,726
+好，现在我们知道了密码是如何定义的
+specified kind of what's the cipher's
+defined over we can actually specify how
+
+49
+00:03:56,726 --> 00:04:02,010
+我们能指定这密码是如何工作的
+很简单的，本质上，密文
+the cipher works and it's actually really
+simple. So essentially the ciphertexts.
+
+50
+00:04:02,010 --> 00:04:07,812
+也就是用特定密钥加密明文的结果
+Which is the result of encrypting a
+message with a particular key, is simply
+
+51
+00:04:07,812 --> 00:04:13,766
+密文就是密钥和明文的异或结果
+就是K异或M。我们看个例子
+the XOR of the two. Simply K XOR M. Let's see a quick example of
+
+52
+00:04:13,766 --> 00:04:20,026
+还记得异或吗？就是这个带环的加号
+this. Remember that XOR, this plus
+with a circle. XOR means addition
+
+53
+00:04:20,026 --> 00:04:26,825
+异或就是模2加法。那么如果我取
+一特定信息，比如0110111
+modulo two. So if I take a particular
+message, say, 0110111. And it take a
+
+54
+00:04:26,825 --> 00:04:33,871
+再取一个特定密钥，比如1011001
+当我计算信息的加密结果时
+particular key, say 1011001. When I
+compute the encryption of the message
+
+55
+00:04:33,871 --> 00:04:38,838
+使用密钥，我只需计算两字符串的异或
+using this key, all I do is I
+compute the XOR of these two
+
+56
+00:04:38,838 --> 00:04:43,942
+换句话说，我逐位计算模2加法
+strings. In other words, I do addition
+module or two bit by bit. So I get one,
+
+57
+00:04:43,942 --> 00:04:48,645
+所以我得到1101110，即密文
+那我怎么解密呢？
+one, zero, one, one, one, zero. That's a
+ciphertext. And then how do I decrypt? I
+
+58
+00:04:48,645 --> 00:04:52,893
+我想可以做同样的事情。使用特定密钥解密
+guess they could do kind of the same
+thing. So they decrypt a cipher text using
+
+59
+00:04:52,893 --> 00:04:57,248
+只需计算密钥和密文的异或
+a particular key. What I do is I XOR the
+key and the ciphertext again. And so all
+
+60
+00:04:57,248 --> 00:05:01,819
+我们只需证明它满足一致性要求
+we have to verify is that it satisfies the
+consistency requirements. And I'm going to
+
+61
+00:05:01,819 --> 00:05:06,443
+我慢慢地证一遍，从今往后
+我将假定大家都能易证这个性质
+do this slowly once and then from now on,
+I'm going to assume this is all, simple to
+
+62
+00:05:06,443 --> 00:05:10,798
+那么我们要保证如果我用特定密钥解密
+you. So we're gonna make, we're gonna have
+to make sure that if I decrypt a cipher
+
+63
+00:05:10,798 --> 00:05:14,893
+我最好能还原明文信息M
+text, that was encrypted using a
+particular key, I had better get back the
+
+64
+00:05:14,893 --> 00:05:20,481
+这里发生了什么？让我们看一下
+message M. So what happens here? Well,
+let's see. So if I look at the encryption
+
+65
+00:05:20,481 --> 00:05:25,996
+用K和M的加密，就是使用了异或的定义
+of k and m, this is just k XOR m by
+definition. What's the decryption of k XOR
+
+66
+00:05:25,996 --> 00:05:31,628
+K异或M用K如何解密？
+就是 K异或（K异或M）
+m using k? That's just k XOR (k XOR
+m). And so since I said that XOR is
+
+67
+00:05:31,628 --> 00:05:36,948
+由于异或是模2加法，加法有可结合性
+于是这就等于（K异或K）异或M
+addition modulo two, addition is
+associative, so this is the same as (k XOR k)
+
+68
+00:05:36,948 --> 00:05:43,007
+显然K异或K就是0，0异或任意M还是M
+XOR m, which is simply as you know k XOR k is a zero, and zero XOR anything
+
+69
+00:05:43,007 --> 00:05:49,066
+好的，这就证明了一次性密码本确是密码
+is simply m. Okay, so this actually shows
+that the one-time pad is in fact a cipher,
+
+70
+00:05:49,066 --> 00:05:54,277
+但它并没有解释其安全性
+but it doesn't say anything about the
+security of the cipher. And we'll talk
+
+71
+00:05:54,277 --> 00:05:58,319
+我们待会将讨论密码的安全性
+首先，我先问一个简单问题
+about security of the cipher in just a
+minute. First of all, let me quickly ask
+
+72
+00:05:58,319 --> 00:06:02,205
+确保大家都跟上了
+you a question, just to make sure we're
+all in sync. Suppose you are given a
+
+73
+00:06:02,205 --> 00:06:06,092
+假设有明文信息M，使用一次性密码本加密
+message m and the encryption of that
+message using the one time pad. So all
+
+74
+00:06:06,092 --> 00:06:10,522
+你有明文和密文。问题是
+you're given is the message and the cipher
+text. My question to you is, given this
+
+75
+00:06:10,522 --> 00:06:15,467
+给定M和C，你能否解出生成密文C用的
+pair m and c, can you actually figure out
+the one-time pad key that was used in the
+
+76
+00:06:15,467 --> 00:06:20,588
+一次性密码本的密钥？
+creation of c from m?
+
+77
+00:06:20,588 --> 00:06:23,030
+我希望大家都发现了，
+给定明文和密文
+So I hope all of you
+realize that in fact, given the message in
+
+78
+00:06:23,030 --> 00:06:25,473
+这是很容易还原出密钥的
+the cipher text it's very easy to recover
+what the key is. In particular the key is
+
+79
+00:06:25,473 --> 00:06:30,241
+密钥就是M异或C。我们来证明之
+如果大家觉得这不是很显然
+simply M XOR C. Then we'll see that if
+it's not immediately obvious to you we'll
+
+80
+00:06:30,241 --> 00:06:35,238
+在讲座稍后讨论之。好的
+see why that's, the case, a little later
+in the talk, in the lecture. Okay alright
+
+81
+00:06:35,238 --> 00:06:40,198
+从性能的观点看，一次性密码本很不错
+so the 1-time pad is a really cool from a
+performance point of view all you're doing
+
+82
+00:06:40,198 --> 00:06:44,656
+你可以以极快的速度异或密钥和信息
+is you exo-ring the key in the message so
+it's a super, super fast. Cypher for
+
+83
+00:06:44,656 --> 00:06:48,464
+可以加解密很长的信息。但很不幸
+encrypting and decrypting very long
+messages. Unfortunately it's very
+
+84
+00:06:48,464 --> 00:06:52,768
+这个方法在实际中很难使用
+原因是密钥需要与明文一样长
+difficult to use in practice. The reason
+it's difficult to use is the keys are
+
+85
+00:06:52,768 --> 00:06:56,907
+所以如果Alice和Bob想安全通信
+essentially as long as the message. So if
+Alice and Bob want to communicate
+
+86
+00:06:56,907 --> 00:07:01,321
+Alice想给Bob发送一条信息
+securely, so you know Alice wants to send
+a message end to Bob, before she begins
+
+87
+00:07:01,321 --> 00:07:06,011
+在她发送信息的第一位之前
+她需要给Bob传送一个密钥
+even sending the first bit of the message,
+she has to transmit a key to Bob that's as
+
+88
+00:07:06,011 --> 00:07:10,536
+密钥和明文一样长
+如果Alice有办法安全地传给Bob一个密钥
+long as that message. Well, if she has a
+way to transmit a secure key to Bob that's
+
+89
+00:07:10,536 --> 00:07:15,061
+这个密钥和明文一样长，她就可以
+用这个办法把明文直接传了
+as long as the message, she might as well
+use that same mechanism to also transmit
+
+90
+00:07:15,061 --> 00:07:19,439
+所以事实上密钥和明文一样长
+the message itself. So the fact that the
+key is as long as the message is quite
+
+91
+00:07:19,439 --> 00:07:23,490
+是很有问题的
+这也使得一次性密码本在实际中很难用
+problematic and makes the one-time pad
+very difficult to use in practice.
+
+92
+00:07:23,490 --> 00:07:28,040
+虽然我们将看到一次性密码本背后的思想
+Although we'll see that the idea behind
+the one-time pad is actually quite useful
+
+93
+00:07:28,040 --> 00:07:32,590
+实际上是很有用的，我们稍后还会讨论
+但我现在想关注一下安全
+and we'll see that a little bit later. But
+for now I want to focus a little bit on
+
+94
+00:07:32,590 --> 00:07:36,918
+那么之前的问题是，
+为什么一次性密码本是安全的？
+security. So the obvious questions are,
+you know, why is the one-time pad secure?
+
+95
+00:07:36,918 --> 00:07:41,195
+为什么它是个好的密码？
+为回答这个问题，我们首先要回答
+Why is it a good cypher? Then to answer
+that question, the first thing we have to
+
+96
+00:07:41,195 --> 00:07:45,191
+什么是安全的密码？
+什么让密码变得安全？
+answer is, what is a secure cipher to
+begin with? What is a, what makes cipher
+
+97
+00:07:45,191 --> 00:07:49,759
+好，为研究密码的安全性
+我们必须讲一点
+secure? Okay, so the study, security of
+ciphers, we have to talk a little bit
+
+98
+00:07:49,759 --> 00:07:54,962
+信息论的内容。事实上
+第一个研究密码安全性的人
+about information theory. And in fact the
+first person, to study security of ciphers
+
+99
+00:07:55,150 --> 00:08:00,076
+非常有名，他是Claude Shannon
+信息论之父
+rigorously. Is very famous, you know, the
+father of information theory, Claude
+
+100
+00:08:00,076 --> 00:08:05,042
+1949年，他发表了一篇著名论文
+Shannon, and he published a famous paper
+back in 1949 where he analyzes the
+(Communication Theory of Secrecy Systems
+第10小节 Perfect Secrecy)
+
+101
+00:08:05,042 --> 00:08:10,603
+文章里他分析了一次性密码本
+Shannon定义的安全的基本想法如下
+security of the one-time pad. So the idea
+behind Shannon's definition of security is
+
+102
+00:08:10,603 --> 00:08:15,182
+如果你得到密文了
+the following. Basically, if all you get
+to see is the cypher text, then you should
+
+103
+00:08:15,182 --> 00:08:19,379
+从中你得不出一点点关于明文的信息
+learn absolutely nothing about the plain
+text. In other words, the cypher text
+
+104
+00:08:19,379 --> 00:08:23,413
+换句话说，密文不揭露任何明文的信息
+should reveal no information about the
+plain text. And you see why it took
+
+105
+00:08:23,413 --> 00:08:28,047
+为什么让创立信息论的人提出这个观点？
+someone who invented information theory to
+come up with this notion because you have
+
+106
+00:08:28,047 --> 00:08:32,517
+因为必须形式化地定义明文的信息
+to formulize, formally explain what does
+information about the plain text actually
+
+107
+00:08:32,517 --> 00:08:37,653
+好，那是Shannon的贡献
+我给大家看一看Shannon的定义
+mean. Okay so that's what Shannon did and
+so lemme show you Shannon's definition,
+
+108
+00:08:37,653 --> 00:08:42,841
+我慢点写。Shannon说
+I'll, I'll write it out slowly first. So
+what Shannon said is you know suppose we
+
+109
+00:08:42,841 --> 00:08:48,029
+假设我们有加解密算法E和D
+定义在三元组(K,M,C)上，之前提过
+have a cypher E D that's defined over
+triple K M and C just as before. So KM and
+
+110
+00:08:48,029 --> 00:08:53,411
+K为密钥空间，M为明文空间，C为密文空间
+C define the key space, the message space
+and the cypher text space. And when we say
+
+111
+00:08:53,411 --> 00:08:58,404
+我们说密码是完美安全的
+that the cypher text sorry we say that the
+cypher has perfect secrecy if the
+
+112
+00:08:58,404 --> 00:09:03,592
+如果如下条件成立：
+对M中任意两个明文M0和M1
+following condition holds. It so happens
+for every two messages M zero and M1 in
+
+113
+00:09:03,592 --> 00:09:08,684
+我只要求它们俩的长度相同
+the message space. For every two messages
+the only requirement I'm gonna put on
+
+114
+00:09:08,684 --> 00:09:13,831
+只有这一个要求，我们很快将看到
+为什么这个要求是必需的
+these messages is they have the same
+length. Yeah so we're only, we'll see why
+
+115
+00:09:13,831 --> 00:09:19,106
+对于每一个密文空间里的密文
+this requirement is necessary in just a
+minute. And for every cyphertext, in the
+
+116
+00:09:19,106 --> 00:09:25,221
+对于每一对明文和密文
+cyphertext space. Okay? So for every pair
+of message and for every cipher
+
+117
+00:09:25,221 --> 00:09:31,118
+如下概率关系成立
+text, it had better be the case that, if I
+ask, what is the probability that,
+
+118
+00:09:31,357 --> 00:09:37,096
+给定C，用K加密M0，对吧？
+encrypting M zero with K, woops.
+Encrypting M zero with K gives C, okay? So
+
+119
+00:09:37,096 --> 00:09:43,551
+如果密钥K随机选取，我们加密M0
+how likely is it, if we pick a random key?
+How likely is it that when we encrypt M
+
+120
+00:09:43,551 --> 00:09:49,819
+结果得到C的可能性有多少？这个概率
+应当与我们加密M1得到c一样
+zero, we get C. That probability should be
+the same as when we encrypt M1. Okay, so
+
+121
+00:09:49,819 --> 00:09:54,920
+好的，所以加密M1得到c的概率
+the probability of encrypting M1 and
+getting c is exactly the same as the
+
+122
+00:09:54,920 --> 00:09:59,955
+等于加密M0得到c的概率
+probability of encrypting M0 and
+getting c. And just as I said where the
+
+123
+00:09:59,955 --> 00:10:04,658
+如我所说，密钥分布在密钥空间上
+key, the distribution, is over the
+distribution on the key. So, the key is
+
+124
+00:10:04,658 --> 00:10:10,157
+密钥分布是均匀的。所以k在K上均匀分布
+我经常写个上面有r的箭头
+uniform in the key space. So k is uniform
+in K. And I'm often going to write k arrow
+
+125
+00:10:10,157 --> 00:10:15,390
+表示k是个均匀分布在密钥空间上的随机变量
+with a little r above it to denote the
+fact that k is a random variable that's
+
+126
+00:10:15,390 --> 00:10:20,491
+好的，这是Shannon定义的主要部分
+uniformly sampled in the key space k.
+Okay, this is the main part of Shannon's
+
+127
+00:10:20,491 --> 00:10:25,892
+我们来想想这个定义到底说的是什么
+definition. And let's think a little bit
+about what this definition actually says.
+
+128
+00:10:25,892 --> 00:10:30,965
+这两个概率相等的意思是什么？
+So what does it mean that these two
+probabilities are the same? Well, what it
+
+129
+00:10:30,965 --> 00:10:36,304
+意思是，如果我是攻击者
+我截获了一段密文c
+says is that if I'm an attacker and I
+intercept a particular cypher text c, then
+
+130
+00:10:36,304 --> 00:10:41,577
+实际中，密文是M0的加密结果的概率
+in reality, the probability that the
+cypher text is the encryption of M0 is
+
+131
+00:10:41,577 --> 00:10:46,798
+与是M1的加密结果的概率严格相等
+exactly the same as the probability that
+it's the encryption of M1. Because
+
+132
+00:10:46,798 --> 00:10:52,219
+因为这些概率是相等的
+如果我有截获的密文C
+those probabilities are equal. So if I
+have, all I have the cypher text C that's
+
+133
+00:10:52,219 --> 00:10:57,639
+我也无从得知这密文是从M0来的
+all I have intercepted I have no idea
+whether the cypher text came from M zero
+
+134
+00:10:57,639 --> 00:11:03,196
+还是从M1来的，因为获得C的概率相等
+or the cypher text came from M one because
+again the probability of getting C is
+
+135
+00:11:03,196 --> 00:11:08,651
+无论是加密M0还是M1
+equally likely whether M zero is being
+encrypted or M one is being encrypted. So
+
+136
+00:11:08,651 --> 00:11:13,286
+所以这里我们又重申了一遍定义
+我想把这些定义写得更清楚些
+here, we have the definition stated again.
+And I just wanna write these properties
+
+137
+00:11:13,286 --> 00:11:17,749
+我们把这个定义再写一遍。这个定义的意思是
+again more precisely. So let's write this
+again. So what does this definition
+
+138
+00:11:17,749 --> 00:11:22,326
+如果我有一段特定的密文，
+我无法得知它是怎么来的
+means is that if I am given a particular
+cipher text, I can't tell where it came
+
+139
+00:11:22,326 --> 00:11:27,125
+我无法得知被加密的明文是M0还是M1
+from. I can't tell if it's, if the message
+that was encrypted. Is either M zero or M
+
+140
+00:11:27,125 --> 00:11:32,090
+事实上，这个性质对所有明文信息都成立
+对所有M0
+one and in fact, this property is true for
+all messages. For all these M zero, for
+
+141
+00:11:32,090 --> 00:11:37,117
+所有M1，我无法得知C是从M0或M1来
+all M zero and M ones. So not only can I
+not tell if 'c' came from M zero or M one,
+
+142
+00:11:37,117 --> 00:11:42,144
+也无法得知是不是从M2,M3,M4,M5来的
+I can't tell if it came from M two or M
+three or M four or M five because all of
+
+143
+00:11:42,144 --> 00:11:47,109
+因为它们生成C的概率都一样
+them are equally likely to produce the
+cypher text'c'. So what this means really
+
+144
+00:11:47,109 --> 00:11:52,074
+这意味着，如果你使用一次性密码本加密
+is that if you're encrypting messages with
+a one time pad then in fact the most
+
+145
+00:11:52,074 --> 00:11:56,729
+不管攻击者有多聪明，多强大
+powerful adversary, I don't really care
+how smart you are, the most powerful
+
+146
+00:11:56,729 --> 00:12:02,530
+其也无法得知任何关于明文的信息
+adversary. Can learn nothing about the
+plain text, learns nothing about the plain
+
+147
+00:12:02,530 --> 00:12:09,624
+换种说法，从密文的角度来看
+text. From the cypher text. So to say it
+in one more way, basically what this
+
+148
+00:12:09,624 --> 00:12:16,315
+这证明了对于完美安全的密码
+任何惟密文攻击无效
+proves is that there's no, there's no
+cypher text-only attack on a cypher that
+
+149
+00:12:16,315 --> 00:12:23,263
+现在，攻击者不单单是攻击密码
+has perfect secrecy. Now, cypher attacks
+actually aren't the only attacks possible.
+
+150
+00:12:23,263 --> 00:12:29,440
+事实上还有其他类型的攻击者
+And in fact, other attacks may be
+possible, other attacks may be possible.
+
+151
+00:12:32,160 --> 00:12:36,772
+好的，现在我们更好地理解了完美安全
+Okay. Now that we understand what perfect
+secrecy, means, the question is, can we
+
+152
+00:12:36,772 --> 00:12:41,327
+问题是，我们能建立完美安全的密码吗？
+build ciphers that actually have perfect
+secrecy? And it turns out that we don't
+
+153
+00:12:41,327 --> 00:12:45,517
+其实我们不必看得太远
+一次性密码本就具备完美安全
+have to look very far, the one time
+pad in fact has perfect secrecy. So I
+
+154
+00:12:45,517 --> 00:12:50,719
+我想给大家证明Shannon最初的结果
+want to prove to you this is Shannon's first
+results and I wanna prove this fact to
+
+155
+00:12:50,719 --> 00:12:55,858
+这个证明很简单，所以我们上
+you, it's very simple proof so let's go
+ahead and look at it and just do it. So we
+
+156
+00:12:55,858 --> 00:13:01,061
+我们需要解释一下E(k,m0)=c的概率是多少
+need to kind of interpret what does that
+mean, what is this probability that E K M
+
+157
+00:13:01,061 --> 00:13:06,200
+不难看出，对每条明文和密文信息
+Zero is equal to C. So it's actually not that
+hard to see that for every message and
+
+158
+00:13:06,200 --> 00:13:11,022
+用密钥k加密m结果等于c的概率
+every cyphertext the probability that the
+encryption of M under a key K the
+
+159
+00:13:11,022 --> 00:13:16,161
+密钥k根据定义是随机选择的
+probability that, that's equal to C, the
+probability that our random choice of key
+
+160
+00:13:16,161 --> 00:13:23,720
+那就是所有密钥的个数。好的
+by definition. All that is, is basically
+the number of keys. Okay, instruct Kay.
+
+161
+00:13:24,758 --> 00:13:31,533
+如果我用密钥k加密m，会得到c。
+我数出所有密钥的个数
+Such that, well. If I encrypt m with k
+I get c. So I literally count the number
+
+162
+00:13:31,533 --> 00:13:37,207
+然后我除以密钥的个数，得到的就是概率吧？
+of keys and I divide by the total number
+of keys. Right? That's what it means, that
+
+163
+00:13:37,207 --> 00:13:42,833
+如果我随机选择一个密钥
+这个密钥将m映射到c
+if I choose a random key, that key maps m
+to c. Right. So it's basically the number
+
+164
+00:13:42,833 --> 00:13:47,707
+概率就是能将n映射到c的密钥数
+除以全体密钥的个数
+of key that map n to c divided by the
+total number of keys. This is its
+
+165
+00:13:47,707 --> 00:13:53,406
+假设我们有一个密码，对所有明文和密文
+probability. So now suppose that we had a
+cypher such that for all messages and all
+
+166
+00:13:53,406 --> 00:13:58,967
+如果我看这个数，k的数目
+cypher texts, it so happens that if I look
+at this number, the number of k, k, and k,
+
+167
+00:13:58,967 --> 00:14:04,391
+满足E(k,m)=c。换句话说
+我要寻找能将m映射到c的密钥数
+such that e, k, m is equal to c. In other
+words, I'm looking at the number of keys
+
+168
+00:14:04,391 --> 00:14:09,259
+假设这个数是个常数
+that map m to c. Suppose this number
+happens to be a constant. So say it
+
+169
+00:14:09,259 --> 00:14:14,079
+比如它会是2，3或10，15
+happens to be two, three, or ten or
+fifteen. It just hap, happens to be an
+
+170
+00:14:14,079 --> 00:14:19,332
+它会是个常数。如果是这种情况
+根据定义，对于所有m0和m1
+absolute constance. If that's the case,
+then by definition, for all m0 and m1 and
+
+171
+00:14:19,332 --> 00:14:24,747
+和所有c，这个概率都是一样的
+因为分母一样
+for all c, this probability has to be the
+same because the denominator is the same,
+
+172
+00:14:24,747 --> 00:14:30,097
+且分子也一样，它就是个常数
+the numerator is the same, it's just as
+constant, and therefore the probability is
+
+173
+00:14:30,097 --> 00:14:35,644
+所以对所有n和c，概率一致
+如果这个性质满足
+always the same for all n and c. And so if
+this property is true, then the cypher has
+
+174
+00:14:35,644 --> 00:14:43,616
+该密码一定具备完美安全
+好的，那我们来看看定量看看
+to have, the cypher has perfect secrecy.
+Okay, so let's see what can we say about
+
+175
+00:14:43,616 --> 00:14:48,804
+一次性密码本的这一性质
+问大家一个问题
+this quantity for the one time pad. So the
+sec-, so, the question to you is, if I
+
+176
+00:14:48,804 --> 00:14:54,770
+如果我有一条密文信息，
+有多少可能的一次性密码本的密钥
+have a message in a cipher-text, how many
+one time pad keys are there that
+
+177
+00:14:54,770 --> 00:15:00,381
+满足映射的结果为密文c？
+换句话说，有多少这样的密钥k
+map, this message ends, so the ciphertext
+C? So, in other words, how many keys are
+
+178
+00:15:00,381 --> 00:15:06,101
+满足m异或k等于c？
+那么我们希望大家都回答的是1
+there, such that M XOR K is equal to C?
+So I hope you've all answered one. And
+
+179
+00:15:06,101 --> 00:15:12,683
+我们来看看为什么是这样
+对于一次性密码本，我们有
+let's see why that's the case. For the one
+time pad, if we have that, the encryption
+
+180
+00:15:12,683 --> 00:15:18,303
+用k加密m等于c，但是根据定义
+of K of M under K is equal to C. But
+basically, well, by definition, that
+
+181
+00:15:18,303 --> 00:15:24,885
+这意味着k异或m等于c，但这也说明
+implies that K XOR M is equal to C. But
+that also simply says that K has to equal
+
+182
+00:15:24,885 --> 00:15:31,766
+k一定等于m异或c。是的，
+我在等式两边同时异或m
+to M XOR C. Yes, I just X over both
+sides by M and I get that K must equal the
+
+183
+00:15:31,766 --> 00:15:37,561
+得到k等于m异或c，对吧？这意味着
+对于一次性密码本，事实上
+M XOR C. Okay? So what that says is
+that, for the one time pad, in fact, the
+
+184
+00:15:37,561 --> 00:15:43,707
+密钥k的数目，满足E(k,m)=c的，就一个
+number of keys, in K, shows the EKM, is
+equal to C. That simply is one, and this
+
+185
+00:15:43,707 --> 00:15:49,852
+这点对所有密文信息都成立
+又根据我们之前说的
+holds for all messages in cipher text. And
+so, again, by what we said before, it just
+
+186
+00:15:49,852 --> 00:15:54,987
+一次性密码本有完美安全
+这个完美安全的证明
+says that the one time pad has, perfect
+secrecy. Perfect secrecy and that
+
+187
+00:15:54,987 --> 00:15:59,093
+是非常简单的，是个非常简单的引理
+completes the proof of this
+very, very simple. Very, very simple
+
+188
+00:15:59,093 --> 00:16:03,644
+有趣的是，即使这个引理如此易证
+lemma. Now the funny thing is that
+even though this lemma is so simple to
+
+189
+00:16:03,644 --> 00:16:08,194
+事实上它还证明了一个很强的结论
+prove in fact it proves a pretty powerful
+statement again. This basically says for
+
+190
+00:16:08,194 --> 00:16:12,328
+对一次性密码本，没有惟密文攻击
+the one time pad, there is no
+cypher text only attack. So, unlike the
+
+191
+00:16:12,328 --> 00:16:16,393
+与替换式密码、Vigenere密码、转轴机不同
+substitution cipher, or the vigenere
+cipher, or the roller machines, all those
+
+192
+00:16:16,393 --> 00:16:20,778
+后面这些都不能抵抗惟密文攻击
+我们刚刚证明了对于一次性密码本
+could be broken by ciphertext-only attack.
+We've just proved that for the one-time
+
+193
+00:16:20,778 --> 00:16:25,110
+惟密文攻击就是不可能。给定密文
+pad, that's simply impossible. Given the
+cyphertext, you simply learn nothing about
+
+194
+00:16:25,110 --> 00:16:29,281
+你无从得知明文。但是，可以看到事还没完
+the plaintext. However, as we can see,
+this is simply not the end of the story. I
+
+195
+00:16:29,281 --> 00:16:33,131
+完了吗？感觉这门课现在上完了
+mean, are we done? I mean, basically,
+we're done with the course now, cuz we
+
+196
+00:16:33,131 --> 00:16:37,359
+因为我们有了一个方法去加密了
+而且攻击者无法还原任何信息
+have a way. To encrypt, so that an
+attacker can't recover anything about our
+
+197
+00:16:37,359 --> 00:16:41,206
+用我们的方法。所以这课可能已经上完
+但事实上，我们会看到
+method. So maybe we're done with the
+course. But in fact, as we'll see, there
+
+198
+00:16:41,206 --> 00:16:45,261
+还有其他类型的攻击。实际上
+一次性密码本并非安全的
+are other attacks. And, in fact, the one
+time pad is actually not such a
+
+199
+00:16:45,261 --> 00:16:49,316
+实际上还有其他可能的攻击
+secure cipher. And in fact, there are
+other attacks that are possible, and we'll
+
+200
+00:16:49,316 --> 00:16:54,075
+我们很快就会看到，对吧？强调一下
+完美安全并不意味着
+see that shortly. Okay? I emphasize again
+the fact that it has perfect secrecy does
+
+201
+00:16:54,075 --> 00:16:58,785
+一次性密码本在实际使用中是安全的
+not mean that the one time pad is the
+secure cypher to use. Okay. But as we said
+
+202
+00:16:58,785 --> 00:17:03,733
+好。就像我们之前说的，一次性密码本的问题
+在于它的密钥非常的长
+the problem with the one time pad is that
+the secret key is really long. If you had
+
+203
+00:17:03,733 --> 00:17:08,071
+如果你有安全传递密钥的方法给对方
+a way of communicating the secret key
+over to the other side. You might as well
+
+204
+00:17:08,071 --> 00:17:12,253
+你也可以使用那个办法直接传递信息了
+use that exact same method to also
+communicate the message to the other side,
+
+205
+00:17:12,253 --> 00:17:16,652
+根本不需要密码，对吧？
+in which case you wouldn't need a cypher
+to begin with. Okay? So the problem again
+
+206
+00:17:16,652 --> 00:17:21,105
+所以问题是一次性密码本的密钥太长
+显然，问题是是否有其他密码
+is the one time pad had really long keys
+and so the obvious question is are there
+
+207
+00:17:21,105 --> 00:17:25,450
+也具备完美安全，却有短得多的密钥？
+other cyphers that has perfect secrecy and
+possibly have much, much shorter keys?
+
+208
+00:17:25,450 --> 00:17:30,136
+有个坏消息是，Shannon在证完
+一次性密码本具有完美安全之后
+Well, so the bad news is the Shannon,
+after proving that the one-time pad has
+
+209
+00:17:30,136 --> 00:17:34,945
+又证明了另一个定理，告诉我们
+perfect secrecy, proved another theorem
+that says that in fact if a cypher has
+
+210
+00:17:34,945 --> 00:17:39,878
+如果一个密码是完美安全的，
+其全体密钥数，不少于其能处理的明文数
+perfect secrecy, the number of keys in the
+cypher must be at least the number of
+
+211
+00:17:39,878 --> 00:17:44,935
+好的，特别地，这意味着
+messages that the cypher can handle. Okay,
+so in particular, what this means is if I
+
+212
+00:17:44,935 --> 00:17:51,037
+如果我们有完美安全，那么密钥数
+have perfect secrecy. Then necessarily the
+number of keys, or rather the length of my
+
+213
+00:17:51,037 --> 00:17:56,309
+或说我的密钥长度必须不小于明文长度
+key, must be greater than the length of
+the message. So, in fact, since the one
+
+214
+00:17:56,309 --> 00:18:00,834
+由于一次性密码本的等号满足条件
+它实际上是一个最优的加密
+time pad satisfies us with equality, the
+one time pad is an optimal, cipher that
+
+215
+00:18:00,834 --> 00:18:04,862
+满足完美安全，对吧？
+has perfect secrecy, okay? So basically,
+what this shows is that this is an
+
+216
+00:18:04,862 --> 00:18:09,056
+这是个有趣的观点。一次性密码本很有趣
+interesting notion. The one time pad is an
+interesting cipher. But, in fact, in
+
+217
+00:18:09,056 --> 00:18:13,360
+但事实上它很难用，很难付诸实践
+reality, it's actually quite hard to use.
+It's hard to use in practice, again,
+
+218
+00:18:13,360 --> 00:18:17,790
+因为过长的密钥
+尽管这个完美安全的观点很有趣
+because of these long keys. And so this
+notion of perfect secrecy, even though
+
+219
+00:18:17,790 --> 00:18:21,840
+它并没有告诉我们如何设计
+it's quite interesting, basically says
+that it doesn't really tell us the
+
+220
+00:18:21,840 --> 00:18:26,279
+既安全又实用的密码
+我们将会看到，就像之前所说
+practical cyphers are going to be secure.
+And we're gonna see, but, as we said, the
+
+221
+00:18:26,279 --> 00:18:30,994
+一次性密码本的思想是很好的
+在下一讲中我们会看到
+idea behind the one time pad is quite good.
+And we're gonna see, in the next lecture,
+
+222
+00:18:30,994 --> 00:18:33,547
+如何利用这一思想，设计一个实用的系统
+how to make that into a practical
+system.

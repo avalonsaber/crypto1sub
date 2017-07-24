@@ -1,0 +1,920 @@
+1
+00:00:00,000 --> 00:00:04,372
+现在我们知道了两个用户可以通过共享一个密钥
+来保护通信数据
+Now that we know how two users can protect
+data using a shared secret key, the next
+
+2
+00:00:04,372 --> 00:00:08,218
+接下来的问题是，开始时，这两个用户如何产生
+这么一个共享密钥？
+question is how did these two users
+generate a shared secret key to begin
+
+3
+00:00:08,218 --> 00:00:12,538
+这个问题将把我们带入公钥密码的世界
+with? This question will take us into the
+world of public key cryptography. In this
+
+4
+00:00:12,538 --> 00:00:16,647
+本章中，我们将看一些玩具似的密钥交换协议
+module, we will look at a few toy key
+exchange protocols as a way to introduce
+
+5
+00:00:16,647 --> 00:00:21,020
+作为引入公钥密码的主要思想的一种方法。
+我们将回头讨论密钥交换
+the main ideas of public key cryptography.
+We're gonna come back and talk about key
+
+6
+00:00:21,020 --> 00:00:25,388
+并设计安全的密钥交换协议，这些将在我们构建
+一些公钥工具之后讲
+exchange and design secure key exchange
+protocols after we build a few more public
+
+7
+00:00:25,388 --> 00:00:29,249
+试想一下，世界上有N位用户
+key tools. So imagine for a second that
+there a N users in the world. And the
+
+8
+00:00:29,249 --> 00:00:33,335
+问题是，这些用户如何管理这些密钥？
+question is, how do these users manage
+these secret keys that they're gonna use
+
+9
+00:00:33,335 --> 00:00:37,612
+他们要使用这些密钥来互相通信的。比如说，
+to communicate with one another? So, for
+example, let's assume N equals four and
+
+10
+00:00:37,612 --> 00:00:41,628
+我们假设N等于4，世界上有4位用户。一种方案是
+there are four users in the world. One
+option is that basically every pair of
+
+11
+00:00:41,628 --> 00:00:46,913
+每一对用户都共享一对密钥。这样的话，比如说
+users will share a shared secret key. And
+so, for example, U1 and U3 will share a
+
+12
+00:00:46,913 --> 00:00:52,522
+U1和U3共享一个密钥，我记之为K13。U1和U2共享一个密钥
+shared, a shared secret key. I'll call it
+K13. U1 and U2 will share a, a shared
+
+13
+00:00:52,522 --> 00:01:01,302
+我们记之为K12，等等。。K24、K34，等等
+secret key. We'll call it K12 so on and so
+forth. K24 K34 and so on and so forth. K14
+
+14
+00:01:01,302 --> 00:01:08,669
+K14和最后的K23。这种方法的问题是
+and finally K23. The problem with this
+approach is that now there are many, many
+
+15
+00:01:08,669 --> 00:01:13,569
+用户需要管理太多的共享密钥了。特别地
+shared keys that users have to manage. And
+in particular, every user has to store on
+
+16
+00:01:13,569 --> 00:01:18,231
+每个用户必须存储N个密钥，如果他要和
+这个世界上N个其他用户对话
+the order of N keys if he's gonna talk to
+N other parties in this world. So the
+
+17
+00:01:18,231 --> 00:01:23,116
+那么问题是，我们能否做得比每个用户存储N个密钥更好？
+question is can we do any better than
+storing N keys per user? And the answer is
+
+18
+00:01:23,116 --> 00:01:27,766
+有一种方法叫做在线可信任第三方
+yes. And one way to do that is what's
+called an online trusted third party. I'll
+
+19
+00:01:27,766 --> 00:01:32,356
+我将使用TTP来表示可信任第三方
+use TTP to denote that trusted third
+party. So the way we are going to use the
+
+20
+00:01:32,356 --> 00:01:37,418
+我们将以这样的方式使用可信任第三方：
+每个用户与可信任第三方共享一个单独的密钥
+trusted third party is every user will now
+share a single key with this trusted third
+
+21
+00:01:37,418 --> 00:01:42,244
+那么用户1会共享一个密钥，用户2会共享一个密钥
+party. So user one will share a secret
+key, user two will share a secret key. And
+
+22
+00:01:42,244 --> 00:01:47,431
+这是我们的朋友Alice和Bob，记他们的密钥为k_A和k_B
+here are our friends Alice and Bob, let's
+call their secret keys k sub A and k sub B.
+
+23
+00:01:48,092 --> 00:01:51,543
+现在这个设计的好处是每个用户只需
+Okay, so now the nice thing about
+this design is that now every user only
+
+24
+00:01:51,543 --> 00:01:56,619
+记住一个密钥。现在问题是
+has to remember one secret key. The
+question is now, what happens when Alice
+
+25
+00:01:56,619 --> 00:02:01,114
+当Alice想和Bob通信时，会发生什么？
+双方必须参加某个特定的协议
+wants to talk to Bob? Somehow the two of
+them have to engage in a certain protocol,
+
+26
+00:02:01,114 --> 00:02:06,857
+在协议的最后，他们会共享一个密钥K_AB
+such that at the end of this protocol they
+will have a shared secret key K_AB that the
+
+27
+00:02:06,857 --> 00:02:11,657
+而攻击者不能知道K_AB。那么问题是
+attacker wouldn't be able to know. And so
+the question is how do Alice and Bob
+
+28
+00:02:11,657 --> 00:02:16,988
+Alice和Bob如何生成这一共享密钥K_AB呢？
+我们来看一个这样一个玩具似的协议
+generate this shared secret key KAB. So
+let's look at an example toy protocol for
+
+29
+00:02:16,988 --> 00:02:22,167
+这里我们有朋友Alice和Bob。通常
+doing that. So here we have our friends
+Alice and Bob. As usual Bob has his key
+
+30
+00:02:22,167 --> 00:02:27,469
+Bob有他的密钥K_B，K_B是与可信任第三方共享的。
+Alice有她的密钥K_A
+KB, which is shared with a trusted third
+party. Alice has her secret key KA,
+
+31
+00:02:27,603 --> 00:02:30,916
+K_A也是与可信任第三方共享的。所以
+which is also shared with a trusted third
+party. So here the trusted third party
+
+32
+00:02:30,916 --> 00:02:37,355
+可信任第三方同时知道K_A和K_B。问题是，
+他们如何生成一个双方都同意的共享密钥
+has both KA and KB. And the question is,
+how do they generate a shared key that
+
+33
+00:02:37,355 --> 00:02:41,392
+但攻击者不知道这个共享密钥？
+they both agree on, but the attacker would
+have no idea what this shared key is? So
+
+34
+00:02:41,392 --> 00:02:45,233
+这里我们要看一个玩具协议。特别地
+here we're only gonna look at a toy
+protocol. In particular, this protocol is
+
+35
+00:02:45,233 --> 00:02:48,729
+这个协议对窃听是安全的
+only gonna to be secure against
+eavesdropping. It's not gonna be secure
+
+36
+00:02:48,729 --> 00:02:52,520
+它对篡改或主动攻击不安全。我说过待会我们会回来
+against more tampering or active attacks.
+As I said, we're gonna come back and
+
+37
+00:02:52,520 --> 00:02:56,459
+在稍后的课程里设计安全的密钥交换协议
+design secure key exchange protocols later
+on in the course. But for now, just to
+
+38
+00:02:56,459 --> 00:03:00,497
+但现在，只是为了引入密钥交换的想法，
+我们看这个最简单的机制
+introduce this idea of key exchange, let's
+look at the simplest, simplest mechanism
+
+39
+00:03:00,497 --> 00:03:04,535
+它对窃听是安全的。换句话说
+that's only secure against eavesdropping.
+So in other words, adversary that listens
+
+40
+00:03:04,535 --> 00:03:09,635
+攻击者监听会话也不知道共享密钥K_AB
+to the conversation won't know what
+the shared key KAB is gonna be. And so the
+
+41
+00:03:09,635 --> 00:03:13,931
+这个协议如下工作。Alice开始时会发送一条信息
+protocol works as follows. Alice is going
+to start by sending a message to the
+
+42
+00:03:13,931 --> 00:03:17,683
+给可信任第三方，说：我想要一个密钥，用于跟Bob通信
+trusted third party saying, hey I want a
+secret key that's going to be shared with
+
+43
+00:03:17,683 --> 00:03:21,779
+可信任第三方会选择
+Bob. What the trusted third party will do
+is it will actually go ahead and choose a
+
+44
+00:03:21,779 --> 00:03:26,844
+一个随机密钥K_AB。那么可信任第三方
+random secret key, KAB. So the trusted
+third party is the one who's gonna
+
+45
+00:03:26,844 --> 00:03:30,402
+生成了他们的共享密钥。它会如下处理这个密钥
+generate their shared secret key. And what
+it will do with this key is the following.
+
+46
+00:03:30,402 --> 00:03:34,909
+它会回复一条信息给Alice。这条信息包含两部分
+It's gonna send one message back to
+Alice. But this message consists of, of
+
+47
+00:03:34,909 --> 00:03:39,873
+信息的第一部分是使用Alice的密钥K_A加密的信息
+two parts. The first part of the message
+is an encryption using Alice's secret key,
+
+48
+00:03:39,873 --> 00:03:45,018
+这个密钥在Alice和Bob之间使用
+using the key KA, of the message. This key
+is supposed to be used between parties
+
+49
+00:03:45,018 --> 00:03:50,101
+她把密钥K_AB包含在这条信息里
+Alice and Bob, and she includes the secret
+key KAB inside the message. Okay? So just
+
+50
+00:03:50,101 --> 00:03:55,370
+为了清楚点，这里的被加密的信息
+to be clear, what's happening here is that
+the message that gets encrypted is the key
+
+51
+00:03:55,370 --> 00:04:00,144
+是密钥K_AB加上"这个密钥是Alice和Bob的共享密钥"这一事实
+KAB plus the fact that this key is
+supposed to be a shared key between Alice
+
+52
+00:04:00,144 --> 00:04:04,467
+这整条信息使用了Alice的密钥加密
+and Bob. Okay. And this whole message is
+encrypted using Alice's secret key. The
+
+53
+00:04:04,467 --> 00:04:08,840
+TTP发给Alice的信息的另一部分叫做票据
+other part of the message that the TTP
+sends to Alice is what's called a ticket.
+
+54
+00:04:08,840 --> 00:04:12,995
+这个票据是为Bob加密的信息
+And this ticket is basically a message
+that's encrypted for Bob. So in other
+
+55
+00:04:12,995 --> 00:04:17,150
+换句话说，这个票据是用密钥K_B加密的
+words, the ticket is gonna be an
+encryption under the key KB of, again, the
+
+56
+00:04:17,150 --> 00:04:21,138
+加密的内容依然是"这个密钥将在Alice和Bob之间使用"
+fact that this key is supposed to be used
+between Alice and Bob. And she
+
+57
+00:04:21,138 --> 00:04:26,019
+然后TTP把这个事实附在密钥K_AB后面
+concatenates to that the, the secret key,
+KAB. Okay, so again, the message that's
+
+58
+00:04:26,019 --> 00:04:31,144
+票据中加密的信息是一个事实，这个事实说
+这个密钥在Alice和Bob之间使用
+encrypted inside of the ticket is the fact
+that this key is to be used by Alice and
+
+59
+00:04:31,144 --> 00:04:35,991
+密钥K_AB也包含在票据里
+Bob. And, the secret key, KAB, is included
+in the ticket as well. Okay, So these two
+
+60
+00:04:35,991 --> 00:04:40,073
+这两条信息，让我圈出它们。这两条信息
+messages, Here, let me circle them. These
+two messages are sent from the trusted
+
+61
+00:04:40,073 --> 00:04:45,438
+由可信任第三方发送给Alice。现在我应该提一下
+third party to Alice. Now I should mention
+that the encryption system E that is
+
+62
+00:04:45,438 --> 00:04:49,365
+这里使用的加密系统E是一个CPA安全密码，
+我们待会会看到为什么需要这一要求
+actually being used here is a CPA secure
+cipher and we'll see why that's needed in
+
+63
+00:04:49,365 --> 00:04:52,973
+那么，Alice与可信任第三方的回合结束了
+just a minute. So, this is the end of the
+conversation between Alice and this
+
+64
+00:04:52,973 --> 00:04:56,190
+如我们所说，在这个会话的最后
+trusted third party. Basically as we
+said at the end of this conversation,
+
+65
+00:04:56,190 --> 00:05:00,114
+Alice收到一条为她加密的信息
+Alice receives one message that's
+encrypted for her and another message
+
+66
+00:05:00,114 --> 00:05:04,691
+另一条信息叫做票据，是为Bob加密的。
+稍后当Alice想和Bob安全通信时
+called a ticket that's encrypted for Bob.
+Now at a later time when Alice wants to
+
+67
+00:05:04,691 --> 00:05:08,586
+Alice当然会解密给她的
+communicate securely with Bob what she
+will do, is of course, she will decrypt
+
+68
+00:05:08,586 --> 00:05:12,855
+那部分信息。换句话说，她会解密用密钥K_A
+her part of the message. In other words
+she will decrypt the cipher text that was
+
+69
+00:05:12,855 --> 00:05:19,341
+加密的密文，现在Alice有了密钥K_AB。然后给Bob
+encrypted using the key KA and now she has
+the key KAB. And then to Bob, she's going
+
+70
+00:05:19,341 --> 00:05:23,240
+她把票据给Bob。Bob将收到这个票据
+to send over this ticket. Bob is going
+to receive the ticket and he is going to
+
+71
+00:05:23,240 --> 00:05:29,068
+他将使用他自己的密钥K_B来解密票据，然后他会
+use his own secret key KB to decrypt it and
+then he himself will also recover the
+
+72
+00:05:29,068 --> 00:05:34,260
+还原出密钥K_AB。那么现在他们有了共享密钥K_AB
+secret key KAB. So now they have the
+shared secret key KAB that they can use
+
+73
+00:05:34,260 --> 00:05:39,024
+他们可以使用K_AB来安全通信了。第一个问题是
+to communicate securely with one another.
+And the first question to ask is, Why is
+
+74
+00:05:39,024 --> 00:05:43,327
+为什么这个协议是安全的？即使我们只考虑窃听攻击者
+this protocol secure? Even if we only
+consider eavesdropping adversaries. So,
+
+75
+00:05:43,327 --> 00:05:46,975
+我们想一会。当我们只关心
+let's think about that for a minute. So,
+at the moment all we care about is just
+
+76
+00:05:46,975 --> 00:05:51,053
+对窃听的安全时，我们想想
+security against an eavesdropper, So let's
+think. What does an eavesdropper see in
+
+77
+00:05:51,053 --> 00:05:54,976
+窃听者在这个协议中看到两个密文
+this protocol. Well basically he sees
+these two cipher texts. Right, he sees the
+
+78
+00:05:54,976 --> 00:05:58,933
+他看到为Alice加密的密文。他看到了给Bob的票据
+cipher text that's encrypted for Alice.
+And then he sees the ticket that's
+
+79
+00:05:58,933 --> 00:06:02,685
+事实上他可以看到很多这样的信息
+encrypted for Bob. And in fact he might
+see many instances of these messages, in
+
+80
+00:06:02,685 --> 00:06:07,271
+特别是如果Alice和Bob连续地以这样的方式交换密钥
+particular if Alice and Bob continuously
+exchange keys in this way he's gonna see
+
+81
+00:06:07,271 --> 00:06:11,557
+他会看到很多这类信息，我们的目标是，
+他没有任何关于交换密钥K_AB的信息
+many messages of this type and our goal is
+to say that he has no information about
+
+82
+00:06:11,557 --> 00:06:17,088
+那么这点可由密码E,D的CPA安全性直接得到
+the exchanged key KAB. So this follows
+directly from the CPA security of the
+
+83
+00:06:17,088 --> 00:06:21,875
+因为窃听者不能真正区分
+cipher E D because the eavesdropper can't
+really distinguish between encryptions of
+
+84
+00:06:22,048 --> 00:06:26,893
+密钥K_AB的加密和某个随机字符串的加密
+the secret key KAB from encryption of just
+random junk. That's the definition of CPA
+
+85
+00:06:26,893 --> 00:06:31,614
+这是CPA安全的定义，因此攻击者不能区分密钥K_AB
+security and as a result, he can't
+distinguish the key KAB from, you know,
+
+86
+00:06:31,614 --> 00:06:35,659
+与某个随机字符串，意味着攻击者不知道K_AB
+random junk which means that he learns
+nothing about KAB. This is kind of a very
+
+87
+00:06:35,832 --> 00:06:40,561
+这是很高层次的观点了，解释了为什么对窃听是安全的
+high level argument for why this is
+eavesdropping security but it's enough for
+
+88
+00:06:40,561 --> 00:06:45,465
+达到我们这里的目标了。至少在这个协议里
+our purposes here. So the bottom line is
+that in this protocol the eavesdropper
+
+89
+00:06:45,465 --> 00:06:49,313
+窃听者实际上没有任何关于K_AB的信息
+would actually have no information about
+what KAB is. And therefore it's okay to
+
+90
+00:06:49,313 --> 00:06:55,277
+因此可以使用K_AB作为Alice和Bob之间交换信息的密钥
+use KAB as secret key to exchange messages
+between Alice and Bob. Now let's think
+
+91
+00:06:55,277 --> 00:06:59,717
+我们想一想TTP。首先，大家注意到
+about the TTP for a minute. So first of
+all, you notice that the TTP is needed for
+
+92
+00:06:59,717 --> 00:07:03,500
+对于每个密钥交换，TTP是需要的。Alice和Bob不能
+every single key exchange. So basically
+Alice and Bob simply cannot do key change
+
+93
+00:07:03,500 --> 00:07:08,016
+交换密钥，除非TTP在线并且能够帮助他们
+unless the TTP is online and available to
+help them do that. And the other property
+
+94
+00:07:08,016 --> 00:07:12,408
+这个协议的另一个性质是，事实上，TTP知道所有的会话密钥
+of this protocol is in fact, the TTP knows
+all the session keys. So if somehow the
+
+95
+00:07:12,408 --> 00:07:17,753
+如果TTP沦陷了，可能TTP被破解了，那么攻击者可以
+TTP is corrupt, or maybe it's broken into,
+then an attacker can very easily steal all
+
+96
+00:07:17,753 --> 00:07:22,471
+轻松获得所有系统中用户之间已经交换过的密钥
+the secret keys that have been exchanged
+between every user of this system. This is
+
+97
+00:07:22,471 --> 00:07:26,884
+这就是问什么TTP被叫做可信任第三方
+why this TTP is called the Trusted Third
+Party because, essentially, it knows all
+
+98
+00:07:26,884 --> 00:07:32,030
+它知道系统中所有生成的回合密钥
+the session keys that have been generated
+in the system. Nevertheless the beauty of
+
+99
+00:07:32,030 --> 00:07:36,509
+不过这个机制漂亮的一点是，它只使用对称密钥密码学
+this mechanism is that it only uses
+symmetric key cryptography, nothing beyond
+
+100
+00:07:36,509 --> 00:07:41,504
+没有用任何我们还没见过的技术，因此它是快速有效的
+what we've already seen and as a result it is
+very fast and efficient. The only issue is
+
+101
+00:07:41,504 --> 00:07:46,213
+唯一的问题是，必须使用这个在线可信任第三方，
+而且有一点还不是很清楚
+that you have to use this online trusted
+party and it's not immediately clear if for
+
+102
+00:07:46,213 --> 00:07:50,749
+例如，如果我们想在万维网中使用这个
+example we wanted to use this in the
+world wide web who would function as this
+
+103
+00:07:50,749 --> 00:07:55,165
+而万维网提供这个可信任第三方的功能。但是
+在公司设定里，这个实际上有道理
+online trusted third party. However, in a
+corporate setting this might actually make
+
+104
+00:07:55,165 --> 00:07:58,408
+如果你有一个公司和一个可信任的点
+sense if you have a single company with a
+single point of trust it might make sense
+
+105
+00:07:58,408 --> 00:08:02,681
+是可以设计一个可信任第三方的机器的
+to actually designate a machine as a
+trusted third party. And in fact a
+
+106
+00:08:02,681 --> 00:08:07,599
+事实上，像这样的机制还不完全是我描述的那样
+mechanism like this not quite as the way I
+described it, but a mechanism like this is
+
+107
+00:08:07,599 --> 00:08:11,586
+但一个像这样的机制是Kerberos系统的基础。
+那么这是我们的第一个密钥交换协议的例子
+the basis of the Kerberos system. So
+this is our first example of a key
+
+108
+00:08:11,586 --> 00:08:15,759
+允许Alice和Bob建立共享密钥
+exchange protocol that allowed Alice and
+Bob to set up shared keys, however I
+
+109
+00:08:15,759 --> 00:08:20,262
+但我很想指出，这只是一个玩具协议，非常简单
+really want to point out that this is just
+a toy protocol. Very, very simple and is
+
+110
+00:08:20,262 --> 00:08:24,545
+而且只对窃听攻击安全
+only secure against eavesdropping
+attack. It's actually completely insecure
+
+111
+00:08:24,545 --> 00:08:28,773
+对主动攻击是完全不安全的。这是一个很简单的例子
+against an active attacker. And here's a
+very simple example of how an active
+
+112
+00:08:28,773 --> 00:08:33,220
+展示了一个主动攻击者是如何破坏这个协议的，
+那么我们来看看重放攻击
+attacker might destroy this protocol, and
+so let's just look at replay attacks. So
+
+113
+00:08:33,220 --> 00:08:37,668
+设想攻击者记下了Alice和某个在线商家的会话
+here imagine the attacker records the
+conversation between Alice and some online
+
+114
+00:08:37,668 --> 00:08:42,289
+我们叫做商家Bob。例如，设想一下
+merchant. Let's call him Merchant Bob. So
+for example, imagine Alice orders a book
+
+115
+00:08:42,289 --> 00:08:47,588
+Alice从商家Bob那里订购了一本书，交易完成
+from the merchant Bob and the transaction
+completes and Bob accepts payment for this
+
+116
+00:08:47,588 --> 00:08:52,265
+Bob接收了这本书的付款，然后发给Alice一份这本书的拷贝
+book. And actually sends Alice a copy
+of this book. What an attacker can do now
+
+117
+00:08:52,265 --> 00:08:56,459
+攻击者现在完全可以记下这段会话
+is, he can complete, completely record the
+conversation and simply replay the
+
+118
+00:08:56,459 --> 00:09:00,654
+稍后向商家Bob重放这段会话，Bob就会认为
+conversation to merchant Bob at a later
+time. Bob will think that Alice just
+
+119
+00:09:00,654 --> 00:09:04,903
+Alice刚刚重新订购了这本书的另一份拷贝，
+Bob就会再收一次Alice的钱
+reordered another, another copy of the
+book and he'll charge her again for it,
+
+120
+00:09:04,903 --> 00:09:08,903
+然后发给Alice这份拷贝
+and send her this, this copy again. So
+essentially by replaying a conversation
+
+121
+00:09:08,903 --> 00:09:12,656
+所以重放会话会对Alice造成巨大危害
+you can cause quite a bit of harm to
+Alice, and as a result this is a simple
+
+122
+00:09:12,656 --> 00:09:16,557
+因此这是一个简单例子，揭示了这个协议对
+主动攻击是完全不安全的
+example of why this protocol is completely
+insecure against active attacks, and
+
+123
+00:09:16,557 --> 00:09:20,705
+在现实中永远不应该被使用的。如我所说，
+未来几周我们将回来
+should never be used in the real world. As
+I said we're going to come back in a few weeks
+
+124
+00:09:20,705 --> 00:09:24,804
+讨论这个协议的安全版本，大家会看到
+and talk about secure versions of this
+protocol, and you'll see how to make this
+
+125
+00:09:24,804 --> 00:09:29,421
+如何让这个协议在现实中正确工作。不过大家看到
+work, in the real world. Nevertheless, you
+see that this, this very simple protocol
+
+126
+00:09:29,421 --> 00:09:33,378
+这个非常简单的协议已经提出了很有趣的问题
+already raises a very interesting
+question. And the question is, can we
+
+127
+00:09:33,378 --> 00:09:37,392
+这个问题是，我们能否设计出密钥交换协议
+basically design key exchange protocols
+whether they're secure against
+
+128
+00:09:37,392 --> 00:09:41,595
+对窃听和主动攻击都保持安全呢？问题是
+eavesdropping or secure against active
+attackers. The question is, can we design
+
+129
+00:09:41,595 --> 00:09:46,549
+我们能否设计安全的密钥交换协议，
+但不需要一个在线的可信任第三方
+key exchange protocols that are secure,
+but work without an online trusted third
+
+130
+00:09:46,549 --> 00:09:50,901
+那么我们不想依赖于任何可信任第三方
+party. So we don't wanna rely on any
+online trusted party that's necessary to
+
+131
+00:09:50,901 --> 00:09:55,506
+来完成这个密钥交换协议。令人惊奇的答案是
+complete the key exchange protocol. And so
+the amazing answer is that in fact this is
+
+132
+00:09:55,506 --> 00:09:59,656
+事实上这是可能的。我们可以不需要可信任第三方
+就能交换密钥。事实上
+possible. We can do key exchange without a
+trusted third party. And this is, in fact,
+
+133
+00:09:59,656 --> 00:10:03,859
+这是公钥密码学的起点。我将为大家展示三种思路
+the starting point of public cryptography.
+So I'm gonna show you three ideas for
+
+134
+00:10:03,859 --> 00:10:08,114
+让这点可行，我们将在后面几章讨论它们的更多细节
+making this happen and we're gonna talk
+about them in much more detail in the, in
+
+135
+00:10:08,114 --> 00:10:12,419
+第一个思路是由Ralph Merkle于1974年提出的
+the coming modules. So the first idea is
+actually due to Ralph Merkle back in 1974.
+
+136
+00:10:12,419 --> 00:10:16,644
+当时他还是本科生
+This was, he was, when he was just an
+undergraduate student. And already he came
+
+137
+00:10:16,644 --> 00:10:20,924
+他就已经想出这个非常漂亮的
+不需要可信任第三方的密钥交换的想法
+up with this really nice idea for key
+exchange without an online trusted third
+
+138
+00:10:20,924 --> 00:10:24,545
+我们将看一个他的想法的例子
+party. So that's one example that
+we're gonna look at. Another example is
+
+139
+00:10:24,545 --> 00:10:28,326
+另一个例子是Diffie与Hellman于1976年提出
+due to Diffie and Hellman. Back in 1976
+they both actually, working here at
+
+140
+00:10:28,326 --> 00:10:32,641
+当时他们都在斯坦福大学，他们提出的这个想法
+开创了现代密码学的新世界
+Stanford University, came up with this idea
+that launched the world of modern key
+
+141
+00:10:32,641 --> 00:10:38,202
+第三个想法是由麻省理工的Rivest，Shamir和Adleman提出
+cryptography. And the third idea is due to
+Rivest, Shamir and Adleman working at MIT and
+
+142
+00:10:38,202 --> 00:10:42,846
+我们将看这些想法的细节
+we're going to look in detail exactly how
+each of these ideas work. But I do want to
+
+143
+00:10:42,846 --> 00:10:46,435
+但我很想提到，公共密钥管理的研究并未止步于1970年代
+mention that the work on public key
+management hasn't stopped in the late
+
+144
+00:10:46,435 --> 00:10:49,867
+事实上这些年来有很多想法被提出
+seventies. In fact there have been many
+ideas over the years and here I'll just
+
+145
+00:10:49,867 --> 00:10:53,683
+我只提过去10年间的两个想法。
+一个叫做基于身份的加密(<b><u>IBE</u></b>)
+mention two from the last decade. One is
+call identity based encryption, which is
+
+146
+00:10:53,683 --> 00:10:57,998
+这是另一种管理公钥的方法。另一种想法叫做泛函加密
+another way for managing public keys. And
+another is called functional encryption,
+
+147
+00:10:57,998 --> 00:11:03,322
+这是一种给密钥的方法，只部分解密一个给定的密文
+which is a way of giving secret keys that
+only partially decrypt a given cipher text.
+
+148
+00:11:03,330 --> 00:11:07,719
+我们将在这两周讨论公钥密码学的核心内容
+And so we're gonna talk about the core of
+public key crypto in this and the next week
+
+149
+00:11:07,719 --> 00:11:11,580
+我们在本课程稍后讨论更多高级想法的细节
+and we'll talk about these more advanced
+ideas later on in the course.

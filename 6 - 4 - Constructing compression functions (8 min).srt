@@ -1,0 +1,695 @@
+1
+00:00:00,000 --> 00:00:03,765
+本节我们的目标是构建安全压缩函数
+So our goal for this segment is to build
+secure compression functions. So
+
+2
+00:00:03,765 --> 00:00:07,736
+使得压缩函数是抗碰撞的。提醒一下
+compression functions are collision
+resistant. So just to remind you where we
+
+3
+00:00:07,736 --> 00:00:11,449
+我们看Merkle-Damgard机制里
+are we looked at this Merkle Damgard
+construction which takes a little
+
+4
+00:00:11,449 --> 00:00:15,421
+用到了一个小压缩函数，根据它构建了一个哈希函数
+compression function and builds from it a
+hash function for much, much larger
+
+5
+00:00:15,421 --> 00:00:19,702
+来处理长得多的输入。我们证明了这个可爱的定理，
+事实上，如果一个小压缩函数h是抗碰撞的
+inputs. We proved this cute theorem that
+in fact if a little compression function h
+
+6
+00:00:19,702 --> 00:00:23,725
+那么把这个h带入Merkle-Damgard机制里
+is collision resistant then plugging in
+into the Merkle Damgard construction
+
+7
+00:00:23,725 --> 00:00:27,748
+会给我们一个抗碰撞的哈希函数，来处理更长的输入
+gives us a collision resistant hash
+function for larger inputs. So now in this
+
+8
+00:00:27,748 --> 00:00:31,874
+本节我们的目标是构建一个抗碰撞的压缩函数
+segment our goal is basically to build a
+compression function that is collision
+
+9
+00:00:31,874 --> 00:00:35,785
+我们将看到一组机制
+resistant. So we're going to see a couple
+of constructions. And so the first
+
+10
+00:00:35,785 --> 00:00:39,755
+我们想到的第一个问题是，我们能否从已有的原型
+question that comes to mind is well, can
+we build compression functions from
+
+11
+00:00:39,755 --> 00:00:43,516
+来构造压缩函数呢？特别地，我们花了大量工夫
+primitives that we already have? In
+particular, we spent a lot of work to
+
+12
+00:00:43,516 --> 00:00:47,694
+来构建分组密码，问题是，我们能否从
+分组密码来构建压缩函数？
+build block cyphers and the question is
+can we build compression functions from
+
+13
+00:00:47,694 --> 00:00:51,978
+答案是肯定的，我来告诉大家怎么办
+block cyphers. And the answer is yes. And
+let me show you how to do it. So assume we
+
+14
+00:00:51,978 --> 00:00:56,157
+假设我们这里有一个特定的分组密码，用来处理N位分组
+have a certain block cypher here that
+operates on N bits blocks, so the input is
+
+15
+00:00:56,157 --> 00:01:00,335
+那么输入是N位，输出也是N位。有一个经典的机制
+an N bits, output is N bits. And then
+there's this classic construction called a
+
+16
+00:01:00,335 --> 00:01:04,600
+叫做Davies-Meyer机制，我用符号的形式写在这了
+Davies-Meyer construction which I wrote
+down in symbols here. Basically says that
+
+17
+00:01:04,600 --> 00:01:09,181
+给定信息分组和链接变量
+what you would do is, given the message
+block and the chaining variable, all we do
+
+18
+00:01:09,181 --> 00:01:13,874
+我们使用信息分组作为密钥，来加密链接变量
+is we encrypt the chaining variable using
+the message block as the key. And then we
+
+19
+00:01:13,874 --> 00:01:18,254
+然后我们在输出上再做一次异或。那么
+这可能看起来有点奇怪
+kind of do one more xor on the output. So
+this might seem a little bizarre, because
+
+20
+00:01:18,254 --> 00:01:22,356
+因为记得信息分组完全是在攻击者的控制之下
+remember the message block is something
+that's completely under the control of the
+
+21
+00:01:22,356 --> 00:01:25,963
+攻击者试图找到碰撞，这样他可以选择
+他想要的信息分组
+adversary. He's trying to find the
+collision so he can choose the message
+
+22
+00:01:25,963 --> 00:01:30,664
+我们把这个信息分组作为一个分组密码的密钥
+blocks however he wants. And yet we're
+using this message block as a key into a
+
+23
+00:01:30,664 --> 00:01:35,456
+不过，我们可以证明这个机制
+block cypher. But nevertheless, we can
+argue that this construction, at least
+
+24
+00:01:35,456 --> 00:01:40,695
+至少当E是一个理想的密码时，我们可以证明
+when E is what's called an ideal cypher,
+we can argue that this construction is in
+
+25
+00:01:40,695 --> 00:01:45,807
+这个机制事实上是抗碰撞的。让我们看这个定理
+fact as collision resistant as possible.
+So let me state the theorem. The theorem
+
+26
+00:01:45,807 --> 00:01:50,855
+这个定理是说，如果E是一个理想的分组密码
+states that, as I said, if E is an ideal
+block cypher, meaning that it's a random
+
+27
+00:01:50,855 --> 00:01:55,793
+意味着它是一个｛0,1｝^N上的随机置换的集合，
+如何置换由密钥K确定
+collection of K random permutations from
+｛0,1｝ to the N to 01 to the N. Then under
+
+28
+00:01:55,793 --> 00:02:00,160
+然后在这个E是理想的分组密码的假设下，
+事实上，找到这个压缩函数H的碰撞
+that assumption that E's an ideal block
+cypher, in fact, finding the collision for
+
+29
+00:02:00,160 --> 00:02:04,366
+需要2的N/2次方的时间。特别地
+this compression function H takes time,
+two to the N over two. In particular, we
+
+30
+00:02:04,366 --> 00:02:08,572
+我们可以证明，任何能找到碰撞的人必须
+can show that anyone who is finding
+collisions has to evaluate the encryption
+
+31
+00:02:08,572 --> 00:02:12,832
+至少花掉2的N/2次方的时间来加、解密
+and decryption functions at least 2 to
+the N over 2 times. And if you think
+
+32
+00:02:12,832 --> 00:02:17,361
+这意味着，因为这个压缩函数只有N位长
+about what that means, since the output of
+this compression function is only N bits
+
+33
+00:02:17,361 --> 00:02:21,135
+我们知道总有一个通用的生日攻击
+long, we know that there's always a
+generic birthday attack that finds
+
+34
+00:02:21,135 --> 00:02:25,557
+可以在2的N/2次方的时间里找到碰撞。
+所以这个定理是说
+collisions in time 2 to the N over 2.
+So basically this theorem says that this
+
+35
+00:02:25,557 --> 00:02:29,497
+这个抗碰撞函数确是抗碰撞的
+collision resistant function is as
+collision resistant as possible. We can
+
+36
+00:02:29,497 --> 00:02:33,332
+我们可以在2的N/2次方的时间里找到碰撞，
+通过使用生日攻击的方式
+find the collision in time 2 to the N
+over 2 using the birthday attack but
+
+37
+00:02:33,332 --> 00:02:37,411
+但没有算法可以做得比2的N/2次方更好
+there is no algorithm that will do better
+than 2 to the n over 2. So this
+
+38
+00:02:37,411 --> 00:02:41,728
+这是一个在抗碰撞哈希中很常见的压缩函数
+is actually a very common compression
+function used in collision resistance
+
+39
+00:02:41,728 --> 00:02:45,901
+事实上SHA函数都使用了Davies-Mayer机制
+hashing in fact of a SHA
+functions all used Davies-Mayer. It turns
+
+40
+00:02:45,901 --> 00:02:50,178
+实际上Davies-Mayer机制有些特别的地方
+out that there is something special about
+the Davies-Mayer construction that
+
+41
+00:02:50,178 --> 00:02:54,670
+使得该机制是抗碰撞的。如果仅仅是猜这个机制
+makes collision resistant. If you just try
+to guess the construction very likely you
+
+42
+00:02:54,670 --> 00:02:59,001
+很有可能最终得到的不是抗碰撞的压缩函数
+will end up with something that is not
+collision resistant. And so let me ask you
+
+43
+00:02:59,001 --> 00:03:03,064
+我问大家下面这个问题。假设我们如下定义了压缩函数
+the following puzzle. Suppose we actually
+define the compression function as
+
+44
+00:03:03,064 --> 00:03:07,395
+我们加密这个链接变量H，使用目前分组作为密钥
+follows, namely all we do is we encrypt
+the chaining variable H using the current
+
+45
+00:03:07,395 --> 00:03:11,352
+不同之处在于，我们不做Davies-Mayer机制里的
+message block as the key. So the
+difference is that we dropped this 'xor' H
+
+46
+00:03:11,352 --> 00:03:15,608
+这一步异或。我们干脆忽略它。当它不存在
+in Davies-Mayer, we simply ignored it. So
+it's not there. And the puzzle for you
+
+47
+00:03:15,608 --> 00:03:19,976
+给大家的问题是，求证这个压缩函数不是抗碰撞的
+is show me that this compression function
+then is actually not collision resistant.
+
+48
+00:03:19,976 --> 00:03:24,133
+我们看，我们试图构建一个碰撞，即一对不同的
+So, let's see, so we're trying to build a
+collision, namely a distinct pair of HM
+
+49
+00:03:24,133 --> 00:03:28,554
+M和M'能在这个函数H下发生碰撞
+and H' M' that happen to collide
+under this later function H. And my
+
+50
+00:03:28,554 --> 00:03:32,974
+我的问题是怎么构造这个碰撞？我将告诉大家
+question to you is how would you do it? So
+I'm already going to tell you that you're
+
+51
+00:03:32,974 --> 00:03:37,013
+选择任意的H,M和M'。唯一的要求是
+going to choose H, M, and M'
+arbitrarily. The only requirement is that
+
+52
+00:03:37,013 --> 00:03:41,766
+M与M'不同。然后我的问题是，如何构建H'
+M and M' are distinct. And then my
+question is, how would you construct an H'
+
+53
+00:03:41,766 --> 00:03:47,534
+可以找出碰撞？答案是，我们首先选择
+that would cause a collision to pop
+out? So the answer is the first choice and
+
+54
+00:03:47,534 --> 00:03:53,200
+一个简单的方法来解释之。如果我们使用加密函数
+an easy way to see it is if we apply the
+encryption function using M' to both
+
+55
+00:03:53,200 --> 00:03:57,994
+对两边进行加密，以M'为密钥。然后我们得到了
+H'用E和密钥M'加密的结果
+sides. Then we get that this is basically
+E of M' applied to H', right.
+
+56
+00:03:57,994 --> 00:04:02,978
+这是我们以M'为密钥通过加密左边获得的
+this is what we get by applying encryption
+using M' to the left hand side. And
+
+57
+00:04:02,978 --> 00:04:07,482
+如果我们以M'为密钥，加密右边
+if we apply encryption using M' to
+the right hand side, the decryption
+
+58
+00:04:07,482 --> 00:04:12,287
+解密操作会被抵消，只剩下M的加密结果
+operator cancels out and we simply are
+left with the encryption of M, H, which is
+
+59
+00:04:12,287 --> 00:04:16,729
+即为我们想找的碰撞。大家可以看到
+exactly the collision that we wanted to
+find. So there. You can see that it's
+
+60
+00:04:16,729 --> 00:04:21,441
+这里使用了解密函数D，容易为压缩函数构建碰撞
+basically by using the decryption function
+D, it's very easy to build collisions for
+
+61
+00:04:21,441 --> 00:04:25,720
+现在我应该告诉大家，事实上Davies-Meyer
+this compression function. Now I should
+tell you that in fact Davies-Meyer is not
+
+62
+00:04:25,720 --> 00:04:29,771
+不是唯一的。还有其他方法可以根据分组密码，
+构建抗碰撞的压缩函数
+unique. There are other ways to build
+collision resistant compression functions
+
+63
+00:04:29,771 --> 00:04:33,976
+例如，有Miyaguchi-Preneel方法
+from block ciphers. For example, here's a
+method called Miyaguchi Preneel. Miyaguchi
+
+64
+00:04:33,976 --> 00:04:38,079
+Miyaguchi-Preneel方法在WHIRLPOOL哈希函数中
+有所使用，我们之前也是看到过WHIRLPOOL
+Preneel actually is used in WHIRLPOOL hash
+function that we saw earlier. Here is
+
+65
+00:04:38,079 --> 00:04:42,387
+这是另一种方法，可以得到一个抗碰撞的压缩函数
+another method that happens to result in a
+collision resistant compression function.
+
+66
+00:04:42,387 --> 00:04:46,182
+有12种变体，就像这样玩弄各种异或
+And there are twelve variants like this
+playing with XORs and placing the
+
+67
+00:04:46,182 --> 00:04:50,028
+以及把变量放在不同位置等手段，都可以
+得到一个抗碰撞的机制
+variables in different slots that will
+actually give a collision resistant
+
+68
+00:04:50,028 --> 00:04:53,874
+但也有许多类似的变体，就像我们在上一问题里
+mechanism. But there are also many, many
+variants of this like we saw in the
+
+69
+00:04:53,874 --> 00:04:57,647
+所看到的，并不是抗碰撞的。这是另一个例子
+previous puzzle that are not collision
+resistant. So here's. Another example,
+
+70
+00:04:57,647 --> 00:05:01,477
+它不是抗碰撞的。我将把它留为家庭作业
+that's not collision resistant. And I'm
+gonna leave it as a homework problem to
+
+71
+00:05:01,477 --> 00:05:04,949
+来解出这个机制的一个碰撞
+figure out a collision for this
+construction. So now, basically, we have
+
+72
+00:05:04,949 --> 00:05:09,110
+现在，对于描述SHA-256哈希函数来说，我们万事俱备了
+all the ingredients to describe the
+SHA-256 hash function. I'll tell
+
+73
+00:05:09,110 --> 00:05:13,218
+我会告诉大家，SHA-256是Merkel-Damgard机制
+you that it's a Merkel-Damgard
+construction, exactly as the one that we
+
+74
+00:05:13,218 --> 00:05:17,051
+我们之前看过Merkel-Damgard机制。SHA-256
+还使用了Davies-Mayer压缩函数
+saw before. It uses a Davies-Mayer
+compression function. And so the only
+
+75
+00:05:17,051 --> 00:05:21,322
+唯一的问题是，Davies-Mayer的底层分组密码是什么？
+question is, what's the underlying block
+cipher for Davies-Mayer? And that block
+
+76
+00:05:21,322 --> 00:05:26,236
+这个分组密码叫做SHACAL-2。我会告诉大家它的参数
+cipher is called SHACAL-2. And I'll
+just tell you its parameters. It uses a
+
+77
+00:05:26,236 --> 00:05:31,498
+它使用了512位密钥。记得密钥是从信息分组里提取的
+512 bit key. And remember the key is taken
+from the message block. So, this is really
+
+78
+00:05:31,688 --> 00:05:36,443
+这是信息分组。它刚好是512位
+what the message block is. And it so
+happens to be 512 bits. Which means the
+
+79
+00:05:36,443 --> 00:05:41,452
+意味着SHA-256一次会处理它的512位输入信息
+SHA-256 will process its input
+message 512 bits at a time. And in the
+
+80
+00:05:41,452 --> 00:05:46,270
+这个分组密码的分组大小是256位。
+然后这些是链接变量
+block size, for this block cipher is
+256 bits. And these are the chaining variable.
+
+81
+00:05:46,270 --> 00:05:51,469
+这是H_i-1。这应该是连续的链接变量
+So this would be H i-1.
+And this would be successive chaining variable.
+
+82
+00:05:51,469 --> 00:05:55,896
+现在大家有了对SHA-256工作的完整理解
+So now you have a complete
+understanding of how SHA-256 works.
+
+83
+00:05:55,896 --> 00:05:59,635
+我这里不描述SHACAL-2密码的内容
+Module of this cipher SHACAL-2 I'm not going to describe here.
+
+84
+00:05:59,789 --> 00:06:04,560
+如我所说，一类压缩函数是由分组密码构建
+So as I said, one class of compression functions is built from block cyphers. It turns out there's another class of
+
+85
+00:06:04,560 --> 00:06:09,032
+还有一类压缩函数是由数论里的困难问题构建的
+compression functions that's built using
+hard problems from number theory, and I
+
+86
+00:06:09,032 --> 00:06:13,530
+我想非常简要地给大家一个例子。
+我们说这些压缩函数是可证实的
+want to very briefly show you one example.
+And we call these compression functions
+
+87
+00:06:13,530 --> 00:06:17,616
+因为如果你可以找到这种压缩函数的碰撞
+provable because if you can find the
+collision on this compression function
+
+88
+00:06:17,616 --> 00:06:21,971
+那么你就可以解决非常困难的理论问题
+then you're going to be able to solve a
+very hard number theoretic problem which
+
+89
+00:06:21,971 --> 00:06:26,165
+一般这类问题是难解的。因此，如果数论问题是难解的
+is believed to be intractable. And as a
+result, if the number theory problem is
+
+90
+00:06:26,165 --> 00:06:29,982
+得到的压缩函数可被证实是抗碰撞的
+intractable, the resulting compression
+function is provably a collision
+
+91
+00:06:29,982 --> 00:06:34,337
+这是这个压缩函数的工作过程
+resistant. So here's how this compression
+function works. Basically we're going to
+
+92
+00:06:34,337 --> 00:06:38,692
+我们选取一个大质数，这是一个非常大的质数，
+约700个十进制数，2000位二进制数
+choose a large prime piece, so this is a
+gigantic prime, something like 700 digits,
+
+93
+00:06:38,692 --> 00:06:42,832
+我们选择两个随机数U和V
+2,000 bits. And then we're going to
+choose two random values, U and V, between
+
+94
+00:06:42,832 --> 00:06:47,118
+在1到P之间。现在如下定义压缩函数
+one and P. And now let's define the
+compression function as follows. It takes
+
+95
+00:06:47,118 --> 00:06:51,775
+它在0和P-1之间取两个数，输出0和P-1之间的一个数
+two numbers between 0, and p-1,
+and it's gonna output one number between
+
+96
+00:06:51,775 --> 00:06:56,236
+那么其压缩率为2比1
+0, and  p-1. So it's compression
+ratio is 2 to 1. And takes two
+
+97
+00:06:56,236 --> 00:07:00,349
+取两个数，输出一个数。在从0到P-1的范围里
+numbers. And outputs one number. In the
+range 0 to p-1.
+
+98
+00:07:00,349 --> 00:07:07,180
+然后计算双重指数，计算U的H次方乘以V的N次方
+And it does it basically by computing double exponentiation. It
+computes u to the H times v to the n.
+
+99
+00:07:07,180 --> 00:07:11,084
+现在这个定理表述为一个事实
+And the theorem, which, right now, I'm just
+gonna state as a fact. This fact actually
+
+100
+00:07:11,084 --> 00:07:15,238
+事实上，这是很直接就能证明的。我们以后再看
+turns out to be fairly straightforward to
+prove, and we're gonna do it later on when
+
+101
+00:07:15,238 --> 00:07:19,343
+当我们讲到本课程的数论部分时再说
+we get to the number theoretic part of the
+course. The fact is, that if you can find
+
+102
+00:07:19,343 --> 00:07:23,247
+事实上，如果你可以找到这个压缩函数的一个碰撞，
+那么你就可以解一个标准的数论难题
+a collision for this compression function,
+then you can solve a standard hard
+
+103
+00:07:23,247 --> 00:07:27,541
+叫做离散对数问题。所有人都相信
+problem in number theory called a discreet
+log problem. Everyone believes discrete
+
+104
+00:07:27,541 --> 00:07:31,881
+离散对数问题是困难的，因此这个压缩函数
+log is hard, and as a result, this
+compression function is provably collision
+
+105
+00:07:31,881 --> 00:07:36,335
+可证实是抗碰撞的。那么大家可能会问，
+为什么在实际中，人们不使用这种压缩函数呢？
+resistant. So you might ask me why do
+people not use this compression function
+
+106
+00:07:36,335 --> 00:07:40,845
+为什么SHA-256不用它？
+in practice. Why would we not use this for
+SHA-256? And the answer is that this
+
+107
+00:07:40,845 --> 00:07:45,470
+答案是与分组密码相比，这个压缩函数速度太慢了
+gives very slow performance in comparison
+to what you get from a block cipher. So
+
+108
+00:07:45,470 --> 00:07:49,410
+所以它在实际的压缩函数中不被使用
+this is not really used for any
+compression functions. However, if for
+
+109
+00:07:49,410 --> 00:07:53,778
+但是，如果出于某些原因，你就是想用它
+来算MAC或签名，对于一段长信息
+some reason you really only want to, say,
+MAC or sign. Just one long message, and
+
+110
+00:07:53,778 --> 00:07:57,544
+你需要花上一天时间来完成计算，然后
+当然你也可以使用它的
+you have a whole day to do it, then
+certainly you can use this type of
+
+111
+00:07:57,544 --> 00:08:02,064
+虽然它很慢，但你可以获得可证实是抗碰撞的函数
+compression function. And even though it's
+slow, you'll get something that's provably
+
+112
+00:08:02,064 --> 00:08:05,714
+本节完结，现在我们准备讨论HMAC了
+collision resistant. Okay, so that's the
+end of this segment. And now we're finally
+
+113
+00:08:05,714 --> 00:08:08,542
+下节开始讲HMAC
+ready to talk about HMAC, which we're
+gonna do in the next segments.

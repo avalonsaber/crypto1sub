@@ -1,0 +1,1289 @@
+1
+00:00:00,000 --> 00:00:04,059
+前面两节中，我们讨论了CBC-MAC和NMAC
+In the last two segments we talked about
+the CBC-MAC and NMAC to convert a PRF for
+
+2
+00:00:04,059 --> 00:00:08,096
+将一个处理短信息的PRF转换成一个处理长信息的PRF
+small messages into a PRF for much larger
+messages. Those two constructions were
+
+3
+00:00:08,096 --> 00:00:13,045
+这两个MAC机制是串行的，意思是即使你有多个处理器
+sequential, in the sense that if you had
+multiple processors you couldn't make the
+
+4
+00:00:13,045 --> 00:00:17,082
+你也不能让它们工作的更快。本节我们看一种并行MAC
+construction work any faster. In this
+segment we're gonna look at a parallel MAC
+
+5
+00:00:17,082 --> 00:00:21,065
+也是把一个小PRF转成了大PRF
+that also converts a small PRF into a
+large PRF, but does it in a very
+
+6
+00:00:21,065 --> 00:00:26,014
+不过是可并行的。特别地，我们将看到一种并行的MAC机制
+parallelizable fashion. In particular we're
+gonna look at a parallel MAC construction
+
+7
+00:00:26,014 --> 00:00:30,029
+叫做PMAC，它使用了一个底层PRF，来构建一个PRF
+called PMAC, that uses an underlying PRF
+to construct a PRF for much larger
+
+8
+00:00:30,029 --> 00:00:34,062
+去处理长得多的信息。特别地，这个PRF可以处理长得多
+messages. In particular, the PRF can
+process much longer messages that can have
+
+9
+00:00:34,062 --> 00:00:39,007
+具有可变长度、最多L个分组的信息
+variable length and have as many as L
+blocks in them. Now the construction works
+
+10
+00:00:39,007 --> 00:00:43,032
+这个机制如下工作。我们取信息，把它分成若干分组
+as follows. We take our message and we
+break it into blocks. And then we process
+
+11
+00:00:43,032 --> 00:00:47,075
+然后我们独立地处理各个分组。首先，我们计算
+each block independently of the other. So,
+the first thing we do, is we evaluate some
+
+12
+00:00:47,075 --> 00:00:52,003
+某个函数P并将结果与第一个分组异或
+function P and we XOR the result
+into the first message block, and then we
+
+13
+00:00:52,003 --> 00:00:56,052
+然后我们运用函数F，使用密钥k1。
+我们对每个分组都做同样的事情
+apply our function F using a key k1.
+We do the same for each one of the
+
+14
+00:00:56,052 --> 00:01:01,000
+大家注意，我们可以并行地处理
+message blocks and you notice that we can
+do it all parallel, all message blocks are
+
+15
+00:01:01,000 --> 00:01:05,038
+所有分组被独立地处理。我们收集来所有的结果
+processed independently of one another.
+And we collect all these results into some
+
+16
+00:01:05,038 --> 00:01:09,064
+然后异或起来，然后再加密一次，就得到了最后的标签
+final XOR and then we encrypt one more time
+to get the final tag value. Now for a
+
+17
+00:01:09,064 --> 00:01:13,074
+由于技术原因，在最后一个分组上，我们不需要
+technical reason, actually on the very
+last one. We actually don't need to apply
+
+18
+00:01:13,074 --> 00:01:17,074
+使用PRF F了。如我所说，这是由于技术原因
+the PRF F, but as I said, this is just
+for technical reason, and I'm going to
+
+19
+00:01:17,074 --> 00:01:21,084
+我这里先不讲。现在我想解释一下这个函数P是干什么的
+ignore that for now. Now, I want to
+explain what the function P is for and
+
+20
+00:01:21,084 --> 00:01:26,028
+设想一下，如果函数P不在这
+what it does. So imagine, just for a
+second, that the function P isn't actually
+
+21
+00:01:26,028 --> 00:01:30,067
+我们想像一下，直接把每条信息输入PRF
+there. That is, imagine we actually,
+directly feed each message block into the
+
+22
+00:01:30,067 --> 00:01:34,062
+不进行任何处理。那么我说
+PRF without applying any other
+processing to it. Then I claim that the
+
+23
+00:01:34,062 --> 00:01:38,087
+得到的MAC是完全不安全的，原因是
+resulting MAC is completely insecure and
+the reason is essentially no order is
+
+24
+00:01:38,087 --> 00:01:43,012
+各个分组之间没有加入先后顺序。
+特别地，如果我交换两个分组
+enforced between the message blocks. In
+particular, if I swap two message blocks,
+
+25
+00:01:43,012 --> 00:01:47,052
+将不会改变最后标签的值。因为异或是可交换的
+that doesn't change the value of the final
+tag. Because the XOR is commutative, the
+
+26
+00:01:47,052 --> 00:01:51,077
+无论我们是否交换分组，标签值都是一样的
+tag will be the same whether we swap the
+blocks or not. As a result, an attacker
+
+27
+00:01:51,077 --> 00:01:56,001
+因此攻击者可以请求一个特定信息的标签
+can request the tag for a particular
+message, and then he obtains the tag for a
+
+28
+00:01:56,001 --> 00:02:00,021
+然后他获得了将其中两分组交换后的信息的标签
+message where two of the blocks are
+swapped and that counts as an existential
+
+29
+00:02:00,021 --> 00:02:04,061
+这也算存在性伪造。这个函数P试图为这些分组加入顺序
+forgery. So what this function P tries to
+do is essentially enforce order on these
+
+30
+00:02:04,061 --> 00:02:08,079
+首先大家注意到，这个函数P是个带密钥的函数
+blocks. And you notice that the function
+takes, first of all, it's a keyed function,
+
+31
+00:02:08,079 --> 00:02:13,008
+他取密钥为输入。其次，更为重要的
+so it takes a key as input. And second of
+all, more importantly, it takes the block
+
+32
+00:02:13,008 --> 00:02:17,000
+它取分组序数为输入。换句话说，函数的这个输入
+number as input. In other words, the
+value of the function is different for
+
+33
+00:02:17,000 --> 00:02:20,087
+每个分组都不相同。这就是用来阻止
+each one of the blocks. And that's
+actually exactly what's preventing this,
+
+34
+00:02:21,002 --> 00:02:25,006
+分组交换攻击的。函数P其实是一个非常容易计算的函数
+blocks swapping attack. So the function P
+actually, is a very easy to compute
+
+35
+00:02:25,006 --> 00:02:29,013
+给了密钥和分组序号
+function. Essentially given the key and
+the message block, all it is, is just a
+
+36
+00:02:29,013 --> 00:02:33,019
+P只是进行了某个有限域上的乘法。所以
+这是个非常容易计算的函数
+multiplication in some finite fields. So
+it's a very, very simple function to
+
+37
+00:02:33,019 --> 00:02:36,094
+对于PMAC的运行时间开销很小
+compute. It adds very little to the
+running time of PMAC. And yet, it's
+
+38
+00:02:36,094 --> 00:02:40,097
+这也足以保证PMAC的安全性。我们说过
+enough in ensure that the PMAC is
+actually secure. As we've said, the key
+
+39
+00:02:40,097 --> 00:02:45,082
+PMAC的密钥是一对密钥，一个密钥是给PRF的
+另一个密钥是给这个掩码函数P的
+for PMAC is this pair of keys. One key for
+the PRF, and one key for this masking
+
+40
+00:02:45,082 --> 00:02:50,014
+最后我会告诉大家，如果信息长度不是
+function P. And finally, I'll tell you
+that if the message length is not a
+
+41
+00:02:50,014 --> 00:02:54,076
+分组长度的倍数，也就是最后一个分组
+multiple of the block length. That is,
+imagine the last block is shorter than
+
+42
+00:02:54,076 --> 00:02:59,088
+比满分组长度短，那么PMAC实际上使用了一个
+与CMAC类似的补齐方法
+full block length, then PMAC actually uses
+a padding that's similar to CMAC, so that
+
+43
+00:02:59,088 --> 00:03:04,004
+这样是不需要加假的分组的
+there is no need for an additional dummy
+block, ever. So that's the PMAC
+
+44
+00:03:04,004 --> 00:03:08,026
+这时PMAC的构建，与往常一样，我们看它的安全性定理
+construction and as usual, we can state
+its security theorem. So the security
+
+45
+00:03:08,026 --> 00:03:12,071
+大家应该习惯这种安全性定理了。
+这个定理说，如果给我
+theorem, by now, you should be used to it.
+Essentially, it says that if you give me
+
+46
+00:03:12,071 --> 00:03:16,071
+一个攻击PMAC的攻击者，我可以构建另一个
+an adversary attacking PMAC, I can
+construct an adversary attacking the
+
+47
+00:03:16,071 --> 00:03:21,003
+攻击底层PRF的攻击者，加上另一个误差项
+underlying PRF. Plus an additional error
+term. And so, since again, the PRF is
+
+48
+00:03:21,003 --> 00:03:25,056
+由于这个PRF是安全的，我们知道这一项是可忽略的
+如果我们希望这一项是可忽略的
+secure, we know that this term is
+negligible. And so if we want this term to
+
+49
+00:03:25,056 --> 00:03:30,063
+我们需要这一误差项也是可忽略的
+be negligible, we know that, we need this
+error term to also be negligible. Here, as
+
+50
+00:03:30,063 --> 00:03:35,040
+与往常一样，q是使用一个密钥计算MAC的信息数
+usual, q is the number of messages that
+are MAC-ed using a particular key. And L
+
+51
+00:03:35,040 --> 00:03:39,093
+L是所有这些信息的最大长度。PMAC是安全的
+is the maximum length of all those
+messages. And PMAC is secure, as long as
+
+52
+00:03:39,093 --> 00:03:44,082
+只要它的乘积小于分组大小的平方根。对于AES
+its product is less than the square root
+of the block size. So for AES, this would be
+
+53
+00:03:44,082 --> 00:03:49,028
+分组大小是2的128次方，其平方根是2的64次方
+two to the 128, and the square root,
+therefore, would be two to the 64th. So the
+
+54
+00:03:49,028 --> 00:03:53,044
+这个MAC将是安全的，只要q乘以L小于2的64次方
+MAC would be secure, as long as Q times L
+is less than two to the 64th. And every time,
+
+55
+00:03:53,044 --> 00:03:57,025
+每次当它接近这个值时，你当然必须更换密钥
+as it gets closer to that value, of
+course, you would have to change the key
+
+56
+00:03:57,025 --> 00:04:01,010
+为了计算更多信息的MAC。这里主要记住一点
+in order to continue MAC-ing more
+messages. So the main thing to remember is
+
+57
+00:04:01,010 --> 00:04:05,041
+PMAC也给了我们一个PRF，当它独立地处理这些信息分组时
+that PMAC also gives us a PRF, and when it
+processes the message blocks independently
+
+58
+00:04:05,041 --> 00:04:10,033
+PMAC也有个非常有趣的性质
+of one another. Turns out that PMAC also
+has a very interesting property. Namely,
+
+59
+00:04:10,033 --> 00:04:15,056
+PMAC的数学是增长的。我来为大家解释一下什么意思
+that PMAC math is incremental. So let me
+explain to you what that means. So suppose
+
+60
+00:04:15,056 --> 00:04:20,055
+假设用来构建PMAC的函数F不仅是PRF
+the function F that's used to construct PMAC
+is not just a PRF, but, in fact, a
+
+61
+00:04:20,055 --> 00:04:25,025
+而且而是PRP，那么我们能在需要时求F的逆
+permutation, PRP. So we can actually
+invert it when we need to. Now suppose
+
+62
+00:04:25,025 --> 00:04:30,008
+现在假设我们已计算长信息m的MAC
+we've already computed the MAC for a
+particularly long message m. And now,
+
+63
+00:04:30,008 --> 00:04:34,059
+假设这个长信息的一个分组发生了变化
+suppose just one message block of this
+long message changes. So here, m[1] has
+
+64
+00:04:34,059 --> 00:04:38,099
+这里m[i]变成了m'[1]，但其他分组不变
+changed into m'[1]. But the
+remaining message blocks all remain the
+
+65
+00:04:38,099 --> 00:04:43,081
+对于其他MAC机制，比如CBC-MAC，即使只有一个分组变化了
+same. For other MAC-s, like CBC-MAC, even
+though only one message block changed, you
+
+66
+00:04:43,081 --> 00:04:48,027
+你还是需要重新计算整个信息的标签
+would have to recompute the tag on the
+entire message. Recomputing the tag
+
+67
+00:04:48,027 --> 00:04:52,073
+重新计算标签需要的时间与信息长度成正比
+basically will take time that's
+proportional to the length of the message.
+
+68
+00:04:52,073 --> 00:04:57,012
+实际上用PMAC，如果我们只变化一个分组
+It turns out, with PMAC, if we only
+change one block, or a small number of
+
+69
+00:04:57,012 --> 00:05:01,088
+或是很少的分组，我们可以很快就完成标签的重新计算
+blocks, actually, we can recompute the
+value of the tag for the new message very,
+
+70
+00:05:01,088 --> 00:05:05,074
+让我考一考大家，看看你能不能想到办法
+very quickly. And let me ask you a puzzle
+to see if you can figure out how to do
+
+71
+00:05:05,074 --> 00:05:09,036
+记住函数F是PRP，所以是可逆的
+that yourself. And remember, the function
+F is a PRP, and therefore is invertible.
+
+72
+00:05:09,036 --> 00:05:13,002
+我们看，你能否自己想出如何计算新信息的MAC
+So let's see if you can figure out how to
+compute the MAC in the new message by
+
+73
+00:05:13,002 --> 00:05:16,087
+这是可以的。你可以很快重新计算
+yourself. So it turns out this can be
+done. And you can quickly recompute the
+
+74
+00:05:16,087 --> 00:05:20,093
+新信息的标签，通过使用这里的第三行。
+为确保我们都能理解这个答案
+tag on the new message using this third
+line here. Just to make sure we all see
+
+75
+00:05:20,093 --> 00:05:25,024
+我们简单回顾一下PMAC的最初图表
+the solution, let's quickly go back to the
+original diagram for PMAC and I can show
+
+76
+00:05:25,024 --> 00:05:29,004
+我能展示我的意思。那么想象这个信息分组
+you what I mean. So imagine this one
+message block changed into some other
+
+77
+00:05:29,004 --> 00:05:33,066
+变成了某个其他分组，即M'[1]。然后我们就可以
+block, say, it changed into M'[1]. Then
+what we could do is we can take the tag on
+
+78
+00:05:33,066 --> 00:05:38,060
+取改变前原信息的标签，我们可以求函数F的逆
+the original message before the change was
+made. So we can invert the function F, and
+
+79
+00:05:38,060 --> 00:05:43,036
+确定应用函数F之前的值。现在由于我们有了
+determine the value before the function F
+was applied. Now, well, since we now have
+
+80
+00:05:43,036 --> 00:05:48,006
+这些分组的异或值，我们可以抵消掉
+an XOR of a bunch of blocks, what
+we can do is we can cancel out the XOR
+
+81
+00:05:48,006 --> 00:05:53,033
+来自原分组的异或部分，通过将这个值
+that came from the original message block,
+basically by XOR-ing this value that came
+
+82
+00:05:53,033 --> 00:05:58,068
+与原信息分组传到这个异或加法器的值进行异或
+from the original message block into this
+XOR-ed accumulator. And then XOR-ing again
+
+83
+00:05:58,087 --> 00:06:03,046
+再异或来自新分组传到这个异或加法器的值
+the value that would come from the new
+message block back into the XOR
+
+84
+00:06:03,046 --> 00:06:08,064
+然后再应用函数F，就得到新信息的标签
+accumulator. And then apply the function F
+again. And that will give us the tag for
+
+85
+00:06:08,064 --> 00:06:13,090
+只改变了一个分组。用符号的话
+the new message, where just one block was
+changed. So in symbols, basically, I wrote
+
+86
+00:06:13,090 --> 00:06:18,060
+我把公式写在这了。大家可以看到，我们对标签进行解密
+the formula over here. You can see,
+basically, we decrypt the tag, and then we
+
+87
+00:06:18,060 --> 00:06:23,092
+然后我们把结果与这个来自原分组的值进行异或
+XOR with the block that comes from the
+original message block. We XOR again with
+(这里第一个block并非分组)
+
+88
+00:06:23,092 --> 00:06:28,099
+再把结果与来自新分组的值进行异或
+the block that comes from the new message
+block. And then we re-encrypt the final
+
+89
+00:06:28,099 --> 00:06:33,089
+然后我们重新加密最后这个异或加法器的输出
+以获得新信息的标签，只改变一个分组
+XOR accumulator to get the new tag for the
+message with a one block changed. So
+
+90
+00:06:33,089 --> 00:06:37,047
+这是个美观的性质。这证明了如果你有很长的信息
+that's kind of a neat property. It kind of
+shows that if you have very large
+
+91
+00:06:37,047 --> 00:06:41,030
+你可以很快地更新标签。当然你需要密钥
+messages, you can very quickly update the
+tag. Of course you would need the secret
+
+92
+00:06:41,030 --> 00:06:45,017
+来完成更新，但你可以快速更新标签，
+如果仅有少量分组被改变了
+key to do the update, but you can quickly
+update the tag if just a small number of
+
+93
+00:06:45,017 --> 00:06:49,013
+好的，我们的PMAC讨论到此为止
+message blocks changed. Okay, so that
+concludes our discussion of PMAC. And now
+
+94
+00:06:49,013 --> 00:06:53,031
+现在我想换一点话题，讨论一次性MAC的概念
+I wanna switch topics a little bit, and
+talk about the concept of a one time MAC,
+
+95
+00:06:53,031 --> 00:06:57,050
+这与一次性密码本类似，但是是关于完整性的
+which is basically the analog of the one
+time pad, but in the world of integrity.
+
+96
+00:06:57,050 --> 00:07:02,007
+那么我解释一下我的意思。想像一下，我们构建了一个MAC
+So let me explain what I mean by that. So
+imagine we wanna build a MAC that is only
+
+97
+00:07:02,007 --> 00:07:06,065
+它只用于单个信息的完整性。换句话说，每次计算
+used for integrity of a single message. In
+other words, every time we compute the
+
+98
+00:07:06,065 --> 00:07:11,028
+特定信息的完整性，我们也要改变密钥
+integrity of a particular message, we also
+change the key. So that any particular key
+
+99
+00:07:11,028 --> 00:07:15,081
+任何密钥只能用于一条信息的完整性。然后
+我们可以定义安全性游戏
+is used only for integrity of one message.
+Then we can define the security game as
+
+100
+00:07:15,081 --> 00:07:20,033
+就是说攻击者看一条信息。所以
+basically saying, the attacker's gonna see
+one message. Therefore, we only allow him
+
+101
+00:07:20,033 --> 00:07:24,063
+我们只允许他做一次选择信息攻击。那么
+他提交一个信息的询问
+to do one chosen message attack. So he
+gets to submit one message query, and he
+
+102
+00:07:24,063 --> 00:07:29,005
+他得到了这个询问信息对应的标签。现在
+is given the tag corresponding to that one
+message query. And now his goal is to
+
+103
+00:07:29,005 --> 00:07:33,014
+攻击者的目标是伪造一对信息-标签。好
+大家可以看到它的目标是产生
+forge a message tag pair. Okay, so you
+can see his goal was to produce one
+
+104
+00:07:33,014 --> 00:07:37,058
+一个信息-标签对，可以正确验证的，并且与
+攻击者得到的信息-标签对不一样的
+message tag pair that verifies correctly and
+is different from the pair that he was
+
+105
+00:07:37,058 --> 00:07:41,079
+我们会看到，就像一次性密码本和流密码那样非常有用
+actually given. As we'll see, just like
+the one time pad and stream ciphers were
+
+106
+00:07:41,079 --> 00:07:45,077
+一次性MAC对同样的应用也是很有用的
+quite useful, it turns out one time MAC-s
+are also quite useful for the same
+
+107
+00:07:45,077 --> 00:07:50,023
+当我们只想使用一个密钥，为单条信息
+提供加密或完整性
+applications when we only wanna use a key
+to encrypt or to provide integrity for
+
+108
+00:07:50,023 --> 00:07:54,030
+通常，我们说一次性MAC是安全的
+just a single message. So as usual we
+would say that a one time MAC is secure,
+
+109
+00:07:54,030 --> 00:07:58,042
+因为没有攻击者可以赢得这场游戏。现在有趣的是
+because basically no adversary can win
+this game. Now the interesting thing is
+
+110
+00:07:58,042 --> 00:08:02,060
+一次性MAC就像一次性密码本一样，
+对无限强力的攻击者都是安全的
+that one time MAC-s, just like the one time
+pad can be secure against infinitely
+
+111
+00:08:02,060 --> 00:08:06,093
+不仅如此，因为它们是只为一次性使用设计的
+powerful adversaries. And not only that,
+because they're only designed to be secure
+
+112
+00:08:06,093 --> 00:08:11,000
+它们可以比基于PRF的MAC更快
+for one time use, they can actually be
+faster than MAC-s that are based on PRFs.
+
+113
+00:08:11,000 --> 00:08:15,017
+我只想给大家一个一次性MAC的简单例子
+And so I just wanted to give you a quick
+example of one one time MAC, this is a
+
+114
+00:08:15,017 --> 00:08:19,042
+这是一个一次性MAC的经典机制，我来展示它的工作过程
+classic construction for a one time MAC,
+let me show you how it works. The first
+
+115
+00:08:19,042 --> 00:08:24,025
+首先，选取一个比分组大小略大的质数
+step is to pick a prime that's slightly
+larger than our block size. In this case
+
+116
+00:08:24,025 --> 00:08:29,002
+当我们使用128位分组时，我们选的第一个质数
+we're going to use 128-bit blocks, so
+let's pick the first prime that's bigger
+
+117
+00:08:29,002 --> 00:08:33,091
+大于2的128次方。质数选为2的128次方加51
+than two to the 128th. This happens to be
+two to the 128th plus 51. And now the key
+
+118
+00:08:33,091 --> 00:08:38,081
+现在这个密钥是一对随机数，它们的取值范围
+从1到我们选的质数，从1到q
+is going to be a pair of random numbers in
+the range 1 to our prime, so 1 to q. So we
+
+119
+00:08:38,081 --> 00:08:43,046
+我们选了两个随机数，范围从1到q。现在我们有了一个信息
+choose two random integers in the range 1
+to q. Now we're given a message so we're
+
+120
+00:08:43,046 --> 00:08:47,052
+我们取信息，把它分成若干分组，每个分组128位
+going to take our message and break it
+into blocks where each block is 128 bits,
+
+121
+00:08:47,052 --> 00:08:51,073
+我们把每个分组里的数视为整数，范围从0
+and we're going to regard each number as
+an integer in the range 0 to 2 to the
+
+122
+00:08:51,073 --> 00:08:55,089
+到2的128次方减一。现在MAC如下定义。首先
+128th minus 1. Now the MAC is defined as
+follows. The first thing we do is we take
+
+123
+00:08:55,089 --> 00:08:59,060
+我们去我们的信息分组，构建它们的多项式
+our message blocks and we kind of
+construct the polynomial out of them. So
+
+124
+00:08:59,060 --> 00:09:03,061
+如果信息中有L个分组，我们构建一个
+if there are L blocks in our message,
+we're going to construct the polynomial of
+
+125
+00:09:03,061 --> 00:09:07,082
+L次多项式，大家注意多项式的常数项设为0
+degree L and you notice that the constant
+term of the polynomial is set to zero. And
+
+126
+00:09:07,082 --> 00:09:11,050
+然后我们非常简单地定义MAC
+then we define the MAC very simply.
+Basically what we do is we take the
+
+127
+00:09:11,050 --> 00:09:15,028
+我们去信息对应的多项式，计算它在点K的值
+polynomial that corresponds to the
+message, we evaluate it at the point K
+
+128
+00:09:15,028 --> 00:09:19,017
+K是我们密钥的一半，然后我们加上A
+that's one half of our secret key, and
+then we add the value A which is the
+
+129
+00:09:19,017 --> 00:09:22,095
+A是我们密钥的另一半。完事了，这就是整个MAC
+second half of our secret key. And that's
+it. That's the whole MAC. So just
+
+130
+00:09:22,095 --> 00:09:27,015
+构建我们信息对应的多项式
+basically construct the polynomial that
+corresponds to our message, evaluate that
+
+131
+00:09:27,015 --> 00:09:31,035
+计算多项式在我们密钥的一半的值，然后再加上另一半密钥
+polynomial at half of the secret key, and
+add the other half of the secret key to
+
+132
+00:09:31,035 --> 00:09:35,050
+当然最后结果取模q。好，整个MAC就是这些
+the result, and of course reduce final
+result modulo q. Okay so that's it, so
+
+133
+00:09:35,050 --> 00:09:40,049
+这是一次性安全MAC，我们会证明这个MAC
+the whole MAC, it's a one time secure MAC
+and we will argue that this MAC is one
+
+134
+00:09:40,049 --> 00:09:45,041
+是一次性安全的，通过证明
+如果我告诉你一个特定信息的MAC值
+time secure, essentially by arguing that
+if I tell you the value of MAC for one
+
+135
+00:09:45,041 --> 00:09:49,093
+并不会告诉你任何关于另一信息的MAC的任何信息
+particular message, that tells you nothing
+at all about the value of the MAC at
+
+136
+00:09:49,093 --> 00:09:54,031
+因此，即使你已经看过一条信息的MAC
+another message. And as a result, even
+though you've seen the value of the MAC on
+
+137
+00:09:54,031 --> 00:09:58,064
+你也无法伪造其他信息的MAC
+a particular message, you have no way of
+forging this MAC on some other message.
+
+138
+00:09:58,064 --> 00:10:03,018
+现在我强调，这是一次性MAC，但不是二次安全的
+Now I should emphasize that this is a one
+time MAC, but it's not two time secure. In
+
+139
+00:10:03,018 --> 00:10:07,067
+换句话说，如果你看到了两条不同信息的MAC
+other words, if you get to see the value
+of the MAC on two different messages, that
+
+140
+00:10:07,067 --> 00:10:11,094
+那将完全暴露了密钥，你就可以预测
+actually completely compromises the
+secret key. And you can actually predict a MAC
+
+141
+00:10:11,094 --> 00:10:16,026
+你选的第3、第4条信息的MAC了。这样MAC就是可伪造的了
+for a third or fourth message of your
+choice. So then the MAC becomes forgeable.
+
+142
+00:10:16,026 --> 00:10:20,074
+但是对于一次性使用，它是完美安全的MAC
+But for one time use, it is a perfectly
+secure MAC, and I'll tell you that in fact
+
+143
+00:10:20,074 --> 00:10:24,099
+我告诉大家事实上，它是一个算起来非常快的MAC。
+我们已经构建了一次性MAC
+it's a very fast MAC to evaluate. So now
+that we've constructed one time MAC-s,
+
+144
+00:10:24,099 --> 00:10:29,035
+实际上有一个通用方法，可以把一次性MAC
+turns out there's actually a general
+technique that will convert one time MAC-s
+
+145
+00:10:29,035 --> 00:10:33,055
+转变成多次MAC。我只想简单展示一下如何工作
+into many time MAC-s. And I just wanted to
+briefly show you how that works. So
+
+146
+00:10:33,055 --> 00:10:37,047
+假设我们有一次性MAC，签名和验证算法分别记为S和V
+suppose we have our one time MAC, let's
+call it S and V for signing and
+
+147
+00:10:37,047 --> 00:10:41,099
+我们假设签名本身是n位字符串
+verification algorithms, and let's just
+assume that the tags themselves are n bit
+
+148
+00:10:41,099 --> 00:10:46,079
+另外，我们看一个安全的PRF
+strings. In addition, let's also look at a
+PRF, a secure PRF, that also happens to
+
+149
+00:10:46,079 --> 00:10:51,069
+它也正好输出n位字符串，但也取n位字符串
+output n bit strings but also takes as
+inputs n bit strings. So let's now define
+
+150
+00:10:51,069 --> 00:10:56,047
+我们现在定义一个通用的MAC构建。
+这些MAC叫做Carter-Wegman MAC
+a general construction for a MAC. These
+MAC-s are called Carter-Wegman MAC-s that
+
+151
+00:10:56,047 --> 00:11:01,050
+它们如下工作。我们对信息M应用一次性MAC
+works as follows. Basically what we would
+do is we would apply the one time MAC to
+
+152
+00:11:01,050 --> 00:11:06,040
+然后我们用PRF加密结果
+the message M and then we're going to
+encrypt the results using the PRF. So how do
+
+153
+00:11:06,040 --> 00:11:11,006
+如何加密结果呢？我们选择一个随机数r
+we encrypt the result? Well, we choose a
+random r and then we compute kind of a
+
+154
+00:11:11,006 --> 00:11:15,064
+根据r计算一个一次性密码本，通过对r应用PRF
+one time pad from this r by applying the
+PRF to it. And then we XOR the result
+
+155
+00:11:15,064 --> 00:11:20,050
+然后我们把结果与一次性MAC异或。这个机制漂亮的一点是
+with the actual one time MAC. So the neat
+thing about this construction is that the
+
+156
+00:11:20,050 --> 00:11:25,019
+快速的一次性MAC被用到了可能有几个G的长信息上
+fast one time MAC is applied to the long
+message, which could be gigabytes long.
+
+157
+00:11:25,019 --> 00:11:29,089
+而费时的PRF只被应用在新鲜值r上
+And the slower PRF is only applied to this
+nonce r, which is then used to
+
+158
+00:11:29,089 --> 00:11:34,068
+r接着被用来加密MAC的最后结果。
+大家可以证明如果我们的MAC
+encrypt the final results of the MAC. And
+you can argue that if the MAC that was
+
+159
+00:11:34,068 --> 00:11:39,046
+作为构建分组，是个安全的MAC，而PRF也是安全的
+given to us as a building block is a one
+time secure MAC, and the PRF is secure,
+
+160
+00:11:39,046 --> 00:11:44,036
+那么事实上，我们可以获得一个多次的安全MAC
+其输出2n位标签
+then, in fact, we get a many time secure
+MAC that happens to output 2n bit tags.
+
+161
+00:11:44,036 --> 00:11:49,013
+我们待会看Carter-Wegman MAC，当我们讨论
+So we're gonna see Carter-Wegman MAC-s later
+on when we talk about authenticated
+
+162
+00:11:49,013 --> 00:11:53,043
+认证加密时。事实上，NIST的一个标准的完整性加密方法
+encryption. And, in fact, one of the NIST standard
+methods for doing encryption with
+
+163
+00:11:53,043 --> 00:11:58,001
+使用了Carter-Wegman MAC来提供完整性
+integrity, uses a Carter-Wegman MAC for
+providing integrity. I want to mention
+
+164
+00:11:58,001 --> 00:12:03,012
+妄想税这个Carter-Wegman MAC是个随机MAC的好例子
+that this Carter-Wegman MAC is a good
+example of a randomized MAC where this nonce
+
+165
+00:12:03,012 --> 00:12:08,010
+这个新鲜值r每次重新计算标签时，都被重新选取
+r is chosen afresh every time the tag is
+computed. And so for example if you try to
+
+166
+00:12:08,010 --> 00:12:13,009
+如果你试图两次计算同一信息的标签，
+你会选择一个不同的r
+compute a tag for the same message twice
+each time you'll choose a different r and
+
+167
+00:12:13,009 --> 00:12:18,013
+因此两次你会得到不同的标签。这是MAC的一个好例子
+as a result you'll get different tags both
+times. And so this is a nice example of a
+
+168
+00:12:18,013 --> 00:12:22,069
+这个MAC不是基于PRF的
+MAC that's actually not a pseudo random
+function, not a PRF, because a single
+
+169
+00:12:22,069 --> 00:12:27,067
+因为单个信息可以被映射到许多不同的标签
+message could actually be mapped to many
+different tags all of which are valid for
+
+170
+00:12:27,067 --> 00:12:31,097
+所有的标签对这个信息都是有效的。
+总结一下Carter-Wegman MAC
+that one message. To conclude our
+discussion on the Carter-Wegman MAC, let me
+
+171
+00:12:31,097 --> 00:12:36,036
+我问大家下面这个问题。这里我们有
+Carter-Wegman MAC的方程
+ask you the following question. Here we
+have the equation for the Carter-Wegman
+
+172
+00:12:36,036 --> 00:12:40,082
+通常，把新鲜值r视为MAC的一部分
+MAC. As usual, you see the nonce r as
+part of the MAC. And the second part of
+
+173
+00:12:40,082 --> 00:12:45,033
+MAC的第二部分我记为t。这是将一次性MAC
+the MAC I'm gonna denote by t. This is
+basically the one time MAC applied to the
+
+174
+00:12:45,033 --> 00:12:49,067
+应用到信息M上，然后使用伪随机函数加密
+message M, and then encrypted using the
+pseudo-random function applied to the
+
+175
+00:12:49,067 --> 00:12:54,007
+新鲜值r。我们把这个异或的结果记为t
+nonce r. So we'll denote the result of
+this XOR by t. So my question to
+
+176
+00:12:54,007 --> 00:12:58,047
+我给大家的问题是，给定特定信息m的
+Carter-Wegman MAC对(r,t)
+you is, given the Carter-Wegman MAC pair r,t
+for particular message m, how
+
+177
+00:12:58,047 --> 00:13:03,045
+如何验证这个MAC是有效的？记得这里的算法V
+would you verify that this MAC is valid?
+And recall that its algorithm V here, is
+
+178
+00:13:03,045 --> 00:13:08,035
+是一次性MAC的验证算法
+the verification algorithm for the
+underlying one time MAC. So this is the
+
+179
+00:13:08,035 --> 00:13:13,034
+这是正确答案。想知道为什么，就观察这里的异或
+right answer, and to see why, just observe
+that this XOR here decrypts the quantity t
+
+180
+00:13:13,034 --> 00:13:17,085
+把量t解密成明文值了，即原一次性MAC
+to its plain text value, which is
+basically the original underlying one time
+
+181
+00:13:17,085 --> 00:13:22,065
+我们可以直接把它带入一次性MAC的验证算法
+MAC. And so we can directly feed that into
+the verification algorithm for the one
+
+182
+00:13:22,065 --> 00:13:26,076
+我想告诉大家的最后一种MAC
+time MAC. The last type of MAC I wanted
+to tell you about is one that is very
+
+183
+00:13:26,076 --> 00:13:31,011
+在因特网协议中特别流行，叫做HMAC。但在我们讨论HMAC前
+popular in internet protocols. It's called the HMAC. But before we talk about the HMAC we
+
+184
+00:13:31,011 --> 00:13:35,004
+我们必须讨论哈希函数，特别是抵抗碰撞的哈希函数
+have to talk about hash functions and in particular, collision resistant hash
+
+185
+00:13:35,004 --> 00:13:39,020
+我们下一章讨论
+functions and we are going to do that in
+the next module. So this is the end of our
+
+186
+00:13:39,020 --> 00:13:43,015
+这就是我们关于MAC的第一章内容。我想指出，有很美的理论
+first module on MAC-s and I wanted to point
+out that there's beautiful theory that
+
+187
+00:13:43,015 --> 00:13:47,005
+构建了我们看到的所有这些MAC。我给大家
+went into constructing all the MAC-s that
+we saw. I gave you the highlights showed
+
+188
+00:13:47,005 --> 00:13:50,086
+重点看了几种主要的机制，但其实有不少理论
+you the main constructions, but
+there's really quite a bit of theory that
+
+189
+00:13:50,086 --> 00:13:54,067
+深入研究了这些MAC的构建，如果想学习更多
+goes into constructing these MAC-s, and if
+you'd like to learn more about that, I
+
+190
+00:13:54,067 --> 00:13:58,062
+我列举了一些论文在这，大家可以看看。
+我大概告诉大家它们是什么
+listed a couple of key papers you might
+want to look at. Let me quickly tell you what they
+
+191
+00:13:58,062 --> 00:14:03,017
+第一篇叫做三密钥机制，是CMAC的基础
+are. The first one is, what's called the
+three key construction, which is the basis
+
+192
+00:14:03,017 --> 00:14:07,853
+是一篇优雅的论文，给出了CBC-MAC的一个非常有效的机制
+of CMAC. A very elegant paper that give a
+very efficient construction out of CBC-MAC.
+
+193
+00:14:07,853 --> 00:14:12,005
+第二篇论文更技术点，但展示了如何证明
+The second paper is a more technical
+paper, but basically shows how to prove
+
+194
+00:14:12,005 --> 00:14:16,052
+CBC-MAC作为PRF的上界。第三篇讨论了PMAC
+that bounds of CBC-MAC as a PRF. The
+third paper talks about PMAC and its
+
+195
+00:14:16,052 --> 00:14:21,022
+及其机制，也是很犀利的文章。第四篇讨论了
+construction. Again, a very acute paper.
+The fourth paper talks about security of
+
+196
+00:14:21,022 --> 00:14:26,028
+NMAC和HMAC的安全性。HMAC我们下一章讲
+NMAC and HMAC as well. HMAC we're going to
+cover in, the next module. The last paper
+
+197
+00:14:26,028 --> 00:14:30,080
+最后一篇提出了一个很有趣的问题。
+记得在我们所有的机制中
+I listed asks an intriguing question.
+Recall that all of our constructions, we
+
+198
+00:14:30,080 --> 00:14:35,073
+我们总是假设AES是一个16字节信息的伪随机函数
+always assume that AES is a pseudo-random
+function for sixteen byte messages and we
+
+199
+00:14:35,073 --> 00:14:40,055
+然后构建一个伪随机函数能计算长得多的信息的MAC
+then built a pseudo-random function and
+therefore a MAC for much longer messages.
+
+200
+00:14:40,055 --> 00:14:45,052
+这篇文章说，如果AES不是伪随机函数，但满足
+某些弱化的性质
+This paper says well, what do we do if AES
+is not a pseudo-random function, but still
+
+201
+00:14:45,052 --> 00:14:50,064
+叫做不可预测函数，我们该怎么办？
+satisfies some weaker security property
+called an unpredictable function. And then
+
+202
+00:14:50,064 --> 00:14:55,026
+然后他们问如果AES仅为不可预测函数，不是伪随机函数的话
+they ask if AES is only an unpredictable
+function, but not a pseudo-random
+
+203
+00:14:55,026 --> 00:15:00,003
+我们还能构建长信息的MAC了吗？
+function, can we still build MAC-s for long
+messages? And so they succeed in actually
+
+204
+00:15:00,003 --> 00:15:03,059
+他们成功给出了基于弱假设，即AES是不可预测函数
+giving constructions just based on the
+weaker assumption that AES is an
+
+205
+00:15:03,059 --> 00:15:07,035
+而构建的机制。但是他们的机制远没有
+unpredictable function. But their
+constructions are far less sufficient than
+
+206
+00:15:07,035 --> 00:15:11,016
+CBC-MAC或NMAC或PMAC充分，如我们这三节所讨论的
+CBC-MAC or NMAC, or PMAC that we discussed
+in these segments. And so if you're
+
+207
+00:15:11,016 --> 00:15:15,027
+如果大家对根据分组密码，如AES，
+构建MAC的不同观点感兴趣
+interested in a different perspective on
+how to build MAC-s from block ciphers like
+
+208
+00:15:15,027 --> 00:15:18,098
+请看这篇论文。这个领域有一些很好的开放问题
+AES, please take a look at this paper. And
+there are actually some nice open
+
+209
+00:15:18,098 --> 00:15:23,014
+值得研究。那么完整性的初章完结
+questions to work on in this area. So this
+concludes our first segment on integrity.
+(口误：segment->module)
+
+210
+00:15:23,014 --> 00:15:26,051
+下一节我们讨论抗碰撞
+And in the next segment, we're gonna talk
+about collision resistance.

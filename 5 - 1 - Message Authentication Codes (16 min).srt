@@ -1,0 +1,1294 @@
+1
+00:00:00,000 --> 00:00:02,432
+本章我们不再讨论加密了
+In this module, we're gonna stop talking
+about encryption,
+【伊卡酱 译注】
+
+2
+00:00:02,432 --> 00:00:04,415
+转而讨论信息完整性
+and instead discuss message integrity.
+
+3
+00:00:04,415 --> 00:00:08,987
+之后我们还会回到加密，并展示如何同时提供加密和完整性
+Next, we will come back to encryption, and show
+how to provide both encryption and integrity.
+
+4
+00:00:08,987 --> 00:00:13,222
+如我所说，我们这里的目标是提供完整性，
+而先不考虑私密性
+So as I said, our goal here is to provide
+integrity without any confidentiality.
+
+5
+00:00:13,222 --> 00:00:16,561
+事实上在现实中，这种情况有很多
+There are actually in fact many cases in
+the real world where this comes up.
+
+6
+00:00:16,561 --> 00:00:19,583
+例如，你可以考虑硬盘里的操作系统文件
+For example, you can think of
+operating system files on your disk.
+
+7
+00:00:19,583 --> 00:00:24,608
+如果你在使用Windows，所有的Windows操作系统文件
+在硬盘上都不是私密的
+Say if you're using Windows, all the Windows
+operating system files on disk are not confidential,
+
+8
+00:00:24,608 --> 00:00:26,116
+它们是公开的，全世界都知道
+they're public and known to the world,
+
+9
+00:00:26,116 --> 00:00:30,883
+很重要的一点是确保它们没有被病毒
+或某些恶意软件修改过
+but it is quite important to make sure that
+they're not modified by a virus or some malware.
+
+10
+00:00:30,883 --> 00:00:33,760
+这就是个例子：想提供完整性
+That's an example where you want
+to provide integrity but you don't
+
+11
+00:00:33,760 --> 00:00:38,127
+但不在乎私密性。另一个例子是网页上的标签广告
+care about confidentiality. Another
+example is banner ads on web pages.
+
+12
+00:00:38,127 --> 00:00:41,467
+广告提供者不在乎有人复制
+The provider of the ads doesn't care
+at all if someone copies them
+
+13
+00:00:41,467 --> 00:00:45,128
+或向别人展示这些广告，所以没有一点私密性
+and shows them to other people.
+So there's no confidentiality issue at all.
+
+14
+00:00:45,128 --> 00:00:47,458
+但是他们很在意修改这些广告
+But they do care about modifying those ads.
+
+15
+00:00:47,458 --> 00:00:52,046
+例如，他们希望阻止人们修改广告，
+以变成不同类型的广告
+So, for example, they do wanna prevent people from
+changing the ads into different types of ads.
+
+16
+00:00:52,046 --> 00:00:57,814
+这就是另一个只关心完整性，而私密性不重要的例子
+So that's another example where integrity matters
+but confidentiality is not important at all.
+
+17
+00:00:57,814 --> 00:00:59,940
+那么我们如何提供信息的完整性？
+So how do we provide message integrity?
+
+18
+00:00:59,940 --> 00:01:04,980
+基本的机制叫做MAC：消息验证码
+The basic mechanism is what's called a MAC,
+a message authentication code, MAC.
+
+19
+00:01:04,980 --> 00:01:08,842
+其原理如下：我们有朋友Alice和Bob
+And the way we do it is as follows.
+So here we have our friends, Alice and Bob.
+
+20
+00:01:08,842 --> 00:01:13,783
+他们共享一个密钥K，攻击者不知道K，但是双方知道
+They have a shared key, K, which is not known
+to the attacker, but known to both of them.
+
+21
+00:01:13,783 --> 00:01:16,868
+Alice想发一个公共信息M给Bob
+And there's a public message M that Alice
+wants to send to Bob,
+
+22
+00:01:16,868 --> 00:01:21,743
+并且攻击者不能在途中修改这一信息M
+such that an attacker along the way cannot
+modify this message on its way to Bob.
+
+23
+00:01:21,743 --> 00:01:27,935
+Alice的方法是使用一种叫做MAC签名算法的东西，我们记为S
+The way Alice does it, is by using what's called
+a MAC signing algorithm, we'll denote it by S,
+
+24
+00:01:27,935 --> 00:01:32,558
+MAC签名算法取密钥和信息M为输入
+where the MAC signing algorithm takes
+as input the key and the message,
+
+25
+00:01:32,558 --> 00:01:37,243
+产生一个非常短的标签。这个标签可以是
+90位或100位的，等等
+and produces a very short tag. The tag could
+be like 90 bits or 100 bits, or so on.
+
+26
+00:01:37,243 --> 00:01:41,905
+尽管信息有几个G长，标签却非常短
+Even though the message is gigabytes long,
+the tag is actually very, very short.
+
+27
+00:01:41,905 --> 00:01:46,640
+然后，她把标签附在信息后面，然后把
+这两个的组合发给Bob
+Then, she appends the tag to the message
+and sends the combination of the two to Bob.
+
+28
+00:01:46,640 --> 00:01:48,790
+Bob接收了消息和标签
+Bob receives the message and the tag,
+
+29
+00:01:48,790 --> 00:01:53,311
+然后他在这个标签上运行所谓的MAC认证算法
+and then he runs what's called a MAC
+verification algorithm on this tag.
+
+30
+00:01:53,311 --> 00:01:56,564
+MAC认证算法取密钥、信息
+So the MAC verification algorithm takes
+as input to the key, the message,
+
+31
+00:01:56,564 --> 00:02:01,359
+和标签为输入，输出"是"和"否"，
+取决于信息是否是有效的
+and the tag and it says basically yes or no,
+depending on whether the message is valid
+
+32
+00:02:01,359 --> 00:02:05,585
+或是被人改过。好，更精确地说
+MAC是什么呢？
+or whether it's been tampered with.
+Okay, so more precisely, what is a MAC?
+
+33
+00:02:05,585 --> 00:02:08,401
+我们说过MAC包含两个算法
+Well, we said the MAC basically consists of
+two algorithms,
+
+34
+00:02:08,401 --> 00:02:10,766
+一个签名算法和一个验证算法
+a signing algorithm and a verification algorithm.
+
+35
+00:02:10,766 --> 00:02:16,214
+通常，它们定义在一个密钥空间，一个信息空间
+和一个标签空间上
+As usual, they're defined over a key space,
+a message space, and a tag space.
+
+36
+00:02:16,214 --> 00:02:18,641
+我们说过，这是一对算法
+And as we said, it's a pair of algorithms.
+
+37
+00:02:18,641 --> 00:02:22,637
+那么签名算法会输出标签空间中的一个标签
+So the signing algorithm will output a
+tag in the tag space, and the verification
+
+38
+00:02:22,637 --> 00:02:27,536
+验证算法取密钥、信息和标签，输出是或否
+algorithm, basically given the key, the
+messages and the tag, will output yes or no.
+
+39
+00:02:27,536 --> 00:02:31,770
+文字提醒大家，通常有一致性要求
+And I want to remind you as usual there are
+these consistency requirements, such that
+
+40
+00:02:31,770 --> 00:02:36,755
+即每一个密钥空间中的密钥K和每一个信息空间中的信息
+for every K in the key space and for every
+message in the message space,
+
+41
+00:02:36,755 --> 00:02:41,067
+都正好满足，如果我使用密钥对信息进行签名
+it so happens that if I sign a message
+using a particular key,
+
+42
+00:02:41,067 --> 00:02:47,364
+然后我使用同样的密钥验证这个签名
+我应该获得"是"作为回应
+and then I verify the tag using the same
+key, I shall get yes in response.
+
+43
+00:02:47,364 --> 00:02:50,915
+这是标准的一致性要求
+So this is the standard consistency
+requirement which is the analog of
+
+44
+00:02:50,915 --> 00:02:54,736
+和讨论加密时我们看过的类似
+现在，我想指出
+the one that we saw for encryption.
+Now, one thing I'd like to point out is that
+
+45
+00:02:54,736 --> 00:02:58,477
+完整性确实需要Alice和Bob之间共享一个密钥
+integrity really does require a shared
+key between Alice and Bob.
+
+46
+00:02:58,477 --> 00:03:02,121
+事实上，人们有一个常犯的错误
+And, in fact, there's a common mistake
+that people make, where they try to
+
+47
+00:03:02,121 --> 00:03:05,795
+他们试图不用共享密钥就能提供完整性
+这里有个例子
+provide integrity without actually a
+shared key. So here's an example.
+
+48
+00:03:05,795 --> 00:03:10,554
+考虑CRC。CRC是循环冗余检验的意思
+So consider CRC. CRC stands for cyclic
+redundancy check. This is a classic
+
+49
+00:03:10,554 --> 00:03:14,544
+是一个经典的校验和算法，为检测信息中的
+随机发生的错误而设计的
+checksum algorithm that's designed to
+detect random errors in messages.
+
+50
+00:03:14,544 --> 00:03:19,636
+那么想像一下，不用密钥生成标签，Alice使用
+So imagine, instead of using a key to
+generate the tag, Alice basically uses a
+
+51
+00:03:19,636 --> 00:03:24,162
+CRC算法，是不需要任何密钥的，就能生成一个标签
+CRC algorithm which is keyless. Doesn't
+take any key, to generate a tag.
+
+52
+00:03:24,162 --> 00:03:27,594
+然后她把这个标签附在信息后面，发送给Bob
+And then she appends this tag to the
+message, she sends it over to Bob,
+
+53
+00:03:27,594 --> 00:03:31,984
+Bob会验证这个CRC码是否正确。换句话说
+Bob will basically verify that the CRC is
+still correct. In other words, Bob will still
+
+54
+00:03:31,984 --> 00:03:37,108
+Bob会检查这个标签是否等于CRC(m)
+如果是，验证算法会说"是"
+verify the tag is equal to CRC(m).
+And if so the verification algorithm
+
+55
+00:03:37,108 --> 00:03:40,454
+否则验证算法会说"否"
+will say yes, and otherwise the
+verification algorithm will say no.
+
+56
+00:03:40,454 --> 00:03:44,027
+这样做的问题是，攻击者很容易就能破解之
+So the problem with this is this is
+very easy for an attacker to defeat.
+
+57
+00:03:44,027 --> 00:03:48,173
+换句话说，攻击者可以很容易地修改信息
+In other words, an attacker can very easily
+modify the message and route,
+
+58
+00:03:48,173 --> 00:03:51,645
+绕开并欺骗Bob，让他认为修改后的信息是有效的
+and fool Bob into thinking that the
+new message is a valid one.
+
+59
+00:03:51,645 --> 00:03:55,205
+攻击者的方法是取消掉标签里的信息
+The way the attacker will do it
+is he'll cancel the message in the tag.
+
+60
+00:03:55,205 --> 00:03:58,352
+他会简单地封锁它们。然后他会产生自己的信息
+He'll simply block them. And then he'll
+produce his own message,
+
+61
+00:03:58,352 --> 00:04:03,042
+M'，为信息M'计算他自己的CRC
+M prime, and compute his own CRC
+on this message M prime,
+
+62
+00:04:03,042 --> 00:04:06,622
+然后把两个联结起来发送给Bob
+and then send the concatenation
+of the two over to Bob.
+
+63
+00:04:06,622 --> 00:04:10,948
+Bob会运行验证算法，验证算法会正常工作
+Bob will run the verification algorithm,
+verification will work properly because
+
+64
+00:04:10,948 --> 00:04:15,856
+因为事实上右边是左边的有效CRC
+in fact the right-hand side is in fact
+a valid CRC for the left-hand side.
+
+65
+00:04:15,856 --> 00:04:19,898
+因此，Bob会认为这个信息来自Alice，但事实上
+And as a result, Bob would think that this
+message came from Alice but in fact its been
+
+66
+00:04:19,898 --> 00:04:24,980
+它已被攻击者修改过了，与最初的Alice发出的信息
+一点关系都没有
+completely modified by the attacker and had
+nothing to do with the original message that Alice sent.
+
+67
+00:04:24,980 --> 00:04:29,440
+好，那么问题是，因为CRC没有密钥
+Okay, so the problem is, because CRC
+doesn't have a key, there's no difference
+
+68
+00:04:29,440 --> 00:04:34,609
+Alice和攻击者之间没有区别。因此
+Bob不知道信息来自谁
+between Alice and the attacker. And as a result,
+Bob doesn't know where the message came from.
+
+69
+00:04:34,609 --> 00:04:39,579
+一旦我们引入了密钥，Alice就可以做一些
+Bob不能做的事情了
+Once we introduce a key, now Alice can do
+something that the attacker can't do.
+
+70
+00:04:39,579 --> 00:04:44,194
+因此，她可能可以计算一个标签
+而攻击者无法修改这个标签
+And as a result, she might be able to compute a
+tag that the attacker can't modify.
+
+71
+00:04:44,194 --> 00:04:50,166
+需要记住的一点是，CRC是为检测随机错误而设计的
+并非针对恶意错误的
+So the point to remember is that CRC is designed
+to detect random errors, not malicious errors.
+
+72
+00:04:50,166 --> 00:04:55,490
+这里我们的目标是确保即使是一个恶意攻击者
+也无法修改传递的信息
+And here our goal is to make sure that even a
+malicious attacker cannot modify messages in route.
+
+73
+00:04:55,490 --> 00:04:59,390
+接下来我们定义MAC系统安全的意义
+So next we want to define what it means
+for a MAC system to be secure.
+
+74
+00:04:59,390 --> 00:05:04,635
+通常，我们用攻击者的力量来定义安全性
+攻击者可以做什么呢？
+So as usual, we define security in terms of the
+attacker's power. What can the attacker do?
+
+75
+00:05:04,635 --> 00:05:08,842
+攻击者的目标是什么？他试图做什么？
+那么对于MAC的情况
+And the attacker's goal. What is he trying
+to do? So in the case of MACs, the
+
+76
+00:05:08,842 --> 00:05:13,699
+攻击者的力量是进行所谓的选择信息攻击，换句话说
+attacker's power is what's called a chosen
+message attack. In other words, the
+
+77
+00:05:13,699 --> 00:05:19,039
+攻击者可以给Alice任意他选择的信息m_1到m_q
+attacker can give Alice arbitrary
+messages of his choice, m_1 to m_q,
+
+78
+00:05:19,039 --> 00:05:24,921
+Alice会为他计算这些信息的标签，
+并且给他这些算出来的标签
+and Alice will compute the tag for him on
+those messages, and give him those tags.
+
+79
+00:05:24,921 --> 00:05:28,070
+大家可能会怀疑，为什么Alice会做这些？
+So again, you might wonder, why
+would Alice ever do that?
+
+80
+00:05:28,070 --> 00:05:31,796
+为什么Alice会计算攻击者给她的信息的标签呢？
+Why would Alice ever compute the tag on a
+message that the attacker gave her?
+
+81
+00:05:31,796 --> 00:05:35,935
+就像选择明文攻击一样，这在现实中很常见的
+So just like in the case of chosen plaintext
+attack, it's very common in the real world,
+
+82
+00:05:35,935 --> 00:05:40,276
+攻击者可以给Alice一个信息，
+Alice会计算这个信息的标签
+that the attacker can give Alice a message.
+Alice will compute the tag on that message,
+
+83
+00:05:40,276 --> 00:05:45,803
+然后攻击者会获得这个算出的标签
+例如，攻击者可以发送给Alice一份电子邮件
+and then the attacker will obtain the resulting tag.
+For example, the attacker might send Alice an email.
+
+84
+00:05:45,803 --> 00:05:50,262
+也许Alice想把邮件保存在硬盘上，同时还想防止别人
+Alice might want to save the email to
+disk in a way that will prevent someone
+
+85
+00:05:50,262 --> 00:05:53,441
+修改硬盘上的内容。所以她会为信息计算标签
+from tampering with the disk. So she'll
+compute a tag on the message,
+
+86
+00:05:53,441 --> 00:05:58,798
+保存信息和其标签到硬盘里。
+稍后，攻击者可能偷到了Alice的硬盘
+and save the message and the tag to disk.
+Later on, the attacker might steal Alice's disk.
+
+87
+00:05:58,798 --> 00:06:03,385
+现在他还原了Alice对他发送给她的信息的标签
+And now he's recovered Alice's tag on the
+message that he sends to Alice.
+
+88
+00:06:03,385 --> 00:06:07,670
+那么这就是一个真实的选择信息攻击的例子
+So this is an example of a chosen message
+attack in the real world, where the attacker
+
+89
+00:06:07,670 --> 00:06:11,497
+攻击者获得了他给Alice的信息的标签
+actually obtained a tag on a
+message that he gave Alice.
+
+90
+00:06:11,497 --> 00:06:15,796
+好，这是攻击者所能做的，即选择信息攻击
+Okay, so that's what the attacker can do,
+basically, this chosen message attack.
+
+91
+00:06:15,796 --> 00:06:20,441
+他的目标是什么？他的目标是所谓的存在性伪造
+And what is his goal? Well, his goal is to do
+something called an existential forgery.
+
+92
+00:06:20,441 --> 00:06:26,312
+攻击者试图产生某些有效的信息标签
+What he's trying to do is to produce some,
+some new valid message tag there.
+
+93
+00:06:26,312 --> 00:06:30,984
+好，某些信息标签对，不同于
+Okay, so some message tag pair
+that's different from one of the
+
+94
+00:06:30,984 --> 00:06:34,327
+在选择信息攻击里，他所获得的q个信息标签对
+pairs that were given to him during
+the chosen message attack.
+
+95
+00:06:34,327 --> 00:06:38,788
+如果他能这么做，那么我们说这个系统是不安全的
+And if he can do that, then we say that
+the system is insecure, and if he can't,
+
+96
+00:06:38,788 --> 00:06:42,704
+如果他不能，我们说这个系统是安全的。我想强调下
+then we'll say the system is secure.
+So I wanna emphasize this existential
+
+97
+00:06:42,704 --> 00:06:47,591
+存在性伪造的意思是，攻击者不能产生
+一个新的信息标签对
+forgery means that the attacker cannot
+produce a new message/tag pair,
+
+98
+00:06:47,591 --> 00:06:52,575
+即使对于一个完全胡言乱语的信息也不行
+大家可能会再次怀疑
+even for a message that's completely gibberish.
+And again, you might wonder, well,
+
+99
+00:06:52,575 --> 00:06:55,737
+为什么我们关心攻击者是否能计算一个
+胡言乱语的信息的标签呢？
+why do we care if the attacker computes
+a tag on a message that's gibberish?
+
+100
+00:06:55,737 --> 00:06:57,697
+不是给攻击者的任何值
+That's not of any value to the attacker.
+
+101
+00:06:57,697 --> 00:07:02,220
+但我们想构建在任何使用情况下都安全的MAC
+But we want to build MACs that are
+secure under any usage settings.
+
+102
+00:07:02,220 --> 00:07:06,741
+事实上有些实例的，比如说
+你可能想计算一个随机密钥的完整性标签
+And there are, in fact cases where, for example,
+you might want to compute an integrity tag on
+
+103
+00:07:06,741 --> 00:07:12,517
+这时，即使攻击者可以计算一个完全随机的信息的标签
+a random secret key. In which case, even if the
+attacker is able to compute a tag on a completely
+
+104
+00:07:12,517 --> 00:07:18,365
+他可能可以欺骗用户去使用错误的密钥
+random message, he might be able to fool
+a user into using the wrong secret key.
+
+105
+00:07:18,365 --> 00:07:22,422
+因此我们想确保如果这个MAC是安全的
+And as a result we want to make sure that
+if the MAC is secure, the attacker can't
+
+106
+00:07:22,422 --> 00:07:26,848
+攻击者不能对任何信息产生有效的标签
+无论是胡言乱语还是合理信息
+produce a valid tag for any message
+whether it's gibberish or sensical.
+
+107
+00:07:26,848 --> 00:07:31,725
+安全性定义蕴涵的另一个性质是，如果攻击者有
+Another property that's implied by the security
+definition is if the attacker is given some
+
+108
+00:07:31,725 --> 00:07:37,691
+某些信息标签对，他不应该能够对同样的信息
+产生新的标签
+message tag pair he shouldn't be able to
+produce a new tag for the same message.
+
+109
+00:07:37,691 --> 00:07:42,456
+换句话说，即使对同一个信息m，
+存在另一个标签t'
+In other words even though there might be
+another tag t' for the same message m,
+
+110
+00:07:42,456 --> 00:07:48,099
+给定m和t，攻击者不应该能够找到新的t'
+the attacker given m and t shouldn't be able
+to find this new t' and again you
+
+111
+00:07:48,099 --> 00:07:52,177
+大家可能又会怀疑为什么我们关心
+攻击者已经有了信息M的一个标签
+might wonder well why do we care the
+attacker already has a tag on message M.
+
+112
+00:07:52,177 --> 00:07:55,774
+为什么他能否对他已经有了一个标签的信息M
+产生另一标签是重要的呢？
+Why does it matter if he can produce
+another tag for the message M he already
+
+113
+00:07:55,774 --> 00:08:00,672
+我们会看到，有些应用中
+has one tag? But as we'll see, there are
+actually applications where it's really important
+
+114
+00:08:00,672 --> 00:08:05,689
+攻击者不能对已签名的信息
+产生新的标签，这点是很重要的
+that the attacker not to be able to produce
+a new tag for a previously signed message.
+ 
+115
+00:08:05,689 --> 00:08:09,360
+特别地，当我们将加密和完整性结合起来时
+这个问题就会出现
+In particular, this will come up when we
+combine encryption and integrity.
+
+116
+00:08:09,360 --> 00:08:13,145
+所以我们要求给定信息的一个标签
+So that we are gonna demand that given
+one tag in the message it's impossible
+
+117
+00:08:13,145 --> 00:08:17,226
+不可能找到同样信息的另一个标签
+好，那么现在我们理解了
+to find another tag for the same message.
+Okay, so now that we understand the
+
+118
+00:08:17,226 --> 00:08:21,703
+我们试图达到的直观目标。通常
+我们用一个更为精确的游戏来定义
+intuition of what we are trying to achieve, let's
+define it as usual using a more precise game.
+
+119
+00:08:21,703 --> 00:08:26,180
+这里我们有两个算法S和V，有一攻击者A
+So here we have two algorithms S and V,
+and we have an adversary A,
+
+120
+00:08:26,180 --> 00:08:29,589
+游戏如下进行：挑战者通常为MAC选择
+and the game proceeds as follows.
+The challenger as usual just chooses
+
+121
+00:08:29,589 --> 00:08:34,833
+一个随机密钥，攻击者进行他的选择信息攻击
+a random key for the MAC and the adversary
+basically does his chosen message attack.
+
+122
+00:08:34,833 --> 00:08:39,697
+那么他提交m1给挑战者，获得m1的标签
+So he submits an m1 to the challenger
+and receives the tag on that message m1.
+
+123
+00:08:39,697 --> 00:08:43,897
+然后他提交m2给挑战者，获得m2的标签
+Then he submits an m2 to the challenger
+and receives a tag on that m2.
+
+124
+00:08:43,897 --> 00:08:48,816
+等等，直到他提交了q个信息给挑战者
+And so on and so forth, until, you know,
+he submits Q messages to the adversary and
+(口误：adversary->challenger)
+
+125
+00:08:48,816 --> 00:08:53,628
+获得了q个这些信息的标签
+这是选择信息攻击的部分
+receives Q tags on all those messages. So
+that's the chosen message attack part.
+
+126
+00:08:53,628 --> 00:08:57,216
+然后攻击者继续试图进行存在性伪造
+And then the adversary goes ahead and
+tries to do an existential forgery.
+
+127
+00:08:57,216 --> 00:09:02,321
+他输出一个信息标签对，一个新的信息标签对
+Namely, he outputs a message tag pair,
+a new message tag pair.
+
+128
+00:09:02,321 --> 00:09:07,704
+我们说他赢下这场游戏，换句话说，b=1
+意思是他赢下这场游戏
+We say that he wins the game, in other words
+b is equal to 1 means that he wins the game if,
+
+129
+00:09:07,704 --> 00:09:12,196
+如果，首先他输出的信息标签对是有效的
+first of all, the message tag pair that he
+outputs is a valid message tag pair,
+
+130
+00:09:12,196 --> 00:09:17,593
+验证算法说"是"；其次，它是一个新鲜的信息标签对
+so the verification algorithm says yes.
+And second of all, it's a fresh message tag pair.
+
+131
+00:09:17,593 --> 00:09:21,168
+换句话说，它不是之前给他的信息标签对中的任何一个
+In other words, it's not one of the message
+tag pairs that we gave him before.
+
+132
+00:09:21,168 --> 00:09:25,339
+换句话说，我们说攻击者输了这场游戏，即b=0
+In other words we say that the attacker lost
+the game. Namely b is equal to zero.
+
+133
+00:09:25,339 --> 00:09:30,855
+通常，我们定义攻击者的优势
+And as usual we say, we define the advantage
+of an adversary as the probability that
+
+134
+00:09:30,855 --> 00:09:35,267
+等于挑战者在本游戏中输出1的概率
+我们说MAC系统是安全的
+the challenger outputs one in this game.
+We say that the MAC system is secure
+
+135
+00:09:35,267 --> 00:09:39,564
+对所有有效的攻击者，优势都是可忽略的。换句话说
+if for all efficient adversaries the advantage
+is negligible. Okay, in other words,
+
+136
+00:09:39,564 --> 00:09:43,853
+没有有效的攻击者可以赢得这个游戏
+以不可忽略的概率
+no efficient adversary can win this
+game with non negligible probability.
+
+137
+00:09:43,853 --> 00:09:48,799
+好的，这就是安全MAC的定义
+我们的目标是构建像这样的安全MAC
+Alright, that's our definition of secure MACs,
+and our goal is to build secure MACs like this.
+
+138
+00:09:48,799 --> 00:09:53,529
+在这之前，我想问大家两个问题
+第一，假设我们有一个MAC
+Before we do that, I wanna ask you two questions.
+So the first question is, suppose we have a MAC.
+
+139
+00:09:53,529 --> 00:09:59,154
+攻击者正好可以找到两个信息m0和m1
+And it so happens that the attacker can
+find two message, m0 and m1,
+
+140
+00:09:59,154 --> 00:10:02,904
+它们对一半的密钥都有着同样的标签
+that happen to have the same tag
+for about half of the keys.
+
+141
+00:10:02,904 --> 00:10:07,505
+换句话说，如果你随机选择一个密钥
+则以一半的概率
+In other words, if you choose a key at
+random with probability one half, the tag
+
+142
+00:10:07,505 --> 00:10:12,339
+m0的标签与m1的标签相等。我的问题是
+of the message m0 will be the same as the
+tag of the message m1. And my question to
+
+143
+00:10:12,339 --> 00:10:16,072
+这是一个安全的MAC吗？那么我想强调
+you is can this be a secure MAC. So I want
+to emphasize the attacker doesn't know
+
+144
+00:10:16,072 --> 00:10:21,832
+攻击者不知道m0和m1的标签。他只知道有一半的概率
+what the tag on m0 and m1 is. All he knows
+is that the two messages happen to have
+
+145
+00:10:21,832 --> 00:10:27,559
+这两个信息的标签是一样的
+问题是，这是不是一个安全MAC
+the same tag with probability one half. So
+the question is whether this is a secure MAC.
+
+146
+00:10:27,559 --> 00:10:31,162
+答案是否定的，这不是一个安全的MAC
+So the answer is no, this is not a secure
+MAC and the reason is because of
+
+147
+00:10:31,162 --> 00:10:36,192
+原因是选择信息攻击。攻击者可以询问m0的标签
+the chosen message attack. Essentially the
+attacker can ask for the tag on the message
+
+148
+00:10:36,192 --> 00:10:42,665
+他会从挑战者那里接收到(m0,T)
+事实上，T是m0的一个有效标签
+m0, then he will receive m0, T from the
+challenger and in fact T would be a valid
+
+149
+00:10:42,665 --> 00:10:49,590
+然后攻击者就可以输出他的存在性伪造(m1,T)
+tag for message m0 and then what he would
+output as his existential forgery is m1, T
+
+150
+00:10:49,590 --> 00:10:55,330
+大家注意到(m1,T)与(m0,T)不同
+所以这是一个有效的存在性伪造
+and you notice that m1, T is different from
+m0, T, so this is a valid existential forgery.
+
+151
+00:10:55,330 --> 00:10:59,748
+因此，攻击者以1/2的优势能赢得这个游戏
+And as a result, the attacker wins
+the game with advantage one-half.
+
+152
+00:10:59,748 --> 00:11:03,968
+因此我们说这个MAC是不安全的。第二个问题是
+So we conclude that this MAC is not secure.
+The second question I'd like to ask you, is,
+
+153
+00:11:03,968 --> 00:11:07,378
+假设我们有一个MAC，总是输出5位标签
+suppose we have a MAC that happens
+to always output a five bit tag.
+
+154
+00:11:07,378 --> 00:11:11,823
+换句话说，这个MAC的标签空间是｛0,1｝^5
+In other words, the tag space for this MAC
+happens to be ｛0,1｝ to the five.
+
+155
+00:11:11,823 --> 00:11:17,680
+那么对每一个密钥和信息，签名算法输出5位标签
+So for every key and for every message, the
+signing algorithm will just output a five bit tag.
+
+156
+00:11:17,680 --> 00:11:21,949
+问题是，这个MAC是安全的吗？
+And the question is, can this MAC be secure?
+
+157
+00:11:21,949 --> 00:11:26,204
+答案当然是否定的，因为攻击者可以轻松猜出标签
+Of course the answer is no, because the
+attacker can simply guess the tag.
+
+158
+00:11:26,204 --> 00:11:28,810
+攻击者根本不会进行选择信息攻击
+So what he would do is he wouldn't
+ask any chosen message attacks.
+
+159
+00:11:28,810 --> 00:11:32,324
+他会像下面这样输出存在性伪造
+All he would do, is he would output
+an existential forgery as follows.
+
+160
+00:11:32,324 --> 00:11:39,661
+他会选择一个随机标签，那么
+选择一个｛0,1｝^5中的随机标签t
+He would just choose a random tag. So
+choose a random tag t at random in ｛0,1｝^5,
+
+161
+00:11:39,661 --> 00:11:45,492
+然后他就输出他的存在性伪造(m0,T)
+and then he would just output his existential
+forgery as say, the message zero and the tag t.
+
+162
+00:11:45,492 --> 00:11:52,720
+现在以概率1/2^5，这个标签是m0的一个有效标签
+And now with probability of 1/2^5, this
+tag will be a valid tag for the message zero.
+
+163
+00:11:52,720 --> 00:11:56,974
+攻击者优势是1/32，是不可忽略的
+And so the adversary's advantage is
+1/32, which is non-negligible.
+
+164
+00:11:56,974 --> 00:12:00,573
+这说明标签不能太短
+So this basically says that tags
+can't be too short.
+
+165
+00:12:00,573 --> 00:12:05,759
+它们必须有点长才行
+事实上，典型的标签长度
+They have to have some length to them.
+And in fact, the typical tag length would be,
+
+166
+00:12:05,759 --> 00:12:14,704
+是64位，或96位，或128位。例如，我们使用96位长的标签
+say 64 bits. or 96 bits, or 128 bits. Here let's
+for example use the tags that are 96 bits long.
+
+167
+00:12:14,704 --> 00:12:19,338
+如果你试图去猜一个信息的标签，当标签是96位时
+If you try to guess the tag for a message
+when the tag is 96 bits the probability of
+
+168
+00:12:19,338 --> 00:12:23,726
+猜中的概率是1/2^96，攻击者的优势
+guessing it correctly is 1/2^96.
+So the adversary's advantage would
+
+169
+00:12:23,726 --> 00:12:28,114
+仅为1/2^96，是可忽略的
+现在我们理解了MAC
+just be 1/2^96 which is negligible.
+So now that we understand what MACs are,
+
+170
+00:12:28,114 --> 00:12:29,935
+我想为大家展示一个简单的应用
+I wanna show you a simple application.
+
+171
+00:12:29,935 --> 00:12:34,193
+特别地，让我们看看如何用MAC来加密硬盘上的系统文件
+In particular, let's see how MACs can be
+used to protect system files on disk.
+
+172
+00:12:34,193 --> 00:12:37,831
+那么想像一下当你安装了一个操作系统，当你安装了Windows
+So imagine that when you install an operating
+system, say, when you install Windows on
+
+173
+00:12:37,831 --> 00:12:42,179
+在你的机器上，Windows会让用户
+your machine. One of the things that,
+Windows does, is it asks the user for a
+
+174
+00:12:42,179 --> 00:12:47,444
+指定一个密码，然后根据这个密码推出一个密钥K
+然后对每一个写入硬盘里的文件
+password, and then derives a key K from
+this password. And then for every file
+
+175
+00:12:47,444 --> 00:12:52,790
+这里有文件F1,F2一直到Fn
+that it writes to disk, in this case, the
+files would be F1, F2, up to Fn, what the
+
+176
+00:12:52,790 --> 00:12:56,123
+操作系统会计算文件的标签
+operating system would do is it
+would compute a tag for that file,
+
+177
+00:12:56,123 --> 00:13:01,908
+然后将标签和文件一道存放，这里把标签联结到各个文件
+and then store the tag along with the file. So here
+it concatenates the tag, to each one of the files.
+
+178
+00:13:01,908 --> 00:13:06,326
+然后它删除密钥K，他不在硬盘、内存
+或任何地方存储密钥K
+And then it erases the key K.
+So it no longer stores the key K on disc,
+
+179
+00:13:06,326 --> 00:13:10,884
+好，现在设想一下，机器被病毒感染了
+or on memory, or anywhere. Okay, so now
+later imagine that the machine gets
+
+180
+00:13:10,884 --> 00:13:15,532
+病毒试图修改一些系统文件
+infected with a virus and the virus tries
+to modify some of the system files.
+
+181
+00:13:15,532 --> 00:13:19,154
+问题是用户能否检测出系统文件是否被修改了
+The question is whether the user can
+detect which files were modified.
+
+182
+00:13:19,154 --> 00:13:24,270
+这是一种方法。用户会重启机器，运行某个干净的操作系统
+So here's one way to do it. Basically, the user
+would reboot the machine into some clean OS.
+
+183
+00:13:24,270 --> 00:13:28,868
+比如从USB硬盘或其他介质重启
+然后，机器从干净的操作系统重启
+Say you reboot from a USB disk or something.
+And then, once the machine boots from this
+
+184
+00:13:28,868 --> 00:13:34,052
+用户会提供给这个干净的操作系统它的密码
+clean OS, the user would supply his password
+to this clean running operating system.
+
+185
+00:13:34,052 --> 00:13:37,974
+然后这个新的干净的操作系统会检查
+每个系统文件的MAC
+And then this new clean running operating
+system would go ahead and check the MAC for
+
+186
+00:13:37,974 --> 00:13:43,279
+现在，MAC是安全的，意味着
+each one of the system files. Now, the
+fact that the MAC is secure, means that
+
+187
+00:13:43,279 --> 00:13:49,819
+可怜的病毒不能创建新的文件，记为f'，以及一个有效标签
+the poor virus couldn't actually create a
+new file, let's call it f prime, with a valid tag.
+
+188
+00:13:49,819 --> 00:13:53,928
+它不能创建一个f',t'，因为如果攻击者可以这么做
+So it couldn't actually create an
+f′, t′. Because, if it could,
+
+189
+00:13:53,928 --> 00:13:58,757
+那就会是一个对这个MAC的存在性伪造了
+then that would be an existential forgery
+on this MAC. And because, well,
+
+190
+00:13:58,757 --> 00:14:02,973
+但因为这个MAC是不可被存在性伪造的
+病毒不能创建任何f'
+the MAC is existentially unforgeable. The
+virus couldn't create any F Prime, no
+
+191
+00:14:02,973 --> 00:14:07,092
+无论是什么样的f'。最终，由于MAC的安全性
+matter what the F Prime is. And
+consequently, because of the security of
+
+192
+00:14:07,092 --> 00:14:10,829
+用户可以检测出所有被病毒修改过的文件
+the MAC, the user will detect all the
+files that were modified by the virus.
+
+193
+00:14:10,829 --> 00:14:16,104
+现在，这有一个警告，病毒可以做一件事
+Now, there's one caveat to that. One thing
+that the virus can do. Is actually swap
+
+194
+00:14:16,104 --> 00:14:22,190
+病毒可以交换两个文件，例如，他可以交换
+这两个文件：F1和F2
+two files. So, for example, he can swap
+this file, file F1, with the file F2 here,
+
+195
+00:14:22,190 --> 00:14:26,364
+就是交换两者。那么当系统或用户
+just literally swap them. So when the
+system, or when the user, tries to run
+
+196
+00:14:26,364 --> 00:14:31,126
+试图运行F1时，他们实际是在运行F2
+当然这也会造成各种损害
+file F1, instead they'll be running file
+F2. And of course that could cause all
+
+197
+00:14:31,126 --> 00:14:35,475
+防止这样做的方法就是
+sorts of damage. And so the way to defend
+against that is essentially by placing the
+
+198
+00:14:35,475 --> 00:14:40,345
+把文件名放在求MAC的区域里
+事实上，我们将文件名和文件内容一起
+file name inside of the MACed area, so in
+fact we're computing an integrity check on
+
+199
+00:14:40,345 --> 00:14:44,658
+计算完整性检查。因此，如果病毒
+the file name as well as on the contents
+of the file. And as a result, if the virus
+
+200
+00:14:44,658 --> 00:14:48,602
+试图交换两个文件，系统会说，这里的文件F1
+tries to swap two files, the system will
+say hey, the file that's located in
+
+201
+00:14:48,602 --> 00:14:52,757
+不具备正确的文件名，因此会检测出
+position F1 doesn't have the right name
+and therefore it will detect that the virus
+
+202
+00:14:52,757 --> 00:14:56,859
+病毒确实交换过，尽管MAC是可以验证的
+that did the swap even though the MAC
+actually verifies. So it is important to
+
+203
+00:14:56,859 --> 00:15:01,094
+记住有一点很重要，MAC可以帮助你抵御文件篡改
+或更广义上的数据篡改
+remember that MACs can help you defend
+against file tampering. Or data tampering
+
+204
+00:15:01,094 --> 00:15:06,403
+但它们无法帮助你抵御认证信息的交换
+in general. But they won't help you defend
+against swapping of authenticated data,
+
+205
+00:15:06,403 --> 00:15:09,725
+那必须借助其他方法完成，好
+and that has to be done by some other
+means. Okay, so that concludes our
+
+206
+00:15:09,725 --> 00:15:13,037
+我们对MAC的介绍先告一段落
+下一节，我们开始组建
+introduction to MACs, and in the next
+segment, we'll go ahead and construct our
+
+207
+00:15:13,037 --> 00:15:15,173
+第一个安全MAC的例子
+first examples of secure MACs.

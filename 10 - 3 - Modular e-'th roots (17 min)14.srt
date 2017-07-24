@@ -1,0 +1,1209 @@
+1
+00:00:00,000 --> 00:00:03,866
+上一节，我们讨论了如何解模线性方程
+In the previous segment, we talked about
+how to solve modular linear equations.
+
+2
+00:00:03,866 --> 00:00:07,733
+本节我们将讨论如何解模二次方程
+In this segment, we're gonna talk about how
+to solve modular quadratic equations.
+
+3
+00:00:07,733 --> 00:00:11,815
+更一般地，我们要看如何计算模e次方根。如我所说
+And more generally, we're gonna talk about how
+to compute modular e'th roots. As I said,
+
+4
+00:00:11,815 --> 00:00:17,238
+我们现在知道如何去解线性方程了，通过使用求逆的算法
+now we know how to solve linear equations
+simply by using an inversion algorithm to
+
+5
+00:00:17,238 --> 00:00:22,468
+来计算一个数的逆，然后乘以-B。问题是
+compute a inverse and then multiplying
+the result by minus B. So the question is
+
+6
+00:00:22,468 --> 00:00:27,375
+怎么解高次多项式方程呢？我们特别感兴趣的是
+what about higher degree polynomials and
+in particular we are interested in
+
+7
+00:00:27,375 --> 00:00:32,669
+解质数模多项式方程，解Z_p中的多项式方程
+solving, polynomials modulo primes. So
+solving polynomials in ZP, but polynomials
+
+8
+00:00:32,669 --> 00:00:38,092
+特别是形如x^2-c或y^3-c或z^37-c，全部在Z_p中
+particularly of the form x squared - c
+or y cubed - c or z to the 37 - c, all in ZP.
+
+9
+00:00:38,092 --> 00:00:43,172
+解这个多项式方程，例如，计算C的平方根
+So solving this polynomial, for
+example, involved computing the square root of C.
+
+10
+00:00:43,172 --> 00:00:47,589
+解这个多项式方程，计算C的立方根
+Solving this polynomial
+involves computing the cube root of C.
+
+11
+00:00:47,589 --> 00:00:52,620
+解这个多项式方程，计算C的37次方根。等等。。
+Solving this polynomial involves computing
+the thirty-seventh root of C. And so on.
+
+12
+00:00:53,440 --> 00:00:59,268
+那么我们固定质数p，我们说C是Z_p中的某元素
+So, again, let's fix the primes P, and
+let's say that C is some element in ZP.
+
+13
+00:00:59,268 --> 00:01:05,709
+我们说在Z_p中，X满足X的e次方等于C
+We'll say that X in ZP that satisfies X to
+the E is equal to C. We'll call such an X
+
+14
+00:01:05,709 --> 00:01:13,801
+我们就说X是C的e次方根。那么我们来看一个例子
+the modular E-th root of C. So let's look
+at an example. We say that the cube root
+
+15
+00:01:13,801 --> 00:01:20,932
+我们说在Z_11中，7的立方根等于6，
+因为6的立方等于216
+of 7 in Z11 is equal to 6,
+because 6 cubed is equal to 216, which
+
+16
+00:01:20,932 --> 00:01:28,434
+216 = 7 mod 11。因此，7模11的立方根
+happens to be 7 modulo 11. And
+therefore, the cube root of 7 modulo 11
+
+17
+00:01:28,434 --> 00:01:35,751
+等于6。我问大家，在Z_11中，3的平方根是多少？
+is equal to 6. So let me ask you,
+what is the square root of 3 in Z11?
+
+18
+00:01:35,751 --> 00:01:46,167
+答案是5，因为5的平方是25，也就是3模11
+So the answer is 5 because 5
+squared is equal to 25, which is 3 modulo 11.
+
+19
+00:01:46,167 --> 00:01:50,555
+类似地，我问大家，1的模11立方根是什么？
+And similarly, let me ask
+you, what is the cubed root of 1, modulo 11.
+
+20
+00:01:50,555 --> 00:01:57,449
+1的立方根就是1，因为1的立方等于1，在Z_11中
+Well the cube root of 1
+is simply 1, because one cubed is equal to 1, in Z11.
+
+21
+00:01:57,449 --> 00:02:01,791
+事实上这点对所有质数模都成立
+In fact that's true
+in modulo any prime. One thing I'd like to
+
+22
+00:02:01,791 --> 00:02:05,802
+我想指出一点，这些e次方根不一定总是存在的。例如
+point out is that these e'th roots
+don't always exist. For example, if I
+
+23
+00:02:05,802 --> 00:02:09,865
+如果我让大家去计算2模11的平方根，就会有问题
+asked you to compute the square root of
+2 modulo 11, you'd have a problem,
+
+24
+00:02:09,865 --> 00:02:14,625
+因为2模11的平方根是不存在的
+because the square root of two simply
+doesn't exist modulo 11. So now that
+
+25
+00:02:14,625 --> 00:02:19,099
+现在我们理解了e次方根的意义。下一问题是
+we understand what an e'th root is, the next
+question is, when do these e'th roots
+
+26
+00:02:19,099 --> 00:02:23,391
+什么时候这些e次方根存在？当我们知道它们存在时
+我们能否有效地计算它们？
+exist, and when we know that they do
+exist, can we actually compute them efficiently?
+
+27
+00:02:23,391 --> 00:02:28,167
+那么我们看一个简单例子。这个简单例子是
+So, let's start with the easy
+case. The easy case is, when we want to
+
+28
+00:02:28,167 --> 00:02:33,185
+当我们想计算某个数的e次方根时，
+正好有e与p-1互质
+compute an e'th root of something, and it
+so happens that e is relatively prime to p-1.
+
+29
+00:02:33,185 --> 00:02:38,082
+这时c^(1/e)始终存在，且有一非常容易的算法
+In this case, c to the one over
+e always exists, and there's a very easy
+
+30
+00:02:38,082 --> 00:02:43,100
+可以计算出c在Z_p中的e次方根。我们来看怎么办
+algorithm to actually compute the e'th root
+of c in ZP. So let's see how this works.
+
+31
+00:02:43,100 --> 00:02:48,628
+首先，因为e与p-1互质，我们知道e模p-1有逆
+So first, since e is relatively prime to
+p-1, we know that e has an inverse
+
+32
+00:02:48,628 --> 00:02:53,623
+我们计算这个逆，并记之为d
+modulo of p-1. So let's compute
+this inverse, and let's call it d.
+
+33
+00:02:53,623 --> 00:03:00,872
+那么我们让d表示e模p-1的逆。然后我宣称，事实上c^(1/e)
+So let's let d be the inverse of e modulo p-1. Then I claim that in fact c to the 1/e
+
+34
+00:03:00,872 --> 00:03:09,017
+就是c^d mod p。如果这个等式成立
+is simply c to the d,
+modulo p. So if this equation holds then
+
+35
+00:03:09,017 --> 00:03:15,337
+那么首先它证明了对Z_p中的所有c，c的e次方根
+first of all it proves that for all
+с in ZP the e'th root to c actually
+
+36
+00:03:15,337 --> 00:03:20,682
+总是存在。进一步地，它给出了一个非常有效的算法
+来计算c的e次方根
+exists. And moreover, it gives a very
+efficient algorithm to compute this e'th root to c,
+
+37
+00:03:20,682 --> 00:03:25,976
+通过简单计算e模p-1的逆
+simply by computing the inverse
+of e modulo p-1, and then raising
+
+38
+00:03:25,976 --> 00:03:30,955
+然后计算c的逆次方。一举两得
+c to the power of that inverse. Okay? So
+we kill two birds in one stone. So let's
+
+39
+00:03:30,955 --> 00:03:37,579
+我们看这个方程为何成立。首先，一个事实是
+see why this equation holds. So first of
+all the fact that d times e is equal to
+
+40
+00:03:37,579 --> 00:03:44,705
+d*e =1 mod p-1，这意味着存在某个整数k，使得
+one mod p-1, what that means is there
+exists some integer k. Such that if I look
+
+41
+00:03:44,705 --> 00:03:52,006
+如果我看d*e，它将等于k(p-1)+1
+at d times e for that's basically gonna be
+k times p-1 plus 1. That's basically
+(这里是看普通整数乘法。总是存在k这样的整数)
+
+42
+00:03:52,006 --> 00:03:58,222
+这个的意思就是d*e = 1 mod p-1
+what it means that d times e is equal to
+one modulo p-1. Well, so now we can
+
+43
+00:03:58,222 --> 00:04:03,206
+现在我们可以确认c^d是c的一个e次方根了
+actually confirm that c to the d is a
+e'th root of C. Well, how do we
+
+44
+00:04:03,206 --> 00:04:08,323
+我们如何确定？取c^d，计算它的e次方
+confirm that? Well, let's take C to the D,
+and raise it to the power of E. If in
+
+45
+00:04:08,323 --> 00:04:13,572
+如果c^d真是c的一个e次方根，那么当我们计算它的e次方
+fact, c to the d is an e'th root of
+c, when we raise it to the power of e;
+
+46
+00:04:13,572 --> 00:04:19,020
+我们应该会得到c。那么我们看为什么是这样
+we're supposed to get c back. So let's see
+why that's true. Well, that's simply equal
+
+47
+00:04:19,020 --> 00:04:24,106
+这等于c^(d*e)
+to c times d to the e, and c times d to
+the e, well, by definition, is equal to c
+(口误，应为c to d times e)
+
+48
+00:04:24,106 --> 00:04:29,488
+等于c^(k(p-1)+1)，使用指数法则
+to the power of k times p-1 plus 1
+Well, using the laws of
+
+49
+00:04:29,488 --> 00:04:37,375
+我们可以把这个写成c^(k(p-1))*c
+exponentiation, we can write this as c to
+the power of p-1 to the power of k times c.
+
+50
+00:04:37,375 --> 00:04:41,948
+我这里使用了标准的指数法则，分配幂
+All I did is I distributed the
+exponentiation using the standard laws of exponentiation.
+
+51
+00:04:41,948 --> 00:04:47,087
+现在关于c^(p-1)我们知道什么？因为c在Z_p中
+Now what do we know about
+c to the p-1? Since c lives in ZP
+
+52
+00:04:47,087 --> 00:04:52,421
+根据费马定理，我们知道在Z_p中，c^(p-1)=1
+by Fermat's theorem we know that c
+to the p-1 is equal to 1, in ZP.
+
+53
+00:04:52,421 --> 00:04:57,755
+1的k次方依然是1，因此这个在Z_p中等于c
+1 to the k is also equal to 1 and as a
+result, this is simply equal to c in ZP,
+
+54
+00:04:57,755 --> 00:05:03,822
+这正是我们需要证明的，c^d是c的e次方根
+which is exactly what we needed to prove
+that c to the d is an e'th root of c.
+
+55
+00:05:03,822 --> 00:05:08,790
+好，那么这就是我说的简单情况。
+事实上当e与p-1互质时
+Okay. So this is what I call the easy
+case. In fact, the e'th root always exists
+
+56
+00:05:08,790 --> 00:05:13,633
+e次方根总是存在。根是容易计算的
+when e is relatively prime to p-1. And it's very easy to compute it
+
+57
+00:05:13,633 --> 00:05:18,730
+只要使用这里的公式即可。现在我们看一个难一些的情况
+simply by using this formula here. Now
+let's turn to the less easy case. So the
+
+58
+00:05:18,730 --> 00:05:24,192
+当e与p-1不互质时。一个经典的例子是
+less easy case is when e is not relatively
+prime to p-1. And the canonical example
+
+59
+00:05:24,192 --> 00:05:29,787
+当e=2的情况。现在假设我们想计算在Z_p中
+here is when e is equal to 2. So now
+suppose we want to compute square roots of
+
+60
+00:05:29,787 --> 00:05:35,183
+c的平方根。那么如果p是一个奇质数，事实上
+从今往后我们一直都关心奇质数
+c in ZP. So if p is an odd prime, and in
+fact we are going to focus on odd primes
+
+61
+00:05:35,183 --> 00:05:40,645
+事实上p-1是欧氏，意味着2整除p-1
+from now on, then in fact p-1 is going to
+be even. Which means that two are divided
+
+62
+00:05:40,645 --> 00:05:46,106
+gcd(2,p-1)确实不等于1，所以这不是容易的情况
+p-1, and indeed the gcd(2,p-1) is
+not equal to 1, So this is not the easy case.
+
+63
+00:05:46,106 --> 00:05:51,827
+所以我们上一张幻灯片里看到的算法，在这里不适用
+So the algorithm that we just saw on
+the previous slide is not gonna work when
+
+64
+00:05:51,827 --> 00:05:56,565
+我们想计算奇质数模的平方根
+we want to compute square roots modulo
+an odd prime.
+
+65
+00:05:56,565 --> 00:06:03,282
+那么当我们工作在奇质数模下，平方函数实际上是2到1函数
+So when we work modulo odd prime, the squaring function is actually a
+2-to-1 function. Namely, it maps X and
+(本质上，这个平方函数也是一个<font color="red">群同态</font>)
+
+66
+00:06:03,282 --> 00:06:09,416
+它把X和-X映射到了同一个值。它把它们都映射到了X^2。因此
+minus X to the same value. It matched both
+of them to X squared. And as a result, we
+
+67
+00:06:09,416 --> 00:06:15,192
+我们说这个函数是2到1函数。这是一个简单的例子
+say that this function is a 2-to-1
+function. So here's a simple example.
+
+68
+00:06:15,192 --> 00:06:20,585
+我们看当我们计算模11的平方，会发生什么
+Let's look at what happens when we compute
+squares modulo eleven. So you can see that
+
+69
+00:06:20,585 --> 00:06:25,508
+那么大家可以看到，1和-1模11都被映射到了1。
+2和-2模11都被映射到了4
+1 and -1 modulo 11 both map
+to 1. 2 and -2 both map to 4.
+
+70
+00:06:25,508 --> 00:06:30,391
+3和-3都被映射到了9，等等。。
+3 and -3  both map to
+9, and so on and so forth, So you can
+
+71
+00:06:30,391 --> 00:06:34,837
+所以大家可以看到这是一个2到1映射。那么
+事实上这些元素：1, 4
+see that it's a 2-to-1 map. So, in
+fact, these elements here, 1, 4,
+
+72
+00:06:34,837 --> 00:06:39,595
+9, 5, 3, 都是有平方根的。例如
+9, 5, 3, all are gonna have square roots. For example, the square root
+
+73
+00:06:39,595 --> 00:06:44,475
+4的平方根是2和9。我宣称，事实上
+of 4 is simply gonna be 2 and 9.
+And I claim that, in fact, none of the
+
+74
+00:06:44,475 --> 00:06:49,227
+Z_11里的其他元素都没有平方根
+other elements of Z11 are gonna have
+a square root. And that motivates this
+
+75
+00:06:49,227 --> 00:06:53,979
+这就引出了这个定义，说一个Z_p中的元素x，
+我们称之为一个二次剩余
+definition to say that an element x in ZP,
+we're gonna say, is called a quadratic
+
+76
+00:06:53,979 --> 00:06:58,493
+如果事实上它在Z_p中有一个平方根。如果它没有
+residue. If in fact, it has a square root
+in ZP. Okay, and if it doesn't have a
+
+77
+00:06:58,493 --> 00:07:03,963
+平方根，我们就称之为二次非剩余
+square root, we'll say that it's a non
+quadratic residue. For example modulo 11
+
+78
+00:07:03,963 --> 00:07:09,283
+例如4模11是一个二次剩余，9也是二次剩余
+4 is going to be a quadratic
+residue, 9 is a quadratic residue, 5
+
+79
+00:07:09,283 --> 00:07:14,137
+5是二次剩余，3是二次剩余，当然
+is a quadratic residue, 3 is a
+quadratic residue, and, of course, 1 is
+
+80
+00:07:14,137 --> 00:07:19,457
+1也是二次剩余。那么我问大家，如果p是一个奇质数
+a quadratic residue. So let me ask you, if
+p is an odd prime, what do you think is
+
+81
+00:07:19,457 --> 00:07:24,578
+你觉得Z_p中的二次剩余一共有多少个？
+我给大家一个提示
+the number of quadratic residues in ZP?
+And I'll give you a hint; the squaring
+
+82
+00:07:24,578 --> 00:07:30,097
+这个平方函数是2到1的映射，意味着Z_p中
+有一半的元素在这个映射中没有原像
+function is a 2-to-1 map, which means
+that half the elements in ZP can't have a
+
+83
+00:07:30,097 --> 00:07:35,699
+所以二次剩余的总数是(p-1)/2 + 1
+pre-image under this map. So the number of
+quadratic residues is simply (p-1)/2 + 1
+
+84
+00:07:35,699 --> 00:07:40,336
+原因是因为我们知道Z_p中的一半元素
+And the reason that's
+true is because we know that exactly half
+
+85
+00:07:40,336 --> 00:07:44,634
+是二次剩余的
+the elements in ZP are gonna be
+quadratic residues, Because of the fact
+
+86
+00:07:44,634 --> 00:07:49,328
+因为平方函数是2到1映射。所以映射的像
+that the squaring function is a 2-to-1
+map. So there can be, at most (p-1)/2
+
+87
+00:07:49,328 --> 00:07:54,123
+最多有(p-1)/2个元素。那么Z_p中的一半的元素
+elements in the image of that
+map. So half the elements in ZP are
+
+88
+00:07:54,123 --> 00:07:59,113
+是二次剩余的。那么在Z_p中还有0也是二次剩余的
+quadratic residues, And then, in ZP,
+there's also zero. We also have to account
+
+89
+00:07:59,113 --> 00:08:04,036
+我们也必须包括0，0总是二次剩余的，因为0的平方是0
+for zero. Zero is always a quadratic
+residue, 'cause zero squared is equal to
+
+90
+00:08:04,036 --> 00:08:08,632
+所以我们在Z_p^*里有(p-1)/2个二次剩余
+zero. So overall, we get (p-1)/2
+quadratic residues in ZP*, plus 1,
+
+91
+00:08:08,632 --> 00:08:13,556
+再加上Z_p里的0也是二次剩余。那么Z_p中一共
+the zero element, which is a quadratic
+residue in ZP. So overall, in ZP, there
+
+92
+00:08:13,556 --> 00:08:18,875
+有(p-1)/2 + 1个二次剩余。好，要记住的要点是
+are (p-1)/2 + 1 quadratic
+residues. Okay, so the main points to
+
+93
+00:08:18,875 --> 00:08:24,401
+约有一半的元素有平方根，另一半则没有
+remember is that roughly half the elements
+have a square root and the other half does
+
+94
+00:08:24,401 --> 00:08:29,763
+我想强调，这和容易的情况很不同
+not have a square root. I wanna emphasize
+that this is very different from the easy
+
+95
+00:08:29,763 --> 00:08:34,748
+容易的情况下，e与p-1互质。如果大家记得
+case, where e was relatively prime to p-1. If you remember in the easy
+
+96
+00:08:34,748 --> 00:08:40,120
+在容易的情况里，Z_p的每一个元素都有一个e次方根，
+当e与p-1不互质的时候
+case, every element in ZP had an e'th
+root. When e is not relatively prime to p-1,
+
+97
+00:08:40,120 --> 00:08:45,428
+不再是这种情况了，特别地，当e=2
+that's no longer the case, and
+in particular in the case of e equals 2,
+
+98
+00:08:45,428 --> 00:08:50,412
+Z_p中只有一半的元素有平方根
+only half of the elements in ZP have
+a square root. Well, so the natural
+
+99
+00:08:50,412 --> 00:08:55,720
+那么自然就有问题，我们能否对Z_p^*里的一个元素X
+question then is, can we given an element x
+that's in ZP*, can we tell whether it has
+
+100
+00:08:55,720 --> 00:09:02,735
+判断出X是否有平方根呢？那么欧拉对此做了重要工作
+a square root or not? So Euler did some
+important work on that too and in fact, he
+
+101
+00:09:02,735 --> 00:09:08,195
+他提出了一个非常清楚的测试这些元素
+came up with a very clean criteria to test
+exactly which elements are quadratic
+
+102
+00:09:08,195 --> 00:09:13,041
+是否是二次剩余的标准。特别地，他说
+residues and which are not. And in
+particular he said that x in ZP is a
+
+103
+00:09:13,041 --> 00:09:18,501
+在Z_p中，x是二次剩余，当且仅当x的(p-1)/2次方等于1模p
+quadratic residue if and only if x to the
+power of (p-1)/2 is equal to 1 modulo p.
+
+104
+00:09:18,501 --> 00:09:23,538
+非常优雅简洁的条件。我们来看一个Z_11的简单例子
+Okay, very, very elegant and very simple condition. Let's see a simple
+
+105
+00:09:23,538 --> 00:09:28,137
+当我们工作在模11下时，这里我为大家计算了
+example in Z11, so when we work mod 11. So here I compute it at the 5th
+
+106
+00:09:28,137 --> 00:09:32,452
+所有Z_11里的元素的5次幂，那么大家可以看到这个符号
+power of all the elements in Z11 for
+you, and you can see that this symbol,
+
+107
+00:09:32,452 --> 00:09:36,880
+X^((p-1)/2)始终是1或-1
+this X to the (p-1)/2, is
+always either one or minus one, and it's
+
+108
+00:09:36,880 --> 00:09:40,741
+在二次剩余1,3,4,5,9上，它一定是1
+one precisely at the quadratic
+residues--so 1, 3, 4, 5, and 9.
+
+109
+00:09:40,741 --> 00:09:44,942
+好，那些就是二次剩余，而其他元素不是二次剩余
+Okay, those are the quadratic
+residues, and the other elements are not
+
+110
+00:09:44,942 --> 00:09:49,541
+这里，我用绿色圈出，这些元素
+quadratic residues. Here, I'll circle them
+in green. These are the elements that do
+
+111
+00:09:49,541 --> 00:09:54,432
+没有平方根，当我们工作在模11下。我想指出一点
+not have a square root when we work modulo
+11. One thing I'd like to point out
+
+112
+00:09:54,432 --> 00:09:58,704
+事实上，如果我们取一个非0的数x，我们看x的(p-1)/2次方
+is, in fact, if we take an x that's not
+equal to 0, and we look at x to the (p-1)/2
+
+113
+00:09:58,704 --> 00:10:02,812
+我们可以把它写成x^(p-1)的平方根
+Well, we can write that as the square root of x to the p-1
+
+114
+00:10:02,812 --> 00:10:07,138
+把二分之一提取出来了，然后这就是
+The kind of, the half bubbles out, and this is simply the square
+
+115
+00:10:07,138 --> 00:10:11,410
+x^(p-1)的平方根。根据费马小定理，x^(p-1)=1
+root of x to the p-1. Well, x to
+the p-1 by Fermat's theorem, is 1.
+
+116
+00:10:11,410 --> 00:10:17,579
+所以x^((p-1)/2)就是1的平方根，也就一定是1或-1
+So, x to the (p-1)/2 is
+simply a square root of 1, which must be 1 or -1.
+
+117
+00:10:17,579 --> 00:10:21,688
+这就证明了这个幂
+So what this proves is that really this exponentiation here must
+
+118
+00:10:21,688 --> 00:10:26,654
+一定输出1或-1，我们实际上看到过了
+output 1 or -1, and we actually
+saw that happening here. It outputs 1
+
+119
+00:10:26,654 --> 00:10:31,118
+当x是二次剩余时，它输出1；当x不是二次剩余时，它输出-1
+when x is a quadratic residue, and it
+outputs -1 when x is not a
+
+120
+00:10:31,118 --> 00:10:34,755
+这个证明不难
+quadratic residue. This is not a
+particularly difficult proof, but I'm not
+(提示：依然是拉格朗日定理的直接推论)
+
+121
+00:10:34,755 --> 00:10:38,492
+但我这里不给出，本章末我会给大家指出一份参考
+going to show it to you here. It's in the
+reference that I point to you at the end
+
+122
+00:10:38,492 --> 00:10:43,643
+为求完整，我说一下，这个值：x^((p-1)/2)
+of the module. And just for completeness,
+I'll mention that this value, x to the (p-1)/2
+
+123
+00:10:43,643 --> 00:10:48,841
+有个名字叫勒让德符号(x/p)
+has a name, it's called the Legendre's symbol of x over p.
+
+124
+00:10:48,841 --> 00:10:54,517
+如我们所说，Z_p中所有元素的勒让德符号不是1就是-1
+And as we said, this for elements in ZP the symbol is either 1 or -1
+
+125
+00:10:54,517 --> 00:10:59,924
+取决于x是否是二次剩余的。现在欧拉定理有个坏消息
+depending on the quadratic residuosity
+of x. Now, the sad thing about Euler's
+
+126
+00:10:59,924 --> 00:11:03,726
+就是它不是构造性的定理。即使它很可爱
+Theorem is that it's not constructive.
+Even though it's a very, very cute theorem,
+
+127
+00:11:03,726 --> 00:11:07,631
+告诉了我们哪些元素是二次剩余的，哪些不是
+it tells us exactly which elements are quadratic residues and which
+
+128
+00:11:07,631 --> 00:11:11,382
+但这个定理没有构建答案
+aren't, this theorem doesn't do it
+constructively, in the sense that if we
+
+129
+00:11:11,382 --> 00:11:15,287
+如果我们想计算一个二次剩余的平方根
+want to compute the square roots of a
+quadratic residue, the theorem doesn't
+
+130
+00:11:15,287 --> 00:11:19,295
+这个定理并没有告诉我们怎么办。事实上
+即使你去看这个定理的证明过程
+actually tell us how to do that. And in
+fact, even if you look at the proof, the
+
+131
+00:11:19,295 --> 00:11:23,508
+证明也是基于存在性依据的。那么它只证明了平方根存在
+proof is by an existential argument. So it
+proves that the square roots exists, but
+
+132
+00:11:23,508 --> 00:11:28,541
+但没有为我们展示如何计算我们想要的平方根
+it doesn't show us how to compute the
+square root when we want it.
+
+133
+00:11:28,695 --> 00:11:33,149
+那么下一个问题是，我们如何计算质数模的平方根
+So the next question is then how do we compute square roots modulo primes. So it turns out
+
+134
+00:11:33,149 --> 00:11:37,423
+实际上，这并不难，它还是分两种情况
+that's actually not so hard and, again, it
+breaks up into two cases. The first case
+
+135
+00:11:37,423 --> 00:11:41,327
+第一种情况是，当p=3 mod 4时
+is when p is equal to 3 modulo 4
+in, which case, it's really easy to
+
+136
+00:11:41,327 --> 00:11:45,707
+非常容易计算平方根，我将告诉大家有一个简单公式
+compute the square root and I'll just tell
+you there's a simple formula. The square
+
+137
+00:11:45,707 --> 00:11:49,876
+这种情况下，c的平方根就是c^((p+1)/4)
+root of c in this case is simply c to the
+power of (p+1)/4.
+
+138
+00:11:49,876 --> 00:11:54,143
+大家会注意到因为p=3 mod 4
+You'll notice that because p is equal to 3
+modulo 4, p+1 is necessarily,
+
+139
+00:11:54,143 --> 00:11:59,094
+必然有p+1=0 mod 4。意味着p+1被4整除
+p+1 is equal to 0 modulo 4.
+Which means that p+1 is divisible by
+
+140
+00:11:59,094 --> 00:12:04,236
+因此(p+1)/4是一个整数
+4, and therefore (p+1)/4 is an integer. And that's exactly what allows
+
+141
+00:12:04,236 --> 00:12:09,188
+这就允许我们计算这个幂，我宣称它给了我们
+us to compute this exponentiation, and I
+claim that, that actually gives us the
+
+142
+00:12:09,188 --> 00:12:14,203
+c的平方根。非常简单的公式，直接给我们c的平方根
+square root of c. Very simple formula,
+that directly gives us the square root of c.
+
+143
+00:12:14,203 --> 00:12:17,099
+我们来验证一下它的正确性
+So let's verify that that's actually true.
+
+144
+00:12:17,099 --> 00:12:22,441
+我计算c的(p+1)/4次方再平方
+Well I'll take c to the power of (p+1)/4 and square that.
+
+145
+00:12:22,441 --> 00:12:29,663
+事实上，如果c的(p+1)/4次方是c的平方根，
+当我求平方时，我应该得到c
+And if, in fact, if c to the (p+1)/4 is the square root of c, when I square it, I should get c.
+
+146
+00:12:29,663 --> 00:12:36,358
+那么我们来看会发生什么。首先，根据指数法则，这就等于
+So let's see what happens. So first of all, by laws of exponentiation, this is simply equal to c
+
+147
+00:12:36,358 --> 00:12:43,232
+c的(p+1)/2次方。我可以写成c^((p-1)/2)*c
+to the power of (p+1)/2. And that I can write as c to the power of (p-1)/2 times c
+
+148
+00:12:43,232 --> 00:12:47,804
+我提取了1/2，移到了幂的外面
+Okay, again, this is basically, I took, one-half, and moved it
+(其实是提取了1)
+
+149
+00:12:47,804 --> 00:12:53,221
+现在，关于c的(p-1)/2次方，我们知道什么？
+out of the exponentiation. Now, what do we
+know about c to the power of (p-1)/2 ?
+
+150
+00:12:53,221 --> 00:12:58,441
+由于c是二次剩余，我们知道c的(p-1)/2次方是1
+Since c is a quadratic residue,
+we know that c to the power of (p-1)/2 is 1.
+
+151
+00:12:58,441 --> 00:13:03,472
+因此，在Z_p中，这等于1乘以c，就是c
+And therefore, this is really equal to one times c, which is c in
+
+152
+00:13:03,472 --> 00:13:08,390
+即为所证。好。那么这就证明了c的(p+1)/4次方
+ZP as we wanted to show. Okay. So this
+basically proves that c to the power of (p+1)/4
+
+153
+00:13:08,390 --> 00:13:13,374
+是c的平方根，至少当p=3 mod 4时
+is the square root of c, at least in the case when p is equal to 3 modulo 4.
+
+154
+00:13:13,374 --> 00:13:18,175
+现在大家应该问我，当p=1 mod 4时，答案是什么？
+Now you should ask me, well, what about the case when p is equal to 1 mod 4 ?
+
+155
+00:13:18,175 --> 00:13:22,672
+在这种情况下，这个公式就不成立了。因为指数(p+1)/4
+In that case, this formula doesn't even make sense. Because (p+1)/4
+
+156
+00:13:22,672 --> 00:13:27,534
+这里将是一个有理分式
+this exponent here, (p+1)/4 is gonna be a rational fraction, and I don't
+
+157
+00:13:27,534 --> 00:13:32,858
+我不知道然后计算c的有理分式次方
+know how to raise, c to the power of a
+rational fraction. Nevertheless, it turns
+
+158
+00:13:32,858 --> 00:13:37,151
+不过，实际上即使当p=1 mod 4时，我们也可以计算平方根
+out that even in the case where p is equal
+to 1 mod 4, we can efficiently find
+
+159
+00:13:37,151 --> 00:13:41,341
+尽管要困难一些。特别地，我们没有
+square roots, although it's a little bit
+harder. And in particular, we don't have a
+
+160
+00:13:41,341 --> 00:13:45,480
+确定性的算法来计算。我们必须使用一个随机算法来找
+deterministic algorithm to do it. We have
+to use a randomized algorithm to do it.
+(其实不只一个，比如Tonelli, Cipolla等人的算法)
+
+161
+00:13:46,180 --> 00:13:51,132
+这个随机算法会非常有效地找到x模p的平方根
+But this randomized algorithm will
+actually find the square root of x mod p,
+
+162
+00:13:51,132 --> 00:13:56,795
+我想我应该提到，如果有人能证明
+very efficiently. I guess I should mention
+that if someone could prove that the
+
+163
+00:13:56,795 --> 00:14:01,559
+扩展的黎曼猜想，一个更深层的解析数论里的猜想
+extended Riemann hypothesis--this is some deep
+hypothesis of analytic number theory. If
+
+164
+00:14:01,559 --> 00:14:05,651
+如果有人能证明这个猜想成立，那么就会给出
+someone could prove that, that hypothesis
+is true, in fact, it would give a
+
+165
+00:14:05,651 --> 00:14:10,079
+一个确定的算法来计算平方根，即使p=1 mod 4
+deterministic algorithm for computing square roots even when p is equal to 1 modulo 4.
+(实际上必须是log p的多项式级的算法。因为即使穷举也是O(p))
+
+166
+00:14:10,079 --> 00:14:14,507
+我说这个的原因是
+So the reason I like to mention that is because you notice that as
+(这段话的根据是1992年Victor Shoup的论文Searching for primitive roots in finite fields)
+
+167
+00:14:14,507 --> 00:14:18,879
+一旦你要研究某个对象的计算
+soon as you put the computational lens on
+something--for example, I ask you to
+
+168
+00:14:18,879 --> 00:14:23,255
+例如，计算x模p的平方根。得到一个这样的算法
+compute the square roots of a number x
+modulo p. Coming up with an algorithm
+
+169
+00:14:23,255 --> 00:14:28,253
+需要极深的数学结果
+already requires extremely, extremely deep
+results in mathematics some of which are
+
+170
+00:14:28,253 --> 00:14:33,835
+甚至是当前未证实的结果。就目前来看
+not even known to be true today. So as
+things stand today, we simply don't have a
+
+171
+00:14:33,835 --> 00:14:38,428
+我们还没有一个确定性算法来计算模p平方根，当p=1 mod 4
+deterministic algorithm to compute square
+roots where p is 1 mod 4. But as I
+
+172
+00:14:38,428 --> 00:14:42,791
+如我所说，我们有很好的随机算法，这个问题被认为是容易的
+said, we have good randomized algorithms,
+and this problem is considered easy.
+
+173
+00:14:42,791 --> 00:14:47,326
+本质上就是算几次幂。因此我们会看到
+Essentially, it boils down to a few exponentiations. And as a result, as we'll
+
+174
+00:14:47,326 --> 00:14:52,033
+计算平方根的运行时间是p的位数的立方
+see, the running time of computing square
+roots essentially is cubic in the number
+
+175
+00:14:52,033 --> 00:14:57,154
+很好。现在我们知道如何计算模p的平方根了
+of bits of p. So excellence. And now we
+know how to compute square roots mod p,
+
+176
+00:14:57,154 --> 00:15:01,100
+现在我们可以讨论解模p的二次方程了
+and so now we can talk about solving
+quadratic equations modulo p. So suppose
+
+177
+00:15:01,100 --> 00:15:04,924
+假设我给你一个二次方程，我让你找到Z_p中
+I give you a quadratic equation and I
+asked you to find a solution of this
+
+178
+00:15:04,924 --> 00:15:08,951
+这个二次方程的解。那么现在我宣称，
+你已经知道怎么做了
+quadratic equation in ZP. Well so now I
+claim that you know how to solve it. The
+
+179
+00:15:08,951 --> 00:15:12,927
+你计算他的方法是使用高中的解二次方程的公式
+way you would solve it is basically you
+would use the high school formula for
+
+180
+00:15:12,927 --> 00:15:16,955
+那么方程的解是
+solving quadratic equations, you know. So
+the solution is minus b plus minus the
+
+181
+00:15:16,955 --> 00:15:20,982
+(-b±sqrt(b^2-4ac))/(2a)。我说大家知道如何计算的
+square root of b squared minus 4ac over
+2a. And I claim that you know how to
+
+182
+00:15:20,982 --> 00:15:25,213
+用这个公式。那么大家知道怎么计算2a的逆
+compute all the elements in this formula. So you know how to compute the inverse of 2a.
+
+183
+00:15:25,213 --> 00:15:29,189
+这样可以除以2a，这是使用的扩展的欧几里德算法
+So you can divide by 2a. That's done using the extended Euclidean algorithm.
+
+184
+00:15:29,189 --> 00:15:33,420
+大家知道如何计算sqrt(b^2-4ac)
+And you know how to compute a square root of b squared minus 4ac, using one of
+
+185
+00:15:33,420 --> 00:15:37,761
+使用上一张幻灯片里的平方根算法
+the square root algorithms from the
+previous slide. And of course the formula
+
+186
+00:15:37,761 --> 00:15:43,495
+当然这个公式可解，仅当Z_p中有平方根。很好
+will only be solvable if the square root
+actually exists in ZP. So that's cool. So
+
+187
+00:15:43,495 --> 00:15:49,592
+现在大家知道如何解Z_p中的二次方程了
+now, you guys know how to solve quadratic
+equations in ZP. So now, the next obvious
+
+188
+00:15:49,592 --> 00:15:54,760
+下一个问题显然是关于计算这些根的，合数模
+question is what about computing these
+roots, modulo composites rather than
+
+189
+00:15:54,760 --> 00:16:00,036
+而不是质数模的。那么我们可以问与之前同样的问题
+modulo primes. So we can ask exactly the
+same questions that we asked before. So
+
+190
+00:16:00,036 --> 00:16:05,012
+什么时候模N的e次方根存在？如果我们知道它存在
+when does the e'th root modulo N exist?
+And if we know that it exists, can we
+
+191
+00:16:05,012 --> 00:16:10,120
+我们能否有效地计算它？这个问题要困难得多了
+actually compute it efficiently? And here,
+the problem is much, much, much harder.
+
+192
+00:16:10,120 --> 00:16:14,692
+事实上，我们只知道，计算合数模的e次方根
+And in fact it turns out that, for all we
+know, computing e'th roots modular
+
+193
+00:16:14,692 --> 00:16:19,751
+与分解合数一样困难。现在，对于一个普通的数e
+composites is in fact as hard as factoring
+that composite. Now, for a general e, this
+
+194
+00:16:19,751 --> 00:16:24,811
+不知道是否是最优的，但我们有的最好的算法
+is actually not known to be true, but the
+best algorithm that we have for computing
+
+195
+00:16:24,811 --> 00:16:29,505
+来计算模N的e次方根，需要我们分解这个模
+e'th roots modulo N requires us to factor
+the modulus. And once we factor the
+
+196
+00:16:29,505 --> 00:16:34,078
+一旦我们分解了这个模，那么实际上每个质数因数的
+modulus, then it's actually easier to
+compute e'th roots modulo each of the
+
+197
+00:16:34,078 --> 00:16:39,137
+e次方根是容易计算的。我们可以组合所有的这些e次方根
+prime factors. And we can combine all the
+e'th roots together to get the e'th roots
+
+198
+00:16:39,137 --> 00:16:44,378
+来得到合数模N的e次方根。所以这是个有趣情况
+modulo the composite N. So it's a very
+interesting case, where computing e'th
+
+199
+00:16:44,378 --> 00:16:48,919
+计算质数模的e次方根非常容易。事实上，
+这对于很多e都非常容易
+root modulo prime was very easy. In
+fact, for many e's, it was very easy. But
+
+200
+00:16:48,919 --> 00:16:53,403
+但计算合数模的e次方根困难得多
+computing e'th root modulo composite is much, much, much harder and, in fact,
+
+201
+00:16:53,403 --> 00:16:59,265
+事实上它需要因子分解N。关于e次方根，
+这些就是我想告诉大家的
+requires the factorization of N. So that's
+all I wanted to tell you about e'th roots.
+
+202
+00:16:59,265 --> 00:17:03,489
+下节我们看模算法
+In the next segment, we're gonna turn to
+modular algorithms and we're gonna talk
+
+203
+00:17:03,489 --> 00:17:08,562
+我们将讨论质数模与合数模的加法、乘法和指数算法
+about addition and multiplication and exponentiation algorithms, modulo primes and composites.

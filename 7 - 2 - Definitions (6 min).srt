@@ -1,0 +1,440 @@
+1
+00:00:00,306 --> 00:00:03,017
+上一节里我们看了两个主动攻击
+In the last segment, we saw two active
+attacks that can completely destroy the
+
+2
+00:00:03,017 --> 00:00:08,354
+它们可以完全破坏CPA安全加密的安全性。
+本节我们将定义一个新概念
+security of CPA secure encryption. In this
+segment, we're gonna define a new concept,
+
+3
+00:00:08,354 --> 00:00:12,183
+叫做认证加密，即存在主动攻击者也能保持安全
+called authenticated encryption, that
+remains secure in the presence of an
+
+4
+00:00:12,183 --> 00:00:16,978
+后面几节里，我们将组建加密机制
+active adversary. In later segments, we'll
+construct encryption schemes that satisfy
+
+5
+00:00:16,978 --> 00:00:21,007
+来满足认证加密这一概念。那认证加密是什么？
+this new authenticated encryption concept.
+So what is authenticated encryption?
+
+6
+00:00:21,007 --> 00:00:25,866
+认证加密是一个密码，通常是个加密算法
+Authenticated encryption is a cipher where
+as usual the encryption algorithm takes a
+
+7
+00:00:25,866 --> 00:00:31,234
+取密钥、信息为输入，还可选一个新鲜值，输出一个密文
+key, a message and optionally a nonce and outputs
+a cipher text. The decryption algorithm as
+
+8
+00:00:31,234 --> 00:00:35,795
+解密算法通常通常输出一个信息。但是
+这个解密算法可以输出一个特殊符号
+usual outputs a message. However, here the
+decryption algorithm is allowed to output
+
+9
+00:00:35,818 --> 00:00:40,594
+叫做底⊥。当解密算法输出符号⊥时
+a special symbol called bottom. When the
+decryption algorithm outputs the symbol
+
+10
+00:00:40,627 --> 00:00:44,887
+意味着密文是无效的，应当被忽略
+bottom, basically it says that the cipher
+text is invalid and should be ignored. The
+
+11
+00:00:44,887 --> 00:00:49,198
+唯一的要求是这个⊥不在信息空间里
+only requirement is that this bottom is
+not in the message space so that in fact
+
+12
+00:00:49,198 --> 00:00:53,655
+事实上⊥是一个唯一的符号，表示密文应当被拒绝
+it is a unique symbol that indicates that
+the cipher text should be rejected. Now
+
+13
+00:00:53,655 --> 00:00:57,175
+现在一个认证加密系统是安全的是什么意思？
+what does it mean for an authenticated
+encryption system to be secure? Well the
+
+14
+00:00:57,175 --> 00:01:00,774
+这个系统必须满足两个性质。第一个性质是
+system has to satisfy two properties. The
+first property is that it has to be
+
+15
+00:01:00,774 --> 00:01:05,035
+它必须像之前一样对选择明文攻击是语义安全的
+semantically secure under a chosen
+plaintext attack just as before. But now
+
+16
+00:01:05,035 --> 00:01:08,881
+第二个性质是，这个系统必须满足密文完整性
+there's a second property which says that
+the system also has to satisfy what's
+
+17
+00:01:08,881 --> 00:01:13,063
+这意味着尽管攻击者
+called cipher text integrity. What that
+means is that even though the attacker
+
+18
+00:01:13,063 --> 00:01:17,145
+能看到许多密文，他也不应该能阐述
+gets to see a number of cipher texts, it
+should not be able to produce another
+
+19
+00:01:17,145 --> 00:01:21,360
+另外一个能顺利解密的密文。换句话说
+cipher text that decrypts properly. In
+other words, that decrypts to something
+
+20
+00:01:21,360 --> 00:01:24,813
+能被解密成其他东西，而不是符号⊥。
+更精确地，我们看这个密文完整性游戏
+other than bottom. More precisely,
+let's look at the ciphertext integrity game.
+
+21
+00:01:24,813 --> 00:01:30,923
+这里(E,D)是一个信息空间M上的密码。
+通常，挑战者开始时
+So here, (E,D) is a cipher with message
+space M. As usual, the challenger begins
+
+22
+00:01:30,923 --> 00:01:35,635
+选择一个随机密钥K。攻击者可以提交他选择的信息
+by choosing a random key K. And
+the adversary can submit messages of his
+
+23
+00:01:35,635 --> 00:01:40,229
+收到这些信息的加密
+choice, and receive the encryptions of
+those messages. So here, C1 is the
+
+24
+00:01:40,229 --> 00:01:44,617
+这里C1是M1的加密，M1由攻击者选择
+encryption of M1, where M1 was chosen by
+the adversary. And the adversary can do
+
+25
+00:01:44,617 --> 00:01:47,677
+攻击者可以反复这样操作。换句话说，攻击者
+提交M2，并获得M2的加密结果
+this repeatedly. In other words, he
+submits M2 and obtains the encryption of
+
+26
+00:01:47,677 --> 00:01:52,867
+等等。。他提交许多信息，直到Mq
+M2, and so on and so forth. He submits
+many more messages up until Mq and obtains
+
+27
+00:01:52,867 --> 00:01:58,499
+并获得了所有这些信息的加密结果。
+那么这里攻击者获得了q个密文
+the encryption of all those messages. So
+here the adversary obtained Q cipher texts
+
+28
+00:01:58,499 --> 00:02:03,851
+都是他选择的信息的密文。然后他的目标是
+产生某个新的有效密文
+for messages of his choice. Then his goal
+is to produce some new cipher text that's
+
+29
+00:02:03,851 --> 00:02:08,883
+我们说攻击者赢得了游戏，如果这个攻击者产生的
+valid. So we'll say that the adversary
+wins the game if basically this new cipher
+
+30
+00:02:08,883 --> 00:02:12,820
+新密文被正确地解密了。换句话说
+text that the adversary created decrypts
+correctly, in other words decrypts to
+
+31
+00:02:12,820 --> 00:02:16,507
+被解密成了不是符号⊥的东西。它是某个新密文
+something other than bottom. And it's a
+new cipher text. In other words, it's not
+
+32
+00:02:16,507 --> 00:02:20,722
+换句话说，它不是选择明文攻击中给攻击者的密文之一
+one of the cipher texts that was given to
+the adversary as part of this chosen
+
+33
+00:02:20,722 --> 00:02:24,499
+然后通常我们定义在这个密文完整性游戏中
+plaintext attack. And then as usual we
+defined the adversary's advantage in the
+
+34
+00:02:24,499 --> 00:02:28,963
+攻击者的优势为挑战者在游戏最后输出1的概率
+cipher text integrity game as the
+probability that the challenger outputs
+
+35
+00:02:28,963 --> 00:02:32,787
+我们说这个密码有密文完整性
+one at the end of the game and we'll say
+that the cipher has cipher text integrity
+
+36
+00:02:32,787 --> 00:02:37,754
+如果事实上对所有的有效攻击者，其赢得游戏的优势
+if in fact for all efficient adversaries
+the advantage in winning this game is
+
+37
+00:02:37,754 --> 00:02:41,615
+都是可忽略的。现在我们理解了密文完整性
+negligible. So now that we understand
+what cipher text integrity is. We can
+
+38
+00:02:41,615 --> 00:02:45,090
+我们可以定义认证加密了。我们说
+define authenticated encryption and
+basically we say that the cipher has
+
+39
+00:02:45,090 --> 00:02:48,787
+密码有认证加密，如果像我们说的，对于选择明文攻击
+authenticated encryption if as we said
+it's semantically secure under a chosen
+
+40
+00:02:48,787 --> 00:02:54,304
+它是语义安全的，并且它还有密文完整性
+plaintext attack and it also has cipher
+text integrity. So just as a bad example,
+
+41
+00:02:54,304 --> 00:02:59,456
+作为一个反面教材，带随机IV的CBC不提供认证加密
+let me mention that CBC with a random IV
+does not provide authenticated encryption
+
+42
+00:02:59,456 --> 00:03:03,812
+因为对于攻击者来说，很容易赢得密文完整性游戏
+because it's very easy for the adversary
+to win the cipher text integrity game.
+
+43
+00:03:03,815 --> 00:03:07,080
+攻击者提交一个随机密文
+The adversary simply submits a random cipher text
+
+44
+00:03:07,080 --> 00:03:10,375
+由于CBC的解密算法从不输出符号⊥　
+and since the decryption algorithm for 
+CBC encryption never outputs bottom,
+
+45
+00:03:10,375 --> 00:03:14,941
+他总是输出某些信息，攻击者轻松获得游戏胜利
+it always outputs some message, 
+the adversary just easily wins the game.
+
+46
+00:03:14,941 --> 00:03:18,883
+任何奇怪的随机密文都会被解密成某些不是符号⊥的东西
+Any odd random cipher text will decrypt 
+to something other than bottom
+
+47
+00:03:18,883 --> 00:03:23,110
+因此攻击者直接取得密文完整性游戏的胜利
+and therefore the adversary directly wins 
+the cipher-text integrity game. So this is just
+
+48
+00:03:23,110 --> 00:03:28,686
+这是个简单例子，CPA安全的密码并不提供认证加密
+a trivial example of a CPA secure cipher that 
+does not provide authenticated encryption.
+
+49
+00:03:28,686 --> 00:03:32,755
+我想提一下认证加密的两个影响
+So I wanna mention two implications of
+authenticated encryption. The first I'll
+
+50
+00:03:32,755 --> 00:03:37,347
+首先我称之为认证，意味着攻击者无法欺骗接收方Bob
+call authenticity, which means that,
+basically, an attacker cannot fool the
+
+51
+00:03:37,347 --> 00:03:42,026
+让Bob认为Alice发送了一条实际上她没有发过的信息
+recipient, Bob, into thinking that Alice
+sent a certain message that she didn't
+
+52
+00:03:42,026 --> 00:03:46,154
+我们看这是什么意思。这里
+actually send. So let's see what I mean by
+that. Well, here, the attacker basically
+
+53
+00:03:46,154 --> 00:03:50,762
+攻击者与Alice互动，让她去加密任意他选择的信息
+gets to interact with Alice, and get her
+to encrypt arbitrary messages of his
+
+54
+00:03:50,762 --> 00:03:56,516
+这是一个选择明文攻击。然后攻击者的目标是
+choice. So this is a chosen plain text
+attack. And then the attacker's goal is to
+
+55
+00:03:56,516 --> 00:04:01,882
+产生某些不是由Alice创造的密文
+produce some cipher text that was not
+actually created by Alice. And because the
+
+56
+00:04:01,882 --> 00:04:06,213
+因为攻击者不能赢下这个密文完整性游戏，他不能做到
+attacker can't win the cipher text
+integrity game, he can't do this. What
+
+57
+00:04:06,213 --> 00:04:10,914
+意味着当Bob接收能被解密算法正确解密的密文时
+this means is, when Bob receives the
+cipher text that decrypts correctly under
+
+58
+00:04:10,914 --> 00:04:14,570
+他知道信息一定来自某知道密钥K的人
+the decryption algorithm, he knows that
+the message must have come from someone
+
+59
+00:04:14,570 --> 00:04:19,317
+特别地，如果Alice是唯一知道K的人
+who knows the secret key K. In particular,
+if Alice is the only one who knows K, then
+
+60
+00:04:19,317 --> 00:04:23,325
+那么他知道密文确实是来自Alice
+he knows the cipher text really did come
+from Alice, and it's not some modification
+
+61
+00:04:23,325 --> 00:04:28,307
+并非攻击者发出的某些修改。现在唯一剩下的警告是
+that was sent by the attacker. Now the
+only caveat to that is that authenticated
+
+62
+00:04:28,307 --> 00:04:32,099
+认证加密无法抵抗重放攻击。特别地
+encryption doesn't defend against replay
+attacks. In particular, the attacker
+
+63
+00:04:32,099 --> 00:04:36,214
+攻击者可以截获某些从Alice到Bob的密文
+could've intercepted some cipher text from
+Alice to Bob. And could have replayed it
+
+64
+00:04:36,214 --> 00:04:40,762
+攻击者可以重放信息，这样重放的密文对Bob来说
+看起来也是有效的。例如
+and both cipher text would look valid to
+Bob. So for example, Alice might send a
+
+65
+00:04:40,762 --> 00:04:46,915
+Alice可能向Bob发送了条信息，说转100美元给Charlie
+message to Bob saying transfer $100 to
+Charlie. Then Charlie could replay that
+
+66
+00:04:46,915 --> 00:04:51,498
+那么Charlie可以重放这条密文，这样
+Bob会再转100美元给Charlie
+cipher text and as a result, Bob would
+transfer another $100 to Charlie. So in
+
+67
+00:04:51,498 --> 00:04:55,419
+所以事实上，任何加密协议必须能防御重放攻击
+fact, any encryption protocol has to
+defend against replay attacks and this is
+
+68
+00:04:55,419 --> 00:04:59,342
+但这是认证算法能直接阻止得了的
+not something that's directly prevented by
+authenticated encryption. And we'll come
+
+69
+00:04:59,342 --> 00:05:02,930
+下面两节，我们会回来并讨论重放攻击。
+第二个认证加密的影响在于
+back and talk about replay attacks in two
+segments. The second implication of
+
+70
+00:05:02,930 --> 00:05:06,987
+它能抵抗一种非常强力的攻击者
+authenticated encryption is that it
+defends against a very powerful type of
+
+71
+00:05:06,987 --> 00:05:11,480
+即能实施所谓选择密文攻击
+adversary, namely an adversary that can
+mount what's called a chosen cipher text
+
+72
+00:05:11,480 --> 00:05:13,933
+我们下节讨论它
+attack. We're going to talk about that
+actually in the next segment.

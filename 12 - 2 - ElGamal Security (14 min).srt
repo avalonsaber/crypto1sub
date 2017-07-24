@@ -1,0 +1,1140 @@
+1
+00:00:00,000 --> 00:00:03,457
+本节我们研究ElGamal公钥加密系统的安全性
+In this segment, we're gonna study the
+security of the ElGamal public key
+
+2
+00:00:03,457 --> 00:00:07,105
+我提醒一下大家，当我们第一次展示
+encryption system. So let me remind you
+that when we first presented the
+
+3
+00:00:07,105 --> 00:00:11,349
+Diffie-Hellman协议的时候，我们说过，其安全性是基于假设的
+Diffie-Hellman protocol, we said that the
+security is based on the assumption that
+
+4
+00:00:11,349 --> 00:00:14,972
+即给定g, g^a和g^b，很难计算出
+says that given G, G to the A, G to the B,
+it's difficult to compute the
+
+5
+00:00:14,972 --> 00:00:19,269
+Diffie-Hellman密钥g^ab的。这是攻击者所必须做的
+Diffie-Hellman secret, G to the AB. This
+is basically what the attacker has to do.
+
+6
+00:00:19,269 --> 00:00:23,410
+他看到Alice的贡献，和Bob的贡献，他的目标是
+He sees Alice's contribution. He sees
+Bob's contribution and then his goal is to
+
+7
+00:00:23,410 --> 00:00:27,447
+解出Diffie-Hellman密钥。我们说过这个问题是困难的
+figure out what the Diffie-Hellman secret
+is. And we said that this problem is
+
+8
+00:00:27,447 --> 00:00:31,329
+这个论断，即这个问题是困难的
+difficult. The statement that the problem
+is difficult is what's called the
+
+9
+00:00:31,329 --> 00:00:35,413
+就是所谓的计算Diffie-Hellman假设。
+那么我们更为准确地看这个假设
+computational Diffie-Hellman assumption.
+So, let's take this assumption more
+
+10
+00:00:35,413 --> 00:00:39,957
+那么通常我们看一个n阶有限循环群
+precisely. So, as usual we're going to
+look at a finite cyclic group of order N,
+
+11
+00:00:39,957 --> 00:00:43,944
+那么G是某个群，大家应把它想成Z_p^*
+so G is some group, in your head you should be
+thinking ZP star, but there could
+
+12
+00:00:43,944 --> 00:00:47,569
+但是也可以是其他群，例如椭圆曲线群。如果我们说
+be other groups, for example, like an ellipctic curve group. And then we say that
+
+13
+00:00:47,569 --> 00:00:51,727
+计算Diffie-Hellman假设，我用简写
+the computational Diffie-Hellman
+assumption. I've often used the shorthand
+
+14
+00:00:51,727 --> 00:00:56,053
+CDH来表示计算Diffie-Hellman假设。
+我们说这个假设在G上成立
+CDH for Computational Diffie Hellman.
+We'll say this assumption holds in G if
+
+15
+00:00:56,053 --> 00:01:00,604
+如果如下条件成立，即对任意有效算法
+the following condition holds, namely for
+all efficient algorithms. If we choose a
+
+16
+00:01:00,604 --> 00:01:04,761
+如果我们选择一个随机生成元，那么我们随机选择
+Z_N中的指数a和b
+random generator, and then we choose
+random exponents A, B in ZN. Then when
+
+17
+00:01:04,761 --> 00:01:08,975
+那么我们把g,g^a,g^b给算法
+we give the algorithm G, G to the A, and G
+to the B, the probability that the
+
+18
+00:01:08,975 --> 00:01:13,638
+算法会产生出正确的Diffie-Hellman密钥的
+概率是可忽略的。如果这对所有
+algorithm will produce the Diffie Hellman
+secret is negligible. If this is true for
+
+19
+00:01:13,638 --> 00:01:18,368
+有效算法都成立，那么我们说CDH假设在G上成立
+all efficient algorithms, then we say that
+the CDH assumption holds for G. CDH, as I
+
+20
+00:01:18,368 --> 00:01:23,202
+我说过CDH代表计算Diffie-Hellman假设。实际上，这个假设
+said, stands for Computational Diffie
+Hellman. As it turns out, this assumption
+
+21
+00:01:23,202 --> 00:01:27,643
+对于分析ElGamal系统的安全性并不理想
+is not ideal for analyzing the security of
+the ElGamal system. And instead I'm gonna
+
+22
+00:01:27,643 --> 00:01:31,768
+我要接着引入一个稍微更强一点的假设，叫做哈希
+go ahead and make a slightly stronger
+assumption called a hash Diffie-Hellman
+
+23
+00:01:31,768 --> 00:01:35,695
+Diffie-Hellman假设，好，那什么是哈希Diffie-Hellman假设？
+assumption. Okay. So what is hash
+Diffie-Hellman assumption? Again, we are
+
+24
+00:01:35,695 --> 00:01:40,379
+我们还是关注一个特定群G，现在我们引入一个哈希函数H
+focusing on a particular group G and now
+we're also gonna introduce a hash function
+
+25
+00:01:40,379 --> 00:01:45,007
+它把许多G中的元素对映射到某个对称加密系统的密钥空间里
+H that maps pairs of elements in G into
+the key space of some symmetric encryption
+
+26
+00:01:45,007 --> 00:01:49,133
+然后我们说这是哈希Diffie-Hellman假设
+system. And then we say that the hash
+Diffie-Hellman assumption, or HDH for
+
+27
+00:01:49,133 --> 00:01:53,482
+或简记为HDH，对于二元组(G,H)成立，G是群，H是哈希函数
+short, holds for this pair, G comma H for
+the group in the hash function if the
+
+28
+00:01:53,482 --> 00:01:57,776
+如果如下条件满足。如果我选择一个随机生成元
+following is true. Basically, if I choose
+a random generator and then I choose
+
+29
+00:01:57,776 --> 00:02:02,292
+然后我随机选择Z_N中的指数a和b，那么我也
+随机选择一对r和k
+random exponents A and B in ZN and then I
+also choose a random R and K, then the
+
+30
+00:02:02,292 --> 00:02:05,985
+那么下面的两个分布是不可区分的
+following distributions are
+computationally indistinguishable. That
+
+31
+00:02:05,985 --> 00:02:09,658
+即，如果我给你g, g^a, g^b，那么这个哈希值
+is, if I give you G, G to the A, G to the
+B, and then this hash value, this should
+
+32
+00:02:09,658 --> 00:02:13,472
+大家应用对它挺熟。这个哈希值在ElGamal系统中
+look familiar to you. This is the hash
+value that's used in the ElGamal system to
+
+33
+00:02:13,472 --> 00:02:17,380
+被用来推出对称加密的密钥。我们说这个分布
+derive the symmetric encryption key. What
+we're saying is that this distribution is
+
+34
+00:02:17,380 --> 00:02:21,103
+与另一个分布不可区分。在另一个分布中，
+同样是给定g, g^a, g^b
+indistinguishable from a distribution
+where you're also given. G, G to the A, G
+
+35
+00:02:21,103 --> 00:02:25,390
+但现在，不给哈希值，你只有随机的密钥
+to the B. But now, instead of giving the
+hash, you're given just really random key.
+
+36
+00:02:25,390 --> 00:02:29,913
+那么这个假设是说，在ElGamal系统中，对称加密时
+So what this assumption says is that the
+symmetric key that was derived during
+
+37
+00:02:29,913 --> 00:02:34,214
+推出的密钥，本质上与一个
+encryption in the ElGamal system,
+essentially is indistinguishable from a
+
+38
+00:02:34,214 --> 00:02:38,012
+真随机密钥不可区分，这个真随机密钥是根据
+truly random key that is derived
+independently from the rest of the
+
+39
+00:02:38,012 --> 00:02:42,312
+系统中余下的参数推出的，是一个独立的真随机密钥
+parameters of the system. It's a truly
+independent random key, looks basically
+
+40
+00:02:42,312 --> 00:02:46,724
+看起来和我们使用的密钥几乎一样。我们使用的密钥
+是根据g^a和g^b推出的
+the same as the key that we used, to
+derive from the G to the A and the G to
+
+41
+00:02:46,724 --> 00:02:51,895
+现在我想指出，这个哈希Diffie-Hellman假设
+the B. Now I'd like to point out that the
+Hash Diffie-Hellman assumption is actually
+
+42
+00:02:51,895 --> 00:02:56,297
+实际上比计算Diffie-Hellman假设要强
+a stronger assumption than the
+Computational Diffie-Hellman assumption.
+
+43
+00:02:56,297 --> 00:03:00,575
+证明的方法是看逆否命题
+The way to see that is using the contra
+positive, that is suppose the
+
+44
+00:03:00,575 --> 00:03:05,596
+即假设计算Diffie-Hellman假设在群G上容易解决
+Computational Diffie-Hellman assumption
+happens to be easy in the group G. Then I
+
+45
+00:03:05,596 --> 00:03:10,866
+那么我宣布，哈希Diffie-Hellman假设也是容易解决的
+claim that in fact the Hash Diffie-Hellman
+assumption is also easy in the group G. In
+
+46
+00:03:10,866 --> 00:03:15,826
+事实上，我说对于g和h，这是成立的，事实上，
+对于所有的哈希函数
+fact, I'll say for G, H and this is true
+in fact for all hash functions where the
+
+47
+00:03:15,826 --> 00:03:20,431
+若哈希函数的像至少含有两个元素。换句话说
+image of the hash function. It contains at
+least two elements. In other words all I
+
+48
+00:03:20,431 --> 00:03:24,695
+哈希Diffie-Hellman假设是容易的
+want to say is that the Hash Diffie-Hellman assumption and it's easy for all
+
+49
+00:03:24,695 --> 00:03:29,270
+如果所有的哈希函数把一切都映射到一个点。
+这对于我们感兴趣的
+hash functions to go match everything to a
+single point. Which is true for almost all
+
+50
+00:03:29,270 --> 00:03:33,054
+所有哈希函数都成立。那么这是一个很简单的
+hash functions of interest to us. So
+actually, this is a really simple
+
+51
+00:03:33,054 --> 00:03:37,168
+命题，我们来证明它。如果计算Diffie-Hellman假设是容易的
+statement to prove. Basically, if the
+Computational Diffie-Hellman assumption is easy, what that
+
+52
+00:03:37,168 --> 00:03:41,665
+这意味着，有了g^a, g^b，我可以计算g^ab
+says is that, given G to the A and G to the B, I can actually calculate G to the AB
+
+53
+00:03:41,665 --> 00:03:46,162
+因为我知道哈希函数H，我完全可以计算这里的值
+myself. Cuz I know the hash function H, I
+can calculate this complete value here. So
+
+54
+00:03:46,162 --> 00:03:50,440
+那么如果你给我一组左边的样本，或是右边的样本
+if you give me a tuple that's
+sampled from the left or sampled from the
+
+55
+00:03:50,440 --> 00:03:54,706
+我都可以轻松地分辨其来源。如果它取自左边
+right. I can very easily tell where it's
+from. If it's sampled from the left, then
+
+56
+00:03:54,706 --> 00:03:59,227
+那么我一旦自己计算g^ab，我就可以测试组里的最后一个元素
+once I've calculated G to the AB myself, I
+can just test that the last element in the
+
+57
+00:03:59,227 --> 00:04:03,377
+是否就是g^b和g^ab的哈希值。如果是，我就知道了
+tuple is, in fact, the hash of G to
+the B and G to the AB. If it is, I know
+
+58
+00:04:03,377 --> 00:04:07,707
+这个样本是取自左边的；如果不是，我就知道是取自右边的
+the sample is from the left. If it isn't,
+I know the sample is from the right. Okay,
+
+59
+00:04:07,707 --> 00:04:12,881
+那么这给了我很高的优势来区分这两个分布
+so this gives me pretty high advantage, in
+distinguishing these two distributions. So
+
+60
+00:04:12,881 --> 00:04:17,422
+所以CDH容易的话，非常容易就能看出这些分布是可区分的
+CDH is easy, it's very easy to see that
+these distributions are distinguishable.
+
+61
+00:04:17,422 --> 00:04:21,964
+这就是说，如果哈希Diffie-Hellman实际上很难解决
+And this basically says that if the Hash
+Diffie-Hellman is in fact hard, then CDH
+
+62
+00:04:21,964 --> 00:04:26,678
+那么CDH也将是很难的，那么我们说，
+因此哈希Diffie-Hellman假设
+must also be hard. Which then we say, that
+therefore the Hash Diffie-Hellman is a
+
+63
+00:04:26,678 --> 00:04:31,220
+是一个更强的假设。可能会有CDH困难的集合，但HDH不困难
+stronger assumption. There might be group
+where CDH is hard, but HDH is not hard.
+
+64
+00:04:31,220 --> 00:04:35,938
+那么我们说HDH是一个更强的假设
+Okay. So we say HDH is a
+stronger assumption. If you found this
+
+65
+00:04:35,938 --> 00:04:39,632
+如果你觉得这种强弱假设的讨论难以理解
+discussion of weak assumption versus
+strong assumption confusing, it's not
+
+66
+00:04:39,632 --> 00:04:43,626
+这点其实并不重要，可以忽略。重要的是
+really that important, it's fine to ignore
+it. The important thing that I want to
+
+67
+00:04:43,626 --> 00:04:47,470
+我想给大家展示，事实上哈希Diffie-Hellman假设
+show you is in fact that the Hash
+Diffie-Hellman assumption is sufficient to
+
+68
+00:04:47,470 --> 00:04:51,613
+足以证明ElGamal系统的语义安全了。在证明之前
+prove the semantic security of the ElGamal
+system. Before we do that let me quickly
+
+69
+00:04:51,613 --> 00:04:56,006
+我简单问一下大家下面的问题，以确保哈希Diffie-Hellman
+假设已经弄清楚了
+ask you the following puzzle just to make
+sure the Hash Diffie-Hellman assumption is
+
+70
+00:04:56,006 --> 00:05:00,050
+设想我们的密钥空间是｛0, 1｝^128，即128位字符串
+clear. So imagine our key space is ｛0, 1｝ to the 128. So 128 bit strings and our
+
+71
+00:05:00,050 --> 00:05:03,744
+我们的哈希函数把一对群元素映射成128位字符串
+hash function will map pairs of group
+elements into this 128 byte strings.
+
+72
+00:05:03,744 --> 00:05:08,061
+假设我们选择一个哈希函数满足
+Suppose it so happens that we chose a hash
+function such that it always outputs
+
+73
+00:05:08,061 --> 00:05:12,733
+他的输出总是以0开始。换句话说，输出的128位字符串的
+strings that begin with zero. In other
+words, of the 128 bit strings the most
+
+74
+00:05:12,733 --> 00:05:17,780
+最高位总是0。如果我们选择一个哈希函数
+significant bit of the output is always
+zero. If we chose such a hash function,
+
+75
+00:05:17,780 --> 00:05:23,677
+那么哈希Diffie-Hellman假设对(G,H)还成立吗？
+does the Hash Diffie-Hellman assumption
+hold for this pair, G comma H. So the
+
+76
+00:05:23,677 --> 00:05:27,297
+答案是否定的，它不成立。原因是因为现在
+answer is no it doesn't hold. And the
+reason is because it now very easy to
+
+77
+00:05:27,297 --> 00:05:31,207
+容易区分这两个分布，左边和右边的分布
+distinguish the two distributions that we
+have here. The distribution on the left
+
+78
+00:05:31,207 --> 00:05:35,313
+区分两者的方法是
+an the distribution on the right. And the
+way you would distinguish the two is
+
+79
+00:05:35,313 --> 00:05:39,501
+如果我随机选择K=｛0, 1｝^128中的元素
+basically if I choose a truly random
+element in K, in ｛0, 1｝ to the 128,
+
+80
+00:05:39,501 --> 00:05:44,008
+那么最高位是0的概率是1/2。不过
+then mostly it can very well be zero with
+probability one half. However, the tuple
+
+81
+00:05:44,008 --> 00:05:48,509
+当给我的样本是选自左边分布时，哈希值的最高位
+that's given to me is chosen from the left
+distribution, then the most significant
+
+82
+00:05:48,509 --> 00:05:53,010
+总是0，因此如果我看到0，我就说
+bit of the hash will always be zero and
+therefore if I see zero, I'm gonna say the
+
+83
+00:05:53,010 --> 00:05:57,072
+分布是来自左边的。如果我看到1，就说
+distribution is a distribution on the
+left. If I see one, I'm gonna say the
+
+84
+00:05:57,072 --> 00:06:01,244
+是来自右边的分布。这会给我1/2的优势
+distribution is a distribution on the
+right. That will give me advantage one
+
+85
+00:06:01,244 --> 00:06:05,087
+以区分这两个分布。因此
+half in distinguishing these two
+distributions. And so as a result, the
+
+86
+00:06:05,087 --> 00:06:09,643
+哈希Diffie-Hellman假设在这里不成立。那么大家清楚地看到
+Hash Diffie-Hillman assumption is false in
+this case. So clearly you could see that,
+
+87
+00:06:09,643 --> 00:06:13,760
+即使CDH可能在群G上是困难的，如果你选择了
+even though CDH might be hard in a certain
+group G, if you choose a bad hash
+
+88
+00:06:13,760 --> 00:06:18,367
+一个不好的哈希函数，那么HDH在这个(G,H)上也不成立
+function, then HDH will not hold for the
+pair G comma H. Okay. But suppose it so
+
+89
+00:06:18,367 --> 00:06:22,830
+假设我们选择了一个群G和一个哈希函数H
+happens that we choose a group G and a
+hash function H for which the Hash Diffie
+
+90
+00:06:22,830 --> 00:06:27,237
+使得哈希Diffie-Hellman假设成立。事实上，
+如果你选择的哈希函数
+Hellman assumption holds. And in fact, if
+you choose the hash function to be just
+
+91
+00:06:27,237 --> 00:06:31,590
+是SHA-256，我们知道哈希Diffie-Hellman假设
+SHA-256, for all we know, the Hash
+Diffie Hellman assumption holds in the
+
+92
+00:06:31,590 --> 00:06:35,983
+在群Z_p^*上成立，在椭圆曲线群上成立。
+我的目标是给大家证明
+group ZP star, and holds in elliptic curve
+groups. My goal then is to show you that
+
+93
+00:06:35,983 --> 00:06:39,987
+ElGamal在哈希Diffie-Hellman假设下是语义安全的
+ElGamal is semantically secure under
+the Hash Diffie-Hellman assumption. So let me
+
+94
+00:06:39,987 --> 00:06:44,042
+我来提醒大家ElGamal系统是如何工作的
+quickly remind you how the ElGamal
+system works. While we're gonna choose a
+
+95
+00:06:44,042 --> 00:06:47,994
+我们选择一个随机生成元g，随机选择Z_N中的一个a
+random generator G, we're gonna choose a
+random 'a' in ZN, the public key is
+
+96
+00:06:47,994 --> 00:06:52,254
+公钥就是(g, g^a)，私钥就是a。现在
+gonna be G, and G to the A, the secret key
+is simply gonna be A. And now here I wrote
+
+97
+00:06:52,254 --> 00:06:56,412
+我这里简写了ElGamal加密。要加密时
+shorthand for the ElGamal encryption.
+Basically, what to encrypt, what we do is
+
+98
+00:06:56,412 --> 00:07:01,833
+我们选择一个随机数b，计算(g^b,h^b)的哈希值
+we choose a random B. We hash G as being H
+to the B. Remember this H to the B is the
+
+99
+00:07:01,833 --> 00:07:06,120
+这个h^b就是g^ab，是Diffie-Hellman密钥。这个哈希函数
+value G to the AB. This is the Diffie
+Hellman secret. The hash function gave us
+
+100
+00:07:06,120 --> 00:07:10,626
+给我们一个对称加密密钥k。我们使用k加密明文信息
+a symmetric encryption key K. We encrypt
+the message with K, and we output G to the
+
+101
+00:07:10,626 --> 00:07:14,858
+输出g^b与对称加密的密文。解密时，我们取值u
+B and the symmetric cipher text. To
+decrypt we hash the value U, and the Diffie
+
+102
+00:07:14,858 --> 00:07:19,200
+和Diffie-Hellman密钥，g^a的哈希值。
+这就推出了一个对称密钥，我们可以来解密密文了
+Hellman secret, G to the A. To derive a
+symmetric key, we decrypt the cipher text.
+
+103
+00:07:19,359 --> 00:07:23,445
+然后我们输出明文m。那么我们来看如何证明
+And then we output the plaintext message m. So let's see how to argue that,
+
+104
+00:07:23,445 --> 00:07:27,744
+事实上，ElGamal在哈希Diffie-Hellman假设下是语义安全的
+in fact, ElGamal is semantically secure under
+this Hash Diffie-Hillman assumption is
+
+105
+00:07:27,744 --> 00:07:31,937
+证明很简单。我们必须证明，在语义安全里
+fairly simple. So well we have to argue,
+remember we had, in semantic security, we
+
+106
+00:07:31,937 --> 00:07:35,546
+我们有这两个实验。在一个实验中，攻击者有
+have these two experiments. One
+experiment, the attacker is given the
+
+107
+00:07:35,546 --> 00:07:39,845
+m0的加密结果；在另一个实验中，攻击者有m1的加密结果
+encryption of m0. In the other experiment,
+the attacker is given the encryption of m1.
+
+108
+00:07:39,845 --> 00:07:44,091
+那么我在这里写了两个实验。大家注意挑战者开始时
+So I wrote the two experiments here. Here
+you notice that the attacker starts by
+(口误：attacker->challenger)
+
+109
+00:07:44,091 --> 00:07:48,071
+把公钥发送给攻击者。然后攻击者选择两个
+sending off the public key to the
+adversary. The adversary then chooses two
+
+110
+00:07:48,071 --> 00:07:52,727
+等长度的信息m0和m1。然后如果他获得了m0的ElGamal加密
+equal length messages m0 and m1. And then
+if he gets the ElGamal encryption of M0,
+
+111
+00:07:52,727 --> 00:07:57,495
+以及一段ElGamal密文。类似地
+and a kind of rough shorthand for what
+ElGamal ciphertext is, okay? Similarly, in
+
+112
+00:07:57,495 --> 00:08:01,660
+在实验1中，他会得到m1的加密，而非m0的
+encryption one, he simply gets the
+encryption of M1 instead of M0, and
+
+113
+00:08:01,660 --> 00:08:06,489
+两个实验的其余部分是一样的。现在
+everything else is the same about these
+two experiments. Now, because of the Hash
+
+114
+00:08:06,489 --> 00:08:11,257
+因为哈希Diffie-Hellman假设，即使攻击者看到
+Diffie-Hellman assumption, we know that
+even though the attacker got to see G, G
+
+115
+00:08:11,257 --> 00:08:16,267
+g, g^a, g^b，我们知道(g^b, g^ab)的哈希输出
+to the a and G to the b, we know that the
+output of the hash of G to the b, G to the
+
+116
+00:08:16,267 --> 00:08:20,981
+与随机数是无法区分的。因此如果我们
+ab is indistinguishable from random.
+Therefore, if we replace the actual hash
+
+117
+00:08:20,981 --> 00:08:26,319
+用真随机、完全独立的密钥k来替换这哈希函数结果
+function by a truly generated random key K
+that's independent of everything else, by
+
+118
+00:08:26,319 --> 00:08:31,148
+根据哈希Diffie-Hellman假设，攻击者无法区分这两个游戏
+the Hash Diffie-Hellman assumption, the
+attacker can't distinguish these two
+
+119
+00:08:31,148 --> 00:08:34,648
+这对于大家是一个简单的练习，试证
+games. And again, it's a simple exercise
+for you to show that if he could
+
+120
+00:08:34,648 --> 00:08:38,570
+如果攻击者可以区分这两个游戏，
+那么他就违反了哈希Diffie-Hellman假设
+distinguish these two games, then he would
+break the Hash Diffie-Hellman assumption.
+
+121
+00:08:38,570 --> 00:08:42,705
+然后对实验1也是一样。攻击者也无法区分
+But then the same is true for experiment
+one. The attacker also could not
+
+122
+00:08:42,705 --> 00:08:47,237
+哈希函数值和真随机密钥
+distinguish the output of the hash
+function from a truly random key, that was
+
+123
+00:08:47,237 --> 00:08:51,341
+用来生成挑战密文。好，那么现在我们看
+used the generate the challenge cipher
+text. Okay. So now basically we look at
+
+124
+00:08:51,341 --> 00:08:55,297
+这两个使用，我们发现，等一下。。
+these two experiments and we realize that,
+wait a minute, what's going on in these
+
+125
+00:08:55,297 --> 00:08:59,106
+这两个实验发生了什么？基本上是一样的，除了在一个实验中
+two experiments? Basically everything is
+the same except in one experiment, the
+
+126
+00:08:59,106 --> 00:09:02,866
+攻击者获得的是m0的对称加密系统加密后的密文
+attacker gets the encryption under
+a symmetric encryption system of m0. In the
+
+127
+00:09:02,866 --> 00:09:06,920
+另一个实验中，攻击者获得了m1的对称加密
+other one, he gets the encryption under a
+symmetric encryption system of m1 and the
+
+128
+00:09:06,920 --> 00:09:10,973
+密钥是随机独立地选择的。那么根据
+key is chosen at random independently over
+everything else. So by the fact that the
+
+129
+00:09:10,973 --> 00:09:14,440
+对称加密系统是语义安全这一事实
+symmetric encryption system is
+semantically secure, these two games are
+
+130
+00:09:14,440 --> 00:09:18,101
+这两个游戏是不可区分的。如果它们可以被区分
+indistinguishable. If they were
+distinguishable, then the attacker could
+
+131
+00:09:18,101 --> 00:09:21,984
+那么攻击者可以破解这个对称加密系统的语义安全
+break the semantic security of this
+symmetric encryption system. So now we
+
+132
+00:09:21,984 --> 00:09:26,235
+那么现在我们证明这个等价关系的链
+kinda prove this, you know, this chain of
+equivalences. And that proves that the
+
+133
+00:09:26,235 --> 00:09:29,436
+这证明了最初的游戏事实上是不可区分的
+original games, in fact, are
+indistinguishable, computationally
+
+134
+00:09:29,436 --> 00:09:33,320
+计算上不可区分的。因此。ElGamal系统是语义安全的
+indistinguishable. And therefore, the
+ElGamal system is semantically secure.
+
+135
+00:09:33,320 --> 00:09:37,769
+好，这像是我用图像进行的简单证明
+Okay so it's like I said a very simple
+proof by pictures and you can make this
+
+136
+00:09:37,769 --> 00:09:42,218
+大家可以不费力就把这个写成严格的证明。
+不过，语义安全是不够的
+into a rigorous proof without too much
+work. But semantic security isn't enough,
+
+137
+00:09:42,218 --> 00:09:46,498
+我们真正想要的是选择密文安全，问题是
+what we really want is chosen ciphertext
+security, and the question is ElGamal chosen ciphertext
+
+138
+00:09:46,498 --> 00:09:50,496
+ElGamal是选择密文安全的吗？实际上，
+为了证明ElGamal是选择密文安全的
+secure? So it turns out to prove the
+chosen ciphertext security of ElGamal we
+
+139
+00:09:50,496 --> 00:09:54,776
+我们需要一个更强的假设，哈希Diffie-Hellman
+actually need a stronger assumption, Hash Diffie-Hellman or Computational Diffie-Hellman
+
+140
+00:09:54,776 --> 00:09:59,000
+或计算Diffie-Hellman假设不足以证明
+这个系统的选择密文安全，就我们目前所知
+are actually not enough to prove
+chosen ciphertext security of the system as far
+
+141
+00:09:59,000 --> 00:10:03,008
+那么为了证明选择密文安全，我要引入一个新的假设
+as we know. So to prove chosen-ciphertext
+security, I'm going to introduce a new
+
+142
+00:10:03,008 --> 00:10:06,447
+叫做交互Diffie-Hellman假设。实际上
+assumption called Interactive Diffie
+Hellman assumption. And actually,
+
+143
+00:10:06,447 --> 00:10:10,384
+从技术上讲，我们真不喜欢这个假设。
+稍后，我们将试图回避这一假设
+technically we really don't like this
+assumption. And we're going to try to get
+
+144
+00:10:10,384 --> 00:10:14,727
+但现在。我们只是想分析
+rid of this, later on. But for now, we
+just want to analyze the security of the
+
+145
+00:10:14,727 --> 00:10:19,056
+基本ElGamal系统对抗选择密文攻击的安全性。
+basic ElGamal system against chosen
+ciphertext attack. So to argue that it is
+
+146
+00:10:19,056 --> 00:10:23,722
+为了证明它是选择密文安全的，这是这个假设的内容
+chosen ciphertext secure, here is what the
+assumption says. Basically the challenger
+
+147
+00:10:23,722 --> 00:10:27,769
+开始时，挑战者和攻击者玩个游戏，他生成了一个随机的g
+starts, you know, plays a game with the
+adversary, he generates a random G,
+
+148
+00:10:27,769 --> 00:10:32,266
+生成两个指数，然后与往常一样，他给攻击者
+generates two exponents, and then he says
+to the adversary as usual, G, G to the a
+
+149
+00:10:32,266 --> 00:10:36,509
+g, g^a, g^b。现在攻击者的目标是解出
+and G to the b. Now the adversary's goal
+is basically to figure out the
+
+150
+00:10:36,509 --> 00:10:41,054
+Diffie-Hellman的密钥，即g^ab。
+他输出v的值
+Diffie-Helmman's secrets, mainly g to the
+ab. He outputs the value of V and he wins
+
+151
+00:10:41,054 --> 00:10:45,278
+攻击者赢得这场游戏，如果v正好等于g^ab。
+那么，目前为止这个假设
+the game if V happens to be equal to G to
+the AB. So, so far this looks identical to
+
+152
+00:10:45,278 --> 00:10:48,943
+和计算Diffie-Hellman假设看起来一样，没有区别
+the Computational Diffie-Hellman assumption,
+there's no difference - this is
+
+153
+00:10:48,943 --> 00:10:52,862
+这就是计算Diffie-Hellman假设，
+但是在交互Diffie-Hellman假设中
+the Computational Diffie-Hellman assumption
+except in Interactive Diffie-Hellman would
+
+154
+00:10:52,862 --> 00:10:57,296
+会赋予攻击者稍微多一点的能力，那么因为攻击者能力更强
+give the attacker a little bit more power.
+So because the attacker has more power,
+
+155
+00:10:57,296 --> 00:11:01,948
+更难满足这个假设，这也是为什么我们说这个假设
+it's harder to satisfy the assumption,
+which is why we say that this assumption
+
+156
+00:11:01,948 --> 00:11:06,188
+比计算Diffie-Hellman还强。现在赋予的能力是什么？
+is stronger than Computational
+Diffie-Hellman. Now what is this power to be
+
+157
+00:11:06,188 --> 00:11:10,840
+进行询问的能力。特别地，攻击者可以提交
+given? We are given the ability to make
+queries. In particular, he gets to submit
+
+158
+00:11:10,840 --> 00:11:15,551
+群G中的两个元素，那么u1，v1是群G中的一对元素
+two elements from the group G, so U1, V1
+is a pair from the group G. And then he's
+
+159
+00:11:15,551 --> 00:11:20,149
+然后他被告知u1^a是否等于v1。
+如果u1^a等于v1，他会得到1
+told whether U1 to the A is equal to V1,
+so he gets one, if U1 to the A equals
+
+160
+00:11:20,149 --> 00:11:24,179
+否则他会得到0。是个有点怪异的询问
+to V1 and he gets zero, otherwise. It's kind of a
+bizarre type of query. What, how does it
+
+161
+00:11:24,179 --> 00:11:28,007
+它能怎样帮助攻击者呢？但实际上我们可以给攻击者
+be possibly help the attacker? But it
+turns out we need to be able to answer
+
+162
+00:11:28,007 --> 00:11:31,834
+回答这类请求，为了能够证明选择密文安全性
+these types of queries to the adversary in
+order to be able to prove chosen
+
+163
+00:11:31,834 --> 00:11:35,914
+事实上攻击者可以一次次地进行这类询问
+ciphertext security. And in fact, he can
+do these type of queries again and again
+
+164
+00:11:35,914 --> 00:11:39,339
+那么他可以进行提交尽可能多的像这样的询问
+and again. So he can issue as many
+queries like these as he wants and then the
+
+165
+00:11:39,339 --> 00:11:43,217
+然后这个假设是说，尽管有所有这些询问
+assumption says that despite all these
+queries he still can't figure out the
+
+166
+00:11:43,217 --> 00:11:47,146
+攻击者依然无法解出Diffie-Hellman密钥，
+就是说尽管做出了这么多的询问
+Diffie-Hellman secret, namely despite
+making all these queries, the probability
+
+167
+00:11:47,146 --> 00:11:51,299
+攻击者正确输出Diffie-Hellman密钥的概率依然是可忽略的
+that he outputs the
+Diffie-Hellman secret is negligible. Okay.
+
+168
+00:11:51,299 --> 00:11:55,516
+那么很明显如果这个假设成立，则计算
+Diffie-Hellman假设也成立
+So clearly if this assumption holds, that the Computational Diffie-Hellman assumption
+
+169
+00:11:55,516 --> 00:11:59,209
+因为这里的攻击者能力更强，因此我们说
+holds, because here, the adversary has more power,
+and as a result we say that this assumption
+
+170
+00:11:59,209 --> 00:12:02,614
+这个假设比计算Diffie-Hellman更强。
+我们不喜欢这个假设的地方在于
+is stronger that Computational Diffie-Hellman, the thing, we really don't like about this
+
+171
+00:12:02,614 --> 00:12:06,019
+实际上它是交互的，攻击者可以
+assumption, is the fact, that, it's
+interactive, and that the adversary is allowed to
+
+172
+00:12:06,019 --> 00:12:09,940
+向挑战者进行询问，如我所说，我们稍后
+make queries to the challenger, and as I
+said, we're gonna trying to get rid
+
+173
+00:12:09,940 --> 00:12:14,462
+将回避这种交互性。但是现在我告诉大家
+of this interaction later on. But for now
+I'll tell you that under this Interactive
+
+174
+00:12:14,462 --> 00:12:18,722
+在这个交互Diffie-Hellman假设下
+Diffie-Hellman assumption and under the
+assumption that the symmetric encryption
+
+175
+00:12:18,722 --> 00:12:22,718
+对称加密系统提供了认证加密，并且在这个假设下
+system provides authenticated encryption, and
+under the assumption that the hash
+
+176
+00:12:22,718 --> 00:12:26,610
+哈希函数是某个理想的哈希函数，我们叫做随机神谕
+function is kind of an ideal hash
+function, what we call the random oracle,
+
+177
+00:12:26,610 --> 00:12:31,079
+那么事实上ElGamal系统是选择密文安全的
+then in fact the ElGamal system is chosen ciphertext secure and again this
+
+178
+00:12:31,079 --> 00:12:35,028
+这里的RO表示是在随机神谕的前提下
+RO here denotes the fact that it's in the
+random oracle model. Which is not
+
+179
+00:12:35,028 --> 00:12:38,892
+对我们的目标来说这并不重要。主要需要记住的是
+important, so much for our purposes. The
+main thing to remember that under
+
+180
+00:12:38,892 --> 00:12:42,756
+在这种奇怪的、交互的假设下，我们可以证明
+kind of this weird, interactive
+assumption we can actually prove that
+
+181
+00:12:42,756 --> 00:12:46,938
+ElGamal是选择密文安全的。到目前为止
+ElGamal is a chosen ciphertext secure.
+And as far as we know this assumption
+
+182
+00:12:46,938 --> 00:12:51,332
+我们知道这个假设对Z_p^*成立。那么接下来
+actually holds for the group ZP star.
+So what we're gonna do next is basically
+
+183
+00:12:51,332 --> 00:12:55,567
+我们回答这个问题：我们能否回避交互假设？
+answer this question of whether we can get
+rid of the interactive assumption. Can we
+
+184
+00:12:55,567 --> 00:12:59,855
+我们能否给出基于CDH的安全性证明？
+类似地，我们的证明能否
+prove security strictly based on CDH? And
+similarly can we proof security without
+
+185
+00:12:59,855 --> 00:13:04,037
+不依赖于随机神谕？无需假设
+relying on random oracles? Just you know
+without having to assume, that the hash
+
+186
+00:13:04,037 --> 00:13:08,295
+哈希函数是理想的。我们能否使用具体的哈希函数
+function is ideal. Just you know, can we
+prove security using a concrete hash
+
+187
+00:13:08,295 --> 00:13:11,600
+完成安全性证明？我们下节简要讨论之
+function. And we'll do that very briefly
+in the next segment.

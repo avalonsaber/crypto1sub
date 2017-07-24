@@ -1,0 +1,1308 @@
+1
+00:00:00,000 --> 00:00:04,152
+现在我们理解了对抗选择明文攻击的安全性
+我们来构建加密机制
+Now that we understand chosen plaintext
+security, let's build encryption schemes
+
+2
+00:00:04,152 --> 00:00:08,515
+它们对选择明文攻击是安全的
+第一个这样的加密机制
+that are chosen plaintext secure. And the
+first such encryption scheme is going to
+
+3
+00:00:08,515 --> 00:00:12,510
+叫做密码分组链接模式
+密码分组链接模式是这么工作的
+be called cipher block chaining. So here
+is how cipher block chaining works.
+
+4
+00:00:12,510 --> 00:00:16,610
+密码分组链接模式使用一个分组密码
+以实现对选择明文攻击是安全的
+Cipher block chaining is a way of using a
+block cipher to get chosen plaintext
+
+5
+00:00:16,610 --> 00:00:20,868
+特别地，我们看使用初始向量IV的
+密码分组链接模式
+security. In particular, we are going to
+look at a mode called cipher block chaining
+
+6
+00:00:20,868 --> 00:00:25,021
+CBC是密码分组链接模式的缩写
+那么假设我们有一分组密码
+with a random IV. CBC stands for cipher
+block chaning. So suppose we have a block
+
+7
+00:00:25,021 --> 00:00:28,963
+EB是一分组密码。那么现在我们定义CBC为如下加密机制
+cipher, so EB is a block cipher. So now
+let's define CBC to be the following
+
+8
+00:00:28,963 --> 00:00:33,248
+当需要加密明文m是
+encryption scheme. So the encryption
+algorithm when it's asked to encrypt a
+
+9
+00:00:33,248 --> 00:00:37,991
+首先选择一个随机的初始向量IV
+message m, the first thing it's going to do
+is it's going to choose a random IV that's
+
+10
+00:00:37,991 --> 00:00:41,958
+IV大小就是分组密码的一个分组大小
+所以IV就是一个密码分组
+exactly one block of the block
+cipher. So IV is one cypher block.
+
+11
+00:00:41,958 --> 00:00:46,035
+对AES的IV将是16字节
+So in the case of AES the IV
+would be 16 bytes. And then we're
+
+12
+00:00:46,035 --> 00:00:50,649
+然后我们这里运行这个算法
+我们选择的IV将和第一个明文分组
+gonna run through the algorithm here, the
+IV basically that we chose is gonna be XORed
+
+13
+00:00:50,649 --> 00:00:54,726
+进行异或，然后得到的结果
+to the first plain text
+block. And then the result is gonna be
+
+14
+00:00:54,726 --> 00:00:58,857
+会使用分组密码进行加密，
+输出的就是第一个分组的密文
+encrypted using the block cipher and
+output of the first block of the ciphertext.
+
+15
+00:00:58,857 --> 00:01:03,041
+现在到链接部分了，我们使用第一个分组的密文
+And now comes the chaining part
+where we actually use the first block of
+
+16
+00:01:03,041 --> 00:01:07,436
+来遮蔽第二个分组的明文
+the ciphertext to kind of mask the second
+block of the plaintext. So we XOR
+
+17
+00:01:07,436 --> 00:01:11,588
+所以我们把两者异或，将得到的结果进行加密
+就得到了第二个分组的密文
+the two together and the encryption of
+that becomes the second ciphertext block.
+
+18
+00:01:11,588 --> 00:01:15,535
+一直下去，等等。。这就是密码分组链接模式
+And so on, and so on, and so forth. So
+this is cipher block chaining, you can
+
+19
+00:01:17,559 --> 00:01:19,584
+可以看到密码分组被链接起来，密文
+与下一分组的明文进行异或
+see that each cipher block is chained and
+XORed into the next plaintext
+
+20
+00:01:19,584 --> 00:01:24,118
+最后的密文将是我们选择的IV
+block, and the final ciphertext is going to
+be essentially the IV, the initial IV
+
+21
+00:01:24,118 --> 00:01:30,024
+以及所有密文分组。我应该说一下，IV代表
+that we chose along with all the ciphertext blocks. I should say that IV stands
+
+22
+00:01:30,024 --> 00:01:35,795
+初始向量。我们将看到这个术语是经常使用的
+for Initialization Vector. And we're going to
+be seeing that term used quite a bit,
+
+23
+00:01:35,795 --> 00:01:39,717
+每次在加密的开始，
+我们都需要随机选取某些东西
+every time we need to pick something at
+random at the beginning of the encryption
+
+24
+00:01:39,717 --> 00:01:43,543
+我们一般称之为初始向量IV
+scheme typically we'll call that an IV
+for initialization vector. So you notice
+
+25
+00:01:43,543 --> 00:01:47,322
+大家注意这个密文有点比明文长
+that the ciphertext is a little bit
+longer than the plain text because we had
+
+26
+00:01:47,322 --> 00:01:51,149
+因为我们必须把IV包含在密文里
+要包含这种加密中使用的随机性
+to include this IV in the ciphertexts
+which basically captures the randomness
+
+27
+00:01:51,149 --> 00:01:55,450
+那么第一个问题是
+that was used during encryption. So the
+first question is how do we decrypt the
+
+28
+00:01:55,450 --> 00:02:00,226
+我们如何解密CBC加密？我再提醒大家一下
+results of CBC encryption, and so
+let me remind you again that if when we
+
+29
+00:02:00,226 --> 00:02:04,470
+当我们加密第一个明文信息分组时，
+我们把它与IV异或
+encrypt the first message block we
+XOR it with the IV, encrypt the
+
+30
+00:02:04,470 --> 00:02:09,187
+加密结果，就得到了第一个密文分组
+那么我问大家如何解密？
+result and that becomes the first ciphertext
+block. So let me ask you how would
+
+31
+00:02:09,187 --> 00:02:13,667
+给定第一个密文分组
+you decrypt that? So given the first
+ciphertext block, how would you recover
+
+32
+00:02:13,667 --> 00:02:17,915
+如何还原第一个明文分组呢？
+解密和加密其实是很相似的
+the original first plaintext block? So
+decryption is actually very similar to
+
+33
+00:02:17,915 --> 00:02:21,660
+我把解密电路写在这了，大家看到
+encryption, here I wrote down the
+decryption circuit, you can see basically
+
+34
+00:02:21,660 --> 00:02:25,961
+除了在底下异或，不是上面，其他基本上是一样的
+it's almost the same thing except the XOR
+is on the bottom, instead of on the top, and
+
+35
+00:02:25,961 --> 00:02:29,605
+大家发现我们去掉解密过程中的IV
+again you realize that essentially we
+chopped off the IV as part of the
+
+36
+00:02:29,605 --> 00:02:33,754
+我们只输出最初的明文，IV被解密算法丢弃了
+decryption process and we only output the
+original message back, the IV is dropped
+
+37
+00:02:33,754 --> 00:02:38,438
+好，那么下面的定理告诉我们
+by the decryption algorithm. Okay, so the
+following theorem is going to show that in
+
+38
+00:02:38,438 --> 00:02:43,762
+事实上带IV的CBC模式对选择明文攻击是语义安全的
+fact CBC mode encryption with a random IV
+is in fact semantically secure under a
+
+39
+00:02:43,762 --> 00:02:48,956
+我们说得更清楚些
+chosen plaintext attack, and so let's
+take that more precisely, basically if we
+
+40
+00:02:48,956 --> 00:02:54,083
+如果我们从一个PRP出发，换句话说
+我们的分组密码E定义在空间X上
+start with a PRP, in other words, our
+block cipher E, that is defined over a
+
+41
+00:02:54,083 --> 00:02:59,079
+那么我们最后获得的加密算法Ecbc
+space X, then we are gonna to end up with
+a encryption algorithm Ecbc that takes
+
+42
+00:02:59,079 --> 00:03:03,944
+输入长度为L的明文，输出L+1长度的密文
+messages of length L and outputs
+ciphertexts of length L+1. And then
+
+43
+00:03:03,944 --> 00:03:09,324
+然后假设我们有一个攻击者进行了Q次
+选择明文的询问
+suppose we have an adversary that makes q
+chosen plaintext queries. Then we can
+
+44
+00:03:09,324 --> 00:03:15,024
+然后我们可以声称下面这个关于安全性的事实
+对每一个这样的攻击Ecbc的攻击者
+state the following security fact, that
+for every such adversary that's attacking
+
+45
+00:03:15,024 --> 00:03:20,184
+存在一个攻击分组密码PRP的攻击者
+Ecbc, to exist an adversary that's
+attacking the PRP, the block cipher, with
+
+46
+00:03:20,184 --> 00:03:24,926
+下面的两个攻击算法之间的关系成立
+the following relation between the two
+algorithms, in other words, the advantage
+
+47
+00:03:24,926 --> 00:03:29,851
+换句话说，算法A对加密机制的优势
+小于算法B对最初PRP的优势
+of algorithm A against the encryption scheme
+is less than the advantage of algorithm B
+
+48
+00:03:29,851 --> 00:03:35,080
+加上一些噪声项。那么我们来解释这个定理
+against the original PRP plus some noise
+term. So let me interpret this theorem for
+
+49
+00:03:35,080 --> 00:03:40,005
+通常，这意味着由于E是一个安全的PRP
+you as usual, so what this means is that
+essentially since E is a secure PRP this
+
+50
+00:03:40,005 --> 00:03:45,051
+这一项是可忽略的，我们的目标是让
+攻击者A的优势也是可忽略的
+quantity here is negligible, and our goal
+is to say that adversary A's advantage is
+
+51
+00:03:45,051 --> 00:03:49,794
+但是，这里我们还不能这么说
+also negligible. However, here we are
+prevented from saying that because we got
+
+52
+00:03:49,794 --> 00:03:54,630
+因为我们有这个多余的误差项
+这一般叫做误差项
+this extra error term. This is often
+called an error term and to argue that CBC
+
+53
+00:03:54,630 --> 00:03:59,676
+为了论证CBC的安全性，我们必须确保
+误差项也是可忽略的
+is secure we have to make sure that the
+error term is also negligible. Because if
+
+54
+00:03:59,676 --> 00:04:04,474
+因为右边的两项都是可忽略的
+它们的和也是可忽略的
+both of these terms on the right are
+negligible, there sum is negligible and
+
+55
+00:04:04,474 --> 00:04:09,458
+因此A对Ecbc的优势也是可忽略的
+therefore the advantage of A against Ecbc
+would also be negligible. So this says
+
+56
+00:04:09,458 --> 00:04:14,565
+这就是说事实上Ecbc是安全的
+最好是q^2L^2远远小于|X|的值
+that in fact for Ecbc to be secure. It has better
+be the case that q squared L squared is
+
+57
+00:04:14,565 --> 00:04:19,564
+我提醒一下大家这里的q和L是什么
+much, much, much smaller than the value X,
+so let me remind you what q and L are, so
+
+58
+00:04:19,564 --> 00:04:24,566
+L是加密的明文长度
+L is simply the length of the messages
+that we're encrypting. Okay, so L could be
+
+59
+00:04:24,566 --> 00:04:29,902
+L可以是1000，意味着我们加密的明文
+like say a 1000, which means that we are
+encrypting messages that are at most 1000
+
+60
+00:04:29,902 --> 00:04:35,303
+最多有1000个AES分组。q是在CPA攻击下，
+攻击者获得的密文数
+AES blocks. q is the number of ciphertexts
+that the adversary gets to see under the
+
+61
+00:04:35,303 --> 00:04:40,770
+但在现实中，q的意义是我们使用密钥K
+CPA attack, but in real life what q is, is
+basically the number of times that we have
+
+62
+00:04:40,770 --> 00:04:46,041
+加密的次数，换句话说，如果我们使用某个AES密钥
+used the key K to encrypt messages, in other
+words if we use a particular AES key to
+
+63
+00:04:46,041 --> 00:04:51,052
+加密了100条明文信息，q=100
+这是因为攻击者将会看到
+encrypt 100 messages, Q would be 100.
+It is because the adversary would then see
+
+64
+00:04:51,052 --> 00:04:56,224
+用密钥K加密的最多100条信息。
+我们来看看这在现实中意味着什么
+at most 100 messages encrypted under this key K. Okay
+so let's see what this means in the real
+
+65
+00:04:56,224 --> 00:05:00,866
+我在这里重新写下了定理里的误差
+world. So here I've rewrote the error
+balance from the theorem. And just to remind
+
+66
+00:05:00,866 --> 00:05:05,093
+提醒一下大家，使用K加密明文，L是明文分组数
+you to use the messages encrypted with K
+and L with the lengths of the messages and so
+
+67
+00:05:05,093 --> 00:05:09,370
+假设我们想让攻击者的优势小于1除以2的32次方
+suppose we want the adversary's advantage
+to be less than one over two to the thirty
+
+68
+00:05:09,370 --> 00:05:13,346
+这意味着这个误差项最好小于1除以2的32次方
+two. This means that the error term had
+better be less than one over two to the
+
+69
+00:05:13,346 --> 00:05:17,853
+我们来看看用AES时是什么意思
+对于AES，当然使用128位分组
+thirty two. Okay, so let's look at AES and see
+what this mean. For AES, AES of course uses
+
+70
+00:05:17,853 --> 00:05:22,300
+那么|X|将是2的128次方
+128 bit blocks, so X is going to be two
+to the 128, the
+
+71
+00:05:22,300 --> 00:05:26,363
+X的大小将是2的128次方
+size of X is going to be 2 to the
+128, and if you
+
+72
+00:05:26,363 --> 00:05:30,865
+如果大家把这个带入到表达式中，可以看出
+q和L的乘积最好小于
+plug this into the expression you see that
+basically the product q times L had
+
+73
+00:05:30,865 --> 00:05:35,477
+2的40次方。这意味着
+better be less than two to the forty eight.
+This means that after we use a particular
+
+74
+00:05:35,477 --> 00:05:40,014
+在我们使用了一个密钥加密了2的48次方个
+AES分组后，我们就必须更换密钥了
+key to encrypt 2 to the 48 AES
+blocks we have to change the key. Okay, so
+
+75
+00:05:40,014 --> 00:05:46,966
+所以CBC在密钥用来加密2的48次方个不同的AES分组后
+不再是安全的了
+essentially CBC stops being secure after
+the key is used to encrypt 2 to the 48 different AES blocks.
+
+76
+00:05:46,966 --> 00:05:49,572
+这个安全定理告诉我们这点很好
+So it's kinda nice that the security theorem tells
+
+77
+00:05:49,572 --> 00:05:54,499
+它严格地告诉我们密钥的使用寿命
+以及多长时间你需要更换密钥
+you exactly how long the key can be used
+and then how frequently, essentially, you have to
+
+78
+00:05:54,499 --> 00:05:59,575
+现在有趣的是，如果你对3DES应用同样的推导
+replace the key. Now interestingly if you
+apply the same analogy to the 3DES it
+
+79
+00:05:59,575 --> 00:06:04,909
+3DES的分组要短得多，只有64位。大家看到
+actually has a much shorter block, maybe
+only 64 bits, you see the key has to be
+
+80
+00:06:04,909 --> 00:06:10,485
+密钥需要更加频繁地更换，可能每65000个DES分组
+需要重新生成一个新的密钥
+changed much more frequently, maybe after every
+65 thousand DES blocks, essentially you need to generate a new key. So
+
+81
+00:06:10,485 --> 00:06:15,275
+这是AES拥有更大分组空间的原因之一
+this is one of the reasons why AES has a
+larger block size so that in fact modes
+
+82
+00:06:15,275 --> 00:06:20,240
+这样CBC等模式会更安全，人们可以在更长的
+时间里使用同一个密钥
+like CBC would be more secure and one can
+use the keys for a longer period of time, before having
+
+83
+00:06:20,240 --> 00:06:24,796
+不用去更换之。这意味着必须更换2的16次方个分组
+to replace it. What this means is having
+to replace two to the sixteen blocks,
+
+84
+00:06:24,796 --> 00:06:29,586
+每个分组当然是8字节，所以在你加密了
+大约半个MB的数据后
+each block of course is 8 bytes, so
+after you encrypt about half a megabyte of
+
+85
+00:06:29,586 --> 00:06:33,868
+你必须更换DES密钥，这样速度很慢的
+data you would have to change the DES key
+which is actually quite low. And you
+
+86
+00:06:33,868 --> 00:06:37,645
+大家注意到用AES加密的话，在换密钥前
+可以加密更多数据。
+notice with AES you can encrypt quite a
+bit more data before you have to change the
+
+87
+00:06:37,645 --> 00:06:42,604
+那么我想警告大家，人们在使用带随机IV的CBC时
+有一个常见错误
+key. So I want to warn you about a very
+common mistake that people have made when
+
+88
+00:06:42,604 --> 00:06:47,627
+当攻击者可以预测IV
+using CBC with a random IV. That is that
+the minute that the attacker can predict
+
+89
+00:06:47,627 --> 00:06:52,712
+你加密将使用的这个IV时
+the IV that you're going to be using for
+encrypting a particular message decipher
+
+90
+00:06:52,712 --> 00:06:57,797
+这个Ecbc将不再安全。所以当使用带随机IV的CBC时
+this Ecbc is no longer CPA secure. So when
+using CBC with a random IV like we've
+
+91
+00:06:57,797 --> 00:07:02,246
+IV的不可预测是重要的。我们来看一个攻击
+just shown, it's crucial that the IV is not
+predictable. But let's see an attack. So
+
+92
+00:07:02,246 --> 00:07:06,282
+假设给定一个明文信息的加密
+suppose it so happens that given a
+particular encryption in a message that
+
+93
+00:07:06,282 --> 00:07:10,695
+攻击者正好可以预测出加密下一条明文的IV
+attacker can actually predict that IV that
+will be used for the next message. Well
+
+94
+00:07:10,695 --> 00:07:14,839
+我们来证明这样子得到的系统对CPA是不安全的
+let's show that in fact the resulting
+system is not CPA secure. So the first thing the
+
+95
+00:07:14,839 --> 00:07:19,197
+首先攻击者询问一个明文分组的加密
+adversary is going to do is, he is going
+to ask for the encryption of a one block
+
+96
+00:07:19,197 --> 00:07:23,449
+特别地，这个明文分组是0
+message. In particular that one block is
+going to be zero. So what the adversary
+
+97
+00:07:23,449 --> 00:07:27,592
+攻击者将获得这个明文分组的加密
+gets back is the encryption of one
+block, which namely is the encryption of
+
+98
+00:07:27,592 --> 00:07:31,748
+明文0的加密，再异或上IV
+当然攻击者也获得了IV
+the message namely zero, XOR the IV. Okay
+and of course the adversary also gets the
+
+99
+00:07:31,748 --> 00:07:35,877
+现在根据假设，攻击者可以预测
+IV. Okay so now the adversary by
+assumption can predict the IV that's gonna
+
+100
+00:07:35,877 --> 00:07:40,196
+下一次加密所用的IV，我们也把它称为IV
+be used for the next encryption. Okay so
+let's say that IV is called, well IV. So
+
+101
+00:07:40,196 --> 00:07:44,460
+接下来攻击者将会挑战语义安全
+next the adversary is going to issue his
+semantic security challenge and the
+
+102
+00:07:44,460 --> 00:07:49,167
+明文m0将变成预测的IV异或上IV1
+IV1是用于加密c1的初始向量
+message m0 is going to be the predicted IV
+XOR IV1 which was used in the encryption
+
+103
+00:07:49,167 --> 00:07:53,707
+而明文m1仅为一些其他信息
+of c1. And the, the message of m1 is just
+going to be some other message, it doesn't
+
+104
+00:07:53,707 --> 00:07:58,248
+具体内容无关紧要。现在我们看当攻击者收到
+really matter what it is. So now let's see
+what happens when the adversary receives
+
+105
+00:07:58,248 --> 00:08:02,346
+语义安全挑战的结果时，会发生什么
+the result of the semantic security
+challenge. Well, he is going to get the
+
+106
+00:08:02,346 --> 00:08:06,470
+攻击者会得到m0和m1的加密
+当攻击者得到m0的加密时
+encryption of m0 or m1. So when the
+adversary receives the encryption of m0,
+
+107
+00:08:06,470 --> 00:08:10,800
+告诉我密文c是由什么明文加密的？
+tell me what is the actual plain text
+that is encrypted in the ciphertext c?
+
+108
+00:08:11,260 --> 00:08:17,368
+答案是它是由信息IV异或IV1异或用于加密的IV
+Well so the answer is that what is
+actually encrypted is the message which is
+
+109
+00:08:17,368 --> 00:08:22,826
+根据预测当然就是IV1
+IV XOR IV1 XOR the IV that's used to
+encrypt that message which happens to be
+
+110
+00:08:22,826 --> 00:08:28,301
+所以当攻击者收到了m0的加密时
+IV and this of course is IV1. So when the
+adversary receives the encryption of m0,
+
+111
+00:08:28,301 --> 00:08:33,167
+他实际上得到的是IV1的分组密码的加密
+he is actually receiving the block cipher
+encryption of IV1. And lo and behold,
+
+112
+00:08:33,167 --> 00:08:38,440
+看，大家注意攻击者已经有了这个值
+根据他之前选择明文攻击的询问而来
+you'll notice that he already has that
+value from his chosen plaintext query.
+
+113
+00:08:38,440 --> 00:08:42,800
+当攻击者收到明文m1的加密时
+And then, when he is receiving the
+encryption of message m1, he just received
+
+114
+00:08:42,800 --> 00:08:47,825
+他刚刚收到一个正常的m1的CBC加密
+那么我们发现攻击者
+a normal CBC encryption of the message m1.
+So you realize that now he has a simple
+
+115
+00:08:47,825 --> 00:08:53,057
+有一个简单方法来破解这个机制，他只需问
+way of breaking the scheme, namely what
+he'll do is he'll say, he's gonna ask, "Is the second
+
+116
+00:08:53,057 --> 00:08:58,354
+第二个密文分组c是否等于选择明文攻击中
+收到的询问结果？
+block of the ciphertext c equal to the
+value that I received in my CPA query?" If
+
+117
+00:08:58,354 --> 00:09:03,843
+如果是，我说我收到了m0的加密，否则我说
+so I'll say that I received the encryption
+of m0, otherwise I'll say that I received
+
+118
+00:09:03,843 --> 00:09:09,209
+我收到了m1的加密。他的测试记为c1，
+即c的第二个密文分组
+the encryption of m1. So really his test
+is c1 he refers to the second block
+
+119
+00:09:09,209 --> 00:09:14,441
+c11为c1的第二个密文分组，如果两者相等
+他就说0
+of c and c11 refers to the second block of
+c1, if the two are equal he says zero,
+
+120
+00:09:14,441 --> 00:09:20,095
+否则，他说1。所以攻击者的优势是1
+otherwise he says one. So the advantage of
+this adversary is going to be 1 and as a
+
+121
+00:09:20,095 --> 00:09:25,650
+因此攻击者完全破解了这个CBC加密的CPA安全性
+result, he completely breaks CPA security
+of this CBC encryption. So the lesson here
+
+122
+00:09:25,650 --> 00:09:30,334
+这里的教训是，如果IV是可被预测的
+事实上，加密系统没有CPA安全性
+is, if the IV is predictable then, in
+fact, there is no CPA security and
+
+123
+00:09:30,334 --> 00:09:35,621
+不幸都是，这点在实际应用中是个
+非常常见的错误
+unfortunately, this is actually a very
+common mistake in practice. In particular
+
+124
+00:09:35,621 --> 00:09:41,339
+特别是在SSL协议和TLS1.1中，第I个记录的IV
+even in SSL protocol and in TLS 1.1, it turns
+out that IV for record number I is in fact
+
+125
+00:09:41,339 --> 00:09:46,363
+实际上就是第I-1个记录的密文分组
+这意味着给定第I-1个记录的加密
+the last ciphertext block of record I-1. That means that exactly given
+
+126
+00:09:46,363 --> 00:09:51,579
+攻击者就可以知道加密第I个记录的IV是多少
+the encryption of record I-1, the
+adversary knows exactly what IV is going
+
+127
+00:09:51,579 --> 00:09:56,031
+最近，也就是去年夏天
+to be used as record number I. Very
+recently, just last summer, this was
+
+128
+00:09:56,031 --> 00:10:00,737
+这一点被利用，形成了对SSL的一个
+非常严重的攻击
+actually converted into a pretty
+devastating attack on SSL. We'll describe
+
+129
+00:10:00,737 --> 00:10:06,016
+等我们更多地讨论SSL时，就会描述这个攻击
+但现在我们想确保大家理解了
+that attack once we talk about SSL in more
+detail, but for now I wanted to make sure
+
+130
+00:10:06,016 --> 00:10:12,371
+当你使用CBC加密时，IV的随机性是非常重要的
+you understand than when you use CBC encryption,
+its absolutely crucial that the IV be random.
+
+131
+00:10:12,371 --> 00:10:16,372
+现在我要给大家展示基于新鲜值的CBC加密
+Okay, so now I going to show you the nonce based version of CBC encryption
+
+132
+00:10:16,372 --> 00:10:21,443
+在这种模式里IV被某个不随机但唯一的新鲜值取代
+So in this mode the IV is replaced by non random but unique nonce
+
+133
+00:10:21,443 --> 00:10:27,928
+例如数字1,2,3,4,5，都可以用来做新鲜值
+这一模式的好处在于
+for example the numbers 1,2,3,4,5, could all be used as a nonce, and now, the appeal of this mode
+
+134
+00:10:27,928 --> 00:10:32,246
+如果接收方知道新鲜值是多少
+is that if the recipient actually knows
+what the nonce is supposed to be
+
+135
+00:10:32,246 --> 00:10:37,880
+就没有必要把新鲜值包含在密文里了
+then there's no reason to include the nonce
+in the ciphertext, in which case, the ciphertext
+
+136
+00:10:37,880 --> 00:10:42,197
+密文和明文就一样长了，这与带随机IV的CBC不一样
+is exactly the same length as the plaintext,
+unlike CBC with the random IV,
+
+137
+00:10:42,197 --> 00:10:48,276
+那里我们还需要扩充密文以包含IV
+这里如果新鲜值已被接收方知道
+where we had to expand the ciphertext to include the IV, here, if the nonce is already known to the recipient,
+
+138
+00:10:48,276 --> 00:10:53,315
+就没有必要把它包含在密文里了
+密文和明文就严格地一样长了
+there's no reason to include it in the ciphertext, and
+the ciphertext is exactly the same length as the plaintext.
+
+139
+00:10:53,315 --> 00:10:58,335
+使用不随机但唯一的新鲜值固然很好，但是
+有一点绝对很重要
+So it's perfectly fine to use a non-random but unique nonce. However, it's absolutely crucial to know that,
+
+140
+00:10:58,335 --> 00:11:04,345
+如果你这样做，在CBC链接使用新鲜值前，还需要再做一步
+if you do this, there's one more step that you have
+to do before you use the nonce in the CBC chain.
+
+141
+00:11:04,345 --> 00:11:11,355
+特别地，在这个模式中，我们要使用两个独立的密钥k和k1
+In particular, in this mode now we're going to
+be using two independent keys, k and k1.
+
+142
+00:11:11,355 --> 00:11:16,434
+如前所述，密钥k是用来加密单独的明文分组的
+The key k is, as before, going to be used to
+encrypt the individual message blocks,
+
+143
+00:11:16,434 --> 00:11:22,474
+而密钥k1是用来加密非随机但唯一的新鲜值的
+However, this key k1 is going to be used to
+encrypt the non-random but unique nonce,
+
+144
+00:11:22,474 --> 00:11:28,494
+这样输出将是一个随机的IV，可以被用在CBC链接中
+so that the output is going to be a random IV,
+which is then used in the CBC chain.
+
+145
+00:11:28,494 --> 00:11:32,504
+多出来的这一步，使用k1加密新鲜值
+是绝对非常重要的
+So this extra step here, encrypting the nonce
+with the key k1, is absolutely crucial.
+
+146
+00:11:32,504 --> 00:11:35,509
+没有的话，CBC加密模式不是安全的
+Without it, CBC mode encryption would not be secure.
+
+147
+00:11:35,509 --> 00:11:38,514
+特别是，如果你在CBC中直接使用新鲜值
+In particular, if you just directly use the nonce
+(接下来一分钟的官方字幕、时间轴全错了，
+由ikamusume酱听译)
+
+148
+00:11:38,514 --> 00:11:42,046
+换句话说，使用新鲜值作为IV
+in CBC encryption. In other words, use the nonce
+as the IV.
+
+149
+00:11:42,046 --> 00:11:47,380
+那么我们知道这个非随即的新鲜值不是CPA安全的
+then we will know the non-random nonce would not
+be CPA secure.
+
+150
+00:11:47,380 --> 00:11:52,919
+我们上一张幻灯片里已经解决了。事实上，
+如果你说k=k1
+We solved that on the previous slide. In fact,
+if you would say that k=k1
+
+151
+00:11:52,919 --> 00:11:58,047
+换句话说，你只用密钥k加密新鲜值的话
+in other words, you just encrypt the nonce using
+the key k
+
+152
+00:11:58,047 --> 00:12:02,728
+那样也不是CPA安全的，会造成严重的攻击
+that is also, well, not gonna be CPA secure, and
+can lead to significant attacks
+
+153
+00:12:02,728 --> 00:12:06,975
+所以我想确保大家理解，如果CBC中的新鲜值不随机
+So I want to make sure you understand that if the 
+nonce in CBC is not random,
+
+154
+00:12:06,975 --> 00:12:10,116
+这步多出的加密步骤就必须有
+this extra encryption step has to take place
+and, you know
+
+155
+00:12:10,116 --> 00:12:15,310
+我要让这多出来的一步跳个舞
+以确保大家不会忘记加上它
+So I'll make the extra step kind of dance
+so that make sure you never forget to put it in.
+
+156
+00:12:15,310 --> 00:12:18,291
+我会告诉大家，这在实际中是一个极为常见的错误
+And I will tell you, this is an extreme 
+common mistake in practice.
+
+157
+00:12:18,291 --> 00:12:23,591
+有很多真实的产品和密码学库
+There are many real world products and
+crypto libraries that actually forget to
+
+158
+00:12:23,591 --> 00:12:26,679
+忘记在CBC链接中使用非随即新鲜值前加密它了
+encrypt the non-random nonce before using it
+
+159
+00:12:26,679 --> 00:12:31,088
+那实际上造成了一个严重的攻击，例如
+in the CBC chain, and that actually leads to a
+practical significant attack. For example
+
+162
+00:12:31,088 --> 00:12:34,795
+在TLS中，这点没有做，因此对TLS里的
+CBC加密就有了一个严重的攻击
+this was not done in TLS. TLS, as we said, 
+uses predictable IVs 
+
+163
+00:12:34,795 --> 00:12:38,282
+造成了针对TLS的一个严重攻击
+进一步地，这点之所以这么重要
+and leads to a significant attack on TLS.
+Moreover, the reason it is so important to
+
+164
+00:12:38,282 --> 00:12:44,950
+是因为事实上很多密码学API是在误导用户
+know is that in fact many crypto APIs are
+set up to almost deliberately mislead the
+
+165
+00:12:44,950 --> 00:12:49,451
+去错误地使用CBC。我们来看一看OpenSSL中
+user to using CBC incorrectly. So let's
+look to see how CBC implemented inside
+
+166
+00:12:49,451 --> 00:12:53,840
+CBC是如何实现的。在这个函数的参数中
+open SSL. So here are the arguments of the
+function. Basically this is the plain
+
+167
+00:12:53,840 --> 00:12:58,119
+这是明文，这是待密文写入的地方
+text, this is the place where the cipher
+text will get written to. This is the
+
+168
+00:12:58,119 --> 00:13:02,760
+这是明文长度，这是一个密钥
+这里有个参数
+length of the plain text. This is a, a Yes
+key. Finally there is an argument here that
+
+169
+00:13:02,760 --> 00:13:06,438
+表示你是想加密还是解密
+says whether you are crypting or
+decrypting. And the most important
+
+170
+00:13:06,438 --> 00:13:10,884
+我想指出，这里最重要的参数是IV，但很不幸
+parameter that I wanted to point out here
+is the actual IV and unfortunately, the
+
+171
+00:13:10,884 --> 00:13:15,330
+用户需要提供这个IV，然后函数直接使用这个IV
+user is asked to supply this IV and the
+function uses the IV directly in the CBC
+
+172
+00:13:15,330 --> 00:13:20,831
+进行CBC加密了。使用前它根本不加密IV
+encryption mechanism. It doesn't encrypt
+the IV before using it and as a result, if
+
+173
+00:13:20,831 --> 00:13:24,332
+因此，如果你调用这个函数，并使用非随机的IV
+you ever call this function using a non
+random IV, the resulting encryption system
+
+174
+00:13:24,332 --> 00:13:28,816
+得到的加密系统将不是CPA安全的
+因此调用这个函数时，这一点很重要
+won't be CPA secure. Okay, so it's very
+important to know that when calling
+
+175
+00:13:28,816 --> 00:13:33,960
+CBC加密或OpenSSL提供了一个真随机的IV
+functions like this. CBC encryption or
+open SSL either supply a truly random IV
+
+176
+00:13:33,960 --> 00:13:38,836
+或者如果你想将IV设为计数器
+那么你需要必须用AES加密计数器
+or if you want the IV to be a counter then
+you have to encrypt a counter using AES
+
+177
+00:13:38,836 --> 00:13:43,668
+在调用CBC加密函数之前。必须自己完成加密工作
+before you actually call a CBC encrypt and
+you have to that yourself. So again, it's
+
+178
+00:13:43,668 --> 00:13:48,340
+作为编程人员这一点必须做，很重要的
+very important that the programmer knows
+that it needs to be done. Otherwise the CBC
+
+179
+00:13:48,340 --> 00:13:52,456
+否则CBC加密是不安全的
+关于CBC的最后一点是
+encryption is insecure. One last
+technicality about CBC is what to do when
+
+180
+00:13:52,456 --> 00:13:56,183
+当我们加密的明文长度不是分组密码的分组长度的倍数时
+the message is not a multiple of the block
+cipher block length? That is what do we do
+
+181
+00:13:56,183 --> 00:14:01,689
+例如，如果最后一个明文分组比AES的分组长度短
+if the last message block is shorter than
+the block length of AES, for example. So
+
+182
+00:14:01,689 --> 00:14:06,281
+最后一个明文分组长度比16字节短
+the last message block is less than
+sixteen bytes. And the answer is if we add
+
+183
+00:14:06,281 --> 00:14:11,586
+答案是如果我们在最后一个分组后面进行补齐
+使之变成16个字节长，与AES分组大小一致
+a pad to the last block so it becomes as
+long as sixteen bytes, as long as the AES
+
+184
+00:14:11,586 --> 00:14:16,633
+当然解密时这个补齐部分会被移除
+block size. And this pad, of course, if
+going to be removed during decryption. So
+
+185
+00:14:16,633 --> 00:14:22,873
+那么这是一个典型的补齐，这种方式是TLS使用的
+here is a typical pad, this is the pad
+that is used in TLS. Basically a pad with
+
+186
+00:14:22,873 --> 00:14:28,919
+用N个字节进行补齐，把这数N写N次
+N bytes then essentially what you do is
+you write the number N, N times. So for
+
+187
+00:14:28,919 --> 00:14:34,036
+比如如果大家想补5个字节，就补上字符串55555
+example if you pad with five bytes, you
+pad with the string 55555. So five bytes
+
+188
+00:14:34,036 --> 00:14:40,175
+5个字节，每个字节值为5。这个补齐重要的一点是
+where each byte is the value five. And the
+key thing about this pad is basically when
+
+189
+00:14:40,175 --> 00:14:44,012
+当解密者收到这条信息时，他看分组的最后一个字节
+the decrypter receives the message, what
+he does is he looks at the last byte of
+
+190
+00:14:44,012 --> 00:14:48,970
+假设这个值为5，那么解密者就移除
+the last block. So suppose that value is
+five, then he simply removes the last five
+
+191
+00:14:48,970 --> 00:14:52,818
+信息的最后5个字节。问题是如果明文长度
+bytes of the message. Now the question is
+what do we do if in fact the message is a
+
+192
+00:14:52,818 --> 00:14:56,262
+正好是16的整数倍，不需要补齐呢？
+如果我们不需要补齐
+multiple of sixteen bytes so in fact no
+pad is needed? If we don't pad at all,
+
+193
+00:14:56,262 --> 00:15:00,476
+就会有问题，因为解密者也会看最后一个分组的
+well that's a problem because the
+decrypter is going to look at the very
+
+194
+00:15:00,476 --> 00:15:05,267
+最后一个字节，是实际信息的一部分
+last byte of the last block which is a
+part of the actual message and he's going
+
+195
+00:15:05,267 --> 00:15:10,000
+解密者将从明文中移除很多字节，就会造成问题
+to remove that many bytes from the plain
+text. So that actually would be a problem.
+
+196
+00:15:10,000 --> 00:15:15,363
+那么解决方法是，如果不需要补齐
+So the solution is, if in fact there is no
+pad that's needed, nevertheless we still
+
+197
+00:15:15,363 --> 00:15:20,662
+我们还是在最后加一个没用的分组，由于
+我们加的这个假的分组
+have to add a dummy block. And since we
+add the dummy block this would be a block
+
+198
+00:15:20,662 --> 00:15:25,830
+包含了16个字节，每个字节的数值为16
+that's basically contains sixteen bytes
+each one containing the number sixteen.
+
+199
+00:15:25,830 --> 00:15:30,042
+好，那我们加16字节的假分组
+解密者解密时
+Okay, so we add essentially sixteen dummy
+blocks. The decrypter, that when he's
+
+200
+00:15:30,042 --> 00:15:34,473
+他看最后分组的最后一个字节
+他会看到16这个值
+decrypting, he looks at the last byte of
+the last block, he sees that the value is
+
+201
+00:15:34,473 --> 00:15:38,823
+所以他移除整个分组，剩下的就是明文了
+sixteen, therefore he removes the entire
+block. And whatever's left is the actual
+
+202
+00:15:38,823 --> 00:15:42,975
+那么有点不幸的是，如果你在用CBC加密
+plain text. So it's a bit unfortunate that
+in fact if you're encrypting short
+
+203
+00:15:42,975 --> 00:15:47,019
+一个短消息，消息正好是32个字节
+messages with CBC and the messages happen
+to be, say, 32 bytes, so they are a
+
+204
+00:15:47,019 --> 00:15:51,387
+是16的倍数，那么你必须再加一个分组
+multiple of sixteen bytes, then you have
+to add one more block and make all these
+
+205
+00:15:51,387 --> 00:15:55,108
+让所有密文共48个字节，以适应CBC补齐
+ciphertexts be 48 bytes just to
+accommodate the CBC padding. I should
+
+206
+00:15:55,108 --> 00:15:59,584
+我应当提一下，有一种CBC变种叫做密文偷窃
+mention there's a variant of CBC called
+CBC with ciphertext stealing that actually
+
+207
+00:15:59,584 --> 00:16:03,790
+可以避免这个问题，但我这里先不讲
+avoids this problem, but I'm not gonna
+describe that here. If you're interested
+
+208
+00:16:03,790 --> 00:16:07,907
+感兴趣的可以上网查。好
+我们关于CBC的讨论先告一段落
+you can look that up online. Okay, so
+that's the end of our discussion of CBC
+
+209
+00:16:07,907 --> 00:16:12,198
+下一节我们看如何使用计数器模式
+来加密多个信息
+and in the next segment we'll see how to
+use counter modes to encrypt multiple
+
+210
+00:16:12,198 --> 00:16:13,720
+使用一个密钥
+messages using a single key.

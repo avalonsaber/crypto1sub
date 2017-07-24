@@ -1,0 +1,1070 @@
+1
+00:00:01,794 --> 00:00:04,612
+本节我们要看我们的第一个密钥交换协议，不借助可信任第三方
+In this segment we're going to look at our first key exchange protocol without a trusted third party.
+
+2
+00:00:04,612 --> 00:00:08,174
+这里的通常设定是，我们有我们的朋友Alice和Bob
+So the settings are, we have our friends Alice and Bob as usual.
+
+3
+00:00:08,174 --> 00:00:11,841
+这两朋友之前从未见面，但他们想生成一个共享密钥
+And these friends have never met before but somehow they want to generate a shared key.
+
+4
+00:00:11,841 --> 00:00:15,263
+那么他们互相发送信息
+So what they're going to do is they're going to send messages to one another, back and forth.
+
+5
+00:00:15,263 --> 00:00:18,895
+这次没有可信任第三方可以和他们交流了
+And this time there is no trusted third party that they can communicate with.
+
+6
+00:00:18,895 --> 00:00:23,641
+在协议的最后，他们必须获得某个双方都知道的共享密钥
+And at the end of this protocol, somehow they should have a shared key that they both know.
+
+7
+00:00:23,641 --> 00:00:26,153
+所以有个双方都知道的密钥k
+So there's a secret key k that they both know.
+
+8
+00:00:26,153 --> 00:00:32,667
+窃听通信流量的攻击者绝对无法得知这个密钥k是什么
+But an eavesdropper who listens in on this traffic has absolutely no idea what this secret key k is.
+
+9
+00:00:32,667 --> 00:00:37,669
+目前我们只关心监听会话的攻击者
+For now we're just going to worry about attackers that only eavesdrop on the conversation.
+
+10
+00:00:37,669 --> 00:00:40,374
+换句话说，我们不允许任何对通信流量的篡改
+In other words, we don't allow any tampering with traffic.
+
+11
+00:00:40,374 --> 00:00:43,611
+我们只允许窃听，而且窃听者
+All we allow is just eavesdropping, and yet eavesdroppers should
+
+12
+00:00:43,611 --> 00:00:46,417
+不应该知道密钥k是什么
+have no idea what the secret key k is.
+
+13
+00:00:46,417 --> 00:00:50,080
+在这些设定下，我们将看到很多密钥交换协议
+So we're going to look at a number of key exchange protocols in these settings.
+
+14
+00:00:50,080 --> 00:00:52,954
+当攻击者仅仅是窃听会话时
+Namely, when the attacker is only eavesdropping on the conversation
+
+15
+00:00:52,954 --> 00:00:58,694
+不能改变流量。我们将看到三个协议来达到这一目标
+but cannot change traffic. And we're going to see three protocols that achieve this goal.
+
+16
+00:00:58,694 --> 00:01:01,262
+本节的第一个问题是
+And the first question, though, for this segment, is
+
+17
+00:01:01,262 --> 00:01:04,095
+这点能使用对称密码学做到吗？
+"Can this be done only using symmetric crypto?"
+
+18
+00:01:04,095 --> 00:01:08,236
+可不可以只使用分组密码或哈希函数
+So can this only be done using block ciphers or hash functions, or any of the tools
+
+19
+00:01:08,236 --> 00:01:11,327
+或是只使用我们前面四周所见的任何技术？
+that we've seen in the last four weeks?
+
+20
+00:01:11,327 --> 00:01:15,747
+令人惊奇的是，答案是肯定的，事实上我们可以进行密钥交换
+And so very surprisingly, the answer is "Yes", in fact we can do key exchange
+
+21
+00:01:15,747 --> 00:01:20,284
+只使用分组密码或哈希函数，不借助可信任第三方
+just using block ciphers or hash functions without a trusted third party
+
+22
+00:01:20,284 --> 00:01:25,265
+但是很不幸，得到的协议非常低效，在实际中从未被使用
+but unfortunately the resulting protocols are very inefficient and are actually never used in practice.
+
+23
+00:01:25,265 --> 00:01:28,904
+不过，这些协议特别简单，所以我想告诉大家它们是如何工作的
+Nevertheless, these are very simple protocols and so I want to show you how they work,
+
+24
+00:01:28,904 --> 00:01:33,317
+然后我们再看更为有效的协议，也就是这两周的内容
+and then we'll move on to the more efficient protocols that we'll discuss this week and the next.
+
+25
+00:01:33,317 --> 00:01:38,305
+我想给大家展示的简单协议叫做Merkle谜题协议
+So the simple protocol I want to show you what's called a Merkle Puzzles protocol.
+
+26
+00:01:38,305 --> 00:01:43,810
+这个协议由Ralph Merkle于1974年发明，当时他还在读本科
+This protocol was invented by Ralph Merkle back in 1974 when he was just an undergraduate.
+
+27
+00:01:43,810 --> 00:01:48,218
+有趣的是，他发明这个协议，作为他选的研习课的一部分
+Interestingly, he invented this protocol as part of a seminar that he took,
+
+28
+00:01:48,218 --> 00:01:52,204
+很明显他的教授不是很理解这一贡献的重要性
+but apparently the professor didn't quite understand the significance of the contribution
+
+29
+00:01:52,204 --> 00:01:55,151
+因此，Ralph Merkle毕业后
+and as a result Ralph Merkle actually graduated and then moved
+
+30
+00:01:55,151 --> 00:01:58,342
+去了斯坦福大学，成为了Marty Hellman的学生
+to Stanford where he became Marty Hellman's student
+
+31
+00:01:58,342 --> 00:02:02,255
+从那以后，他们为公钥密码学做了很多贡献
+and they've done a lot of good things in public-key cryptography since then.
+
+32
+00:02:02,255 --> 00:02:05,478
+那么我来告诉大家Merkle谜题的工作过程
+So let me show you how Merkle Puzzles work.
+
+33
+00:02:05,478 --> 00:02:08,084
+这个协议的主要工具叫做一个"谜题"
+The main tool for this protocol is what's called a "puzzle"
+
+34
+00:02:08,084 --> 00:02:10,164
+我来解释这个谜题的意思
+and let me explain what I mean by a puzzle.
+
+35
+00:02:10,164 --> 00:02:14,020
+谜题是指难解的问题，但通过努力还是可以解出的
+A puzzle is a problem that's difficult to solve, but can be solved with some effort.
+
+36
+00:02:14,020 --> 00:02:17,282
+换句话说，如果大家专心研究，是可以解出来的
+In other words, if you really put your mind to it you can solve it.
+
+37
+00:02:17,282 --> 00:02:18,719
+我来给个例子
+So let me give an example.
+
+38
+00:02:18,719 --> 00:02:22,826
+假设我们有一个对称密码，使用128位的密钥
+Suppose we have a symmetric cipher that uses keys that are 128 bits long
+
+39
+00:02:22,826 --> 00:02:24,988
+以AES为例
+So just think of AES for example.
+
+40
+00:02:24,988 --> 00:02:31,080
+假设我选择的AES密钥的前96位都是0
+And suppose what I do is a choose an AES key such that the first 96 bits are all 0
+
+41
+00:02:31,080 --> 00:02:35,996
+只有剩下的32位是非零的，并随机选取的
+and only the remaining 32 bits are non-zero and just chosen at random.
+
+42
+00:02:35,996 --> 00:02:42,502
+128位密钥中只有32位是随机的。其他都是0
+Ok, so only 32 bits of this 128-bit key are random. The rest are all 0.
+
+43
+00:02:42,502 --> 00:02:46,683
+现在我加密一段固定的明文，比如说
+And now what I do is I encrypt a fixed plaintext, for example,
+
+44
+00:02:46,683 --> 00:02:52,504
+加密明文"message"，使用128位密钥，大部分位都是0
+simply the plaintext "message" using this 128-bit key that happens to be mostly 0.
+
+45
+00:02:52,504 --> 00:02:55,252
+加密的结果叫做"谜题"
+The result is what I would call a "puzzle".
+
+46
+00:02:55,252 --> 00:02:58,250
+我称之为谜题，是因为其实不难找到
+The reason I call it a puzzle is because it's actually not that hard to find
+
+47
+00:02:58,250 --> 00:03:03,279
+密钥P，只需要尝试所有2的32次方种可能性
+the secret key P simply by trying all 2-to-the-32 possibilities.
+
+48
+00:03:03,279 --> 00:03:10,376
+记住前96位都是0，所以只需要试2的32次方个可能的密钥
+Remember the first 96 bits are all 0, there are only 2-to-the-32 possible keys to try.
+
+49
+00:03:10,376 --> 00:03:16,407
+尝试用每个密钥去解密这个谜题，看看是否得到明文"message"
+And for each key we'll try to decrypt this puzzle and see if we get the plaintext "message".
+
+50
+00:03:16,407 --> 00:03:20,877
+如果是的话，我们就知道了已经发现了正确的答案P
+If so, we know that we've recovered the right solution, P.
+
+51
+00:03:20,877 --> 00:03:25,043
+最多2的32次方次尝试，我们就可以解出这个谜题
+So within 2-to-the-32 work, we can actually solve this puzzle.
+
+52
+00:03:25,043 --> 00:03:28,507
+给定谜题(P)，我们可以找到P
+Namely, we can find P just given puzzle (P).
+
+53
+00:03:28,507 --> 00:03:30,350
+那么协议的工作方式如下：
+So the way this is going to work is as follows:
+
+54
+00:03:30,350 --> 00:03:33,524
+Alice开始时生成大量的谜题
+Alice is going to start by generating a large number of puzzles.
+
+55
+00:03:33,524 --> 00:03:36,473
+特别地，她将生成2的32次方个不同的谜题
+In particular, she's going to generate 2-to-the-32 different puzzles.
+
+56
+00:03:36,473 --> 00:03:40,558
+对于每个谜题，她生成的方法如下：
+Now each of these puzzles, the way she generates it is as follows:
+
+57
+00:03:40,558 --> 00:03:44,912
+她会选择一个32位随机谜题P_i
+What' she'll do is she'll choose a 32-bit random puzzle P-i,
+
+58
+00:03:44,912 --> 00:03:48,106
+这里的i从1遍历到2的32次方
+she does this for i = 1 to 2-to-the-32
+
+59
+00:03:48,106 --> 00:03:52,567
+然后她再选择两个值x_i和k_i
+and then she's going to choose two more values, x-i and k-i that
+
+60
+00:03:52,567 --> 00:03:54,108
+每个128位
+happen to be 128-bits each.
+
+61
+00:03:54,108 --> 00:04:00,779
+现在她会使用谜题P_i作为一个AES密钥
+Now what she'll do is she'll use the puzzle P-i as an AES secret key.
+
+62
+00:04:00,779 --> 00:04:06,581
+她会产生128位密钥，其中前96位都是0
+So she'll create 128-bit key where 96 of the bits are set to 0.
+
+63
+00:04:06,581 --> 00:04:09,987
+只有最低32位是随机的
+And only the 32 least significant bits happen to be random.
+
+64
+00:04:09,987 --> 00:04:13,511
+所以这个密钥的熵是32位，如果大家算一下
+So this is a key that only has 32 bits of entropy, if you like,
+(H(M)=-\sum p_i \log p_i，p_i表示各字符串出现概率)
+
+65
+00:04:13,511 --> 00:04:15,934
+只有2的32次方个密钥
+and there are only 2-to-the-32 such keys.
+
+66
+00:04:15,934 --> 00:04:19,439
+现在她要使用这个密钥加密的明文
+Now the plaintext that she'll encrypt using this key
+
+67
+00:04:19,439 --> 00:04:22,025
+是我写在这里的信息
+is this message that I wrote over here.
+
+68
+00:04:22,025 --> 00:04:23,890
+这个明文以"Puzzle"开头
+Basically it's starts off with the word "Puzzle".
+
+69
+00:04:23,890 --> 00:04:27,253
+谜题被表示为x_i
+That puzzle is identified by the identifier x-i,
+
+70
+00:04:27,253 --> 00:04:29,623
+正好是128位
+which happens to be 128 bits.
+
+71
+00:04:29,623 --> 00:04:32,548
+我们在x_i后面附上k_i
+And to that we concatenate a value k-i which also happens
+
+72
+00:04:32,548 --> 00:04:34,056
+k_i正好也是128位
+to be 128 bits.
+
+73
+00:04:34,056 --> 00:04:38,270
+那么她对所有的2的32次方个谜题都这么做
+So she does this for all 2-to-the-32 puzzles, and as a result
+
+74
+00:04:38,270 --> 00:04:41,267
+于是她得到了2的32次方个不同的谜题
+she gets 2-to-the-32 different puzzles.
+
+75
+00:04:41,267 --> 00:04:44,283
+然后她把这2的32次方个谜题发送给Bob
+She then goes ahead and sends these 2-to-the-32 puzzles to Bob.
+
+76
+00:04:44,283 --> 00:04:46,213
+那Bob做什么呢？
+So what does Bob do?
+
+77
+00:04:46,213 --> 00:04:49,790
+Bob接收了这如同洪水般的2的32次方个不同谜题
+Well Bob receives this flood of 2-to-the-32 different puzzles.
+
+78
+00:04:49,790 --> 00:04:51,785
+他只选择其中一个
+He's just going to choose one of them.
+
+79
+00:04:51,785 --> 00:04:53,503
+他不需要记住所有的谜题
+He doesn't even have to remember any of them.
+
+80
+00:04:53,503 --> 00:04:55,857
+他只需要随机地忽略大部分谜题
+He just randomly lets most of them go by.
+
+81
+00:04:55,857 --> 00:04:57,997
+只选择其中的一个谜题
+And he happens to choose one of them.
+
+82
+00:04:57,997 --> 00:05:00,215
+比如说他选择了谜题j
+Let's say he chose puzzle number "j".
+
+83
+00:05:00,215 --> 00:05:04,150
+他花了2的32次方的时间来解决这个谜题
+Then he spends time 2-to-the-32 and solves this puzzle.
+
+84
+00:05:04,150 --> 00:05:06,127
+解决这个谜题是什么意思？
+Well what does it mean to solve this puzzle?
+
+85
+00:05:06,127 --> 00:05:08,430
+他要尝试所有可能的P_i
+He's going to try all possible values of P-i.
+
+86
+00:05:08,430 --> 00:05:11,971
+他要解密他选择的谜题
+He's going to decrypt the puzzle that he chose, and
+
+87
+00:05:11,971 --> 00:05:15,490
+他要检查明文的前面部分
+he's going to check whether the first part of the plaintext starts
+
+88
+00:05:15,490 --> 00:05:17,152
+是否以"Puzzle"开头
+with the word puzzle.
+
+89
+00:05:17,152 --> 00:05:19,481
+如果确实是这样，Bob就知道了他正确地解决了这个谜题
+And if it does, he knows that he's correctly solved that puzzle,
+
+90
+00:05:19,481 --> 00:05:22,866
+然后他就获得了嵌在谜题里的数据
+and he basically obtains the data embedded in the puzzle
+
+91
+00:05:22,866 --> 00:05:25,552
+x_j和k_j
+namely, x-j and k-j.
+
+92
+00:05:25,552 --> 00:05:29,801
+记得x_j是这个谜题的标记
+Remember x-j is this value that identifies the puzzle
+
+93
+00:05:29,801 --> 00:05:31,455
+k_j是他们要使用的秘密信息
+and k-j is going to be a secret that they use.
+
+94
+00:05:31,455 --> 00:05:35,988
+现在他已经解决了这个谜题--他知道了如何正确地解决这个谜题
+So now he's solved the puzzle -- he knows that he's solved the puzzle correctly
+
+95
+00:05:35,988 --> 00:05:38,087
+他获得了这个x_j和k_j
+and he obtained this x-j and k-j.
+
+96
+00:05:38,087 --> 00:05:40,667
+他会把x_j发送给Alice
+What he'll do is he'll send x-j back to Alice
+
+97
+00:05:40,667 --> 00:05:45,885
+只发送x_j的值。k_j他自己保留，作为秘密
+-- just the value of x-j. k-j he keeps for himself, and keeps it a secret.
+
+98
+00:05:45,885 --> 00:05:49,186
+然后Alice查找他的谜题数据库
+And then Alice is simply going to lookup in her database
+
+99
+00:05:49,186 --> 00:05:52,311
+她会查到谜题x_j
+of puzzles, she's going to lookup puzzle number x-j,
+
+100
+00:05:52,311 --> 00:05:57,577
+就知道了Bob选择的密钥k_j
+and then she knows Bob chose the key k-j.
+
+101
+00:05:57,577 --> 00:05:59,608
+现在他们就有了这个共享密钥
+And now they have this shared key.
+
+102
+00:05:59,608 --> 00:06:02,875
+那么k_j就是这个共享密钥，可以被用来保证他们之间的安全通信
+So k-j is going to be the shared key they that use to communicate securely with one another.
+
+103
+00:06:02,875 --> 00:06:07,262
+以图表的形式，这个协议如下工作：
+So in a diagram the way this protocol works is as follows:
+
+104
+00:06:07,262 --> 00:06:11,228
+开始时Alice发送2的32次方个谜题给Bob
+Alice starts off by sending 2-to-the-32 puzzles to Bob.
+
+105
+00:06:11,228 --> 00:06:14,468
+那么我们可以推广这个说法，比如说她发送n个谜题给Bob
+So we can generalize this. Let's say that she says n puzzles to Bob.
+
+106
+00:06:14,468 --> 00:06:19,152
+每个谜题需要花正比于n的时间来解决
+And let's say that each puzzle takes work proportional to n to solve.
+
+107
+00:06:19,152 --> 00:06:21,512
+Bob解决其中一个谜题
+Bob solves one of these puzzles,
+
+108
+00:06:21,512 --> 00:06:24,347
+然后把x_j发送给Alice
+and then he sends back x-j to Alice.
+
+109
+00:06:24,347 --> 00:06:28,494
+目前双方都花了时间n
+So far each one of them has spent work n.
+
+110
+00:06:28,494 --> 00:06:31,595
+然后Alice查看谜题x_j
+And then Alice basically looks up puzzle x-j
+
+111
+00:06:31,595 --> 00:06:35,339
+还原出对应于谜题的密钥
+and recovers the key that corresponds to this puzzle.
+
+112
+00:06:35,339 --> 00:06:38,411
+因此现在双方有了一个共享密钥
+And as a result both of them now have a shared key
+
+113
+00:06:38,411 --> 00:06:40,185
+他们可以使用这个密钥来相互交流
+that they can use to communicate with one another.
+
+114
+00:06:40,185 --> 00:06:42,157
+我们来看他们所做的工作
+Ok so let's look at the work they did.
+
+115
+00:06:42,157 --> 00:06:44,845
+Alice必须准备n个谜题
+So the work that Alice did is that she had to prepare n puzzles.
+
+116
+00:06:44,845 --> 00:06:47,255
+准备谜题花掉固定长的时间
+Well, preparing the puzzle takes constant time.
+
+117
+00:06:47,255 --> 00:06:51,006
+她必须准备n个谜题，她的工作是O(n)的
+She had to prepare n puzzles, so her work is roughly order n.
+
+118
+00:06:51,006 --> 00:06:54,232
+Bob选择一个谜题并解决
+Bob chose one puzzle and solved it, so his work
+
+119
+00:06:54,232 --> 00:06:57,402
+所以他的工作是与n成正比的。与n成线性
+is also proportional to order n. So linear in n.
+
+120
+00:06:57,402 --> 00:07:00,238
+我们看窃听者怎么办
+Let's see what the eavesdropper has to do.
+
+121
+00:07:00,238 --> 00:07:03,001
+可怜的窃听者看着n个谜题过去了
+Well the poor eavesdropper sees these n puzzles go by
+
+122
+00:07:03,001 --> 00:07:05,366
+然后他看到Bob返回了一个x_j
+and then he sees this x-j come back.
+
+123
+00:07:05,366 --> 00:07:08,678
+攻击者并不知道Bob解的是哪个谜题
+And he doesn't really know which puzzle Bob actually solved.
+
+124
+00:07:08,678 --> 00:07:12,022
+他看到的只是谜题中的随机值
+All he sees is this random value inside of the puzzle.
+
+125
+00:07:12,022 --> 00:07:14,480
+为了破解这个协议，窃听者会
+And so to break this protocol, the eavesdropper would
+
+126
+00:07:14,480 --> 00:07:18,347
+解决所有的谜题，直到他找到正确的谜题
+actually have to solve all puzzles until he finds the right puzzle
+
+127
+00:07:18,347 --> 00:07:21,517
+里面有x_j，那么攻击者就会还原k_j
+that has the value x-j in it, and then he will recover k-j.
+
+128
+00:07:21,517 --> 00:07:24,894
+我给大家的问题是，"攻击者要做多少工作？"
+So my question to you is, "What is the attacker's work?"
+
+129
+00:07:24,894 --> 00:07:26,955
+攻击者必须做多少工作
+How much work did the eavesdropper have to spend
+
+130
+00:07:26,955 --> 00:07:28,705
+才能破解这个协议？
+in order to break this protocol.
+
+131
+00:07:28,705 --> 00:07:33,536
+答案当然是O(n^2)
+So the answer is, of course, order n-squared.
+
+132
+00:07:33,536 --> 00:07:35,487
+n平方的时间
+You know, quadratic time in n.
+
+133
+00:07:35,487 --> 00:07:39,125
+他必须解决n个谜题。每个谜题花掉时间n
+He had to solve n puzzles. Each puzzle takes time n to solve.
+
+134
+00:07:39,125 --> 00:07:42,306
+因此他必须花掉时间n^2
+And as a result he had to spend time order n-squared.
+
+135
+00:07:42,306 --> 00:07:45,467
+在我们的例子中，我们说过有2的32次方个谜题
+In our example we said that there were 2-to-the-32 puzzles
+
+136
+00:07:45,467 --> 00:07:47,986
+每个谜题需要2的32次方的时间来解决
+and each one took 2-to-the-32 time to solve,
+
+137
+00:07:47,986 --> 00:07:51,820
+所以总的来看，攻击者需要做2的64次方步工作
+so overall the attacker's work is roughly 2-to-the-64 steps.
+
+138
+00:07:51,820 --> 00:07:55,465
+大家可以看到这个协议的问题了
+So you can see the problem with this protocol.
+
+139
+00:07:55,465 --> 00:07:58,151
+首先，参与者Alice和Bob自己
+First of all, the participants Alice and Bob had to do quite
+
+140
+00:07:58,151 --> 00:07:59,584
+需要做大量的工作
+a bit of work themselves.
+
+141
+00:07:59,584 --> 00:08:01,421
+想一想，Alice必须发送
+If you think about it, Alice basically had to send
+
+142
+00:08:01,421 --> 00:08:03,481
+2的32次方个谜题给Bob
+2-to-the-32 puzzles to Bob.
+
+143
+00:08:03,481 --> 00:08:07,168
+她必须发很多GB的数据给Bob
+That's many, many gigabytes that she had to send to Bob.
+
+144
+00:08:07,168 --> 00:08:10,893
+比如16GB或32GB，取决于谜题的大小
+Like 16 or 32 gigabytes, depending on how big each puzzle is.
+
+145
+00:08:10,893 --> 00:08:14,937
+Bob必须花2的32次方的时间，来解决其中的一个谜题
+Bob had to spend time 2-to-the-32 to solve one of these puzzles.
+
+146
+00:08:14,937 --> 00:08:16,787
+这大概也会花几秒钟
+That would take a few seconds, too.
+
+147
+00:08:16,787 --> 00:08:20,361
+那么他们获得的所有的安全性在于
+But then, all the security they got is that the attacker
+
+148
+00:08:20,361 --> 00:08:23,435
+攻击者可以在2的64次方的时间内破解这一协议
+can break this protocol in time 2-to-the-64.
+
+149
+00:08:23,435 --> 00:08:26,677
+2的64次方依然不能被认为是安全的
+So 2-to-the-64 is still not considered particularly secure.
+
+150
+00:08:26,677 --> 00:08:29,366
+因此，如果攻击者真想
+As a result, the attacker, really, if he really wanted
+
+151
+00:08:29,366 --> 00:08:31,502
+破解这个协议，他是可以的
+to break this protocol, he could.
+
+152
+00:08:31,502 --> 00:08:33,738
+那么为了让这个协议安全，参与双方必须
+So to make this secure, the participants would have to
+
+153
+00:08:33,738 --> 00:08:36,141
+增加参数n
+increase the parameter n.
+
+154
+00:08:36,141 --> 00:08:38,391
+他们必须发送，比如说，2的64次方个谜题
+And they would have to send, say, 2-to-the-64
+
+155
+00:08:38,391 --> 00:08:41,450
+给对方，然后花2的64次方的时间
+puzzles to one another, and then spend time 2-to-the-64
+
+156
+00:08:41,450 --> 00:08:44,380
+去解决这个谜题，那么攻击者的工作
+to solve each puzzle, and then the attacker's work
+
+157
+00:08:44,380 --> 00:08:47,791
+将是2的128次方，可认为是安全的了
+would be 2-to-the-128, which is considered secure.
+
+158
+00:08:47,791 --> 00:08:50,165
+但是参与者花了2的64次方的时间
+But having the participants spend time 2-to-the-64 to
+
+159
+00:08:50,165 --> 00:08:53,217
+来建立一个安全的会话，对每个参与者来说
+set up a secure session is a little bit too much
+
+160
+00:08:53,217 --> 00:08:55,429
+有点吃力了
+to ask each of these participants.
+
+161
+00:08:55,429 --> 00:08:58,954
+所以这就是为什么这个协议不实用
+So this is why this protocol is not particularly used in practice.
+
+162
+00:08:58,954 --> 00:09:01,496
+不过这里有一个很好的想法
+But nevertheless there's a really nice idea here
+
+163
+00:09:01,496 --> 00:09:04,194
+攻击者必须花线性的时间
+in that the participants had to spend linear time,
+
+164
+00:09:04,194 --> 00:09:06,748
+而攻击者必须花平方的时间
+whereas the attacker had to spend quadratic time.
+
+165
+00:09:06,748 --> 00:09:09,083
+这就有一个"平方鸿沟"
+So there's a "quadratic gap" between the amount of
+
+166
+00:09:09,083 --> 00:09:11,604
+横亘在参与者与攻击者的工作之间
+work that the participants had to do, versus what the attacker
+
+167
+00:09:11,604 --> 00:09:13,607
+当攻击者想破解这个协议
+had to do to break the protocol.
+
+168
+00:09:13,607 --> 00:09:16,926
+那么一个很自然的问题是，我们能否做得更好？
+So a natural question is, "Can we actually do better
+
+169
+00:09:16,926 --> 00:09:20,132
+只使用对称密码，做得比平方鸿沟更好呢？
+than a quadratic gap, just using symmetric ciphers?"
+
+170
+00:09:20,132 --> 00:09:21,602
+换句话说，使用我们前面四个礼拜
+In other words, just using tools
+
+171
+00:09:21,602 --> 00:09:24,144
+在本课程中见过的技术
+that we developed in the first four weeks of the class.
+
+172
+00:09:24,144 --> 00:09:27,384
+答案是未知的
+And the answer really is that this is unknown.
+
+173
+00:09:27,384 --> 00:09:30,633
+我们不知道平方鸿沟是否是我们所能做到的最好的结果
+We don't know whether a quadratic gap is the best that we can do.
+
+174
+00:09:30,633 --> 00:09:32,993
+大家可以试着想一想
+You might even try to think about this a bit.
+
+175
+00:09:32,993 --> 00:09:36,062
+如何使用AES或SHA-256来进行密钥交换
+How would you use AES or SHA-256 to do key exchange
+
+176
+00:09:36,062 --> 00:09:38,556
+可以获得比平方鸿沟更好的结果？
+that achieves better than a quadratic gap.
+
+177
+00:09:38,556 --> 00:09:40,759
+不过我可以告诉大家，我们相信
+But I can tell you that we believe that quadratic
+
+178
+00:09:40,759 --> 00:09:41,931
+平方鸿沟是我们所能做到的最好的了
+is the best we can do.
+
+179
+00:09:41,931 --> 00:09:44,436
+这里甚至还有一些负面的结果
+And there are even some negative results along those lines.
+
+180
+00:09:44,436 --> 00:09:47,557
+不严格地说，有一个结果说
+So roughly speaking, there is a result that says
+
+181
+00:09:47,557 --> 00:09:51,177
+事实上，如果我们把分组密码或哈希函数
+that, in fact, if we treat the block cipher or the hash function
+
+182
+00:09:51,177 --> 00:09:53,736
+当作黑盒神谕来使用，换句话说
+that we use as a black box oracle -- in other words
+
+183
+00:09:53,736 --> 00:09:57,124
+参与者只能询问分组密码
+all the participants can do is just query the block cipher
+
+184
+00:09:57,124 --> 00:09:59,165
+或询问哈希函数在特定点的值
+or query the hash function at certain points
+
+185
+00:09:59,165 --> 00:10:03,237
+并获得结果，如果这些是参与者所能做的全部
+and receive the results -- if that's all they're allowed to do,
+
+186
+00:10:03,237 --> 00:10:05,729
+换句话说，参与者不能实际使用
+in other words, they're not allowed to actually use the implementation
+
+187
+00:10:05,729 --> 00:10:08,541
+分组密码或哈希函数的实现
+of the cipher, or the hash function, then in fact
+
+188
+00:10:08,541 --> 00:10:12,414
+那么事实上有一个结果告诉我们，如果参与者只能
+there is a result that says that if the participants only query
+
+189
+00:10:12,414 --> 00:10:15,351
+询问分组密码在n个点的值，那么总有一个攻击
+the block cipher at n points, there will always be an attack
+
+190
+00:10:15,351 --> 00:10:18,707
+运行在n平方的时间里
+that runs in time n-squared.
+
+191
+00:10:18,707 --> 00:10:21,549
+这就是说，如果你只能使用
+So again this suggests that if all you do is use
+
+192
+00:10:21,549 --> 00:10:24,094
+分组密码作为一个黑盒进行询问
+the block cipher as a black box that you query,
+
+193
+00:10:24,094 --> 00:10:26,128
+那么无论交换什么密钥
+then whatever key exchange you come up with,
+
+194
+00:10:26,128 --> 00:10:29,371
+这个密钥交换总有一个平方时间的攻击
+there will always be a quadratic attack on this key exchange.
+
+195
+00:10:29,371 --> 00:10:31,747
+事实上，在本章结束时，我指出这篇论文
+And, in fact, at the end of this module, I point to this
+
+196
+00:10:31,747 --> 00:10:34,713
+最近的一篇2009年的论文
+paper -- it's a fairly recent paper from 2009 -- that shows
+
+197
+00:10:34,713 --> 00:10:36,591
+证明了平方是我们能做的最好的
+that quadratic is best we can do.
+
+198
+00:10:36,591 --> 00:10:38,985
+如果大家想了解更多的关于这种不可能性的结果
+If you want to read more about this impossibility result
+
+199
+00:10:38,985 --> 00:10:41,126
+去读这篇文章吧
+you know, go ahead and take a look at this paper.
+
+200
+00:10:41,126 --> 00:10:44,093
+这篇论文可读性强，大家应该能理解它
+It's actually a very readable paper, and you should be able to understand it.
+
+201
+00:10:44,093 --> 00:10:46,104
+那么问题是接下来怎么办？
+And so the question is what to do next.
+
+202
+00:10:46,104 --> 00:10:47,470
+我们有点困住了
+So now we're kind of stuck.
+
+203
+00:10:47,470 --> 00:10:49,013
+我们说过用分组密码，我们不能
+We said that with block ciphers, we really can't do
+
+204
+00:10:49,013 --> 00:10:51,259
+做得比平方鸿沟更好
+better than a quadratic gap.
+
+205
+00:10:51,259 --> 00:10:52,635
+那我们怎么办？
+And so what do we do?
+
+206
+00:10:52,635 --> 00:10:55,029
+那么这就是公钥密码学的起点
+So this was kind of the starting point of public-key cryptography.
+
+207
+00:10:55,029 --> 00:10:57,727
+我们发现，我们需要
+And the realization is that we need more than just
+
+208
+00:10:57,727 --> 00:11:00,851
+比通用分组密码和哈希函数更多的技术
+generic block ciphers and generic hash functions.
+
+209
+00:11:00,851 --> 00:11:04,682
+我们实际上需要具备非常特殊性质的函数
+We actually need functions that have very, very special properties.
+
+210
+00:11:04,682 --> 00:11:08,806
+为了构建这些函数，我们实际上必须依赖于某些代数
+And to build these functions, we actually have to rely on some algebra.
+
+211
+00:11:08,806 --> 00:11:11,506
+下面几节我们看
+So in the next few segments we're going to look
+
+212
+00:11:11,506 --> 00:11:14,002
+一些代数机制，然后我们看
+at some algebraic constructions and then we'll see
+
+213
+00:11:14,002 --> 00:11:15,760
+如何使用它们来进行密钥交换
+how to use those for key exchange and for
+
+214
+00:11:15,760 --> 99:59:59,000
+以及公钥密码学里的许多其他技术
+many other things in public-key cryptography.

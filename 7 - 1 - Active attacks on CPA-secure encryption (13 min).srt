@@ -1,0 +1,1037 @@
+1
+00:00:00,000 --> 00:00:03,410
+现在我们已经讲完了信息完整性
+Now that we're done with message
+integrity, we're gonna back and talk about
+【伊卡酱 译注】
+
+2
+00:00:03,410 --> 00:00:07,092
+我们将回到加密的讨论，我们将展示如何构建加密机制
+encryption, and we're gonna show how to
+construct encryption schemes that provide
+
+3
+00:00:07,092 --> 00:00:10,916
+提供比之前强得多的安全性
+much stronger security guarantees than
+what we had before. But first let's do a
+
+4
+00:00:10,916 --> 00:00:15,323
+首先，我们回顾一下。在前面的内容里，我们讨论了私密性
+recap of where we are. So in previous
+segments, we talked about confidentiality,
+
+5
+00:00:15,323 --> 00:00:20,125
+特别地，如何加密信息，让我们获得语义安全
+in particular how to encrypt messages such
+that we achieve semantic security against
+
+6
+00:00:20,125 --> 00:00:24,814
+来对抗选择明文攻击。现在我一再提到
+what's called a chosen plaintext attack.
+Now I kept mentioning again and again that
+
+7
+00:00:24,814 --> 00:00:28,938
+对选择明文攻击的安全性仅仅提供了
+security against chosen plaintext attacks
+only provides security against
+
+8
+00:00:28,938 --> 00:00:33,571
+对抗窃听的安全性。换句话说，这仅仅提供了
+eavesdropping. In other words, this only
+provides security against adversaries that
+
+9
+00:00:33,571 --> 00:00:37,638
+对抗只会监听网络流量的攻击者的安全性，
+但攻击者不会改变任何数据包
+listen to network traffic. But don't
+actually change any packets, or don't
+
+10
+00:00:37,638 --> 00:00:41,729
+也不会篡改数据包，等等。本章中，我们的目标是
+inject their own packets, and so on. In
+this module, our goal is actually to
+
+11
+00:00:41,729 --> 00:00:46,318
+设计加密机制，以对抗可以篡改信息的攻击者
+design encryption schemes that are secure
+against adversaries that can tamper with
+
+12
+00:00:46,318 --> 00:00:50,641
+攻击者可以封锁特定的数据包，以及修改其他的数据包等
+traffic by blocking certain packets, and
+injecting other packets and so on. And
+
+13
+00:00:50,641 --> 00:00:55,322
+然后我们看了如何提供信息完整性，信息本身不是私密的
+then we also looked at how to provide
+message integrity where the message itself
+
+14
+00:00:55,322 --> 00:00:59,889
+我们只想确保信息在传输中没被修改
+is not confidential. We just want to make
+sure that the message is not modified
+
+15
+00:00:59,889 --> 00:01:04,223
+我们讨论了信息验证码MAC
+while it's en route. And so we talked
+about message authentication codes, MAC
+
+16
+00:01:04,223 --> 00:01:08,616
+MAC算法对选择信息攻击提供了不可存在性伪造的性质
+algorithms that provide existential
+unforgeability against a chosen message
+
+17
+00:01:08,616 --> 00:01:13,067
+换句话说，尽管攻击者可以获得他选择的
+attack. In other words, even though the
+attacker is able to obtain the MACs on
+
+18
+00:01:13,067 --> 00:01:17,926
+信息的MAC，他也不能构建其他信息的MAC
+arbitrary messages of his choice, he can't
+build MACs for any other messages. And we
+
+19
+00:01:17,926 --> 00:01:23,593
+我们看了很多MAC机制，特别是CBC-MAC, HMAC
+looked at a number of MAC constructions,
+in particular CBC MAC, HMAC, a Parallel MAC
+
+20
+00:01:23,593 --> 00:01:28,050
+并行MAC，一个快速MAC机制叫做Carter-Wegman MAC
+construction. And a fast MAC construction
+called a Carter-Wegman MAC. In this
+
+21
+00:01:28,050 --> 00:01:32,420
+本章中，我们将展示如何把私密性和完整性机制组合起来
+module, we're going to show how to combine
+these confidentiality and integrity
+
+22
+00:01:32,420 --> 00:01:36,679
+得到的加密机制可以对抗
+mechanisms to obtain encryption schemes
+that are secure against a much, much
+
+23
+00:01:36,679 --> 00:01:41,386
+强大得多的攻击者，即攻击者可以修改网络通信内容
+stronger adversary, namely an adversary that
+can tamper with traffic while it's in the
+
+24
+00:01:41,386 --> 00:01:45,644
+感染数据包，封锁特定数据包等等
+network, inject its own packets, block
+certain packets, and so on. And our goal
+
+25
+00:01:45,644 --> 00:01:50,015
+我们的目标是确保即使对抗如此强大的攻击者
+is basically to insure that even against
+such powerful adversaries, we maintain
+
+26
+00:01:50,015 --> 00:01:54,274
+我们依然可以保持私密性。换句话说，攻击者
+confidentiality. In other words, the
+adversary can't learn what the plain text
+
+27
+00:01:54,274 --> 00:01:58,759
+无法学习到明文内容，无法修改密文
+is and the adversary can't even modify the
+cipher text and cause the recipient to
+
+28
+00:01:58,759 --> 00:02:03,518
+并让接收方对经过修改后的明文信以为真。那么在这之前
+think a different plain text was actually
+sent. So before we do that I want to give
+
+29
+00:02:03,518 --> 00:02:08,387
+我想给大家一个攻击者的例子，他们可以篡改通信
+you a few examples of adversaries that can
+tamper with traffic. And as a result
+
+30
+00:02:08,387 --> 00:02:12,974
+因此完全破坏了CPA安全加密的安全性。这个会告诉大家
+completely break security of CPA secure
+encryption. This will show you that,
+
+31
+00:02:12,974 --> 00:02:17,789
+实际上那种方法提供的完整性和私密性也会被破坏
+actually, with that providing integrity,
+confidentiality can also be destroyed. In
+
+32
+00:02:17,789 --> 00:02:22,363
+换句话说，完整性和私密性，两者必须都保证
+other words, the two must go together,
+integrity and confidentiality, if we're
+
+33
+00:02:22,363 --> 00:02:27,238
+如果我们要安全地对抗主动型攻击者
+going to achieve security against active
+adversaries. So let's look at an example
+
+34
+00:02:27,238 --> 00:02:31,581
+那我们看个网络领域的例子。特别地，我们看TCP/IP
+from the world of networking. In
+particular, let's look at TCP/IP. I'm gonna
+
+35
+00:02:31,581 --> 00:02:36,776
+我使用一个高度简化的TCP/IP版本，这样我们可以
+use a highly simplified version of TCP/IP
+just so we can quickly focus on the attack
+
+36
+00:02:36,776 --> 00:02:41,738
+关注于攻击，不拘泥于细节。我们有两个机器互相通信
+and not get bogged down by the details. So
+here we have two machines communicating
+
+37
+00:02:41,738 --> 00:02:45,995
+一用户坐在一台机器上，另一台机器是个服务器
+with one another. A user sits at one
+machine, and the other machine is a
+
+38
+00:02:45,995 --> 00:02:50,732
+现在，服务器上当然有TCP/IP协议栈在接收数据包
+server. Now, the server, of course, has a
+TCP/IP stack that's receiving packets. And
+
+39
+00:02:50,732 --> 00:02:55,529
+然后，根据这些数据包的目标地址域，服务器把数据包
+then, based on the destination field in
+those packets, it forwards the packets to
+
+40
+00:02:55,529 --> 00:03:00,146
+转发到合适的位置。比如，这里我们有两个进程
+the appropriate place. So here we have,
+for example, two processes listening to
+
+41
+00:03:00,146 --> 00:03:04,523
+在监听这些数据包。一个网页服务器在这里。
+另一个用户，我们叫他Bob
+these packets. A web server, say, over
+here, and another user, we'll call him
+
+42
+00:03:04,523 --> 00:03:09,260
+Bob在这里。网页服务器监听80端口
+Bob, over here. The web server listens on
+port 80, and here, this user Bob, listens
+
+43
+00:03:09,260 --> 00:03:13,972
+这个用户Bob监听25端口。现在，当一个数据包到来时，
+TCP/IP协议栈查看目标端口
+on port 25. Now, when a packet comes in,
+the TCP/IP stack looks at the destination
+
+44
+00:03:13,972 --> 00:03:18,323
+在这个情况下，端口号是80，因此
+port. In this case, it would be
+destination 80, and as a result, the stack
+
+45
+00:03:18,323 --> 00:03:22,972
+协议栈把数据包转发到网页服务器。如果目标端口是25
+forwards the packets over to the web
+server. If the destination port said port
+
+46
+00:03:22,972 --> 00:03:27,443
+TCP/IP协议栈会把数据包转发给Bob
+25, the TCP/IP stack would forward the
+packet over to Bob, who's listening on
+
+47
+00:03:27,443 --> 00:03:32,469
+Bob在监听25端口。现在，一个很有名的安全协议叫做IPsec
+port 25. Now, a fairly well known security
+protocol called IPsec, encrypts these IP
+
+48
+00:03:32,469 --> 00:03:36,957
+加密了发送方和接收方之间的IP数据包
+packets between the sender and the
+recipient. So here, the sender and the
+
+49
+00:03:36,957 --> 00:03:41,694
+这里，发送方和接收方共享一个密钥。
+当发送方发送IP数据包时
+recipients basically have a shared key.
+And when the sender sends IP packets,
+
+50
+00:03:41,694 --> 00:03:46,687
+使用密钥K来加密这些IP包。现在一个数据包
+those IP packets are encrypted using the
+secret key K. Now when a packet arrives at
+
+51
+00:03:46,687 --> 00:03:51,344
+到达了目的地，我的意思是到达了服务器
+the destination, and I mean it arrives at
+the server, the TCP/IP stack will go ahead
+
+52
+00:03:51,344 --> 00:03:55,832
+TCP/IP栈会解密这个数据包，然后看目标端口
+and decrypt the packet, and then look at
+the destination port and send it to the
+
+53
+00:03:55,832 --> 00:04:00,153
+把数据包发送到合适的位置去解密。大家注意，
+这里的数据是被加密的
+appropriate place decrypted. You notice
+the data here is decrypted. So in this
+
+54
+00:04:00,153 --> 00:04:04,585
+这种情况下，会把数据发给网页服务器，
+因为目标端口是80
+case it would send it to the webserver
+because the destination port is port 80.
+
+55
+00:04:04,585 --> 00:04:09,074
+如果目标端口正好是25，TCP/IP栈会解密这个包
+If the destination port happens to be port
+25, the TCP/IP stack will decrypt the
+
+56
+00:04:09,074 --> 00:04:13,675
+看目标端口，然后把明文数据发给相应进程
+packet, look at the destination port, and
+send the data in the clear to the process
+
+57
+00:04:13,675 --> 00:04:18,536
+这个进程正监听25端口。现在我想告诉大家，没有完整性的话
+who's listening on port 25. So now I wanna
+show you that without integrity, in this
+
+58
+00:04:18,536 --> 00:04:23,463
+这里我们不能获得任何的私密性，我们来看为什么
+setup, we can't possibly achieve any form
+of confidentiality and let's see why. So
+
+59
+00:04:23,463 --> 00:04:28,574
+想像一下攻击者截获了一个特定的给网页服务器的数据包
+imagine the attacker intercepts a certain
+packet that's intended for the web server.
+
+60
+00:04:28,574 --> 00:04:33,380
+换句话说，这是个加密的目标端口为80的数据包
+In other words, it's an encrypted packet
+intended for port 80. Remember that the
+
+61
+00:04:33,380 --> 00:04:38,003
+攻击者实际上可以接收任何给25端口的数据包的解密
+attacker can actually receive the
+decryption of any packets that's intended
+
+62
+00:04:38,003 --> 00:04:42,809
+因为TCP协议栈会乐意解密给25端口的数据包
+for port 25 because the TCP stack will
+happily decrypt packets for port 25 and
+
+63
+00:04:42,809 --> 00:04:47,872
+并把结果给正在监听的Bob。这里Bob是攻击者
+send them over to Bob who's listening over
+here. So what Bob is going to do, Bob here
+
+64
+00:04:47,872 --> 00:04:52,754
+他会截获途中的数据包
+is the attacker, what he's going to do is
+he's gonna intercept this packet en route,
+
+65
+00:04:52,754 --> 00:04:57,278
+防止数据包到达服务器
+prevent the packet from reaching the
+server as is, and instead, he's going to
+
+66
+00:04:57,278 --> 00:05:02,099
+而他将修改这个数据包。现在目标端口读起来是25了
+modify the packet. So now the destination
+port is going to read like port 25. This
+
+67
+00:05:02,099 --> 00:05:06,980
+这在密文里完成，我们待会将看到怎么办
+is done on the cipher text and we're going
+to see how to do that in just a minute.
+
+68
+00:05:06,980 --> 00:05:11,504
+当这个数据包到达服务器时，目标端口说是25
+When this packet now arrives at the
+server, the destination port says 25, the
+
+69
+00:05:11,504 --> 00:05:16,445
+服务器会解密这个数据包，看到目标端口是25
+server will decrypt the packet, see that
+the destination is 25 and forward the data
+
+70
+00:05:16,445 --> 00:05:21,261
+就把数据转发给了Bob。现在Bob通过改变目标端口
+over to Bob. So now Bob was simply by
+changing the destination ports, Bob was
+
+71
+00:05:21,261 --> 00:05:26,388
+就可以读到本不该给他的数据
+able to read data that was not intended
+for himself, but rather was intended for
+
+72
+00:05:26,388 --> 00:05:31,619
+这数据应该是给网页服务器的。如果数据是使用
+带随机IV的CBC加密的
+the web server. So, if the data is
+encrypted using a CBC encryption with a
+
+73
+00:05:31,619 --> 00:05:37,067
+记得这是一个对CPA安全的机制。不过如果是这种情况
+random IV, remember this is a CPA secure
+scheme. Nevertheless if that's the case,
+
+74
+00:05:37,067 --> 00:05:41,861
+我将为大家展示，攻击者很容易改变密文
+I'm gonna show you that it's trivial for
+the attacker to change the cipher text.
+
+75
+00:05:41,861 --> 00:05:46,889
+以获得新密文，其目标端口是25，而非80
+So that now he can obtain new cipher text
+where the destination port is 25 instead
+
+76
+00:05:46,889 --> 00:05:51,054
+攻击者只需要修改IV域即可。事实上
+of 80. The only thing that's gonna change
+is just the IV field. In fact, everything
+
+77
+00:05:51,054 --> 00:05:55,725
+其他的一切都保持不变。那么，我们看怎么办
+else is gonna remain the same. So, let's
+see how to do it. So here, just to remind
+
+78
+00:05:55,725 --> 00:06:00,870
+记住，事实上，攻击者捕捉的是一个CBC加密的数据包
+yourself, that, in fact, what the attacker
+captured is a CBC encrypted packet. Where
+
+79
+00:06:00,870 --> 00:06:05,020
+从这个数据包里，攻击者知道了目标端口是80，
+但他不知道数据是什么
+he knows that the destination port is port
+80, but he doesn't know what the data is.
+
+80
+00:06:05,020 --> 00:06:08,920
+攻击者没有关于数据内容的任何线索，
+但他知道这个数据包是给网页服务器的
+The attacker has no clue what the data is
+but he does know that his packet is
+
+81
+00:06:08,920 --> 00:06:13,020
+他的目标是构建一个新的加密的数据包
+intended for the web server. His goal is
+to build a new encrypted packet where now
+
+82
+00:06:13,020 --> 00:06:17,600
+其目标端口是25。我们说过，攻击者只需
+the destination port is port 25. So the
+way he's gonna do is as we said is just by
+
+83
+00:06:17,600 --> 00:06:22,547
+改变IV，让我提醒大家，解密CBC加密的数据的方法是
+changing the IV, and let me remind you that
+the way you decrypt CBC encrypted data is
+
+84
+00:06:22,547 --> 00:06:27,434
+本质上，第一个明文分组是第一个密文分组
+essentially the first plain text block is
+simply decryption of the first cipher
+
+85
+00:06:27,434 --> 00:06:32,143
+与IV异或结果的解密。我们知道在原数据包里
+text block XORed with IV. And we
+know that in the original packet this is
+
+86
+00:06:32,143 --> 00:06:36,732
+这会读到目标端口为80。因为在原数据包中
+gonna read dest equals 80. Cuz in the
+original packet the destination port is
+
+87
+00:06:36,732 --> 00:06:41,619
+目标端口是80。现在我给大家的问题是，
+攻击者该如何修改IV
+port 80. So now my question to you is how
+will the attacker have changed the IV so
+
+88
+00:06:41,619 --> 00:06:46,925
+使得目标端口读起来是25。容易看出
+now the destination port will read dest
+equals 25. So it's pretty easy to see that
+
+89
+00:06:46,925 --> 00:06:52,101
+如果攻击者取原IV，和这个异或
+if the attacker simply takes the original
+IV, XORs it with here, there are a bunch
+
+90
+00:06:52,101 --> 00:06:57,086
+这里有很多0，这里也有很多0。攻击者异或了很多0
+of zeros over here, and a bunch of zeros
+over here. He's XORs it with the zeros,
+
+91
+00:06:57,086 --> 00:07:02,135
+然后80异或0，然后是25，在合适的地方
+and then 80 XORs with zeros, and then 25,
+in the appropriate place. Namely, in the
+
+92
+00:07:02,135 --> 00:07:07,186
+也就是在加密的数据包的端口域字节里。
+然后容易看出这个新的IV'
+port's bytes in the encrypted packets. Then
+it's easy to see that when this new IV prime
+
+93
+00:07:07,186 --> 00:07:11,948
+与原密文信息一并发送，当攻击者解密时
+is sent along with the original
+cipher text, when the attacker decrypts,
+
+94
+00:07:11,948 --> 00:07:17,076
+大家可以看到原密文会解密到80端口
+you can see that the original cipher text
+would decrypt to port 80, but now the new
+
+95
+00:07:17,076 --> 00:07:22,082
+但现在这个新的IV会抵消掉这个80，这个80
+把本该从原明文中获得的80抵消掉了
+IV will cancel out this 80, this 80 here
+cancels out the 80 that would be obtained
+
+96
+00:07:22,082 --> 00:07:26,661
+然后通过与25异或
+in the original plain text and then by
+XORing with 25, essentially the
+
+97
+00:07:26,661 --> 00:07:31,558
+目标端口现在变成25了。那么这是一个很好的例子
+destination now becomes 25. So this is a
+nice example, where with the simple change
+
+98
+00:07:31,558 --> 00:07:36,106
+通过简单修改IV域，攻击者可以重定向数据包
+to the IV field, the attacker was able to
+divert the packet. So that now, after
+
+99
+00:07:36,106 --> 00:07:40,182
+现在，在解密后，数据包将送给攻击者，而不是网页服务器
+decryption, the packet goes to the
+attacker, instead of the actual web
+
+100
+00:07:40,182 --> 00:07:44,730
+因此，现在攻击者能读到明文数据
+server. And as a result now the attacker
+can read the plaintext data, that was
+
+101
+00:07:44,730 --> 00:07:49,396
+这些本应给服务器的。这个好例子展示了
+intended for the server. So this nice
+example shows that without integrity it's
+
+102
+00:07:49,396 --> 00:07:53,737
+没有完整性，一个CPA安全的加密不可能提供私密性
+simply impossible for a CPA secure
+encryption to provide confidentiality,
+
+103
+00:07:53,737 --> 00:07:58,378
+如果攻击者可以在途中修改数据包
+when the attacker can modify packets
+en route. CPA secure encryption only
+
+104
+00:07:58,378 --> 00:08:03,079
+CPA安全加密只能在攻击者只能窃听数据的
+这一假设下，提供私密性
+provides confidentiality if the attacker is
+only eavesdropping on data, but can't
+
+105
+00:08:03,079 --> 00:08:07,445
+但攻击者不能在途中修改密文。大家看到
+actually modify a cipher text en route.
+Where, as you see, if you can modify
+
+106
+00:08:07,445 --> 00:08:11,573
+如果你可以修改密文，一个简单的修改，也会完全改变明文
+cipher text, a simple modification,
+completely reveals the plaintext. I want
+
+107
+00:08:11,573 --> 00:08:16,065
+我想给大家看另外一个篡改攻击的例子，
+只需要能接收到网络流量即可
+to show you another tampering attack that
+only requires network access to traffic.
+
+108
+00:08:16,065 --> 00:08:20,503
+不需要攻击者在解密机器上操作
+It doesn't actually require the attacker
+to be present on the decryption machine.
+
+109
+00:08:20,503 --> 00:08:25,105
+我们再看一个例子，有一个远程终端的应用
+So let's look at an example where there's
+a remote terminal application, where every
+
+110
+00:08:25,105 --> 00:08:29,707
+每次用户敲击键盘，一个加密的键盘输入被送往服务器
+time the user hits a keystroke, basically
+an encrypted keystroke is sent over to the
+
+111
+00:08:29,707 --> 00:08:33,706
+我们假定键盘输入是使用计数器模式加密的
+server, and let's pretend that the
+encrypted keystroke is encrypted using
+
+112
+00:08:33,706 --> 00:08:38,342
+这里你有TCP/IP包。这里D对应一个字节输入
+counter mode. So here you have the
+TCP/IP packet. D here corresponds to the
+
+113
+00:08:38,342 --> 00:08:43,269
+我们说过，它是使用计数器模式加密的
+one byte keystroke. And as we said, it's
+encrypted using counter mode, and as you
+
+114
+00:08:43,269 --> 00:08:48,376
+大家大概知道，每个TCP/IP包包含了一个校验和
+probably know every TCP/IP packet actually
+contains a checksum. This is a sixteen bit
+
+115
+00:08:48,376 --> 00:08:52,943
+校验和只能使用于检测传输错误
+checksum that's just used to detect
+transmission errors. So, the server, if it
+
+116
+00:08:52,943 --> 00:08:57,630
+如果服务器接收了一个含错误校验和的数据包，
+它就会简单地扔了这个包
+receives a packet that has the wrong
+checksum, it simply drops it on the floor
+
+117
+00:08:57,630 --> 00:09:02,076
+忽略它。现在TCP报文头包含了键盘输入的校验和
+and ignores it. Now the TCP header
+including the checksum in the keystroke,
+
+118
+00:09:02,076 --> 00:09:06,206
+所有都是用计数器模式加密的。现在攻击者想学习
+键盘输入的内容
+all are encrypted using counter mode. Now
+the attacker wants to learn what the
+
+119
+00:09:06,206 --> 00:09:09,973
+我来告诉大家他会怎么做。攻击者会截获这个数据包
+keystroke was, and let me show you what he
+can do. The attacker is gonna intercept
+
+120
+00:09:09,973 --> 00:09:13,739
+他不修改它，直接把包发给服务器
+this packet and he's not actually gonna
+modify it, he's gonna send it over to the
+
+121
+00:09:13,739 --> 00:09:18,208
+但他会记录下这个数据包。之后他将修改数据包
+server. But he's gonna record the packet.
+Later on he's gonna modify the packet and
+
+122
+00:09:18,208 --> 00:09:23,486
+然后把修改后的数据包发给服务器。
+send a modified packet over to the server.
+What he's going to do is he's gonna XOR
+
+123
+00:09:23,486 --> 00:09:28,205
+他会把加密的校验和和一个值T异或
+the encrypted checksum field with a
+value T and he's going to XOR the
+
+124
+00:09:28,205 --> 00:09:33,360
+他会把加密的数据和一个值S异或。
+他用很多的T和S来做这件事
+encrypted data field with a value S. And
+he's going to do this for lots and lots of
+
+125
+00:09:33,360 --> 00:09:38,390
+现在，记得计数器模式的一个性质是
+T and S. Now remember, a property
+of counter mode is that if you XOR the
+
+126
+00:09:38,390 --> 00:09:43,538
+如果你用T异或密文，解密后明文结果也是与T异或的
+cipher text with T, after decryption, the
+result in plain text is also XOR with T.
+
+127
+00:09:43,646 --> 00:09:49,020
+类似地，如果你用S异或加密数据，解密后
+Similarly, if you XOR the encrypted data with S, after decryption.
+
+128
+00:09:49,020 --> 00:09:54,753
+获得的解密数据也是与S异或后的
+the resulting decrypted data will also be
+encrypted with S. Now, the server's gonna
+(口误：encrypted->XORed)
+
+129
+00:09:54,753 --> 00:09:59,456
+服务器解密这个修改后的数据包，得到的数据包
+decrypt this modified packet. And the
+resulting packet is gonna have the
+
+130
+00:09:59,456 --> 00:10:03,527
+有个异或了T的校验和，而数据是异或了S的
+checksum XORed with T, and the data XORed with S. Now what happens if the
+
+131
+00:10:03,527 --> 00:10:07,817
+如果修改的校验和对于这个修改的数据包来说是正确的，
+服务器会发送一个ACK应答包
+modified checksum is correct for this
+modified packet, the server will send an
+
+132
+00:10:07,817 --> 00:10:12,107
+如果修改后的校验和对于修改后的数据包来说不正确
+ACK back. If the modified checksum
+is incorrect for this modified packet, the
+
+133
+00:10:12,107 --> 00:10:16,374
+服务器会扔掉这个数据包，什么也不做
+server will just drop the packet on the
+floor and do nothing. So the attacker can
+
+134
+00:10:16,374 --> 00:10:20,937
+所以攻击者可以观察到，看看能不能收到ACK包
+simply observe, look for an ACK packet or
+not, and in doing so, he learns whether
+
+135
+00:10:20,937 --> 00:10:25,499
+这样他能学习到特定的T异或和S异或，
+是否对应一个有效的校验和
+this particular XOR of T and XOR of S
+pairs corresponds to a valid checksum or not.
+
+136
+00:10:25,499 --> 00:10:30,061
+现在攻击者要对很多T和S做这件事
+Now the attacker's going to do
+this for lots and lots of T's and S's.
+
+137
+00:10:30,061 --> 00:10:34,508
+大家注意到攻击者会学习到，如果我修改了数据，
+把数据和特定值S异或
+And you notice what he learns is if I
+modify the data by XORing it with this
+
+138
+00:10:34,508 --> 00:10:38,897
+那么校验和就要与T异或
+particular value S, that changes the
+checksum by a particular value T. And
+
+139
+00:10:38,897 --> 00:10:43,401
+他学到了很多的T和S
+he learns this for lots and lots of T and
+S pairs. So it turns out for certain
+
+140
+00:10:43,401 --> 00:10:47,912
+对特定的校验和，看一系列这样的方程
+checksums, by looking at a sequence of
+equations of this type. You can actually
+
+141
+00:10:47,912 --> 00:10:52,122
+你可以解出值D。我应该指出对于这里的TCP校验和
+figure out what the value D is. I should
+point out that for the TCP checksums on this,
+
+142
+00:10:52,122 --> 00:10:55,818
+可能是错误的。但当然它们是简单的校验和
+actually, might not be true. But
+certainly, they're easy checksums for
+
+143
+00:10:55,818 --> 00:11:00,376
+这里是完全正确的。再看很多这样的方程
+which this is actually absolutely true. So
+again by looking at a lot of equations of
+
+144
+00:11:00,376 --> 00:11:04,977
+攻击者可以恢复D。这是一个很好的例子
+this type the attacker can recover D. And
+this is a really nice example of what's
+
+145
+00:11:04,977 --> 00:11:09,521
+被叫做选择密文攻击。攻击者提交他选择的密文
+called a chosen cipher text attack. The
+attacker basically submitted cipher text
+
+146
+00:11:09,521 --> 00:11:14,236
+是由他想解密的密文所推出的
+of his choice that was derived from that
+cipher text that he wanted to decrypt. And
+
+147
+00:11:14,236 --> 00:11:18,497
+然后看服务器如何反应，攻击者可以学习到
+then by looking at how the server
+responded he was able to learn something
+
+148
+00:11:18,497 --> 00:11:23,041
+明文的一些信息。重复这个操作，用许多不同的T和S值
+about the resulting plaint text. And by
+repeating this for many different values
+
+149
+00:11:23,041 --> 00:11:27,699
+攻击者最终可以还原整个明文
+of T and S he was actually eventually able to
+recover what the actual full plain text is.
+
+150
+00:11:27,699 --> 00:11:32,186
+本节，我们将看许多这种攻击的例子
+So in this segment we are gonna look
+at many more examples of attacks of this
+
+151
+00:11:32,186 --> 00:11:36,225
+它们叫做主动攻击，攻击者可修改途中的通信
+type. These are called active attacks,
+where the attackers actually modify
+
+152
+00:11:36,225 --> 00:11:40,707
+我希望这两个简单的例子可以说服大家
+traffic in route. And I hope that these
+two simple example convinces you that all
+
+153
+00:11:40,707 --> 00:11:45,079
+只提供CPA安全，或者说对抗窃听的安全
+you provide is CPA security, in other words
+security against eavesdropping. You can't
+
+154
+00:11:45,079 --> 00:11:49,561
+对抗主动攻击者时不能保证安全
+even guarantee secrecy against an active
+attacker. Not only does your cipher text
+
+155
+00:11:49,561 --> 00:11:53,545
+不仅密文没有完整性，换句话说，接收方可能收到
+not have integrity, in other words the
+recipients might obtain a message
+
+156
+00:11:53,545 --> 00:11:58,275
+一个与发送方所发出的不同的信息；
+而且甚至连私密性也没有
+different from the one sent by the sender.
+But you don't even have confidentiality.
+
+157
+00:11:58,275 --> 00:12:03,146
+我为大家展示了两个例子，其中没有完整性
+And I showed you two examples where
+without integrity the attacker can simply
+
+158
+00:12:03,146 --> 00:12:08,198
+攻击者就可以把接收方当成一个神谕，来解密数据包
+decrypt the packet by using the recipient
+as an oracle for decrypting certain parts
+(神谕：可以回答特定的询问，大量节省询问者的计算)
+
+159
+00:12:08,198 --> 00:12:12,611
+神谕负责解密数据的特定部分。
+这个教训我要在本章中反复强调
+of the data. And so the lesson that I'm
+gonna repeat again and again and again
+
+160
+00:12:12,611 --> 00:12:16,526
+如果你的信息需要完整性，但不需要私密性
+throughout this module is that if your
+message needs integrity but no
+
+161
+00:12:16,526 --> 00:12:20,508
+使用MAC就够了。但如果你的信息需要完整性
+confidentiality, just use a MAC. But if
+your message needs integrity and
+
+162
+00:12:20,508 --> 00:12:24,950
+同时也要私密性，那你必须使用一个认证加密模式
+confidentiality, you have to use what's
+called an authenticated encryption mode,
+
+163
+00:12:24,950 --> 00:12:29,278
+也就是本章的主题。接下来
+which is precisely the topic of this
+module. So the next thing we're gonna do
+
+164
+00:12:29,278 --> 00:12:33,888
+我们定义认证加密的意义
+is define what authenticated encryption
+means. And we're gonna build authenticated
+
+165
+00:12:33,888 --> 00:12:38,442
+我们要构建认证加密系统。但这里我希望大家记住
+encryption systems. But the point I want
+you to remember is that the CPA security
+
+166
+00:12:38,442 --> 00:12:42,658
+我们之前讨论过的CPA安全模式，
+不应当被使用在加密数据上
+modes we discussed before should never
+actually be used to encrypt data by
+
+167
+00:12:42,658 --> 00:12:46,987
+带随机IV的CBC可以为认证加密构建分组
+themselves. So CBC with a random IV is a
+building block towards authenticated
+
+168
+00:12:46,987 --> 00:12:51,212
+但不应被单独使用
+encryption, but should never be used on
+its own. Okay. So we're gonna define
+
+169
+00:12:51,212 --> 00:12:53,851
+下一节我们定义认证加密
+authenticated encryption in the next
+segment.

@@ -1,0 +1,1349 @@
+1
+00:00:00,000 --> 00:00:04,220
+上一节我们讨论了模逆，我们说过
+In the previous segment we talked about
+modular inversion and we said the Euclid's
+
+2
+00:00:04,220 --> 00:00:08,238
+欧几里德算法给了我们一个有效的找元素的模N逆的方法
+algorithm gives us an efficient way to
+find the inverse of an element modulo N.
+
+3
+00:00:08,238 --> 00:00:12,256
+本节我们沿着历史往后看
+In this segment we're going to forward
+through time and we're going to move to
+
+4
+00:00:12,256 --> 00:00:15,866
+来到17、17世纪，我们来讨论
+the seventeenth and eighteenth century
+where we're going to talk about
+
+5
+00:00:15,866 --> 00:00:19,986
+费马和欧拉的贡献。在这之前我们先简单回顾一下
+Fermat and Euler contributions.
+Before that let's do a quick review of
+
+6
+00:00:19,986 --> 00:00:24,257
+上一节讨论的内容。通常我用N表示
+what we discussed in the previous segment.
+So as usual I'm going to let N denote the
+
+7
+00:00:24,257 --> 00:00:28,427
+正整数，我们说N正好是一个n位整数
+positive integer and let's just say that N
+happens to be a n-bit integer, in other
+
+8
+00:00:28,427 --> 00:00:32,445
+换句话说，N在2^n和2^(n+1)之间，通常
+words it's between two to the n and two to
+the n+1, as usual we're going to let P
+
+9
+00:00:32,445 --> 00:00:36,761
+我们记质数为p。现在我们说过Z_N是
+denote a prime. Now we said that
+ZN is a set of integers from zero
+
+10
+00:00:36,761 --> 00:00:41,370
+从0到N-1的全体整数集，我们说过，我们可以
+在这个模N集上进行加法和乘法
+to N-1 and we said that we can add and
+multiply elements in the set modulo N. We
+
+11
+00:00:41,370 --> 00:00:46,186
+我们也说过Z_N^*是Z_N中全体可逆元素的集合
+also said that ZN star is basically the
+set of invertible elements in ZN. And we
+
+12
+00:00:46,186 --> 00:00:51,243
+我们证明了一个简单的引理，X是可逆的
+当且仅当X与N互质
+proved a simple lemma to say that, X is
+invertible if and only if X is relatively
+
+13
+00:00:51,243 --> 00:00:55,879
+我们不仅完全理解了什么元素是可逆的
+prime to N. And not only did we
+completely understand which elements are
+
+14
+00:00:55,879 --> 00:01:00,635
+哪些不是，我们也展示了一个非常有效的算法
+invertible and which aren't, we also
+showed a very efficient algorithm based on
+
+15
+00:01:00,635 --> 00:01:05,572
+基于扩展的欧几里德算法，去找到Z_N中X的逆
+Euclid's extended algorithm, to find the
+inverse of an element X in ZN. And we said
+
+16
+00:01:05,572 --> 00:01:10,388
+我们说过这个算法的运行时间是O(n^2)
+that the running time of this algorithm,
+is basically order n squared, where
+
+17
+00:01:10,388 --> 00:01:16,107
+n是N的位数。如我所说
+again, n is the number of bits of the
+number capital N. So as I said, now
+(位数显然是O(log(N))的)
+
+18
+00:01:16,107 --> 00:01:21,037
+现在我们要从古希腊时代来到17世纪
+we're going to move from Greek times all
+the way to the seventeenth century and
+
+19
+00:01:21,037 --> 00:01:26,276
+讨论费马。费马提出了很多重要的定理
+talk about Fermat. So Fermat did a number
+of important theorems. The one that I want
+
+20
+00:01:26,276 --> 00:01:31,206
+我今天想给大家看的如下。假设我给大家一个质数p
+to show you here today is the following.
+So suppose I give you a prime P. Then in
+
+21
+00:01:31,206 --> 00:01:36,260
+然后事实上对Z_p^*里的任意元素X，如果我研究
+fact for any element X in ZP star, it so
+happens that if I look at X and raise it
+
+22
+00:01:36,260 --> 00:01:41,130
+X^(p-1)，我在Z_p中就会得到1。那么我们来看一个简单例子
+to the power of P - 1, I'm a gonna get
+one, in ZP. So let's look at a quick
+
+23
+00:01:41,130 --> 00:01:46,061
+假设我设p=5。我看3^(p-1)
+example. Suppose I set the number P to be
+five. And I look at, three to the power of
+
+24
+00:01:46,061 --> 00:01:50,645
+换句话说，3的4次方，3^4=81
+P-1. In other words, three to the power of
+four, Three to the power of four is 81,
+
+25
+00:01:50,645 --> 00:01:55,286
+事实上81=1 mod 5。这个例子满足费马小定理
+which in fact, is one modulo five. This
+example satisfies Fermat's theorem.
+
+26
+00:01:55,286 --> 00:01:59,521
+有趣的是，费马并没有自己证明这个定理
+Interestingly, Fermat actually didn't prove this theorem himself. The proof
+
+27
+00:01:59,521 --> 00:02:04,337
+证明实际上要等到欧拉在100年后给出
+actually waited until Euler, who
+proved that almost 100 years later. And in
+
+28
+00:02:04,337 --> 00:02:09,122
+事实上，他证明了这个定理的一个更一般的版本
+fact, he proved a much more general
+version of this theorem. So let's look at
+
+29
+00:02:09,122 --> 00:02:14,154
+我们看费马小定理的一个简单应用。
+假设我看Z_p^*里的一个元素X
+a simple application of Fermat's theorem.
+Suppose I look at an element X in Z P
+
+30
+00:02:14,154 --> 00:02:19,441
+我想提醒大家，这里的p必须是质数
+star. And I want to remind you here that P
+must be a prime. Well, then what do we
+
+31
+00:02:19,441 --> 00:02:24,664
+我们知道什么？我们知道X^(p-1)=1。我们可以写
+know? We know that X to the P minus one is
+equal to one. Well, we can write X to the
+
+32
+00:02:24,664 --> 00:02:29,573
+X^(p-1)=X*X^(p-2)。那么现在我们知道了
+P minus one as X times X to the power of P
+minus two. Well so now we know that X
+
+33
+00:02:29,573 --> 00:02:34,087
+X乘以X的p-2次方正好是1
+times X to the power of P minus two
+happens to be equal to one. And what that
+
+34
+00:02:34,087 --> 00:02:39,310
+这就是说，X模p的逆正好就是X^(p-2)
+says, is that really the inverse of X
+modulo P, is simply X to the P minus two.
+
+35
+00:02:39,310 --> 00:02:44,042
+这就给了我们另一个计算X模质数的逆的算法
+So this gives us another algorithm for
+finding the inverse of X modulo a prime.
+
+36
+00:02:44,042 --> 00:02:48,835
+计算X^(p-2)，就会得到X的逆
+Simply raise X to the power of p minus
+two, and that will give us the inverse of
+
+37
+00:02:48,835 --> 00:02:53,508
+实际上这是一个计算模质数的逆的好方法
+x. It turns out, actually this is a fine
+way to compute inverses modulo a prime.
+
+38
+00:02:53,508 --> 00:02:58,301
+但是与欧几里德算法相比有两个不足。首先
+But it has two deficiencies compared to
+Euclid's algorithm. First of all, it only
+
+39
+00:02:58,301 --> 00:03:02,528
+他只能工作在质数模上，而欧几里德算法
+也能工作在合数模上
+works modulo primes, Whereas, Euclid's
+algorithm worked modulo composites as
+
+40
+00:03:02,528 --> 00:03:07,017
+第二，实际上这个算法效率更低
+well. And second of all, it turns out this
+algorithm is actually less efficient. When
+
+41
+00:03:07,017 --> 00:03:10,911
+当我们讨论然后计算模指数时
+we talk about how to do modular
+exponentiations--we're gonna do that in
+
+42
+00:03:10,911 --> 00:03:15,345
+我们在本章最后一节讨论之。大家会看到
+计算这个指数的运行时间
+the last segment in this module--you'll
+see that the running time to compute this
+
+43
+00:03:15,345 --> 00:03:19,792
+实际上是p长度的立方。所以这会花掉大约
+exponentiation is actually cubic in the
+size of P. So this will take roughly log
+
+44
+00:03:19,792 --> 00:03:24,266
+(log p)^3的时间，如果大家记得，欧几里德算法
+cube of P, whereas if you remember,
+Euclid's algorithm was able to compute the
+
+45
+00:03:24,266 --> 00:03:30,343
+可以计算逆，在p长度的平方的时间内
+inverse in quadratic time in the
+representation of P. So not only is this
+
+46
+00:03:30,343 --> 00:03:36,512
+所以这个算法不仅不普适，它仅限质数模；而且更低效
+algorithm less general it only works for
+primes, it's also less efficient. So score
+
+47
+00:03:36,512 --> 00:03:41,473
+所以欧几里德赢了。但是这个关于质数的事实极为重要
+one for Euclid. But nevertheless, this
+fact about primes is extremely important,
+
+48
+00:03:41,473 --> 00:03:47,506
+我们将在未来几周大量用到这个事实
+and we're gonna be making extensive use of
+it in the next couple of weeks. So let me
+
+49
+00:03:47,506 --> 00:03:52,155
+我给大家看一个简单的费马小定理的应用
+show you a quick and simple application
+for Fermat's theorem suppose we wanted
+
+50
+00:03:52,155 --> 00:03:57,226
+假设我们想生成一个随机的大质数，比如说
+我们的质数需要有1000位长
+to generate a large random prime, say our
+prime needed to be 1,000 bits or so. So
+
+51
+00:03:57,226 --> 00:04:02,006
+我们要找的质数是2的1024次方的量级
+the prime we're looking for is on the
+order of two to the 1024. So here's
+
+52
+00:04:02,006 --> 00:04:06,724
+这是一个非常简单的概率问题。我们可以选择一个
+a very simple probabilistic algorithm.
+What we would do is we would choose a
+
+53
+00:04:06,724 --> 00:04:11,938
+随机整数，从一个指定的区间里面。然后我们检测
+random integer in the interval that was
+specified. And then we would test whether
+
+54
+00:04:12,124 --> 00:04:17,153
+这个选取的整数是不是满足费马小定理。
+换句话说，我们可以用2为底数进行检测
+this integer satisfies Fermat's theorem.
+In other words, we would test for example
+
+55
+00:04:17,153 --> 00:04:22,367
+我们检测2的p-1次方是否在Z_p中等于1
+using the base two; we would test whether
+two to the power of p minus one equals one
+
+56
+00:04:22,367 --> 00:04:27,271
+如果答案是否定的，如果这个等式不成立，那么我们知道
+in Z p. If the answer is no, then if this
+equality doesn't hold, then we know for
+
+57
+00:04:27,271 --> 00:04:33,003
+我们选择的这个数p一定不是质数。如果这个发生了
+sure that the number p that we chose is
+not a prime. And if that happens, all we
+
+58
+00:04:33,003 --> 00:04:37,284
+我们只需要返回第一步，尝试另一个数
+do is we go back to step one and we try
+another prime. And we do this again and
+
+59
+00:04:37,284 --> 00:04:41,782
+我们一次次地这么做，直到我们最终找到一个整数
+满足费马小定理的条件
+again and again, until finally we find an
+integer that satisfies this condition. And
+
+60
+00:04:41,782 --> 00:04:46,009
+我们一旦找到了一个整数满足这个条件，我们就输出它
+once we find an integer that satisfies
+this condition, we simply output it and
+
+61
+00:04:46,009 --> 00:04:51,573
+然后停止。实际上，虽然很难证明
+stop. Now it turns out, this is actually a
+fairly difficult statement to prove. But
+
+62
+00:04:51,573 --> 00:04:56,305
+但如果一个随机数通过了这里的检测，那么它极有可能
+it turns out if a random number passes
+this test, then it's extremely likely to
+
+63
+00:04:56,305 --> 00:05:01,398
+是质数。特别地，p不是质数的概率非常小
+be a prime. In particular the probability
+that P is not a prime is very small. It's
+
+64
+00:05:01,398 --> 00:05:06,191
+对于1024位的数来说，不是质数的概率小于2^-60
+like less than two to the -60 for the
+range of 1024 bit numbers. As the
+
+65
+00:05:06,191 --> 00:05:10,744
+随着数的变大，一个数通过这里的测试
+number gets bigger and bigger the
+probability that it passes this test here,
+
+66
+00:05:10,744 --> 00:05:15,716
+却不是质数的概率迅速向0衰减
+but is not a prime drops to zero very
+quickly. So this is actually quite an
+
+67
+00:05:15,716 --> 00:05:20,455
+所以这是个很有趣的算法。大家发现，我们
+无法保证输出一定是质数
+interesting algorithm. You realize we're
+not guaranteed that the output is in fact
+
+68
+00:05:20,455 --> 00:05:25,021
+我们只知道它非常有可能是一个质数。换句话说
+a prime. All we know is that it's very,
+very likely to be a prime. In other words
+
+69
+00:05:25,021 --> 00:05:29,587
+它不是质数的唯一可能，是我们极其倒霉
+the only way that it's not a prime is that
+we got extremely unlucky. In fact so
+
+70
+00:05:29,587 --> 00:05:34,298
+事实上倒霉到一个可忽略的概率事件发生了
+unlucky that a negligible probability
+event just happened. Another way to say
+
+71
+00:05:34,298 --> 00:05:40,230
+另一种说法是，如果你看所有1024位的整数的集合
+this is that if you look at the set of all
+1024 integers, then, well, there's the set
+
+72
+00:05:40,230 --> 00:05:45,233
+然后有质数的集合。我把质数写在这。然后
+of primes. Let me write prime here. And
+then there is a small number of
+
+73
+00:05:45,233 --> 00:05:50,805
+有很少量的会导致检测失败的合数。我们把假质数记为F
+composites that actually will falsify the
+test. Let's call them F for false primes.
+
+74
+00:05:50,805 --> 00:05:55,653
+我们记它们为FP，假质数的意思。
+有很少的数，不是质数，是合数的
+Let's call them FP, for false primes.
+There's a very small number of composites
+
+75
+00:05:55,653 --> 00:06:00,626
+却能通过这个检测的。但是当我们选择随机整数时
+that are not prime and yet will pass this
+test. But as we choose random integers,
+
+76
+00:06:00,626 --> 00:06:05,349
+我们选择一个在这，一个在这，一个在这，等等。。
+you know, we choose one here, one here,
+one here, and so on, as we choose random
+
+77
+00:06:05,349 --> 00:06:10,260
+我们选择随机整数时，落到假质数集合里的概率
+integers, the probability that we fall
+into the set of false primes is so small
+
+78
+00:06:10,260 --> 00:06:15,082
+如此之小，以至于这是一个可忽略的时间。换句话说
+That it's essentially a negligible event
+that we can ignore. In other words, one
+
+79
+00:06:15,082 --> 00:06:20,591
+可以证明假质数的集合是极小的
+can prove that the set of false primes is
+extremely small, and a random choice is
+(实际上这种假质数叫Carmichael数，其分布密度指数级衰减)
+
+80
+00:06:20,591 --> 00:06:25,266
+随机选择不太可能选到假质数。现在我应该提到
+unlikely to pick such a false prime. Now I
+should mention, in fact, this is a very
+
+81
+00:06:25,266 --> 00:06:28,960
+这是生成质数的一个非常简单的算法。
+目前来看，这还不是最好的算法
+simple algorithm for generating primes.
+It's actually, by far, not the best
+
+82
+00:06:28,960 --> 00:06:32,654
+我们现在有了更好的算法。事实上，你一旦有了
+algorithm. We have much better algorithms
+now. And, in fact, once you have a
+
+83
+00:06:32,654 --> 00:06:36,349
+一个候选的质数，我们现在有非常有效的算法
+candidate prime, we now have very
+efficient algorithms that will actually
+
+84
+00:06:36,349 --> 00:06:40,498
+可以证明这个候选质数确实是一个质数
+prove beyond a doubt that this candidate
+prime really is a prime. So we don't even
+
+85
+00:06:40,498 --> 00:06:44,597
+我们甚至不需要依赖于概率的结果。
+但是，这个费马检测如此简单
+have to rely on probabilistic statements.
+But nevertheless, this Fermat test is so
+
+86
+00:06:44,597 --> 00:06:48,595
+我只想为大家展示，这是一个容易生成质数的方法
+simple, that I just wanted to show you
+that it's an easy way to generate primes.
+
+87
+00:06:48,595 --> 00:06:53,076
+尽管在实际中，并不用这个方法来生成质数
+Although in reality, this is not how
+primes are generated. As the last point,
+
+88
+00:06:53,076 --> 00:06:57,468
+最后，我要说，大家可能想知道这个迭代需要重复多少次
+I'll say that you might be wondering how
+many times this iteration has to repeat
+
+89
+00:06:57,468 --> 00:07:01,536
+直到我们找到质数。有一个经典的结果
+until we actually find the prime. And
+that's actually a classic result; it's
+
+90
+00:07:01,536 --> 00:07:05,820
+叫做质数定理，这个定理是说，经过几百次迭代
+called the prime number theorem, which
+says that, after a few hundred iterations,
+(迭代次数的期望是1024 ln 2，约为710)
+
+91
+00:07:05,820 --> 00:07:09,833
+我们就能以很高的概率找到质数。那么从期望来看
+in fact, we'll find the prime with
+high probability. So in expectation, one would
+
+92
+00:07:09,833 --> 00:07:14,771
+可能需要几百次的迭代，无需更多了
+expect a few hundred iterations and no
+more. Now that we understand
+
+93
+00:07:14,771 --> 00:07:19,314
+现在我们理解了费马小定理，接下来我想讨论
+Fermat's theorem, the next thing I want
+to talk about is what's called the
+
+94
+00:07:19,314 --> 00:07:23,915
+Z_p^*的结构。我们看在这之后100年。。
+structure of ZP star. So here, we are
+going to move 100 years into the future...
+
+95
+00:07:23,915 --> 00:07:28,576
+18世纪，看欧拉的工作。欧拉证明的最初结果之一
+Into the eighteenth century and look at
+the work of Euler. And one of the first
+
+96
+00:07:28,576 --> 00:07:33,118
+用现代语言来讲，Z_p^*是一个
+things Euler showed is in modern language
+is that ZP star is what's called a
+
+97
+00:07:33,118 --> 00:07:38,014
+循环群。Z_p^*是一个循环群是什么意思？
+cyclic group. What does it mean that ZP
+star is a cyclic group? What it means is
+
+98
+00:07:38,014 --> 00:07:42,734
+这意味着Z_p^*里有某个元素g，如果我们取g
+that there exists some element G in ZP
+star, such that if we take G and raise to
+
+99
+00:07:42,734 --> 00:07:47,681
+计算g的一组幂，g^2，g^3，g^4。。
+a bunch of powers G, G squared, G cubed, G
+to the fourth. And so on and so forth up
+
+100
+00:07:47,681 --> 00:07:52,590
+直到g^(p-2)。注意没有点超过g^(p-2)
+until we reach G to the P minus two.
+Notice there's no point of going beyond G
+
+101
+00:07:52,590 --> 00:07:57,296
+因为根据费马小定理，g^(p-1)=1
+to the p minus two, because G to the p
+minus one by Fermat's theorem is equal to
+
+102
+00:07:57,296 --> 00:08:02,178
+所以我们回到了1。如果我们回到g^(p-1)
+one, so then we will cycle back to one. If
+we go back to G to the p minus one, then G
+
+103
+00:08:02,178 --> 00:08:06,825
+那么g^p=g，g^(p+1)=g^2，等等。。
+to the p will be equal to G, G to the p
+plus one will be equal to G squared, and
+
+104
+00:08:06,825 --> 00:08:11,825
+我们就得到了一个循环，如果我们继续增加g的指数
+so on and so forth. So we'll actually get
+a cycle if we keep raising to higher and
+
+105
+00:08:11,825 --> 00:08:16,590
+我们也可以就停在g^(p-2)
+higher powers of G. So we might as well
+stop at the power of G to the p minus two.
+
+106
+00:08:16,590 --> 00:08:21,413
+欧拉证明了事实上，有这么一个元素g
+And what Euler showed is that in fact
+there is an element G such that if you
+
+107
+00:08:21,413 --> 00:08:26,300
+如果你看它的所有幂，可以扩展成整个群Z_p^*
+look at all of its powers all of its
+powers expand the entire group ZP Star.
+
+108
+00:08:26,300 --> 00:08:31,239
+g的幂给出了Z_p^*里的所有元素
+The powers of G give us all the elements
+in ZP star. Elements of this, of this type
+
+109
+00:08:31,239 --> 00:08:35,997
+这样的元素g叫做生成元。那么g就叫做Z_p^*的一个生成元
+is called a generator. So G would be said
+to be a generator of ZP star. So let's
+
+110
+00:08:35,997 --> 00:08:40,696
+我们看一个简单例子。例如，p=7
+look at a quick example. So let's look,
+for example, at P equals seven. And let's
+
+111
+00:08:40,696 --> 00:08:45,575
+我们看3的所有幂。3^2, 3^3, 3^4
+look at all the powers of three. So three
+squared three cubed, three to the fourth,
+
+112
+00:08:45,575 --> 00:08:50,130
+3^5, 3^6，由费马小定理，我们已经知道
+three to the fifth, Three to the six,
+already we know, is equal to one modular
+
+113
+00:08:50,130 --> 00:08:54,917
+3^6=1 mod 7。所以没有必要看3^6了
+seven by Fermat's Theorem. So there's no
+point in looking at three to the six. We
+
+114
+00:08:54,917 --> 00:08:59,644
+我们知道了它会是1。这里我给大家计算了所有这些幂
+know we would just get one. So here, I
+calculated all these powers for you, and I
+
+115
+00:08:59,644 --> 00:09:04,431
+我写下了它们，大家可以看到我们得到了Z_7^*里
+wrote them out. And you see that in fact,
+we get all the numbers in Z,
+
+116
+00:09:04,431 --> 00:09:09,313
+所有的数。换句话说，我们获得了1,2,3,4,5,6
+in Z7 star. In other words, we get
+one, two, three, four, five, and six. So
+
+117
+00:09:09,313 --> 00:09:14,599
+所以我们说，3是Z_7^*的一个生成元。现在我应该指出
+we would say that three is a generator of
+Z7 star. Now I should point out that not
+
+118
+00:09:14,599 --> 00:09:19,886
+不是每个元素都是生成元。例如，如果我们看2的所有幂
+every element is a generator. For example,
+if we look at all the powers of two, well,
+
+119
+00:09:19,886 --> 00:09:24,914
+那不会生成整个群。特别地，如果我们看2^0
+that's not gonna generate the entire
+group. In particular, if we look at two to
+
+120
+00:09:24,914 --> 00:09:29,650
+会得到1，2^1=2, 2^2=4
+the zero, we get one. Two to the one, we
+get two. Two squared is four, and two
+
+121
+00:09:29,650 --> 00:09:34,455
+2^3=8=1 mod 7。所以我们循环回来了
+cubed is eight, which is one modular
+seven. So we cycled back and then two to
+
+122
+00:09:34,455 --> 00:09:39,766
+那么2^4=2, 2^5=4..等等
+the fourth would be two, two to the fifth
+would be four. And so on and so forth. So
+
+123
+00:09:39,766 --> 00:09:44,697
+那么如果我们看2的各个幂，我们只能获得1, 2, 4
+if we look at the powers of two, we just
+get one, two, and four. We don't get the
+
+124
+00:09:44,697 --> 00:09:49,981
+我们不能获得整个群，因此我们说2不是Z_7^*的生成元
+whole group and therefore we say that two
+is not a generator of Z7 star. Now again,
+
+125
+00:09:49,981 --> 00:09:55,831
+一个很常用的是，给定Z_p^*里的一个元素g
+something that we'll use very often is
+given an element G of ZP, if we look at a
+
+126
+00:09:55,831 --> 00:10:01,901
+如果我们看g的全体幂组成的集合，得到的集合
+就叫做g的生成群
+set of all powers of G, the resulting set
+is gonna be called the group generated by
+
+127
+00:10:01,901 --> 00:10:06,947
+这些都是g的幂
+G, okay? So these are all the powers of G.
+They give us what's called a
+
+128
+00:10:06,947 --> 00:10:12,798
+它们给了我们一个乘法群。这些技术术语并不重要
+multiplicative group. Again, the technical
+term doesn't matter. The point is we're
+
+129
+00:10:12,798 --> 00:10:18,397
+重要的是，我们把所有这些g的幂，叫做g的生成群
+gonna call all these powers of G, the
+group generated by G. In fact there's this
+
+130
+00:10:18,397 --> 00:10:23,570
+事实上这个记号我们不会经常使用：<g>
+notation which I don't use very often,
+angle G angle, to denote this group that's
+
+131
+00:10:23,570 --> 00:10:30,010
+<g>表示g的生成群。然后，我们把g的生成群的大小
+generated by G. And then we call the order
+of G in Z p star, we simply let that be
+
+132
+00:10:30,010 --> 00:10:35,663
+叫做g在Z_p^*里的阶。换句话说
+the size of the group that's generated by
+G. So in other words, the order of G in Z
+
+133
+00:10:35,663 --> 00:10:40,626
+g在Z_p^*里的阶等于<g>的大小。另一种思考的方法是
+p star is the size of this group. But
+another way to think about that is
+
+134
+00:10:40,626 --> 00:10:46,280
+g的阶是满足在Z_p中，g^a=1的最小的整数a
+basically it's the smallest integer A such
+that G to the A is equal to one in Z P.
+
+135
+00:10:47,380 --> 00:10:52,838
+是最小的次数，导致g的幂等于1
+Okay, it's basically the smallest power
+that causes the power of G to be equal to
+
+136
+00:10:52,838 --> 00:10:58,566
+非常容易看出这个等式，如果我们看g的所有幂
+one. And it's very easy to see that this
+equality here basically if we look at all
+
+137
+00:10:58,566 --> 00:11:04,024
+我们看1, g, g^2, g^3..
+the powers of G and we look at one, G, G
+squared, G cubed and so on and so forth up
+
+138
+00:11:04,024 --> 00:11:09,887
+直到我们得到g^(|<g>|-1)。然后如果我们看
+until we get to G to the order of G minus
+one. And then if we look at the order of G
+
+139
+00:11:09,887 --> 00:11:15,420
+g^|<g>|，根据定义，g^|<g>|=1
+to the order of G. This thing is simply
+going to be equal to one, by definition.
+
+140
+00:11:16,080 --> 00:11:22,000
+好，再看更高的点没有意义了
+Okay, so there's no point in looking at
+any higher powers. We might as well just
+
+141
+00:11:22,000 --> 00:11:27,631
+这里我们可以停止升幂次了。因此这个集合的大小
+stop raising to powers here. And as a
+result the size of the set, in fact, is
+
+142
+00:11:27,631 --> 00:11:33,263
+事实上就是g的阶。大家可以看到这个阶是最小的幂次
+the order of G. And you can see that the
+order is the smallest power such that
+
+143
+00:11:33,263 --> 00:11:38,931
+满足对应的g的幂在Z_p中等于1。那么我希望说清楚了
+raising G to that power gives us one in Z
+p. So I hope this is clear although it
+
+144
+00:11:38,931 --> 00:11:43,455
+理解所有的这些记号需要费些功夫
+might take a little bit of thinking to
+absorb all this notation. But in the
+
+145
+00:11:43,455 --> 00:11:48,100
+同时我们看几个例子。我们固定质数为7
+meantime let's look at a few examples. So,
+again, let's fix our, our prime to be
+
+146
+00:11:48,100 --> 00:11:52,986
+我们看其各个元素的阶
+seven. And let's look at the order of the
+number of elements. So what is the order
+
+147
+00:11:52,986 --> 00:11:57,752
+3模7的阶是多少？我们在问3模7的生成群的大小
+of three modulus of seven? Well, we're
+asking what is the size of the group that
+
+148
+00:11:57,752 --> 00:12:02,759
+我们说过，3是Z_7^*的一个生成元
+three generates modulus of seven? Well, we
+said that three is a generator of Z7 star.
+
+149
+00:12:02,759 --> 00:12:07,705
+所以它生成了Z_7^*的全部元素。Z_7^*里共有6个元素
+So it generates all of Z7 star. There are
+six elements in Z7 star. And therefore we
+
+150
+00:12:07,705 --> 00:12:12,758
+所以3的阶等于6。类似地，我可以问
+say that the order of three is equal to
+six. Similarly, I can ask, well, what is
+
+151
+00:12:12,758 --> 00:12:17,421
+2模7的阶是多少？事实上，我们已经见过答案了
+the order of two modulo seven? And in
+fact, we already saw the answer. So let's,
+
+152
+00:12:17,421 --> 00:12:22,084
+我问大家，2模7的阶是多少？看看大家能否解出答案
+I'll ask you, what is the order of two
+modulo seven and see if you can figure
+
+153
+00:12:22,084 --> 00:12:28,549
+那么答案是3，原因是如果我们看
+out what this answer is. So the answer is
+three and again, the reason is if we look
+
+154
+00:12:28,549 --> 00:12:33,618
+2模7的幂组成的集合，我们有1,2,2^2
+at the set of powers of two modulo seven,
+we have one, two, two squared, and then
+
+155
+00:12:33,618 --> 00:12:39,077
+然后2^3就又是1了。所以这些就是2模7的所有幂
+two cubed is already equal to one. So this
+is the entire set of powers of two modulo
+
+156
+00:12:39,077 --> 00:12:44,211
+只有3个，因此2模7的阶是3
+seven. There are only three of them and,
+therefore, the order of two modulo seven
+
+157
+00:12:44,211 --> 00:12:49,215
+我问大家一个有点难的问题：1模7的阶是多少？
+is exactly three. Now let me ask you a
+trick question. What's the order of one
+
+158
+00:12:49,215 --> 00:12:54,499
+答案是1，因为大家看1的生成群
+modulo seven? Well, the answer is one.
+Because if you look at the group that's
+
+159
+00:12:54,499 --> 00:12:58,633
+只有一个数在1的生成群里，即数1
+generated by one, well, there's only one
+number in that group, namely the number
+
+160
+00:12:58,633 --> 00:13:02,608
+如果我计算1的一组幂，我总是得到1
+one. If I raise one to a whole bunch of
+powers, I'm always gonna get one, And
+
+161
+00:13:02,608 --> 00:13:07,060
+所以1模7的阶是1，事实上，1模任意质数的阶
+therefore the order of 1 modulo 7
+In fact the order of 1 modulo any prime
+
+162
+00:13:07,060 --> 00:13:12,518
+总是1。现在有重要的拉格朗日定理
+is always gonna be 1. Now there's an
+important theorem of Lagrange, that
+
+163
+00:13:12,518 --> 00:13:17,137
+我这里说的仅仅是拉格朗日定理的一个特例
+actually this is a very, very special case
+of it, what I am stating here. But
+(定理说：有限子群的阶必然整除有限群的阶)
+
+164
+00:13:17,137 --> 00:13:22,309
+拉格朗日定理意味着，如果你看g模p的阶
+Langrage's theorem basically implies that
+if you look at the order of G modulo p,
+
+165
+00:13:22,309 --> 00:13:27,112
+这个阶始终整除p-1。那么在我们给大家的两个例子中
+the order is always going to divide P-1. So in our two example you see,
+
+166
+00:13:27,297 --> 00:13:32,100
+6整除7-1，即6整除6，类似地，3整除7-1
+six divides seven minus one, six divides
+six, and similarly, three divides seven
+
+167
+00:13:32,100 --> 00:13:37,026
+即3整除6。但这是很一般的
+minus one. Namely again three divides six.
+But this is very general; your order is
+
+168
+00:13:37,026 --> 00:13:41,333
+你的阶始终是p-1的因子。事实上，我会告诉你
+always going be a factor of P minus one.
+In fact, I'll tell you, maybe it's a
+
+169
+00:13:41,333 --> 00:13:45,177
+也许你可以想想这个谜题：由拉格朗日定理的这个事实
+puzzle for you to think about. It's
+actually very easy to deduce Fermat's
+
+170
+00:13:45,177 --> 00:13:49,179
+非常容易推导出费马小定理
+theorem directly from this fact, from this
+Lagrange's theorem in fact. And so
+(显然，费马小定理等式的左边只能是若干个1相乘)
+
+171
+00:13:49,179 --> 00:13:53,340
+所以费马小定理某种意义上是拉格朗日定理的直接推论
+Fermat's theorem really in some sense
+follows directly from Lagrange's theorem.
+
+172
+00:13:54,580 --> 00:13:59,375
+顺便一提，拉格朗日的工作在19世纪，大家看到
+Lagrange, by the way, did his work in the
+nineteenth century, so you can already see
+
+173
+00:13:59,375 --> 00:14:04,053
+我们是如何沿着历史前进的。我们从古希腊时代出发
+how we're making progress through time. We
+started in Greek times, and already we
+
+174
+00:14:04,053 --> 00:14:09,376
+现在已经到了19世纪了。我可以告诉大家
+ended up in the nineteenth century. And I
+can tell you that more advanced crypto
+
+175
+00:14:09,376 --> 00:14:14,024
+更高级的密码学实际上用了大量的20世纪的数学
+actually uses twentieth century math very
+extensively. Now that we understand the
+
+176
+00:14:14,024 --> 00:14:18,416
+现在我们理解了Z_p^*的结构，我们把它推广到合数
+structure of ZP star, let's generalize
+that to composites, and look at the
+
+177
+00:14:18,416 --> 00:14:23,471
+来看Z_N^*的结构。那么我这里想展示给大家的是
+structure of ZN star. So what I wanna show
+you here is what's called Euler's Theorem
+
+178
+00:14:23,471 --> 00:14:28,044
+欧拉定理，一个费马小定理的直接推广
+which is a, a direct generalization of
+Fermat's Theorem. So, Euler defined the
+
+179
+00:14:28,044 --> 00:14:32,978
+那么欧拉定义了下面这个函数，那么给定一个整数N，
+欧拉定义了函数ψ
+following function. So given an integer N,
+he defined what's called the phi
+
+180
+00:14:32,978 --> 00:14:37,190
+ψ(M)，表示Z_N^*的大小
+function, phi of M, to be
+basically the size of the set ZN star.
+
+181
+00:14:37,190 --> 00:14:42,686
+有时这也叫做欧拉的ψ函数，Z_N^*的大小
+This is sometimes called, Euler's phi
+function. The size of the set Z N star. So
+
+182
+00:14:42,686 --> 00:14:48,521
+例如，我们已经看了Z_12^*。我们说过Z_12^*
+for example, we already looked at Z twelve
+star. We said that Z twelve star contains
+
+183
+00:14:48,521 --> 00:14:53,881
+包含4个元素：1,5,7,11，因此我们说
+these four elements, one, five, seven, and
+eleven. And therefore we say that phi of
+
+184
+00:14:53,881 --> 00:14:59,310
+ψ(12)=4。那么我问大家一个问题，ψ(p)是多少？
+twelve is simply the number four. So let
+me ask you as a puzzle, what is phi of P?
+
+185
+00:14:59,310 --> 00:15:06,266
+也就是Z_p^*的大小。那么事实上，我们说过
+It will basically be the size of Z P star.
+And so, in fact, we said that in the Z P
+
+186
+00:15:06,266 --> 00:15:12,335
+Z_p^*包含了Z_p中的全部元素，除了0。因此
+star contains all of Z P except for the
+number zero. And therefore, phi of P for
+
+187
+00:15:12,335 --> 00:15:18,533
+对于任意质数p，ψ(p)=p-1。现在，有一个特例
+any prime P is gonna be P minus one. Now,
+there is a special case, which I'm gonna
+
+188
+00:15:18,533 --> 00:15:23,282
+我这里要说，之后在RSA系统中我们要用到
+state here and we're gonna use later for
+the RSA system. If N happens to be a
+
+189
+00:15:23,282 --> 00:15:28,277
+如果N正好是两个质数p和q的乘积，那么
+ψ(N)=N-p-q+1
+product of two primes, then phi of N is
+simply N minus P minus Q plus one. And let
+
+190
+00:15:28,277 --> 00:15:33,045
+我来为大家解释为什么是这样。N是Z_N的大小
+me just show you why that's true. So
+basically N is the size of Z N. And now we
+
+191
+00:15:33,045 --> 00:15:37,838
+现在我们需要移除所有与m不是互质的元素
+need to remove all the elements that are
+not relatively prime to m. Well how can an
+
+192
+00:15:37,838 --> 00:15:42,632
+一个元素如何才能不与m互质呢？
+它要不被p整除，要不就被q整除
+element not be relatively prime to m? It's
+gotta be divisible by p or it's gotta be
+
+193
+00:15:42,632 --> 00:15:47,079
+在0到m-1之间，有多少元素
+divisible by q. Well how many elements
+between zero and m minus one are there,
+
+194
+00:15:47,079 --> 00:15:51,757
+能被p整除？一定有q个
+there that are divisible by p? Well there
+are exactly q of them. How many elements
+
+195
+00:15:51,757 --> 00:15:55,973
+有多少元素能被q整除？一定有p个
+are there that are divisible by q? Well
+there are exactly p of them. So we
+
+196
+00:15:55,973 --> 00:16:00,593
+那么我们减去p，来除去那些被q整除的数；
+减去q，来除去那些被p整除的数
+subtract p to get rid of those divisible
+by q. We subtract q to get rid of those
+
+197
+00:16:00,593 --> 00:16:05,776
+大家注意，我们见了0两次，因为
+divisible by p. And you notice we
+subtracted zero twice, because zero is
+
+198
+00:16:05,776 --> 00:16:12,020
+0被p和q同时整除，所以我们再加1
+divisible both by P and Q. And therefore,
+we add one just to make sure we subtract
+
+199
+00:16:12,020 --> 00:16:18,264
+以确保我们只减了一次0。不难看出
+ψ(N)=N-p-q+1
+zero only once. And so it's not difficult
+to see that phi(N) is N-P-Q+1. And another way
+
+200
+00:16:18,264 --> 00:16:24,599
+另一种书写方法是(p-1)(q-1)。好，那么
+这是我们待会将利用的事实
+of writing that is simply (P-1) times (Q-1). Okay,
+so this is a fact that we will use later
+
+201
+00:16:24,599 --> 00:16:30,275
+当我们回来讨论RSA系统时。目前只是定义了
+on, when we come back and talk about the
+RSA system. So far, this is just defining
+
+202
+00:16:30,275 --> 00:16:35,690
+欧拉的ψ函数。但现在欧拉非常好地运用了这个ψ函数
+this phi function of Euler. But now Euler
+put this phi function to really good use.
+
+203
+00:16:35,690 --> 00:16:41,104
+他证明了这个惊人的事实
+And what he proved is this amazing fact
+here that basically says that if you give
+
+204
+00:16:41,104 --> 00:16:46,060
+如果你给我Z_N^*中任意的元素X，事实上，X的ψ(N)次方
+me any element X in Z N star. In fact, and
+it so happens that X to the power of phi(N)
+
+205
+00:16:46,060 --> 00:16:50,678
+在Z_N中一定等于1。那么大家可以看出，
+这是费马小定理的一个推广
+is equal to one in Z N. So you can see
+that this is a generalization of Fermat's
+
+206
+00:16:50,678 --> 00:16:55,239
+特别地，费马小定理只适用于质数的情况
+theorem; in particular, Fermat's theorem
+only applied to primes. For primes we know
+
+207
+00:16:55,239 --> 00:16:59,913
+对于质数而言，我们知道ψ(p)=p-1。
+换句话说，如果N是质数
+that phi(p) is equal to p minus one, and
+in other words if N were prime we would
+
+208
+00:16:59,913 --> 00:17:04,494
+我们在这里写下p-1，那么我们就得到了费马小定理
+simply write p minus one here, and then we
+would get exactly Fermat's theorem. The
+
+209
+00:17:04,494 --> 00:17:08,892
+欧拉定理的美丽之处在于，他适用于合数
+beauty of Euler's theorem is that it
+applies to composites, and not just
+
+210
+00:17:08,892 --> 00:17:16,462
+不仅仅是质数。那么我们看一些例子。
+我们看5的ψ(12)次方
+primes. So let's look at some examples. So
+let's look at five to the power of phi(12).
+
+211
+00:17:16,462 --> 00:17:21,743
+那么5是Z_12^*里的元素。如果我们计算5的ψ(12)次方
+So five is an element of Z12 star.
+If we raise it to the power of phi of
+
+212
+00:17:21,743 --> 00:17:27,155
+我们应该得到1。我们知道ψ(12)=4
+twelve, we should be getting one. Well, we
+know that phi(12) is 4, so we're
+
+213
+00:17:27,155 --> 00:17:32,037
+那么我们计算5^4，是625
+raising 5 to the power of 4. Five to
+the power of four is 625 and it's a simple
+
+214
+00:17:32,037 --> 00:17:36,227
+容易计算出625等于1模12
+calculation to show that that's equal to
+1 modulo 12. So this is proof
+
+215
+00:17:36,227 --> 00:17:40,468
+这是一个例证，但当然不是证明，仅仅是个例子
+by example but of course it's not a proof
+at all. It's just an example. But in fact
+
+216
+00:17:40,468 --> 00:17:44,555
+但事实上不难证明欧拉定理。事实上，我会告诉大家，
+it's not difficult to prove Euler's
+theorem and in fact I'll tell you that
+
+217
+00:17:44,555 --> 00:17:48,900
+欧拉定理也是拉格朗日定理的特例
+Euler's theorem is also a very special
+case of Lagrange's general theorem.
+
+218
+00:17:49,880 --> 00:17:53,888
+好，那么我们说这是费马定理的推广
+Okay so we say that this is a
+generalization of Fermat's theorem and
+
+219
+00:17:53,888 --> 00:17:58,230
+事实上我们会看到，欧拉定理是RSA密码系统的基础
+in fact as we'll see this Euler's
+theorem is the basis of the RSA crypto
+
+220
+00:17:58,230 --> 00:18:03,922
+我先讲这么多，下节继续讨论
+system. So I stop here and we continue
+with modular quadratic equations in the
+
+221
+00:18:03,922 --> 00:18:04,740
+模二次方程
+next segment.

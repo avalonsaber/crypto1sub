@@ -1,0 +1,1579 @@
+1
+00:00:00,000 --> 00:00:04,524
+现在我们已经知道了一次性密码本
+让我们讨论一下如何让一次性密码本
+Now that we know about the one-time pad,
+let's talk about making the one-time pad
+
+2
+00:00:04,524 --> 00:00:08,881
+变得更为实用，即所谓流密码技术
+在这之前，我们一起
+more practical using something called the
+stream cypher. But before we do that,
+
+3
+00:00:08,881 --> 00:00:13,573
+快速回顾一下之前的内容
+我提示大家一下密码的定义
+let's do a quick review of where we were.
+So let me just remind you that a cypher is
+
+4
+00:00:13,573 --> 00:00:18,209
+密码是一个三元组：密钥空间、明文空间
+defined over a triple of sets called a key
+space, a message space, and a cypher text
+
+5
+00:00:18,209 --> 00:00:22,398
+和密文空间。密码有一对有效算法E和D
+bare space. And a cypher is a pair of
+efficient algorithms called E and D; E
+
+6
+00:00:22,398 --> 00:00:27,086
+E是加密算法，D是解密算法
+我们需要用到的性质仅仅是
+stands for encryption and D stands for
+decryption. And the only property that we
+
+7
+00:00:27,086 --> 00:00:32,294
+解密是加密的逆过程，换句话说
+need to satisfy is that decryption is the
+opposite of encryption. In other words if
+
+8
+00:00:32,294 --> 00:00:36,954
+如果我用某个密钥加密了明文M
+然后我使用相同的密钥解密
+I encrypt a message M using a particular
+key. And I decrypt using the same key. I
+
+9
+00:00:36,954 --> 00:00:41,272
+我可以还原明文的
+上一次我们看了一些易破解的密码
+get back the original message. Last time
+we looked at a couple of weak cyphers like
+
+10
+00:00:41,272 --> 00:00:45,591
+比如替换式密码和Vigenere密码
+我们展示了它们都能被轻易破解
+the substitution cypher and the Vigenere
+cypher. We showed that all of them can be
+
+11
+00:00:45,591 --> 00:00:49,650
+所以大家永远不要使用它们
+easily broken so you should never ever,
+ever use those cyphers. Those were just
+
+12
+00:00:49,650 --> 00:00:53,604
+它们仅具有历史意义
+然后我们看了第一个好的密码
+for historical reference. And then we
+looked at our first example of a good
+
+13
+00:00:53,604 --> 00:00:57,819
+叫做一次性密码本。我再提醒一下
+一次性密码本是如何定义的
+cypher, namely the one-time pad. So let me
+just remind you how the one-time pad is
+
+14
+00:00:57,819 --> 00:01:01,877
+明文空间是所有位字符串的集合
+defined. Basically the message space is
+the set of all bit and bit strings. The
+
+15
+00:01:01,877 --> 00:01:05,892
+密文也都是位字符串，密钥也类似
+cypher text is a set of all bit and bit
+strings. And similarly, the key is the
+
+16
+00:01:05,892 --> 00:01:10,310
+为所有N位字符串，加密也是使用简单的异或
+set of all N bit strings and the way we
+encrypt is by a simple XOR to encrypt the
+
+17
+00:01:10,310 --> 00:01:14,467
+来加密明文。我们通过用密钥异或明文
+来获取密文
+message. We just XOR the message in the
+key that gives us the cypher text. And
+
+18
+00:01:14,467 --> 00:01:18,990
+为了解密密文，我们只需再次异或
+then to decrypt a cypher text, we just do
+this XOR again and it's easier to show
+
+19
+00:01:18,990 --> 00:01:23,240
+我们容易验证异或满足
+解密为加密的逆过程这一性质
+by properties of XOR that in fact
+decryption is the opposite of encryption.
+
+20
+00:01:23,240 --> 00:01:27,380
+然后我们讨论了这个引理，我们证明了
+And then we talked about this lemma, in
+fact, we proved it, that says that the
+
+21
+00:01:27,380 --> 00:01:31,794
+一次性密码本拥有完美的安全性
+这意味着，如果你只是监听通信
+one-time pad has perfect secrecy, which
+means that if you're just an eavesdropper
+
+22
+00:01:31,794 --> 00:01:35,935
+截获一段密文，你将无法破解
+and you just get to see a single cypher
+text, you're not going to be able to
+
+23
+00:01:35,935 --> 00:01:40,332
+以获得任何关于明文的信息，不幸的是
+deduce any information about the encrypted
+plain text. Unfortunately, we also said
+
+24
+00:01:40,332 --> 00:01:44,648
+我们还说Shannon证明了一个
+充满坏消息的引理
+that Shannon proved this lema, we called
+it the bad news lema, that basically says
+
+25
+00:01:44,648 --> 00:01:48,751
+即任何完美安全的密码必须有足够长的密钥
+that any cypher that has perfect secrecy
+must have really long keys. In other
+
+26
+00:01:48,751 --> 00:01:53,067
+换句话说，密钥长度至少和明文一样长
+words, the key length must be at least as
+long as the length of the message, which
+
+27
+00:01:53,067 --> 00:01:57,490
+这意味着这种密码根本不实用
+因为如果通信双方能够
+means that the cypher is not particularly
+useful. Because if two parties have a way
+
+28
+00:01:57,490 --> 00:02:01,753
+安全通信和明文一样长的密钥
+to agree on really long keys that are as
+long as the message, they, in some sense,
+
+29
+00:02:01,753 --> 00:02:05,931
+某种意义上他们可以使用这种机制直接通信
+might as well use that mechanism to
+already transmit the message itself. So in
+
+30
+00:02:05,931 --> 00:02:10,538
+所以这节讲座我们将使用一次性密码本的思想
+this lecture we're going to take the idea
+of the one time pad and try to make it
+
+31
+00:02:10,538 --> 00:02:15,031
+将其改造成一个实用的加密机制
+这就是流密码
+into a practical encryption scheme. So
+this is called what's called a stream
+
+32
+00:02:15,031 --> 00:02:20,999
+在流密码中，密钥不是完全随机的
+cypher. So the idea in this stream cypher
+is rather than using a totally random key,
+
+33
+00:02:20,999 --> 00:02:26,346
+我们将使用一种伪随机密钥
+we're actually going to use a
+pseudo-random key. And to explain how that
+
+34
+00:02:26,346 --> 00:02:31,544
+为进一步解释，我需要定义什么是
+伪随机数发生器(PRG)
+works, I need to define what is a
+pseudo-random generator, PRG. So a PRG,
+
+35
+00:02:31,544 --> 00:02:37,337
+PRG是一个函数，我取名g，意为发生器
+really, all it is, is just a function,
+I'll call it g for generator, that takes a
+
+36
+00:02:37,337 --> 00:02:43,277
+这个函数取一个种子为输入
+我用｛0,1｝^s表示所有长度为s的字符串
+seed, so I'm going to use zero one to the
+s to denote all strings of length s, so
+
+37
+00:02:43,277 --> 00:02:48,729
+那么这个我们叫做种子空间
+它将s位种子映射到一个
+this we'll call the seed space. So he
+takes an s bit seed and maps it to a much
+
+38
+00:02:48,729 --> 00:02:53,978
+长得多的字符串｛0,1｝^n
+larger string which will denote by zero
+one to the n. And the property is that n
+
+39
+00:02:53,978 --> 00:02:59,161
+这里n远远大于s。换句话说
+我们的种子可能只有128位
+must be much larger than s. So in other
+words, we take a seed that might be only
+
+40
+00:02:59,161 --> 00:03:04,345
+但我们把它扩展成一个长得多的字符串
+128 bits and we expand it into a much,
+much larger output string that could be
+
+41
+00:03:04,345 --> 00:03:08,806
+可能有数G长度。这就是
+伪随机数发生器的工作原理
+gigabytes long. That's what this
+pseudo-random generator does. And of
+
+42
+00:03:08,806 --> 00:03:14,055
+当然，发生器首先应当是能有效计算的
+course, the goal is that first of all, the
+generator is efficiently computable, so
+
+43
+00:03:14,055 --> 00:03:19,248
+所以应当有一些有效算法能计算函数g
+the function g. There should be some sort
+of an efficient algorithm that computes
+
+44
+00:03:19,248 --> 00:03:24,066
+也就是能被一确定性算法有效地计算
+it. So, efficiently computable by a
+deterministic algorithm. It's important to
+
+45
+00:03:24,066 --> 00:03:29,250
+函数g本身没有随机性，这点很重要
+understand that the function g itself has
+no more randomness, in it, it's a totally
+
+46
+00:03:29,250 --> 00:03:33,946
+函数g是完全确定的。这里唯一具有随机性的
+就是这个随机种子
+deterministic. The only thing that's
+random here is the random seed, that's
+
+47
+00:03:33,946 --> 00:03:38,703
+它是作为函数g的输入
+当然，另一性质是
+given as input to the function g. And the
+other property, of course, is that the
+
+48
+00:03:38,703 --> 00:03:43,388
+输出应当看起来是随机的
+问题是“看起来是随机的”是什么意思？
+output should look random and the
+question is what does it mean to look
+
+49
+00:03:43,388 --> 00:03:48,694
+我们在本讲稍后给出这个的定义
+random, and that's something we'll define
+later on in the lecture. Okay so suppose
+
+50
+00:03:48,694 --> 00:03:53,869
+好的，假设我们有一发生器
+我们如何使用它来构建一个流密码？
+we have such a generator, how do we use
+that, to build a stream cipher? Well the
+
+51
+00:03:53,869 --> 00:03:59,503
+方法是使用这个种子作为我们的密钥
+idea is that we're gonna use the seed, as
+our key, so our short seed is gonna be our
+
+52
+00:03:59,503 --> 00:04:04,679
+以种子为私钥，使用发生器将种子
+secret key. And then we're gonna use the
+generator to basically expand the seed
+
+53
+00:04:04,679 --> 00:04:09,723
+扩张成长得多的看起来很随机的序列
+或称为伪随机序列
+into a much, much larger random looking
+sequence, or pseudo random sequence, as
+
+54
+00:04:09,723 --> 00:04:14,657
+由于算法已知，所以可写作G(K)
+然后我们将进行异或操作
+it's known, so this would be G of K. And then
+we are going to XOR it just like in the
+
+55
+00:04:14,657 --> 00:04:19,185
+就像一次性密码本一样
+我们将伪随机序列和明文异或
+one time pad we're going to XOR the
+pseudo random sequence with the message
+
+56
+00:04:19,185 --> 00:04:24,185
+得到密文。如果我们用数学表示之
+and that's going to give us the cypher
+text. Or if we want to write this in math,
+
+57
+00:04:24,185 --> 00:04:30,139
+即为C是M与K的加密
+we'll write C equals the encryption of the
+message M with a key K, which is simply
+
+58
+00:04:30,139 --> 00:04:35,619
+即为M与G(K)的简单异或。当我们想解密时
+我们就做同样的事情
+defined as M XOR G of K. And then when we
+want to decrypt, basically we do exactly
+
+59
+00:04:35,619 --> 00:04:41,234
+就是密文异或G(K)，就像一次性密码本
+the same thing. It's basically the cypher
+text XOR G of K, just like in the one-time
+
+60
+00:04:41,234 --> 00:04:46,782
+只不过不是与密钥K异或，而是与
+发生器对K的输出结果异或
+pad except then instead of XOR-ing with K,
+we XOR with the output of the generator
+
+61
+00:04:46,782 --> 00:04:52,148
+那么第一个问题就是，为什么这是安全的？
+applied to K. So the first question to ask
+is why is it secure? So, basically you
+
+62
+00:04:52,148 --> 00:04:56,651
+目前，我们只有一种安全的观念，叫做完美安全
+now, we only have one notion of security
+so far, which we called perfect secrecy.
+
+63
+00:04:56,651 --> 00:05:01,552
+那么一个流密码是完美安全吗？
+And so let's just quickly ask can a stream
+cipher have perfect secrecy. Remember in
+
+64
+00:05:01,552 --> 00:05:06,132
+注意在流密码中，密钥比明文短得多
+the stream cipher the key is much, much
+shorter than the message. And so,
+
+65
+00:05:06,132 --> 00:05:12,392
+即便如此，可能是完美安全吗？答案是否定的
+nevertheless can it have perfect secrecy? So
+I hope everybody said the answer is, no.
+
+66
+00:05:12,392 --> 00:05:17,198
+密钥比明文短得多，我们说在完美安全的密码中
+The key is much shorter than the message.
+And we said that in a, in a perfectly
+
+67
+00:05:17,198 --> 00:05:21,819
+密钥至少和明文一样长
+secure cypher, the key must be as long as
+the message. And therefore, it's not
+
+68
+00:05:21,819 --> 00:05:26,317
+所以流密码不可能是完美安全的
+possible that a, that a stream cypher
+actually has perfect secrecy. So the
+
+69
+00:05:26,317 --> 00:05:30,774
+问题是，为什么我们还说流密码是安全的呢？
+首先我们需要一个不同的关于安全的定义
+question is, then, well, why is it secure?
+First of all we would need a different
+
+70
+00:05:30,774 --> 00:05:34,410
+来论证流密码的安全性
+definition of security to argue that
+stream cypher is, is secure and in
+
+71
+00:05:34,410 --> 00:05:38,783
+特别地，安全性依赖于我们使用的特别的发生器
+particular, the security property is going
+to depend on the specific generator that
+
+72
+00:05:38,783 --> 00:05:42,681
+事实上，我们需要隐私的定义来论证
+we used. So in fact the definition of
+privacy that we'll need to argue the
+
+73
+00:05:42,681 --> 00:05:47,054
+流密码的隐私安全，我们将在下一讲介绍
+security of Stream Cipher is we'll see in
+the next lecture, but for now let me show
+
+74
+00:05:47,054 --> 00:05:51,614
+现在我给大家一个特别的性质
+安全的发生器所必须有的性质
+you one particular property. That a
+generator must have a minimum property
+
+75
+00:05:51,614 --> 00:05:56,510
+这个性质叫不可预测性
+needed for security. This property is
+called unpredictability. So let's
+
+76
+00:05:56,510 --> 00:06:01,807
+我们设想一下如果一个流密码是可预测的
+suppose for one second that in fact a
+stream cycle is predictable. So, what does
+
+77
+00:06:01,807 --> 00:06:07,172
+什么意思？PRG是可预测的
+即存在某个数I
+that mean? Both the PRG is predictable.
+What that means is essentially that there
+
+78
+00:06:07,172 --> 00:06:13,691
+如果我们给PRG输出的前I位
+is some i. Such that if I give you the
+first I bits of the outputs. This notation
+
+79
+00:06:13,691 --> 00:06:18,920
+这个记号表示看函数输出的前I位
+Bar one to I means look at the first
+I-bits of the output of the function.
+
+80
+00:06:18,920 --> 00:06:23,733
+好，如果我们给生成流的前I位
+存在某种算法
+Okay, so I give you the first I bits of
+the stream. There is some sort of an
+
+81
+00:06:23,733 --> 00:06:28,995
+一种有效的算法，可以计算余下的字符串
+algorithm, there's an efficient algorithm
+that will compute the rest of the string.
+
+82
+00:06:28,995 --> 00:06:34,193
+好的，给定前I位，你能计算出余下的位
+Okay, so given the first I bits, you can
+compute the remainder of the bits. I claim
+
+83
+00:06:34,193 --> 00:06:39,392
+我觉得如果是这种情况，
+那么这个流密码是不安全的
+that if this is the case, then the stream
+cypher would not be secure. So let's see
+
+84
+00:06:39,392 --> 00:06:44,205
+为什么？设想攻击者截获了一段密文
+why. Suppose an attacker actually
+intercepts a particular cypher text, let's
+
+85
+00:06:44,205 --> 00:06:49,511
+即为C。如果是这种情况，就会有问题
+call it c. If this is the case, then in
+fact, we have a problem. Because suppose
+
+86
+00:06:49,511 --> 00:06:55,514
+因为基于一些预知的知识
+that just by some prior knowledge, the
+attacker actually knows that the initial
+
+87
+00:06:55,514 --> 00:07:01,298
+攻击者知道信息的某些部分最初的明文内容
+举个例子
+part of the message happens to be some
+known value. For example, we know that in
+
+88
+00:07:01,298 --> 00:07:07,448
+因特网电子邮件标准协议之一SMTP
+the mail protocol, smtp, the standard mail
+call used in the internet, you know that
+
+89
+00:07:07,448 --> 00:07:12,860
+大家知道这个协议里每条信息都以from;开头
+那就是攻击者预先知道的前缀
+every message starts with a word from
+colon. Well, that would be a prefix that
+
+90
+00:07:12,860 --> 00:07:18,169
+信息必须以from；开头
+the adversary knows. That the site, that
+the message must begin with from a colon.
+
+91
+00:07:18,169 --> 00:07:23,677
+攻击者可以将from；的密文
+What it could do is it could XOR
+the cipher text with the words from colon,
+
+92
+00:07:23,677 --> 00:07:29,053
+与事先预知的明文异或
+with the little prefix of the message that
+it actually knows. And what that would
+
+93
+00:07:29,053 --> 00:07:33,951
+得到的就是伪随机序列的前缀
+give it is a prefix of, of the pseudo
+random sequence. And I would learn as a
+
+94
+00:07:33,951 --> 00:07:39,103
+我能知道伪随机序列的前缀
+result of this, it would learn a prefix of
+the pseudo random sequence but then we
+
+95
+00:07:39,103 --> 00:07:44,191
+由于一旦知道伪随机序列的前缀
+know that once it has a prefix of the
+pseudo random sequence it can predict the
+
+96
+00:07:44,191 --> 00:07:49,280
+我们就可以预测伪随机序列的剩余部分
+remainder of the pseudo random sequence
+and that would allow it to then predict
+
+97
+00:07:49,280 --> 00:07:54,559
+也就是说我们能预测出明文的剩余部分
+这个例子说明如果伪随机序列是可预测的
+the rest of the message. Okay, so for
+example if the pseudo random generator was
+
+98
+00:07:54,559 --> 00:07:59,132
+给定序列的前5位，那么这个用流密码加密的
+predictable given five bits of the pad.
+Then every email encrypted using the
+
+99
+00:07:59,132 --> 00:08:03,203
+邮件就是可以被破解的，再说一遍
+stream cypher would be decryptable
+because, again, the attacker knows the
+
+100
+00:08:03,203 --> 00:08:07,556
+攻击者知道明文的前缀，推出伪随机序列的前缀
+prefix of the message from which he
+deduces the prefix of the pad, which then
+
+101
+00:08:07,556 --> 00:08:12,023
+进而计算出序列的其他部分，从而还原整个明文
+allows him to compute the rest of the pad,
+which then allows him to recover the
+
+102
+00:08:12,023 --> 00:08:16,433
+所以这个例子证实了如果一个PRG可预测
+entire plain text. Okay, so this is an
+example that shows that in fact if a PRG
+
+103
+00:08:16,433 --> 00:08:21,485
+就有安全问题。因为前缀会暴露整个信息
+is predictable then already there are
+security problems. Because a small prefix
+
+104
+00:08:21,485 --> 00:08:27,288
+即使我只能预测输出序列的一位
+would reveal the entire message. As it
+turns out, even if I could just predict
+
+105
+00:08:27,288 --> 00:08:33,163
+即使给定前I位的输出，我能预测下一位
+one bit of the outputs. Even if given, you
+know, the first I bits, I can predict the
+
+106
+00:08:33,163 --> 00:08:38,764
+第I+1位，这也有问题，因为新的前缀又有了
+next bit, the I plus first bit. Already,
+this is a problem. Because that would say
+
+107
+00:08:38,764 --> 00:08:43,252
+也就是信息的前缀可以被预测和解密
+that given again, the first couple of
+letters in a message can predict, can
+
+108
+00:08:43,252 --> 00:08:48,163
+进而还原信息中的下一位，或是下一字母，等等
+decrypt essentially, and recover the next
+bit of the message, or the next letter of
+
+109
+00:08:48,163 --> 00:08:52,347
+所以这个可预测性告诉我们
+the message, and so on. So this
+predictability property shows that, you
+
+110
+00:08:52,347 --> 00:08:57,259
+如果我们在流密码中使用PRG
+know, if we use a PRG that's going to be
+used in a stream cypher, it had better be
+
+111
+00:08:57,259 --> 00:09:02,363
+它最好是不可预测的。PRG不可预测是什么意思？
+unpredictable. So what does it mean that a
+PRG is unpredictable? So let's define more
+
+112
+00:09:02,363 --> 00:09:07,129
+让我们给出不可预测性的更多定义
+precisely what it means for a PRG to be
+unpredictable. Well first we'll define
+
+113
+00:09:07,129 --> 00:09:11,833
+我们先定义PRG可预测的意义
+more precisely what it means for a PRG to
+be predictable. So we say that G is
+
+114
+00:09:11,833 --> 00:09:18,111
+我们说G是可预测的，如果存在一个有效算法
+我们将该算法记为A，还有一个位置
+predictable, if there exists an efficient
+algorithm. Let's call it A and there is
+
+115
+00:09:18,111 --> 00:09:24,932
+有一个位置为I，位于0到N-1之间
+some position. There's a position I
+between one and N minus one such that if
+
+116
+00:09:24,932 --> 00:09:31,587
+如果我们看分布在随机密钥上的概率
+we look at the probability over a random
+key. Probability if I generate a random
+
+117
+00:09:31,587 --> 00:09:36,791
+我生成一个随机密钥，这个记号表示
+从密钥空间K中随机选取一个密钥
+key. You remember, this notation means
+choose a random key from the set K. So
+
+118
+00:09:36,791 --> 00:09:42,212
+那么这个带r的箭头表示
+从K中随机选取一个密钥
+this arrow with r just means choose a
+random key from the set K. Basically, if I
+
+119
+00:09:42,212 --> 00:09:47,632
+如果我把输出前缀输入给这个算法
+我给输出的前I个字节
+give this algorithm the prefix of the
+output, if I give it the first I bytes of
+
+120
+00:09:47,632 --> 00:09:53,190
+该算法能预测出下一位的概率
+the output, the probability that it's able
+to predict the next bit of the outputs,
+
+121
+00:09:53,190 --> 00:10:00,890
+大于1/2加上Epislon
+this probability is greater than half plus
+epislon. For some non-negligible. For some
+
+122
+00:10:00,890 --> 00:10:07,389
+对于一些不可忽略的量，表示为Epsilon
+non-negligible, epsilon. A non-
+negligible, for example, would be
+
+123
+00:10:07,389 --> 00:10:11,322
+比如Epsilon大于2的负30次方
+也就是十亿分之一
+epsilon, which is greater than one over 
+two to the 30. One over a billion, for
+
+124
+00:10:11,322 --> 00:10:15,415
+我们并不认为它是可忽略的
+那么我们将在本讲稍后来讨论
+example, we would consider it not
+negligible. So these terms, negligible and
+
+125
+00:10:15,415 --> 00:10:19,508
+可忽略与不可忽略，并给出更精确的定义
+non negligible will come back at the end
+of the lecture, and define them more
+
+126
+00:10:19,508 --> 00:10:24,260
+现在我们继续使用不可忽略的直观概念
+precisely. But for now, let's just, stick
+with the intuitive notion of what non
+
+127
+00:10:24,260 --> 00:10:28,684
+一个发生器算法
+negligible means. And so this is what it
+means, for an algorithm, for a generator
+
+128
+00:10:28,684 --> 00:10:33,332
+如果它是可预测的，存在某个算法能够预测
+to be, predictable. Basically, there is
+some algorithm that is able to predict the
+
+129
+00:10:33,332 --> 00:10:37,813
+第I+1位，在给定前缀的前提下，对吧？
+然后我们说，一个算法
+I plus first bit, given the mutual prefix,
+okay? And then we say that an algorithm,
+
+130
+00:10:37,813 --> 00:10:42,013
+PRG是不可预测的，事实上
+that a PRG is unpredictable. If in
+fact, well, if it doesn't satisfy the
+
+131
+00:10:42,013 --> 00:10:46,269
+这样的算法不满足这里定义的性质
+换句话说，它是不可预测的
+property that we just defined. In other
+words, it is not predictable. But what
+
+132
+00:10:46,269 --> 00:10:50,861
+不可预测的更为精确的定义是
+does it mean, more precisely for it not to
+be predictable. It means that, in fact,
+
+133
+00:10:50,861 --> 00:10:55,246
+对于各个位置，即对所有i，
+没有有效的破解算法A
+for all positions, for all i there is
+no efficient adversary no efficient
+
+134
+00:10:55,246 --> 00:10:59,881
+以不可忽略的概率预测出第i+1位
+algorithm A that can predict the i + 1
+bit with non negligible probability.
+
+135
+00:10:59,881 --> 00:11:04,642
+很好。这个对所有i都成立，
+不管给定什么样的前缀
+Excellent. Okay and this has to be true
+for all I. So no matter which prefix I
+
+136
+00:11:04,642 --> 00:11:08,920
+你也无法成功预测出前缀的下一位
+give you, you're not gonna be able to
+predict the next bit that follows the
+
+137
+00:11:08,920 --> 00:11:13,267
+那么让我们看几个例子
+这是一个很傻瓜的例子
+prefix. Okay, so let's look at some
+examples. Here is a silly, silly example.
+
+138
+00:11:13,267 --> 00:11:17,632
+我给你一个发生器，
+问你它是可预测的吗？
+Suppose I give you a generator, and I ask
+you, is it predictable? Well, this
+
+139
+00:11:17,632 --> 00:11:22,476
+这个发生器具有这样的性质：
+如果我计算输出的所有位的异或
+generator happens to have the property,
+that if I XOR all the bits of the
+
+140
+00:11:22,476 --> 00:11:27,317
+我总能得到1，好，我计算所有位
+outputs, I always happen to get one. Okay,
+so I XOR all the bits. Bit number one,
+（回顾：奇偶校验）
+
+141
+00:11:27,317 --> 00:11:31,895
+第一位异或第二位，再异或第三位
+如果我将所有位全部异或
+XOR bit number two, XOR bit number
+three. If I XOR all those bits, I
+
+142
+00:11:31,895 --> 00:11:36,657
+我可以得到1。问题是，
+这个发生器是可预测的吗？
+happen to get one. The question is, is
+that a predictable generator? And again, I
+
+143
+00:11:36,657 --> 00:11:41,113
+我希望大家都认为“是”
+本质上，给定输出前n-1位
+hope everybody answered yes, that
+essentially given the first n minus one
+
+144
+00:11:41,113 --> 00:11:45,997
+我可以预测出第n位，因为要
+满足前n位的异或必须是1
+bits of the outputs, I can predict the nth
+bit because it would just be the bits
+
+145
+00:11:45,997 --> 00:11:50,819
+换句话说，我给你发生器的输出
+that's needed to make the XOR all the
+bits be one. In other words, I give you
+
+146
+00:11:50,819 --> 00:11:55,825
+除了最后一位，你是可以预测出
+发生器输出的最后一位的
+all but one of the bits of the generator,
+you can actually predict the last bit of
+
+147
+00:11:55,825 --> 00:12:00,230
+我们既然已经看到PRG必须是不可预测的
+the generator. Now that we've seen that
+PRGs have to be unpredictable, I just want
+
+148
+00:12:00,230 --> 00:12:04,469
+我只想提几个脆弱的PRG
+它们永远不应在密码学中使用
+to mention a couple of weak PRGs that
+should never ever be used for crypto. This
+
+149
+00:12:04,469 --> 00:12:08,762
+这是个常见错误，我希望确保
+大家不要犯这些错误
+is a very common mistake and I just want
+to make sure none of you guys make this
+
+150
+00:12:08,762 --> 00:12:12,895
+一种常见的、加密时不能使用的PRG
+mistake. So a very common PRG that should
+actually never be used for crypto is
+
+151
+00:12:12,895 --> 00:12:17,347
+叫做线性同余方法
+我稍微解释一下
+called a linear congruential generator. So
+let me explain what a linear congruential
+
+152
+00:12:17,347 --> 00:12:22,773
+线性同余方法有三个参数，
+分别叫做A，B,和P
+generator is. Basically it has parameters.
+It has three parameters. I'll call them A,
+
+153
+00:12:22,773 --> 00:12:28,910
+A和B是整数，P是一个质数
+我们如下定义发生器
+B and P. A and B are just integers and P
+is a prime. And the generator is defined
+
+154
+00:12:28,910 --> 00:12:35,341
+我引入R0作为发生器的种子
+as follows, essentially I'll say R zero is
+the seed of the generator. And then the
+
+155
+00:12:35,341 --> 00:12:42,883
+然后生成随机数的方法就是
+迭代地运行下面的步骤
+way you generate randomness is basically
+you iteratively run through the following
+
+156
+00:12:42,883 --> 00:12:49,971
+计算A乘以R(i-1)加上B，再取模P
+steps. You compute a times r of I minus
+one plus b modular p. Then you output a
+
+157
+00:12:49,971 --> 00:12:58,053
+然后输出几位关于目前状态i的数Ri
+few bits of the current states, output few
+bits of Ri. Then, of course, you
+
+158
+00:12:58,053 --> 00:13:02,782
+然后将i加一，再反复迭代之，怎么样？
+increment I and you iterate this again and
+again and again. Okay? So you can see how
+
+159
+00:13:02,782 --> 00:13:07,341
+这就是其如何工作的
+从一个特定的种子开始
+this generator proceeds. It starts with a
+particular seed. At every step there is
+
+160
+00:13:07,341 --> 00:13:11,934
+每一步应用这个线性变换
+this linear transformation that's being
+applied to the seed. And then you output a
+
+161
+00:13:11,934 --> 00:13:16,258
+然后你输出目前状态Ri的几位
+然后反复迭代。。。
+few bits of the current state and then you
+do that again and again and again and
+
+162
+00:13:16,258 --> 00:13:20,476
+不幸的是，尽管这个发生器
+具有良好的统计学性质
+again. Unfortunately even though this
+generator has good statistical properties
+
+163
+00:13:20,476 --> 00:13:24,960
+比如说，输出的0的数目很可能
+in the sense that, for example, the number
+of zeroes it outputs is likely going to be
+
+164
+00:13:24,960 --> 00:13:29,231
+与1的数目差不多，等等；
+实际上你可以证实
+similar to the number of ones and so on;
+it has, you can actually argue all sorts
+
+165
+00:13:29,231 --> 00:13:33,662
+一些漂亮的统计性质。
+但是这个发生器很容易被预测
+of nice statistical properties about this,
+nevertheless it is a very easy generator
+
+166
+00:13:33,662 --> 00:13:37,925
+事实上它不应当被使用
+如果给定一些输出
+to predict. And in fact should never ever
+be used. In fact, just given a few
+
+167
+00:13:37,925 --> 00:13:42,592
+一些输出的样本，是容易预测出
+序列的剩余部分的
+outputs, a few output samples, it's easy
+to predict the remainder of the sequence.
+
+168
+00:13:42,592 --> 00:13:47,143
+因此，这个发生器不应当被使用的
+And as a result, this generator should
+never ever be used. Another example is a
+
+169
+00:13:47,143 --> 00:13:51,810
+另一个随机数发生器的例子与
+线性同余方法很接近
+random number generator that is very
+closely related to the linear congruential
+
+170
+00:13:51,810 --> 00:13:56,244
+这也是glibc里使用的发生器
+generator. This is a random number
+generator implemented in glibc, very
+(glibc: GNU C Library函数库)
+
+171
+00:13:56,244 --> 00:14:01,437
+非常常见，我写下了它的定义
+common library. That you can see. I just
+wrote down the definition here. You can
+
+172
+00:14:01,437 --> 00:14:07,056
+每轮输出几位数据
+see that it basically outputs a few bits
+at every iteration and it just does this
+
+173
+00:14:07,056 --> 00:14:12,470
+每轮都执行这个简单的线性变换
+同样这个发生器非常容易预测
+simple linear transformation at every
+step. Again, this is a very easy generator
+
+174
+00:14:12,470 --> 00:14:17,952
+在加密中不应当被使用
+to predict and should never ever be used
+for crypto. And so the lesson I want to
+
+175
+00:14:17,952 --> 00:14:23,179
+所以我强调永远不要使用glibc库里的
+随机生成函数
+emphasize here is never ever use the
+built-in glibc function random. For crypto,
+
+176
+00:14:23,179 --> 00:14:27,718
+因为它不能满足密码学的随机性
+because it doesn't produce,
+cryptographic randomness, in the sense
+
+177
+00:14:27,718 --> 00:14:32,749
+也就是不易预测性。事实上，
+类似第四版Kerberos的系统
+that it is easy to predict. And, in fact,
+systems like Kerberos version four have
+
+178
+00:14:32,749 --> 00:14:37,717
+使用了这个函数，也已被破解了
+所以，不要再犯错了
+used random and, have been beaten by that.
+So, please don't make that mistake
+
+179
+00:14:37,717 --> 00:14:42,643
+下一讲我们会讨论如何安全地
+生成随机数
+yourself. We will talk about how to do
+secure random number generation actually in
+
+180
+00:14:42,643 --> 00:14:47,765
+结束本讲之前，我想给出
+the next lecture. Before we conclude this
+lecture I just want to give a little bit
+
+181
+00:14:47,765 --> 00:14:52,513
+关于可忽略和不可忽略的更多细节
+more detail about these concepts of
+negligible and non-negligible values, so
+
+182
+00:14:52,513 --> 00:14:57,449
+密码学界的不同圈子对这两概念的
+定义有所不同
+different communities in crypto actually
+define these concepts differently, for
+
+183
+00:14:57,449 --> 00:15:02,879
+对于实用派来说，可忽略和不可忽略
+practitioners basically these the term
+negligible and non-negligible,
+
+184
+00:15:02,879 --> 00:15:06,991
+仅仅是定义里的特定值，例如
+are just, particular scalers that are used in the
+definition. So, for example, a
+
+185
+00:15:06,991 --> 00:15:11,623
+实用派认为，如果一个值
+比十亿分之一大(2^-30)
+practitioner would say, that if a value is
+more than one over, one over a billion,
+
+186
+00:15:11,623 --> 00:15:16,082
+我们说这个值是不可忽略的
+one over two to the 30, we say that the
+value is non-negligible. The reason is,
+
+187
+00:15:16,082 --> 00:15:20,831
+原因是如果你使用密钥加密
+the reason that's so, is, because if you
+happen to use a key, for example, for, for
+
+188
+00:15:20,831 --> 00:15:25,522
+一个G的数据，约2^30字节
+encrypting a gigabyte of data, a gigabyte
+of data is about two to the 30 or maybe
+
+189
+00:15:25,522 --> 00:15:30,198
+或2^32字节，那么2^30分之一概率的事件
+even two to the 32 bytes. Then an event
+that happens with the probability one over
+
+190
+00:15:30,198 --> 00:15:34,672
+就会很有可能发生，
+对于1个G的数据而言
+two to the thirty will likely happen after
+about a gigabyte of data. So since a
+
+191
+00:15:34,672 --> 00:15:39,090
+由于我们用一个G的数据来推断密钥
+这个事件很有可能发生
+gigabyte of data is within reason for a
+particular key, this event is likely to
+
+192
+00:15:39,090 --> 00:15:43,338
+所以2^30分之一是不可忽略的
+happen. Therefore one over two to the
+thirty is non-negligible. On the other
+
+193
+00:15:43,338 --> 00:15:47,732
+另外，我们说2^80分之一
+hand, we'll say that one over two to the
+eighty. Which is much, much, much smaller
+
+194
+00:15:47,732 --> 00:15:51,794
+这是一个小得多的概率
+is an event, an event that happens with
+this probability is an event that's
+
+195
+00:15:51,794 --> 00:15:56,451
+在密钥使用过程中，这个小概率事件
+将不太可能会发生
+actually not going to happen over the life
+of the key. And therefore we'll say that
+
+196
+00:15:56,451 --> 00:16:00,559
+我们说这是一个可忽略的事件
+由此可见，这些关于
+that's a negligible event. As it turns
+out, these practical definitions of
+
+197
+00:16:00,559 --> 00:16:05,212
+可忽略与不可忽略的定义
+其实是有点问题的
+negligible and non-negligible are quite
+problematic and we'll see examples of why
+
+198
+00:16:05,212 --> 00:16:09,290
+我们稍后再来看相关例子
+事实上，更严格的密码学理论
+they're problematic later on. So in fact
+in the more rigorous theory of
+
+199
+00:16:09,290 --> 00:16:14,058
+可忽略与不可忽略的定义
+有所不同
+cryptography, the definition of negligible
+and non-negligible are somewhat different.
+
+200
+00:16:14,058 --> 00:16:18,251
+事实上，当我们讨论事件概率时
+And in fact, when we talk about the
+probability of an event, we don't talk
+
+201
+00:16:18,251 --> 00:16:23,019
+我们不会对概率定值
+而是把它看作是一个安全参数的函数
+about these probabilities as scalers, but
+rather we talk about them as functions of
+
+202
+00:16:23,019 --> 00:16:27,270
+让我来解释一下
+a security parameter. So let me explain
+what that means. So these functions,
+
+203
+00:16:27,450 --> 00:16:32,447
+这些函数本质上输出正实数
+essentially, are functions that map, that
+outputs, positive real values. So, are non
+(注意有口误map)
+
+204
+00:16:32,447 --> 00:16:37,384
+这些非负实数被认为是概率
+negative real values that are supposedly
+probabilities. But they're functions that
+
+205
+00:16:37,384 --> 00:16:41,960
+函数的定义域为非负整数，怎么样？
+那么不可忽略的函数如何呢？
+act on non negative integers, okay? So,
+what does it mean for a function to be
+
+206
+00:16:41,960 --> 00:16:46,836
+答案是函数值以无限的可能性
+大于某个多项式的值
+non-negligible? What it means is that the
+function is bigger than some polynomial
+
+207
+00:16:46,836 --> 00:16:51,171
+换句话说，对于无穷多个值
+infinitely often. In other words, for
+many, for infinitely many values, the
+
+208
+00:16:51,171 --> 00:16:55,867
+函数值大于1除以某个多项式的值
+function is bigger than some, one over
+polynomial, okay? So I wrote the exact
+
+209
+00:16:55,867 --> 00:17:01,130
+我写下了严格定义，待会看一个例子
+definition here, and we'll see an example,
+in just a minute. Okay? So if something is
+
+210
+00:17:01,130 --> 00:17:06,100
+如果函数值经常大于1除以多项式的值
+我们说它是不可忽略的
+bigger, is often bigger than one of that
+polynomial, we'll say that it's non-negligible.
+
+211
+00:17:06,100 --> 00:17:11,070
+不过，如果函数值小于所有多项式
+对应的值，我们就说它是可忽略的
+However, if something is
+smaller than all polynomials, then we'll
+
+212
+00:17:11,070 --> 00:17:15,908
+这就是说，对于任何次数的多项式
+say that it's negligible. So, what this
+says here, basically, for any degree
+
+213
+00:17:15,908 --> 00:17:20,838
+对于任何d，存在某个下界Lambda_d
+polynomial, for all d, there exists some
+lower bound lambda-d such as, for all
+
+214
+00:17:20,838 --> 00:17:25,162
+对于任何比这个下界大的参数Lambda
+函数总是小于1除以多项式的值
+lambda bigger than this lambda-d, the
+function is smaller than one over the
+
+215
+00:17:25,162 --> 00:17:29,716
+这说明了可忽略的函数值总是小于
+polynomial. So all this says is that the
+function is negligible if it's less than
+
+216
+00:17:29,716 --> 00:17:33,924
+各个多项式分式值。换句话说
+总是小于1除以Lambda^d
+all polynomial fractions. In other words, is
+less than one over lambda-d for
+
+217
+00:17:33,924 --> 00:17:38,135
+对于充分大的Lambda总成立
+让我们看几个例子
+sufficiently large lambda. So let's look
+at some examples. And we'll see
+
+218
+00:17:38,135 --> 00:17:43,085
+稍后我们会看到可忽略与
+不可忽略的一些应用
+applications of these negligible and
+non-negligible concepts later on. But I
+
+219
+00:17:43,085 --> 00:17:47,689
+这里我们只是希望大家能明白
+如何去准确理解这些概念
+just want to make, wanted to make it clear
+that this is how you would rigorously find
+
+220
+00:17:47,689 --> 00:17:52,185
+小于或大于1除以多项式
+these concepts. Basically either smaller
+than one over poly or bigger than one over
+
+221
+00:17:52,185 --> 00:17:56,410
+一个是可忽略，另一个不可忽略
+poly, one would be negligible, the
+other would be non-negligible. Let's look
+
+222
+00:17:58,522 --> 00:18:00,635
+看些例子。比如说，一个函数
+随Lambda的增加指数级衰减
+at some examples. So, for example, a
+function that drops exponentially in
+
+223
+00:18:00,635 --> 00:18:05,456
+很明显这个函数是可忽略的
+对于任意d，存在一个充分大的Lambda
+lambda clearly would be negligible because
+for any constant d there is a sufficiently
+
+224
+00:18:05,456 --> 00:18:09,952
+满足：1除以2的Lambda次方小于
+1除以Lambda的d次方
+large, large lambda. Such as one over two
+to the lambda is less than one over lambda
+
+225
+00:18:09,952 --> 00:18:15,405
+好的，这显然比所有多项式分式小
+to the d. Okay. So this is clearly less
+than all polynomials. Over the function,
+
+226
+00:18:15,405 --> 00:18:20,894
+1除以Lambda的1000次方
+这是一个增长极为缓慢的函数
+say, one over lambda to a thousand, right.
+This is a function that grows very, very,
+
+227
+00:18:20,894 --> 00:18:25,217
+它的值几乎不动
+不过，这个函数不可忽略
+very slowly. It barely ever moves.
+Nevertheless, this function is
+
+228
+00:18:25,217 --> 00:18:30,432
+因为如果我取d为10000
+non-negligible because if I set d to be
+10,000, then clearly this function is
+
+229
+00:18:30,432 --> 00:18:36,127
+显然函数值大于
+1除以Lambda的10000次方
+bigger than one over lambda to the 10,000.
+And so this function is bigger than some
+
+230
+00:18:36,127 --> 00:18:41,238
+这个函数值大于某个多项式分式
+我们再看一个费解一点的例子
+polynomial fraction. And let's look at a
+confusing example, just to be tricky. What
+
+231
+00:18:41,238 --> 00:18:45,925
+你怎么想？设想我有一个函数
+对于奇数lambda它是指数级小的
+do you think? Suppose I have a function that for
+an odd lambda it happens to be exponentially small,
+
+232
+00:18:45,925 --> 00:18:50,375
+对于偶数lambda它是多项式级小的
+for even lambda, it happens to be
+polynomially small. Is this a negligible or
+
+233
+00:18:50,375 --> 00:18:55,350
+它是可忽略还是不可忽略呢？
+那么根据定义，它是
+non-negligible function? Well, by our
+definition this would a non-negligible
+
+234
+00:18:55,350 --> 00:19:00,747
+不可忽略的。直观地，这个函数
+经常表现为多项式小
+function. And the intuition is, if a
+function happens to be only polynomially
+
+235
+00:19:00,747 --> 00:19:05,815
+实际上意味着这个事件
+small, very often, that actually means
+that this event, you know, an event
+
+236
+00:19:05,815 --> 00:19:10,680
+发生的概率已然太大了
+无法满足实际加密的需要
+that happens with this probability, is
+already too large to be used in a real
+
+237
+00:19:10,680 --> 00:19:15,420
+这里需要记住的要点是这些术语
+cryptosystem. Okay, so, the main points to
+remember here, are that these terms,
+
+238
+00:19:15,420 --> 00:19:19,559
+小于多项式，大于多项式
+basically, correspond to less than
+polynomial or more than polynomial, but
+
+239
+00:19:19,559 --> 00:19:23,862
+但在本课程里，我们最常使用
+小于指数来表示可忽略性
+throughout the course, we'll mostly use
+negligible to mean less than, than an
+
+240
+00:19:23,862 --> 00:19:28,328
+不可忽略意思是大于1除以多项式
+exponential. And non-negligible to mean,
+less than one over polynomial. So now we
+（有口误less）
+
+241
+00:19:28,328 --> 00:19:32,848
+现在我们看了将一次性密码本
+实用化的核心思想
+saw the core idea for converting the one
+time pad into a practical cipher. And I
+
+242
+00:19:32,848 --> 00:19:36,933
+也就是流密码。下一讲里
+mean, the stream cipher. And then, in the
+next lecture, we're gonna see how to
+
+243
+00:19:36,933 --> 00:19:41,236
+我们将证实流密码的安全性
+actually argue that the stream cipher is
+actually secure. That's gonna require a
+
+244
+00:19:41,236 --> 00:19:45,757
+需要引入安全的新定义，因为
+完美安全在这里不是很好
+new definition of security, since perfect
+secrecy is not good enough here, and we
+
+245
+00:19:45,757 --> 00:19:47,500
+那么我们下一讲见
+will see that in the next lecture.

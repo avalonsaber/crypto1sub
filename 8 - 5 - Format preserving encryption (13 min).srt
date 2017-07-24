@@ -1,0 +1,989 @@
+1
+00:00:00,000 --> 00:00:03,752
+本节我跟大家讨论另一种形式的加密
+In this segment, I want to tell you about
+another form of encryption, called format
+
+2
+00:00:03,752 --> 00:00:07,322
+叫做保格式加密。这个加密也是经常在实际中遇到
+preserving encryption. This is again
+something that comes up in practice quite
+
+3
+00:00:07,322 --> 00:00:10,617
+特别是加密信用卡号
+often, especially when it comes to
+encrypting credit card numbers. And, so,
+
+4
+00:00:10,617 --> 00:00:14,244
+我们看它是如何工作的。记得一般来说
+信用卡号有16位数字
+let's see how it works. Remember that a
+typical credit card number is sixteen
+
+5
+00:00:14,244 --> 00:00:18,978
+分成4组，每组4个数字
+digits, broken into four blocks of four
+digits each. You've probably heard before
+
+6
+00:00:18,978 --> 00:00:23,416
+大家很可能听过，前6个数字叫做BIN码
+that the first six digits are what's
+called the BIN number, which represent the
+
+7
+00:00:23,416 --> 00:00:28,124
+代表了发行方的ID。例如，所有的VISA信用卡
+issuer ID. For example, all credit cards
+issued by VISA always start with the digit
+
+8
+00:00:28,124 --> 00:00:34,114
+都以数字4开头；所有的MasterCard信用卡
+都以数字51或55开头，等等。。
+four; all credit cards issued by
+MasterCard start with digits 51 to 55, and
+
+9
+00:00:34,114 --> 00:00:38,808
+后面9位数字是帐号
+so on and so forth. The next nine digits
+are actually the account number that is
+
+10
+00:00:38,808 --> 00:00:43,275
+是每个消费者特有的，而最后一位数字是一个校验和
+specific to the, to the particular
+customer and the last digit is a check sum
+
+11
+00:00:43,275 --> 00:00:48,031
+是由前15位数字计算得到的。有大约20000个BIN码
+that's computed from the previous fifteen
+digits. So there are about 20,000 BIN
+
+12
+00:00:48,031 --> 00:00:52,846
+所以如果你算一下，实际上大约有2的42次方个
+numbers and so if you do the calculation
+it turns out there are about 2 to the 42
+
+13
+00:00:52,846 --> 00:00:56,733
+可能的信用卡号，对应于42位信息
+possible credit card numbers which
+corresponds to about 42 bits of
+
+14
+00:00:56,733 --> 00:01:01,489
+你需要编码这42位信息，如果你想紧密地表示信用卡号
+information that you need to encode if you
+want to represent a credit card number
+
+15
+00:01:01,489 --> 00:01:05,999
+问题是，假设我们想加密信用卡号
+compactly. Now the problem is this.
+Suppose we wanted to encrypt credit card
+
+16
+00:01:05,999 --> 00:01:10,713
+使得当用户在销售终端刷信用卡时
+numbers, so that when the user swipes the
+credit card number at the point of sale
+
+17
+00:01:10,713 --> 00:01:14,640
+比如在商家的现金登记处
+terminal, namely at the, you know,
+the merchant's cash register. The cash
+
+18
+00:01:14,640 --> 00:01:18,670
+现金登记处是一种销售终端
+register, this is called a point of sale
+terminal, goes ahead and encrypts the
+
+19
+00:01:18,670 --> 00:01:22,751
+使用密钥k加密信用卡号，并始终保持加密
+credit card number using a key k and
+it's encrypted all the way until it goes
+
+20
+00:01:22,751 --> 00:01:27,036
+直到银行需要，或甚至是VISA要用
+to the acquiring bank or maybe even beyond
+that, maybe even all the way when it goes
+
+21
+00:01:27,036 --> 00:01:31,117
+现在，问题是这些信用卡号经历了
+to VISA. Now, the problem is that these
+credit card numbers actually pass through
+
+22
+00:01:31,117 --> 00:01:35,300
+许多处理环节。它们都希望获得某些
+many, many, many processing points. All of
+them expect to get basically something
+
+23
+00:01:35,300 --> 00:01:39,683
+看起来像是信用卡号的信息
+that looks like a credit card number as a
+result. So if we simply wanted to encrypt
+
+24
+00:01:39,683 --> 00:01:43,893
+如果我们只想在端点加密，在另一端点解密
+something at the end point, at one end
+point, and decrypt it at the other end
+
+25
+00:01:43,893 --> 00:01:48,087
+这并不容易，因为如果我们使用AES加密
+point, it's actually not that easy because
+if all we did was encrypt it using AES,
+
+26
+00:01:48,087 --> 00:01:52,748
+即使我们使用的是确定的AES，加密后的信用卡号
+even if we just used deterministic AES,
+the output of the encrypted credit card
+
+27
+00:01:52,748 --> 00:01:57,164
+将是128位的分组，16字节，将会从一个系统发送给
+number would be 128 bit block. Sixteen
+bytes that would be, that would need to be
+
+28
+00:01:57,164 --> 00:02:01,691
+下一个系统，直到它到达目的地。但是这些处理节点
+sent from one system to the next, until it
+reaches its destination. But each one of
+
+29
+00:02:01,691 --> 00:02:06,107
+每个都必须改变，因为它们都希望获得信用卡号
+these processors, then, would have to be
+changed, because they're all expecting to
+
+30
+00:02:06,107 --> 00:02:10,192
+所以问题是，我们能否在现金登记处加密
+get credit card numbers. And so the
+question is, can we encrypt at the cash
+
+31
+00:02:10,192 --> 00:02:14,388
+使得获得的加密本身看上去像是一个信用卡号
+register, such that the resulting
+encryption itself looks like a credit card
+
+32
+00:02:14,388 --> 00:02:18,528
+因此，这些中间系统都无需做出改变
+number. And as a result, none of these
+intermediate systems would have to be
+
+33
+00:02:18,528 --> 00:02:22,937
+只有端点需要改变。通过这样做
+changed. Only the endpoints would have to
+be changed. And in doing so we would
+
+34
+00:02:22,937 --> 00:02:27,399
+我们实际上获得了端到端的加密，
+不需要改变太多的沿途的软件
+actually obtain end-to-end encryption
+without actually having to change a lot of
+
+35
+00:02:27,399 --> 00:02:31,973
+那么问题是，我们如何构造这种机制
+software along the way. So the question
+then is, again, can we have this mechanism
+
+36
+00:02:31,973 --> 00:02:36,546
+即所谓的保格式加密，加密一个信用卡号
+called format preserving encryption, where
+encrypting a credit card itself produces
+
+37
+00:02:36,546 --> 00:02:40,881
+能产生某些类似信用卡号的信息呢？这是我们的目标
+something that looks like a credit card?
+So that's our goal. The encrypted credit
+
+38
+00:02:40,881 --> 00:02:44,719
+加密的信用卡号应该看起来像一个正常的有效信用卡号
+card number should look like a regular
+valid credit card number. So this is the
+
+39
+00:02:44,719 --> 00:02:48,768
+这是保格式加密的目标。更为抽象地，我们试图
+goal of format preserving encryption. More
+abstractly what it is we're trying to do,
+
+40
+00:02:48,768 --> 00:02:54,055
+在集合｛0,1,...,S-1｝上构建一个伪随机置换
+is basically build a pseudo random
+permutation on the set zero to S minus one
+
+41
+00:02:54,055 --> 00:02:59,105
+S是任意的。那么对于信用卡号的集合来说，S大约为
+for any given S. So for the set of credit
+card numbers, S would be roughly, you
+
+42
+00:02:59,105 --> 00:03:03,966
+2的42次方。事实上，它并不是严格的2的42次方
+know, two to the 42. In fact, it's gonna
+be, not exactly two to the 42. It's gonna
+
+43
+00:03:03,966 --> 00:03:08,415
+它是某个有趣的接近2的42次方的数。我们的目标是
+be some funny numbers that's around two to
+the 42. And our goal is to build a PRP
+
+44
+00:03:08,415 --> 00:03:14,326
+构建一个从0到S-1的区间上的PRP
+that acts exactly on the interval, zero to
+S minus one. And what we're given as input
+
+45
+00:03:14,326 --> 00:03:20,369
+我们已有某个PRF，比如像AES，这个PRF可以
+处理长得多的分组，比如说
+is some PRF, say, something like AES, that
+acts on much larger blocks, say, acts on
+
+46
+00:03:20,369 --> 00:03:24,384
+像AES的16字节分组。那么某种意义上，
+我们试图压缩这个PRF的定义域
+sixteen byte blocks. So we're trying to,
+in some sense, shrink the domain of the
+
+47
+00:03:24,384 --> 00:03:29,576
+使之适应我们已有的数据。问题是怎么办？
+PRF to make it fit the data that we're
+given. And the question is basically how
+
+48
+00:03:29,576 --> 00:03:33,639
+我们一旦有了这么一个机制
+to do that. Well, once we have such a
+construction we can easily use it to
+
+49
+00:03:33,639 --> 00:03:37,610
+就可以使用它轻松加密信用卡号了。
+我们取给定的信用卡号
+encrypt credit card numbers. What we would
+do is we would take the, a given credit
+
+50
+00:03:37,610 --> 00:03:41,937
+我们加密它，使得它能用
+card number. We would encode it such that
+now it's represented as a number between
+
+51
+00:03:41,937 --> 00:03:47,312
+从0到信用卡号总数之间的某个数来表示。
+那么我们应用我们的PRP，这样一来
+zero and the total number of credit card
+numbers. Then we would apply our PRP so we
+
+52
+00:03:47,312 --> 00:03:51,815
+我们就加密这个信用卡号
+would encrypt this credit card number, you
+know, using construction number two from
+
+53
+00:03:51,815 --> 00:03:56,428
+使用确定性加密一节里的2号机制。然后
+我们把最后的数映射到一个正常的值
+the deterministic encryption segment. And
+then we would map the final number back to
+
+54
+00:03:56,428 --> 00:04:00,656
+一个有效的信用卡号
+be a regular, to look like val--, regular,
+valid credit card number and then send
+
+55
+00:04:00,656 --> 00:04:05,083
+然后发送。那么这也是非扩展加密
+this along the way. So this is, this
+is again non expanding encryption. The
+
+56
+00:04:05,083 --> 00:04:09,442
+如前所述，我们目前最多只能使用PRP加密
+best we can do, as we said before is to
+encrypt using a PRP except again the
+
+57
+00:04:09,442 --> 00:04:14,145
+不过这里困难之处在于，我们需要一个PRP
+在这个看上去很有趣的集合上操作
+technical challenge is we need a PRP that
+acts on this particular funny looking set
+
+58
+00:04:14,145 --> 00:04:19,811
+从0到S-1，S是预先指定的。那么我的目标是
+from zero to S-1 for this prespecified
+value of S. So my goal is to show you how
+
+59
+00:04:19,811 --> 00:04:23,379
+告诉大家如何组建这个机制，一旦我们知道了
+如何加密，大家就会知道
+to construct this and once we see how to
+do it, you will also know how to encrypt
+
+60
+00:04:23,379 --> 00:04:27,738
+如何加密信用卡号，使得密文本身也是信用卡号
+credit card number so that the resulting
+cipher text is itself a credit card
+
+61
+00:04:27,738 --> 00:04:33,176
+那么这个机制共两步。首先我们压缩PRF的定义域
+number. So the construction works in two
+steps. The first thing we do is we shrink
+
+62
+00:04:33,176 --> 00:04:38,552
+｛0,1｝^n，比如说AES的｛0,1｝^128
+our PRF from the set ｛0,1｝ to the n, say
+｛0,1｝ to the 128 in the case of AES,
+
+63
+00:04:38,552 --> 00:04:43,965
+压缩到｛0,1｝^t，t是最接近以2为底，S的对数的值
+to ｛0,1｝ to the t where t is the
+closest power of two to the value S.
+(换句话说，2的t次方最接近S)
+
+64
+00:04:44,580 --> 00:04:50,035
+比如说S是某个很大的数，接近2的41次方，那么t就是42
+So say S is some crazy number around two to
+the 41. T would basically be then 42
+
+65
+00:04:50,035 --> 00:04:55,338
+因为那最接近以2为底，S的对数，且大于S
+because that's the closest power of two
+that's just above the value S. So the
+
+66
+00:04:55,338 --> 00:04:59,396
+那么这个机制使用Luby-Rackoff机制
+construction is basically gonna use the
+Luby-Rackoff construction. What we need
+
+67
+00:04:59,396 --> 00:05:05,157
+我们需要一个PRF F'，在长度为t/2的分组上操作
+is a PRF F prime that acts on blocks of
+size t over two. So imagine for example
+
+68
+00:05:05,157 --> 00:05:10,103
+例如，在信用卡号的例子中，t将是42，
+因为我们说过，2的42次方最接近S
+in the credit card case, t would be 42
+because two to the 42 we said is the
+
+69
+00:05:10,301 --> 00:05:15,132
+也比S大。S是所有信用卡号的总数
+closest power of two that's bigger than,
+than, than S. S is the number of credit,
+
+70
+00:05:15,132 --> 00:05:20,387
+那么我们需要一个PRF，在21位输入上操作
+total number of credit cards. Then we would
+need a PRF now that acts on 21-bit
+
+71
+00:05:20,387 --> 00:05:25,828
+一种方法是取AES分组密码，把它当成
+inputs. So one way to do that is simply to
+take the AES block cipher, treat it as a
+
+72
+00:05:25,828 --> 00:05:30,437
+128位输入的PRF，然后截断输出
+PRF on 128-bit inputs, and then simply
+truncate the output to the least
+
+73
+00:05:30,437 --> 00:05:35,238
+取低21位。我们得到21位的值
+significant 21 bits. Okay, so we were
+given a 21 bit value. We would append
+
+74
+00:05:35,238 --> 00:05:40,359
+我们在它后面附0，以获得128位。
+然后我们对它应用AES
+zeros to it so that we get 128 bits as a
+result. We would apply AES to that and
+
+75
+00:05:40,359 --> 00:05:45,016
+然后将结果截断成21位。现在我应该告诉大家
+then we would truncate back to 21 bits.
+Now I should tell you that that's actually
+
+76
+00:05:45,016 --> 00:05:48,722
+这是一个简单的方式，但它不是最好的
+a simple way to do it but it's actually
+not the best way to do it. There are
+
+77
+00:05:48,722 --> 00:05:54,181
+实际上有更好的截断n位PRF的方法，以生成t位PRF
+actually better ways to truncate a PRF on
+n bits to a PRF on t over two bits.
+
+78
+00:05:54,181 --> 00:05:58,454
+但对于本节的目标，我刚刚说的截断方法已经足够好了
+But for our pur--, for the purposes of this
+segment, the truncation method I just said
+
+79
+00:05:58,626 --> 00:06:03,113
+我们姑且先使用它。好，那么现在
+is good enough. So let's just use that
+particular method. Okay, so now, we've
+
+80
+00:06:03,113 --> 00:06:09,279
+我们已经把我们的AES分组密码转换成了
+一个t/2位的PRF，比如说，21位
+converted our AES block cipher into a PRF
+on t over two bits, say, on 21 bits. But
+
+81
+00:06:09,279 --> 00:06:14,108
+但我们真正想要的是一个PRP。所以我们只要
+把我们的新PRF F'
+what we really want is a PRP. And so what
+we'll do is we'll plug our new PRF, F prime,
+
+82
+00:06:14,108 --> 00:06:17,937
+直接带入到Luby-Rackoff机制中。如果大家还记得
+directly into the Luby-Rackoff
+construction. If you remember, this is
+
+83
+00:06:17,937 --> 00:06:22,489
+这是一个Feistel机制。我们讨论DES时，见过它
+basically a Feistel construction. We saw
+this when we talked about DES. It's a,
+
+84
+00:06:22,489 --> 00:06:27,009
+Luby-Rackoff使用了3轮Feistel网络，
+我们知道这将一个安全的PRF
+Luby-Rackoff used three rounds, and we
+know that this converts a secure PRF into
+
+85
+00:06:27,009 --> 00:06:31,961
+转换成一个安全的PRP。换句话说，我们从一个安全的
+a secure PRP on twice the block size. In
+other words, we started from a secure PRF
+
+86
+00:06:31,961 --> 00:06:36,973
+21位PRF出发，这样做Luby-Rackoff会给我们一个安全的42位PRF
+on 21 bits, and that will give us, and
+Luby-Rackoff will give us a secure PRF on
+(事实上，也是安全的42位PRP)
+
+87
+00:06:36,973 --> 00:06:41,424
+这正是我们想要的。现在，我应该告诉大家
+42 bits, which is what we wanted. Now, I
+should tell you that the error parameters
+
+88
+00:06:41,424 --> 00:06:45,531
+Luby-Rackoff机制中的误差参数并不是最好的
+in the Luby-Rackoff construction are not as
+good as they could be. And, in fact, a
+
+89
+00:06:45,531 --> 00:06:49,689
+事实上，迭代7轮Feistel网络会更好。换句话说
+better thing to do is to use seven rounds
+of Feistel. So in other words, we'll do
+
+90
+00:06:49,689 --> 00:06:54,782
+我们迭代7次，每次使用不同的密钥。大家注意
+this seven times; every time we'll use a
+different key. So you notice, here, we're
+
+91
+00:06:54,782 --> 00:06:59,318
+我们只使用这三个密钥。我们应该这样做7遍
+only using three keys. We should be using,
+we should be doing this seven times using
+
+92
+00:06:59,318 --> 00:07:03,839
+使用7个不同的密钥。然后这有一个很好的结果
+seven different keys. And then there's a
+nice result, due to Patarin, that
+
+93
+00:07:03,839 --> 00:07:06,998
+Patarin证明了这个7轮机制具有最好的误差参数
+shows that the seven-round construction
+basically has as good an error
+
+94
+00:07:06,998 --> 00:07:11,312
+那么这个安全性定理里的误差参数
+terms as possible. So the error terms in
+the security theorem will basically be two
+
+95
+00:07:11,312 --> 00:07:15,978
+将是2的t次方，所以我们现在就有了一个伪随机置换
+to the T. Okay. So now we have a pseudo
+random permutation that operates on close
+
+96
+00:07:15,978 --> 00:07:21,529
+在约2的S次方个值上操作。但这还是不够好
+power of two to the value of S. But that's
+not good enough. We actually want to get a
+
+97
+00:07:21,529 --> 00:07:26,701
+我们想要一个在集合｛0,1,...,S-1｝上的伪随机置换
+pseudo random permutation on the set zero
+to S minus one. So step two will take us
+
+98
+00:07:26,701 --> 00:07:30,772
+那么第二步，取｛0,1｝^t里的值，映射到
+我们感兴趣的集合｛0,1,...,S-1｝
+down from ｛0,1｝ to the T, to the actual
+set zero to the S minus one that we're
+
+99
+00:07:30,772 --> 00:07:35,135
+这个机制也很犀利
+interested in. And this construction is,
+again, really, really acute, so let me show
+
+100
+00:07:35,135 --> 00:07:39,073
+我告诉大家它是如何工作的。我们有这个PRP了，
+可以置换这个t位集合里的元素
+you how it works. So, again, we're given
+this PRP that operates on a power of two.
+
+101
+00:07:39,073 --> 00:07:44,360
+我们想让这个PRP可以在更小的集合上工作
+And we wanna go down to a PRP that
+operates on something slightly smaller.
+
+102
+00:07:44,360 --> 00:07:49,239
+好，那么这是这个机制的工作过程。
+我们有输入X，X属于我们想要的集合｛0,1,...,S-1｝
+Okay, so here's on the construction works.
+Basically we're given input X in the set
+
+103
+00:07:49,239 --> 00:07:53,149
+我们接下来
+zero to S minus one that we want. And what
+we're going to do is we're going to
+
+104
+00:07:53,149 --> 00:07:57,436
+一次次地迭代以下流程：首先
+iterate the following procedure again
+and again. So first of all we map X into
+
+105
+00:07:57,436 --> 00:08:02,477
+我们把X映射到某个临时变量Y。现在我们加密输入X
+this temporary variable Y. And now we're
+just gonna encrypt the input X and put the
+
+106
+00:08:02,477 --> 00:08:07,213
+把结果放在Y里。如果Y在我们的目标集合里，
+我们就停止迭代，然后输出Y
+result into Y. If Y is inside of our
+target set, we stop and we output Y. If
+
+107
+00:08:07,213 --> 00:08:12,460
+如果不在，我们就继续迭代下去，直到
+not we iterate this again and again and
+again and again and again until finally Y
+
+108
+00:08:12,460 --> 00:08:16,696
+Y落在了我们的目标集合里，然后我们输出这个Y值
+falls into our target set and then we
+output that value. So in a picture, let me
+
+109
+00:08:16,696 --> 00:08:22,513
+我以图像的形式解释一下。我们从目标集合中的一点出发
+explain how this works. So we start from a
+point in our target set. And now, now we
+
+110
+00:08:22,513 --> 00:08:27,272
+现在我们应用函数E，我们可能会把这个点映射到
+我们的目标集合的外面
+apply the, the function E and we might be
+mapped into this point outside our target
+
+111
+00:08:27,272 --> 00:08:30,871
+那么我们就不会停止，我们反复应用函数E
+set, so we're not gonna stop. So now we
+apply the function E again and we might
+
+112
+00:08:30,871 --> 00:08:35,050
+我们可能映射到这个点，现在我们再次应用函数E
+be mapped into this point and now we apply
+the function E again and now all of a
+
+113
+00:08:35,050 --> 00:08:39,118
+突然间我们映射到了这个点，然后我们停止迭代，
+这就是我们的输出
+sudden we map into this point, and then we
+stop, and that's our output. Okay, so
+
+114
+00:08:39,118 --> 00:08:44,199
+这就是我们如何映射集合｛0,1,..,S-1｝中的点
+that's how we map points between from zero
+to S minus one, to other points in the
+
+115
+00:08:44,199 --> 00:08:48,490
+到这个集合本身的。很显然，这是可逆的
+zero to S minus one. It should be pretty
+clear that this is invertible. To invert,
+
+116
+00:08:48,490 --> 00:08:52,466
+求逆时，我只要解密，然后反方向逐次尝试
+all I'll do is I'll just decrypt and walk,
+kind of, in the opposite direction. So
+
+117
+00:08:52,466 --> 00:08:56,342
+解密，再解密。。直到落在集合｛0,1,..,S-1｝中
+I'll decrypt, and then decrypt, and then
+decrypt, until finally, I fall into the
+
+118
+00:08:56,342 --> 00:09:00,419
+这就给我一个点的逆置换结果，正是我想要的
+set, zero to S minus one. And that gives
+me the inverse of the point that I wanted
+
+119
+00:09:00,419 --> 00:09:04,625
+事实上这是一个PRP。问题是，它是否是一个安全的PRP？
+to. So this is, in fact, a PRP. The
+question is whether it's a secure PRP, and
+
+120
+00:09:04,625 --> 00:09:08,738
+我们待会就会看到。不过在这之前，我问大家
+we'll see that in just a minute. But before 
+that, let me ask you, how many iterations
+
+121
+00:09:08,738 --> 00:09:13,317
+你觉得我们需要循环多少次呢？
+在问这个问题之前，我想再提醒大家
+do you expect that we're gonna need? And 
+I wanna remind you again, before I ask you
+
+122
+00:09:13,317 --> 00:09:19,635
+事实上，S小于2的t次方，但大于2的t-1次方
+that question, that, in fact, S is less than 
+two to the T, but is more than two to the T-1.
+
+123
+00:09:19,635 --> 00:09:25,092
+特别地，S大于2的t次方的一半
+So in particular S is greater than two to 
+the T over two. And my question to you
+
+124
+00:09:25,092 --> 00:09:29,661
+我给大家的问题是，我们平均需要多少次迭代，
+知道该过程收敛？
+now is how many iterations are we gonna 
+need, on average, until this process converges?
+
+125
+00:09:32,907 --> 00:09:35,075
+那么答案是我们平均需要迭代两次
+So the answer is we're going to need two iterations,
+(提示：几何分布的期望)
+
+126
+00:09:35,075 --> 00:09:38,984
+这是一个很小的迭代次数
+so really just a small
+constant number of iterations. And so this
+
+127
+00:09:38,984 --> 00:09:43,159
+这给我们一个非常有效的机制
+will give us a very, very efficient
+mechanism that will move us down from
+
+128
+00:09:43,159 --> 00:09:48,567
+让我们从｛0,1｝^t转变到｛0,1,..,S-1｝。
+那么现在我们来讨论其安全性
+｛0,1｝ to the T to zero to the S-1. So now
+when we talk about security, it turns out
+
+129
+00:09:48,567 --> 00:09:53,210
+实际上这一步是紧的，换句话说，没有附加的
+this step here is tight. In other words,
+there is really no additional security
+
+130
+00:09:53,210 --> 00:09:59,250
+安全性开销，从｛0,1｝^t到｛0,1,..,S-1｝
+cost to going down from two to the T to
+zero to S-1. And the reason that's true,
+
+131
+00:09:59,250 --> 00:10:02,734
+其原因是有个很犀利的定理可以证明。但我这里不给出证明
+it's actually again a very acute theorem
+to prove, but I, I won't do it here. Maybe
+
+132
+00:10:02,734 --> 00:10:07,621
+也许留给大家作为练习。这是在说，如果你给我
+I'll leave it as an exercise for you guys
+to argue. Which says that if you give me
+(提示：从概率出发，会涉及一个等比数列求和的极限)
+
+133
+00:10:07,621 --> 00:10:11,921
+两个集合Y和X，Y包含于X，那么应用刚才我们看到的变换
+any two sets Y and X, where Y is contained
+inside of X, then applying the
+
+134
+00:10:11,921 --> 00:10:16,520
+我们从一个X到X的随机置换出发
+transformation that we just saw to a
+random permutation from X to X actually
+
+135
+00:10:16,520 --> 00:10:21,340
+得到一个Y到Y的随机置换。这意味着
+如果我们从一个X上的真随机置换出发
+gives a random permutation from Y to Y. So
+this means that if we started with a truly
+
+136
+00:10:21,340 --> 00:10:25,578
+最后会得到一个Y上的真随机置换
+random permutation on X, you'll end up
+with a truly random permutation on Y. And
+
+137
+00:10:25,578 --> 00:10:29,445
+因此，我们开始时的置换与X上的随机置换不可区分
+since, well, the permutation we're
+starting with is indistinguishable from
+
+138
+00:10:29,445 --> 00:10:33,366
+我们最后得到的置换也和Y上的随机置换不可区分
+random on X, we'll end up with a
+permutation that's indistinguishable from
+
+139
+00:10:33,366 --> 00:10:37,763
+好，这个机制是紧致的，如我所说
+random on Y. Okay, so this is a very tight
+construction and as I said, the first step
+
+140
+00:10:37,763 --> 00:10:42,001
+第一步的分析与Luby-Rackoff的分析一致
+actually is basically, the analysis is the
+same as the Luby-Rackoff analysis. In
+
+141
+00:10:42,001 --> 00:10:46,187
+事实上，我说过，根据Patarin的分析，最好是用7轮
+fact, it's better to use as I said, the
+Patarin analysis using seven rounds. So
+
+142
+00:10:46,187 --> 00:10:50,425
+那么这里，有一点安全性的开销
+actually here, there's a bit of cost in
+security. But, overall, we get a
+
+143
+00:10:50,425 --> 00:10:55,558
+总的来说，我们获得一个安全PRP的机制
+construction that is a secure PRP for
+actually, not such good security
+
+144
+00:10:55,558 --> 00:10:59,992
+虽然安全参数不是很好，但这是我们能够组建的好的安全PRP
+parameters, but nevertheless, this is a
+good secure PRP that we can construct that
+
+145
+00:10:59,992 --> 00:11:04,644
+可以在｛0,1,..,S-1｝上操作
+actually will operate on the range zero to
+S minus one. This in turn will allow us to
+
+146
+00:11:04,644 --> 00:11:08,968
+这就允许我们去加密信用卡号，使得密文
+看起来也像是信用卡号了
+encrypt credit card numbers such that the
+cipher text looks like a credit card
+
+147
+00:11:08,968 --> 00:11:13,183
+我想再强调一下，这里没有任何的完整性
+number. And again, I want to emphasize
+that there's no integrity here. The best
+
+148
+00:11:13,183 --> 00:11:17,124
+我们能取得的最好的结果是确定的CPA安全
+we can achieve here is just 
+deterministic CPA security. No cipher text
+
+149
+00:11:17,124 --> 00:11:21,251
+没有任何密文完整性，没有任何随机性。好。本章完结
+integrity, and no randomness at all. Okay.
+So this concludes this module. And as
+
+150
+00:11:21,251 --> 00:11:25,620
+通常我们会指出一些阅读材料
+usual I want to point to a few reading
+materials that you can take a look at if
+
+151
+00:11:25,620 --> 00:11:29,990
+如果你对本章的某些话题感兴趣，可以读一读
+you're interested in learning more about
+anything that we discussed in this module.
+
+152
+00:11:29,990 --> 00:11:34,255
+首先，我们讨论密钥推导时
+So first of all, the HKDF construction
+that we talked about for key derivation is
+
+153
+00:11:34,255 --> 00:11:38,950
+HKDF机制在2010年Hugo Krawczyk的文章里有所描述
+described in a paper from 2010 by Hugo
+Krawczyk. Deterministic encryption, The
+
+154
+00:11:38,950 --> 00:11:44,477
+确定性加密，SIV模式在这篇论文里有所讨论
+SIV mode that we described is discussed in
+this paper over here. The EME mode that we
+
+155
+00:11:44,477 --> 00:11:49,628
+我们描述了EME模式，可以让我们构建一个
+宽分组的伪随机置换
+described that allows us to build a, a
+wider block pseudo random permutation is
+
+156
+00:11:49,628 --> 00:11:54,402
+EME模式在这篇Halevi和Rogaway的论文里描述
+described in this paper here by Halevi and
+Rogaway. Tweakable block ciphers that
+
+157
+00:11:54,402 --> 00:11:59,239
+微调分组密码，引入了用于硬盘加密的XTS模式
+actually led to the XTS mode of operation
+that's used for disk encryption is
+
+158
+00:11:59,239 --> 00:12:04,704
+在这篇论文里描述。最后，保格式加密
+described in this paper here. And finally,
+a format preserving encryption is described
+
+159
+00:12:04,704 --> 00:12:09,718
+在这最后一篇论文里描述。本章完结
+in this last paper that I point to over
+here. Okay so this concludes this module.
+
+160
+00:12:09,718 --> 00:12:13,831
+下一章我们开始看如何交换密钥
+And in the next module we gonna start
+looking at how to do key exchange.

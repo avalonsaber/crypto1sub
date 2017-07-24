@@ -1,0 +1,1216 @@
+1
+00:00:00,000 --> 00:00:04,045
+本节我们看确定性加密的概念
+In this segment, we're gonna look at the
+concept of deterministic encryption that
+
+2
+00:00:04,045 --> 00:00:08,040
+这在实际中经常出现。当我说确定性加密系统时
+often comes up in practice. When I say
+deterministic encryption system, I mean an
+
+3
+00:00:08,040 --> 00:00:12,001
+我是指一个加密系统总是把给定明文映射到同一个密文
+encryption system that will always map
+given message to exactly the same cipher
+
+4
+00:00:12,001 --> 00:00:15,981
+如果我们加密同样的明文三次
+text. So if we encrypt the same message
+three times, every time we'll get exactly
+
+5
+00:00:15,981 --> 00:00:19,885
+每次我们都会得到同样的密文。这里没有用到新鲜值
+the same cipher text. So there are no
+nonces involved here. Literally this is
+
+6
+00:00:19,885 --> 00:00:24,143
+这只是一个一致性加密机制，对特定的明文
+just a consistence encryption scheme that
+will always output the same cipher text
+
+7
+00:00:24,143 --> 00:00:28,100
+总是输出同样的密文。那么我们将在实际中看到它
+given a particular message. So let's see
+where this comes up in practice and in
+
+8
+00:00:28,100 --> 00:00:32,158
+特别地，我想给大家看查找加密的数据库的例子
+particular, I want to show you the case of
+look-ups into an encrypted database. So
+
+9
+00:00:32,158 --> 00:00:36,416
+设定是这样的：我们这里有一个服务器，存储了
+the settings are imagine we have a server
+here that is going to store information
+
+10
+00:00:36,416 --> 00:00:40,524
+一个加密的数据库。它存储的是记录
+inside of an encrypted database. So what
+it will store is records, and every record
+
+11
+00:00:40,524 --> 00:00:44,736
+每条记录都有一个索引，一些数据存储在记录里
+has an index and some data that's stored
+inside of the record. Now, the first thing
+
+12
+00:00:44,736 --> 00:00:48,886
+现在，服务器首先要加密这条记录
+the server's gonna do is, it's gonna
+encrypt this record. So here's a record
+
+13
+00:00:48,886 --> 00:00:53,479
+这是一个加密了的记录，大家注意这个索引
+被加密了，使用了密钥K1
+became encrypted and you notice that the
+index became encrypted with K1 and the
+
+14
+00:00:53,479 --> 00:00:57,851
+数据也被加密了，用的密钥K2，然后
+加密好的记录被发送给了数据库
+data is encrypted with K2 and then the
+encrypted record is sent over to the
+
+15
+00:00:57,851 --> 00:01:02,333
+同样的事情发生在许多记录上，这样整个数据库
+database. And the same thing happens to
+many records so that the database overall
+
+16
+00:01:02,333 --> 00:01:06,704
+保存了许多加密的记录。大家可以想象
+holds many, many encrypted records. Well,
+again, you can imagine that the index is
+
+17
+00:01:06,704 --> 00:01:11,131
+索引使用密钥K1加密，数据和记录使用密钥K2加密
+encrypted using the key K1 and then the
+data and the records is encrypted using
+
+18
+00:01:11,131 --> 00:01:15,015
+现在，如果加密是确定性的，有件好事是
+the key K2. Now, if encryption is
+deterministic, the nice thing about that
+
+19
+00:01:15,015 --> 00:01:19,096
+稍后，当服务器想提取数据库中的一条记录时
+is that, at a later time, when the server
+wants to retrieve a record from the
+
+20
+00:01:19,096 --> 00:01:23,338
+他只需要向数据库发送加密后的
+database, all he needs to do is send to
+the database an encryption of the index
+
+21
+00:01:23,338 --> 00:01:27,741
+服务器感兴趣的记录的索引。这里它会发送
+加密后的索引"Alice"
+that the server is interested in. So here,
+it would send an encryption of the index,
+
+22
+00:01:27,741 --> 00:01:32,091
+这也是加密的，获得的密文
+Alice. That again, becomes encrypted, and
+the resulting cipher text is identical to
+
+23
+00:01:32,091 --> 00:01:36,172
+与最初写入数据库时生成的密文一样
+the cipher text that was generated when
+the record was first written to the
+
+24
+00:01:36,172 --> 00:01:40,145
+然后数据库可以找到这个记录，里面有
+database. And the database can then, you
+know, find the record that has this
+
+25
+00:01:40,145 --> 00:01:44,462
+这个加密的索引，然后把结果发送给服务器
+encrypted index in it, and then send the
+result back to the server. The nice thing
+
+26
+00:01:44,462 --> 00:01:48,633
+这里的好事是，数据库完全蒙在鼓里
+about this is that now the database is
+completely in the dark as to what data is
+
+27
+00:01:48,633 --> 00:01:52,959
+完全不知道数据库里存了什么数据，它甚至不知道
+服务器提取了什么记录
+stored in the database and it doesn't even
+know what records are being retrieved by
+
+28
+00:01:52,959 --> 00:01:57,128
+因为数据库看到的请求都是密文形式的
+the server since all it sees are basically
+requests for encrypted entices. And so
+
+29
+00:01:57,128 --> 00:02:01,018
+这就是确定的加密机制。我们做一个数据库里的
+this deterministic encryption mechanism.
+Let's just do a quick look up in the
+
+30
+00:02:01,018 --> 00:02:04,858
+简单查询，给定一个加密的索引，
+我们保证，由于确定性加密的性质
+database given an encrypted index and
+we're guaranteed that because of the
+
+31
+00:02:04,858 --> 00:02:09,209
+这个索引将会以与记录被创建时
+deterministic encryption property that the
+index is going to be encrypted in exactly
+
+32
+00:02:09,209 --> 00:02:13,622
+严格相同的方式被加密。这可能对很多人来说会有麻烦
+the same way as if was when the record was
+created. And so this should be disturbing
+
+33
+00:02:13,622 --> 00:02:17,936
+因为我们之前说过，确定性加密
+to many of you because we previously said
+that deterministic encryption simply
+
+34
+00:02:17,936 --> 00:02:22,250
+不可能是选择明文安全的。问题是，
+攻击者可以看不同的密文
+cannot be chosen plain text secure. The
+problem is that an attacker can look at
+
+35
+00:02:22,250 --> 00:02:26,729
+如果他看到同样的密文两次
+different cipher text and if he sees the
+same cipher text twice he knows that the
+
+36
+00:02:26,729 --> 00:02:31,316
+他就知道底层被加密的明文一定是一样的。
+换句话说，通过看密文
+underlying encrypted messages must also be
+the same. So in other words, by looking at
+
+37
+00:02:31,316 --> 00:02:35,904
+攻击者可以学到一些对应明文的信息
+cipher text, he can learn something about
+the corresponding plain text because every
+
+38
+00:02:35,904 --> 00:02:40,382
+因为每次他看到同样的密文两次时，他就知道
+底层的明文是相等的
+time he sees the same cipher text twice,
+he knows that the underlying messages are
+
+39
+00:02:40,382 --> 00:02:44,603
+实际中，这会带来严重的攻击
+equal. In practice, this leads to
+significant attacks, and particularly when
+
+40
+00:02:44,603 --> 00:02:49,240
+特别地，当明文空间很小时，例如，
+如果我们在网络中传递单个字节
+the message space is small. For example,
+if we're transmitting single bytes across
+
+41
+00:02:49,240 --> 00:02:54,107
+比如一次传递一个键盘的敲击结果
+the network, such as, keystrokes that are
+being transmitted one keystroke at a time.
+(可以参考Telnet协议里的情形)
+
+42
+00:02:54,107 --> 00:02:58,573
+事实上，攻击者可以为所有可能的密文
+Then, in fact, an attacker can simply
+build a dictionary of all possible cipher
+
+43
+00:02:58,573 --> 00:03:02,924
+构建一个字典。如果只有单个字节，那么
+总共只有256种可能的密文
+texts. If it's only single bytes, then
+there will only be 256 possible cipher
+
+44
+00:03:02,924 --> 00:03:07,561
+然后，通过学习这些密文的解密结果
+texts. And then, simply by learning what
+the decryptions of those cipher texts are,
+
+45
+00:03:07,561 --> 00:03:11,970
+攻击者可以解出所有的未来密文，通过简单地查找
+he can actually figure out all future
+cipher texts, simply by looking them up,
+
+46
+00:03:12,142 --> 00:03:16,811
+在这个字典里。有很多情况的明文很小
+in this dictionary. And so there are many
+cases where the message being so small,
+
+47
+00:03:16,811 --> 00:03:21,256
+这时确定性加密是不安全的。具体而言
+where this, deterministic encryption,
+simply is insecure. Now concretely, in the
+
+48
+00:03:21,256 --> 00:03:25,357
+在加密数据库的情况下，攻击者会看到
+case of an encrypted database, what the
+attacker would see is if there are two
+
+49
+00:03:25,357 --> 00:03:29,510
+如果有两个记录在索引位置正好有同样的密文
+records that happen to have the same
+cipher text in the index position then now
+
+50
+00:03:29,510 --> 00:03:33,821
+那么他就知道了这两条记录对应同一个索引
+he knows that those two records correspond
+to the same index. So again, even though
+
+51
+00:03:33,821 --> 00:03:37,921
+尽管他不知道索引是什么，他也能学习到
+he doesn't know what the index is, he
+learns something about the corresponding
+
+52
+00:03:37,921 --> 00:03:42,400
+明文的信息。我想简单地提醒大家，形式化地
+plain text. I wanted to briefly remind you
+that, formally, we say that deterministic
+
+53
+00:03:42,400 --> 00:03:46,459
+我们说确定性的加密不可能是CPA安全的，
+通过描述一个可以赢得CPA游戏的攻击者
+encryption cannot be CPA secure by
+describing an adversary that wins the CPA
+
+54
+00:03:46,459 --> 00:03:50,570
+这个选择明文攻击(CPA)的游戏。我简单地提醒大家
+game. The chosen plain text attack game,
+and let me quickly remind you how that
+
+55
+00:03:50,570 --> 00:03:54,682
+这个游戏的工作流程。这个游戏开始时，
+攻击者选择发送两条明文信息M0和M0
+works. The game starts by the adversary
+sending two messages, M zero and M zero.
+
+56
+00:03:54,682 --> 00:03:58,740
+记得在这个游戏里，攻击者总是能得到
+And remember that, in this game, the
+adversary is always going to be given the
+
+57
+00:03:58,740 --> 00:04:02,852
+左边或右边的明文信息的加密结果
+encryption of the left message or the
+encryption of the right message. In this
+
+58
+00:04:02,852 --> 00:04:06,963
+这种情况下，由于左右两边的明文信息是一样的
+case, since he used the same message in
+both cases, both on the left and on the
+
+59
+00:04:06,963 --> 00:04:10,763
+攻击者将会得到信息M0的加密
+right, he's simply gonna get the
+encryption of the message M zero. In the
+
+60
+00:04:10,763 --> 00:04:14,979
+下一步中，攻击者会发送明文信息M0,M1。现在，他将获得
+next step, he's gonna send the messages M
+zero, M1. And now he's either gonna get
+
+61
+00:04:14,979 --> 00:04:18,874
+M0或M1的加密。攻击者的目标是
+the encryption of M zero, or the
+encryption of M1. And his goal is to tell
+
+62
+00:04:18,874 --> 00:04:22,823
+确定他得到的是哪一个信息的加密。但是由于
+这个加密是确定的，攻击者很容易分辨
+which one he got. But because the
+encryption is deterministic, this is very
+
+63
+00:04:22,823 --> 00:04:26,985
+他只需要测试C是否等于C0
+easy for him to do. All he has to do is
+just test whether C is equal to C zero.
+
+64
+00:04:26,985 --> 00:04:31,467
+如果C等于C0，那么他就知道他获得的是M0的加密
+And if C is equal to C zero, then he knows
+that he got the encryption of M zero. If C
+
+65
+00:04:31,467 --> 00:04:35,843
+如果C不等于C0，那么他就知道他获得的是M1的加密
+is not equal to C zero, he knows that he
+got the encryption of M1. So he can output
+
+66
+00:04:35,843 --> 00:04:40,422
+所以如果C等于C0，攻击者输出0。
+如果C不等于C0，攻击者就输出1
+zero, if C is equal to C0 and output one,
+if C is not equal to C0 and his advantage
+
+67
+00:04:40,422 --> 00:04:45,127
+攻击者在这个游戏中的优势是1。
+这个优势已经是最大了
+in this in this particular game would be
+one. So it, it would be a high, as high an
+
+68
+00:04:45,127 --> 00:04:49,719
+意味着这个攻击者完全破坏了选择明文安全
+advantage as possible which means that the
+attacker completely defeats chosen
+
+69
+00:04:49,719 --> 00:04:54,306
+这是以形式化方法来表述，关于明文信息
+plain text security. Okay so, this is just
+a formal way of saying that the attacker
+
+70
+00:04:54,306 --> 00:04:58,631
+攻击者能学到比他应该知道的更多的信息
+basically learns more information about
+the plain text than he should. So, the
+
+71
+00:04:58,631 --> 00:05:03,579
+那么问题是，我们怎么办呢？实际上答案是
+question is, what do we do? And it turns
+out the solution is basically to restrict
+
+72
+00:05:03,579 --> 00:05:08,803
+限制能够使用单个密钥加密的信息的类型
+the type of messages that can be encrypted
+under a single key. And so, the idea is to
+
+73
+00:05:08,803 --> 00:05:13,839
+想法是，让加密者永远不要用单个密钥
+来加密同样的明文信息
+say that suppose the encryptor never ever,
+ever encrypts the same message under a
+
+74
+00:05:13,839 --> 00:05:18,814
+换句话说，信息密钥对总是不同的
+single key. In other words the message key
+pair is always different and never
+
+75
+00:05:18,814 --> 00:05:23,415
+是永不重复的。那么对每个加密，要不改变明文
+repeats. So that for every single
+encryption, either the message changes, or
+
+76
+00:05:23,415 --> 00:05:28,328
+要不改变密钥，或者两个都改，但不能用同样的密钥
+the key changes, but, or both change. But
+it can't be that we encrypt the same
+
+77
+00:05:28,328 --> 00:05:33,001
+加密同样的明文两次。那么为什么会这样？
+message twice under the same key. So why
+would this ever happen? Well it turns out
+
+78
+00:05:33,001 --> 00:05:37,152
+实际上这里有很自然的情形。比如说
+there are very natural cases where this
+happens. For example, if the messages
+
+79
+00:05:37,152 --> 00:05:41,194
+如果明文正好是随机地，加密者加密密钥
+happen to be random. Say you, the
+encryptors encrypting keys and those keys,
+
+80
+00:05:41,194 --> 00:05:45,509
+这些密钥比如说有128个，会有很高的概率
+you know, say are 128 the keys so,
+they'll never actually with very high
+
+81
+00:05:45,509 --> 00:05:49,933
+这些密钥是不重复的。这里当我们加密密钥时
+probability, they'll never repeat. In this
+case when we're encrypting keys, in fact,
+
+82
+00:05:49,933 --> 00:05:54,358
+事实上，很有可能所有使用一个主密钥加密的
+is very likely that all the messages that
+are encrypted under one master key are
+(这个<font color="red">主密钥</font>出现在基于ID的加密(IBE)中)
+
+83
+00:05:54,358 --> 00:05:58,617
+明文是互不相同的，因为这些密钥不太可能重复
+always distinct because, again, these keys
+are very unlikely to ever repeat. The
+
+84
+00:05:58,617 --> 00:06:03,021
+另一个原因是，明文之所以不会重复，
+是因为明文空间中的某些结构
+other reason why messages would never
+repeat is simply because of some structure
+
+85
+00:06:03,021 --> 00:06:07,371
+例如，如果我们是在加密唯一的用户ID
+in the message space. For example, if all
+we're encrypting are unique user IDs. So
+
+86
+00:06:07,371 --> 00:06:11,612
+那么试想一下，在数据库的例子中，
+索引对应唯一的用户ID
+imagine, in the database example, the
+index corresponds to a unique user ID. And
+
+87
+00:06:11,612 --> 00:06:15,690
+如果每个用户在数据库中只有一条记录
+if there's exactly one record in the
+database for each user, that says that
+
+88
+00:06:15,690 --> 00:06:20,040
+也就是说，每个加密的记录包含一个加密的索引
+every encrypted record basically contains
+an encrypted index, where the index is
+
+89
+00:06:20,040 --> 00:06:24,666
+数据库中所有记录的索引都不一样。
+所以信息不重复有这么两个原因
+distinct for all records in the database.
+Okay so these are two reasons why messages
+
+90
+00:06:24,666 --> 00:06:29,460
+这是很合理的，实际上也经常发生
+might never repeat. And this is a fairly
+reasonable thing that actually does happen
+
+91
+00:06:29,627 --> 00:06:33,919
+现在如果信息永不重复，我们也许可以
+quite often in practice. So now if the
+messages never repeat, now maybe we can
+
+92
+00:06:33,919 --> 00:06:38,897
+定义安全性，并构建机制以满足我们的定义
+actually define security and actually give
+constructions to satisfy our definitions.
+
+93
+00:06:38,897 --> 00:06:43,646
+那么这就是确定性选择明文攻击的概念的由来
+So this motivates the concept of deterministic chosen plain text attacks and
+
+94
+00:06:43,646 --> 00:06:48,511
+我来解释一下它们的意思。通常我们把密码
+let me explain what they mean. So as usual
+we have a cipher defined as an encryption
+
+95
+00:06:48,511 --> 00:06:53,029
+定义为一对加密、解密算法。所以我们有一个
+密钥空间，一个信息空间和一个密文空间
+and a decryption algorithm. So we have a
+key space, a message space and a cipher
+
+96
+00:06:53,029 --> 00:06:57,662
+我们要定义安全性，依照惯例使用两个实验来定义
+text space and we're gonna define security
+just as normal using two experiments.
+
+97
+00:06:57,662 --> 00:07:02,098
+实验0和实验1。这个游戏和之前的很类似
+Experiment zero and experiment one. And
+the game actually looks very similar, it's
+
+98
+00:07:02,098 --> 00:07:06,233
+与标准的选择明文攻击游戏几乎一样
+almost an identical game to the standard
+chosen plaintext attack game where
+
+99
+00:07:06,233 --> 00:07:10,630
+攻击者发送询问，那么你可以看到这些询问中
+basically the attacker issues queries, so
+you can see these queries consist of pairs
+
+100
+00:07:10,630 --> 00:07:14,609
+包含了明文信息M0和M1。通常它们的长度必须一样
+of messages, M0 and M1. They, as usual
+they have to be the same length and for
+
+101
+00:07:14,609 --> 00:07:18,849
+对于每个询问，攻击者要不获得M0的加密结果，
+要不获得M1的加密结果
+each query the attacker either gets the
+encryption of M0 or the encryption of M1
+
+102
+00:07:18,849 --> 00:07:22,984
+攻击者可以反复这样操作。他可以这样做q次
+and the attacker can do this again and
+again. He can do this Q times, and at the
+
+103
+00:07:22,984 --> 00:07:27,172
+在游戏的最后，攻击者要判断他获得的
+end of the game he's supposed to say
+whether he got the encryptions of the left
+
+104
+00:07:27,172 --> 00:07:31,613
+是左边信息的加密，还是右边信息的加密
+messages or the encryptions of the right
+messages. So this is the standard chosen
+
+105
+00:07:31,613 --> 00:07:36,318
+这是标准的选择明文攻击游戏，但现在有一个警告
+plain text attack game, but now there's
+one extra caveat. Which is to say that, if
+
+106
+00:07:36,318 --> 00:07:41,141
+如果这一位b等于0，换句话说
+the bit is equal to zero, if B is equal to
+zero. In other words, the attacker always
+
+107
+00:07:41,141 --> 00:07:46,022
+攻击者总能看到左边明文的加密，那么碰巧
+sees the encryption of the left messages,
+then it so happens that the left messages
+
+108
+00:07:46,022 --> 00:07:50,669
+左边的信息都是不同的，换句话说，他不会两次看到
+must all be distinct. In other words, he
+will never get to see the encryption of
+
+109
+00:07:50,669 --> 00:07:55,433
+同一个信息的加密，因为这些左边的信息总是不同的
+the same message twice, because these left
+messages are always distinct. So if the
+
+110
+00:07:55,433 --> 00:08:00,298
+如果位b等于0，那么他不会看到同样的信息被同样的密钥加密
+bit B is equal to zero, again, he'll never
+see the same message encrypted under the
+
+111
+00:08:00,298 --> 00:08:04,496
+也是因为这些信息M0，M10到Mq0
+same key. Because, again, these zero
+messages, M1 zero to MQ zero, are all
+
+112
+00:08:04,496 --> 00:08:09,353
+都是不相同的。类似地，我们要求所有的
+信息M1也都是不相同的
+distinct. Similarly, we require that all
+the one messages are also distinct. And so
+
+113
+00:08:09,353 --> 00:08:13,851
+如果b正好等于1，攻击者永远不会
+that, again, if B happens to be equal to
+one, the attacker will never see two
+
+114
+00:08:13,851 --> 00:08:18,586
+看到两条信息被同一个密钥加密。这一要求是说
+messages encrypted under the same key.
+Okay? So this requirement that the, all
+
+115
+00:08:18,586 --> 00:08:22,854
+所有这些信息互不相同，类似地，所有这些q个信息
+these messages are distinct, and
+similarly, all these Q messages are
+
+116
+00:08:22,854 --> 00:08:28,285
+互不相同。这里使用的原则是，加密者不会使用
+distinct. Basically captures this use case
+that the encryptor will never encrypt the
+
+117
+00:08:28,285 --> 00:08:33,005
+同一密钥多次加密同样的明文信息。因此
+same message multiple times using one
+particular key. And as a result, the
+
+118
+00:08:33,005 --> 00:08:37,983
+攻击者不能多次询问，用同样的密钥
+对同样的信息进行加密的结果
+attacker simply can't ask for, the
+encryption of the same message multiple
+
+119
+00:08:37,983 --> 00:08:42,573
+现在，我应该指出，回到最初的攻击
+times using the same key. Now, I should
+point out as you go back to our, to the
+
+120
+00:08:42,573 --> 00:08:47,033
+我们回到确定性加密的CPA攻击
+original attack, here. So, here we go back
+to our CPA attack on deterministic
+
+121
+00:08:47,033 --> 00:08:51,436
+大家注意，事实上这不是一个确定性的CPA游戏
+encryption, you notice that here, in fact,
+this is not a deterministic CPA game,
+
+122
+00:08:51,436 --> 00:08:56,011
+因为这里攻击者确实两次问了同样的信息m0的加密
+because, here, the attacker did ask for
+the same message m0 to be encrypted twice.
+
+123
+00:08:56,011 --> 00:09:00,471
+事实上，在确定性的CPA游戏中，这个攻击是非法的
+So, in fact, this attack would be an
+illegal attack under the deterministic CPA
+
+124
+00:09:00,471 --> 00:09:05,160
+通过删除这种攻击，我们实际上可以
+game. And by ruling out this attack we
+actually make it plausible that we might
+
+125
+00:09:05,160 --> 00:09:09,682
+给出确定性CPA安全的机制
+be able to give constructions that are
+deterministic CPA secure. And so as usual
+
+126
+00:09:09,682 --> 00:09:13,939
+通常，我们说如果攻击者不能区分实验0和实验1
+we say if the adversary cannot distinguish
+experiment zero, when he's given the
+
+127
+00:09:13,939 --> 00:09:17,819
+在实验0中它得到左边信息的加密
+encryption of the left messages, from
+experiment one, when he's given the
+
+128
+00:09:17,819 --> 00:09:22,128
+在实验1中它得到右边信息的加密，那么这个机制是语义安全的
+encryption of the right messages, then the
+scheme is semantically secure. Under a
+
+129
+00:09:22,128 --> 00:09:26,202
+在一个确定性CPA攻击下，通常我们问
+deterministic CPA attack. Okay. So as
+usual, we ask for what's the probability
+
+130
+00:09:26,202 --> 00:09:30,114
+攻击者在实验0中输出1的概率是多少？
+that the adversary outputs one in
+experiment zero? What's the probability
+
+131
+00:09:30,114 --> 00:09:34,241
+攻击者在实验1中输出1的概率是多少？
+如果这两个概率很接近
+that the outputs one in experiment one?
+Then if these probabilities are close then
+
+132
+00:09:34,241 --> 00:09:38,475
+那么他攻击这个机制的优势是可忽略的
+his advantage in attacking the scheme is
+negligible. And if that's true for all
+
+133
+00:09:38,475 --> 00:09:42,710
+如果这对所有有效攻击者都成立，那么我们说
+这个机制在确定性的CPA攻击下是语义安全的
+efficient adversaries then we say that the
+scheme is semantically secure under
+
+134
+00:09:42,710 --> 00:09:47,199
+首先我想给大家看
+deterministic CPA attack. So the first
+thing I want to do is show you the cipher
+
+135
+00:09:47,199 --> 00:09:51,722
+带固定IV的CBC事实上不是确定的CPA安全的
+block chaining with a fixed IV, in fact,
+not deterministic CPA secure. And this a
+
+136
+00:09:51,722 --> 00:09:56,188
+这在实际中是一个常见的错误。有很多产品
+common mistake that's used in practice.
+There are many products that should be
+
+137
+00:09:56,188 --> 00:10:00,597
+应该使用确定性CPA安全的密码
+using a cipher that's deterministic CPA
+secure, but instead, they just use CBC
+
+138
+00:10:00,597 --> 00:10:05,177
+但它们却使用带固定IV的CBC，并假设这是个安全的机制
+with a fixed IV and assume that's a secure
+mechanism. And in fact, it's not and I
+
+139
+00:10:05,177 --> 00:10:09,968
+事实上，它并不是，我想给大家展示为什么。
+假设我们有一个PRP正好定义在N位分组上
+want to show you why. So suppose we have a
+PRP that happens to operate on N bits
+
+140
+00:10:10,150 --> 00:10:15,259
+我们要以CBC模式使用这个PRP
+blocks. And we're going to use this PRP in
+CBC mode. So, you know, if there are five
+
+141
+00:10:15,259 --> 00:10:20,306
+如果信息中有5个分组，那么这个PRP E会被调用5次
+blocks in the message then this PRP E will
+be called five times to encrypt each one
+
+142
+00:10:20,306 --> 00:10:24,519
+来解密各个分组。攻击如下进行
+of those blocks. Okay. So here's how the
+attack's going to work. Well, the first
+
+143
+00:10:24,519 --> 00:10:28,767
+攻击者首先询问信息0^N1^N的加密结果
+thing the adversary is going to do is he's
+going to ask for the encryption of the
+
+144
+00:10:28,767 --> 00:10:32,802
+换句话说，第一个分组全是0
+message as 0N, 1N. In other words, the
+first block is all zeros and the second
+
+145
+00:10:32,802 --> 00:10:36,997
+第二个分组全是1。那么左边的信息等于右边的信息
+block is all ones. So the left message is
+equal to the right message here which
+
+146
+00:10:36,997 --> 00:10:41,458
+意味着他想得到信息0^N1^N的加密结果
+means that he just wants the encryption of
+this 0N, one to the N message. So let's
+
+147
+00:10:41,458 --> 00:10:45,784
+我们看到密文长什么样。为求完整性，我写下IV
+see what the cipher text looks like. Well,
+for completeness I'm gonna write the IV,
+
+148
+00:10:45,784 --> 00:10:50,077
+固定的IV，作为密文的第一个元素
+the fixed IV, as the first element in the
+ciphertext. And if you think about how
+
+149
+00:10:50,077 --> 00:10:54,048
+如果你考虑CBC然后工作，密文的第二个元素
+CBC works and the second element in
+the ciphertext is gonna be basically the
+
+150
+00:10:54,048 --> 00:10:58,609
+是IV异或明文第一个分组。在这个情况下
+encryption of the IV XOR the first
+block of the message. Well in our case the
+
+151
+00:10:58,609 --> 00:11:02,955
+第一个明文分组全是0，所以我们所加密的
+first block of the message is all zeros so
+really all we're encrypting is just a
+
+152
+00:11:02,955 --> 00:11:07,087
+就是一个固定的IV，那么密文的第二个分组
+fixed IV. So the second block of the
+ciphertext is simply gonna be the
+
+153
+00:11:07,087 --> 00:11:11,112
+将是这个固定IV的加密。接下来
+encryption of this fixed IV. So next, what
+the adversary's gonna do is, now he's
+
+154
+00:11:11,112 --> 00:11:14,845
+攻击者会输出两个单分组的信息
+gonna output two messages that are a
+single block. So the first message is
+
+155
+00:11:14,845 --> 00:11:18,982
+第一个信息在左边，是全0的分组
+gonna be, the message on the left is gonna
+be the all zeroes block. And the message
+
+156
+00:11:18,982 --> 00:11:22,918
+而右边的信息是全1的分组。观察到这是一个有效的询问
+on the right is gonna be all ones block.
+So observe that this is a valid query,
+
+157
+00:11:22,918 --> 00:11:26,752
+因为左边的信息不相同，右边的信息也不相同
+because messages on the left are all
+distinct. And the messages on the right
+
+158
+00:11:26,752 --> 00:11:30,788
+所以这些都是有效的确定性CPA询问
+are also all distinct. So these are all
+valid deterministic CPA queries. Now, what
+
+159
+00:11:30,788 --> 00:11:34,471
+现在，攻击者获得了什么样的回复？他会得到如下回复
+does the attacker get in response? Well,
+what he'll get in response is the
+
+160
+00:11:34,471 --> 00:11:38,240
+如果他获得了左边信息的加密
+following. If he gets the encryption of
+the message on the left. Then, well,
+
+161
+00:11:38,240 --> 00:11:42,783
+那么全是0的一个分组的明文信息被加密成什么了？
+what's the encryption of the one block
+message, zero to the N? It's simply the
+
+162
+00:11:42,783 --> 00:11:47,327
+就是固定IV的加密结果，就像我们之前看到的
+encryption of the fixed IV, just as we saw
+before. However, if he's getting the
+
+163
+00:11:47,327 --> 00:11:52,107
+不过，如果他获得右边信息的加密，那将是
+encryption of the message on the right,
+well, that's gonna be the encryption of 1 XOR
+
+164
+00:11:52,107 --> 00:11:56,671
+1异或固定IV后的加密。这是CBC加密的定义
+the fixed IV. That's the definition
+of, CBC encryption. So know, you can see
+
+165
+00:11:56,671 --> 00:12:00,884
+大家可以看到攻击将如何进行了。注意
+basically how the attack is going to
+proceed. You notice, if I, here I'll use a
+
+166
+00:12:00,884 --> 00:12:05,370
+我这里使用了不同的颜色。大家注意，
+如果这两个分组正好是一样的
+different color here. You notice if these
+two blocks happen to be the same, then we
+
+167
+00:12:05,370 --> 00:12:09,802
+那么我们知道他收到了左边明文信息的加密，换句话说
+know that he received the encryption of
+the message on the left, in other words B
+
+168
+00:12:09,802 --> 00:12:14,356
+b等于0。如果它们不一样，攻击者就知道了b=1
+is equal to zero. If they're not the same
+then he knows that B is equal to one. Okay,
+
+169
+00:12:14,356 --> 00:12:18,885
+那么他就会输出0，如果这个密文分组C1
+so he's gonna output zero if, you know, C
+of one, which is this block, is equal to
+
+170
+00:12:18,885 --> 00:12:23,127
+等于这个分组C1的话，攻击者就会输出1
+C1 of one, which is this block, and he's
+gonna output one otherwise. So this
+
+171
+00:12:23,127 --> 00:12:27,599
+这就证实了带固定IV的CBC是根本不安全的
+basically shows that CBC with a fixed IV
+is completely insecure. Basically the
+
+172
+00:12:27,599 --> 00:12:32,070
+第一个分组可以分轻松破解。事实上，如果信息很短
+first block can be very easily attacked.
+And, in fact, if the messages are short
+
+173
+00:12:32,070 --> 00:12:36,542
+你可以构建字典，来完全破解类似于
+you can again build dictionaries and
+completely break systems that kind
+
+174
+00:12:36,542 --> 00:12:41,185
+带固定IV的CBC的系统，还希望它是确定的CPA安全的
+of view CBC with a fixed IV hoping that
+it's gonna be a deterministic CPA secure.
+
+175
+00:12:41,185 --> 00:12:45,996
+不要这么做。下节我们将看到安全的确定性的CPA机制
+So don't do that. We're actually gonna see
+secure deterministic CPA constructions in
+
+176
+00:12:45,996 --> 00:12:50,520
+那么我们还要再说一遍，如果你需要加密数据库的索引
+the next segment. So I'll say one more
+time, if you need to encrypt the database
+
+177
+00:12:50,520 --> 00:12:54,872
+以一致性的方式，不要使用带固定IV的CBC
+index in a consistent manner, don't use
+CBC with a fixed IV to do it. Use the
+
+178
+00:12:54,872 --> 00:12:59,316
+用我下节给大家展示的机制
+schemes that I'm gonna show you in the
+next segment. And so let me ask you the
+
+179
+00:12:59,316 --> 00:13:03,939
+那么关于固定IV的计数器模式，我问大家同样的问题
+same question about counter mode with a
+fixed IV. Is this gonna be a deterministic
+
+180
+00:13:03,939 --> 00:13:08,225
+这个是不是确定性的CPA安全呢？我提示一下大家
+什么是带固定IV的计数器模式
+CPA secure system or not? And here, I'm
+reminding you what counter mode with a
+
+181
+00:13:08,225 --> 00:13:12,848
+我们联结固定IV，固定IV+1。。。一直到固定IV+L
+fixed IV is. Basically, we concatenate the
+fixed IV. Fixed IV plus one, Fixed IV plus
+
+182
+00:13:12,848 --> 00:13:17,021
+我们加密所有的这些计数器。我们联结这些加密结果
+L. We encrypt all these counters. We
+concatenate the results, we encrypt the
+
+183
+00:13:17,021 --> 00:13:21,645
+加密明文获得密文。大家是否认为这是确定性的CPA安全的？
+message to get the cipher text. So if you
+think this is gonna be deterministic CPA
+
+184
+00:13:21,645 --> 00:13:26,919
+我希望大家的答案是否定的，因为这是一个
+secure. So I hope everybody said no,
+because basically this is a onetime
+
+185
+00:13:26,922 --> 00:13:31,504
+一次性补齐的加密，如果我们使用这个一次性密码本
+来加密不同的明文信息
+padding encryption, and if we use this one
+time pad to encrypt distinct messages,
+
+186
+00:13:31,504 --> 00:13:36,152
+我们会得到一个二次密码本。更精确地
+basically we'll be getting a two time pad.
+And to see more precisely, here I wrote
+
+187
+00:13:36,152 --> 00:13:40,638
+这里我写下了确定性CPA游戏。大家注意
+down the, deterministic CPA game. So,
+you notice what the attacker will do is he
+
+188
+00:13:40,638 --> 00:13:45,066
+攻击者开始时会询问信息m的加密结果
+would start off by asking for the
+encryption of the message m. So he would
+
+189
+00:13:45,066 --> 00:13:49,955
+他会得到信息m与固定IV的加密结果的异或
+get here the message m XOR the encryption
+of the fixed IV and then he's gonna ask
+
+190
+00:13:49,955 --> 00:13:54,555
+他会询问两个不同的信息m0和m1，它们都与m不同
+for some two distinct messages m0 and m1
+that's different from m. So, m, m0 and m1
+
+191
+00:13:54,555 --> 00:13:59,099
+所以m，m0和m1是三个不同的信息
+are a three are all three are distinct
+messages. And then what he'll get is the
+
+192
+00:13:59,099 --> 00:14:03,527
+然后攻击者会得到mb的加密，现在他可以实施标准的
+encryption of mb and now he can simply
+mount the standard, kinda two time pad
+
+193
+00:14:03,527 --> 00:14:09,222
+两次密码本攻击。如果这个等式成立，c异或c'等于m异或m0
+attack. And if this equality here of c XOR c prime is equal to m XOR m zero, he
+
+194
+00:14:09,222 --> 00:14:14,658
+那么攻击者就知道了c'是m0的加密，否则
+knows that c prime is the encryption of m
+zero. And otherwise he knows it's the
+
+195
+00:14:14,658 --> 00:14:19,348
+他知道c'是m1的加密。那么他会以优势1完胜这场游戏
+encryption of M1. So, again, he will
+completely win this game with advantage
+
+196
+00:14:19,348 --> 00:14:23,975
+带固定IV的确定性的CPA
+equals to one. Okay, so again deterministic CPA
+with a fixed IV is also
+
+197
+00:14:23,975 --> 00:14:28,411
+也是方根不安全的，作为确定的CPA密码来说
+completely insecure as a deterministic CPA
+cipher. So, don't use any of those
+
+198
+00:14:28,411 --> 00:14:33,482
+不要使用这些机制，而是用我下节讲的机制
+schemes, instead let's use the schemes I'm
+going to describe in the next segment.

@@ -1,0 +1,1560 @@
+1
+00:00:00,000 --> 00:00:04,069
+本节我们看Diffie-Hellman协议
+In this segment, we're gonna look at the
+Diffie-Hellman protocol, which is our
+
+2
+00:00:04,069 --> 00:00:08,234
+这是我们的第一个实用的密钥交换机制。
+那么让我为大家讲一下目前的设定。
+first practical key exchange mechanism. So
+let me remind you of the settings. Our
+
+3
+00:00:08,234 --> 00:00:12,442
+我们的朋友Alice和Bob素未谋面，却想交换一个共享密钥
+friends here, Alice and Bob, have never
+met and yet they wanna exchange a shared
+
+4
+00:00:12,442 --> 00:00:16,445
+然后他们可以使用这个密钥来用于相互安全通信
+secret key that they can then use to
+communicate securely with one another.
+
+5
+00:00:16,445 --> 00:00:20,088
+这两节我们只看对窃听攻击的安全性
+In this segment and the next, we're only
+gonna be looking at eavesdropping
+
+6
+00:00:20,088 --> 00:00:23,937
+换句话说，我们只关心窃听攻击者
+security. In other words, we only care
+about eavesdroppers. The attackers are
+
+7
+00:00:23,937 --> 00:00:27,992
+攻击者不能篡改网络中的数据
+actually not allowed to tamper with data
+in the network. They're not allowed to
+
+8
+00:00:27,992 --> 00:00:32,046
+他们不能修改数据包，不能以任何方式改数据包
+inject packets. They're not allowed to
+change packets in any way. All they do is
+
+9
+00:00:32,046 --> 00:00:36,336
+他们只能窃听网络流量。在密钥交换协议的最后
+to just eavesdrop on the traffic. And at
+the end of the protocol, the key exchange
+
+10
+00:00:36,336 --> 00:00:40,880
+我们的朋友Alice和Bob应该有一个共享密钥
+protocol our friends Alice and Bob should
+have a shared secret key but the attacker
+
+11
+00:00:40,880 --> 00:00:45,031
+但窃听攻击者无法知道交换的密钥是什么
+namely the eavesdropper has no idea what
+that key's gonna be. In the previous
+
+12
+00:00:45,031 --> 00:00:49,343
+上一节我们看了所谓的Merkle谜题的协议
+segment we looked at a key segment called
+Merkle puzzles. That's just using block
+
+13
+00:00:49,343 --> 00:00:53,708
+只使用分组密码和哈希函数。我还告诉大家
+ciphers or hash functions. And I showed
+you that there that basically the attacker
+
+14
+00:00:53,708 --> 00:00:57,487
+攻击者有一个平方鸿沟，相比于参与者。换句话说
+has a quadratic gap compared to the
+participants. In other words if the
+
+15
+00:00:57,487 --> 00:01:01,799
+如果参与者花了与N成正比的时间，那么攻击者
+participants spent time proportional to N
+the attacker can break the protocol in
+
+16
+00:01:01,799 --> 00:01:06,163
+能在与N平方成正比的时间里破解这个协议。
+因此这个协议从应用角度来看是不安全的
+time proportional to N squared. And as a
+result that protocol is too insecure to be
+
+17
+00:01:06,163 --> 00:01:10,369
+本节我们研究，我们能否做同样的事情
+considered practical. In this segment we
+are going to ask whether we can do the
+
+18
+00:01:10,369 --> 00:01:14,733
+但现在能获得一个指数级鸿沟，横亘在
+same thing but now we'd like to achieve an
+exponential gap between the attacker's
+
+19
+00:01:14,733 --> 00:01:19,051
+攻击者和参与者的工作之间。换句话说，Alice和Bob
+work ended up in the participant's work.
+In other words, Alice and Bob might do
+
+20
+00:01:19,051 --> 00:01:23,602
+可以做与N成正比的工作，但为了破解这个协议
+work proportional to N, but to break the
+protocol the attacker is gonna have to do
+
+21
+00:01:23,602 --> 00:01:27,876
+攻击者必须做与N的某个指数级成正比的工作量
+work proportional to some exponential in
+N. So now there's an exponential gap
+
+22
+00:01:27,876 --> 00:01:32,702
+现在，在参与者和攻击者的工作之间
+有一条指数级鸿沟。那么如我上节所说
+between the participants work and the
+attacker's work. So as I said in the
+
+23
+00:01:32,702 --> 00:01:37,985
+我们不能获得这个指数级鸿沟，仅凭
+previous segment we can't achieve this
+exponential gap from block ciphers like AES
+
+24
+00:01:37,985 --> 00:01:43,143
+想AES或SHA-256这样的分组密码技术。我们必须
+使用拥有比对称原型更多结构的难解问题
+or SHA-256. We have to use hard problems
+that have more structure than just those
+
+25
+00:01:43,143 --> 00:01:48,714
+那么我们使用一点代数
+symmetric primitives. And so instead what
+we're gonna do is use a little bit of algebra.
+
+26
+00:01:48,714 --> 00:01:51,600
+本节我将描述Diffie-Hellman协议
+In this segment I'm gonna
+describe the Diffie-Hellman protocol very
+
+27
+00:01:51,600 --> 00:01:55,769
+以很具体的形式，不是很形式化。
+下周我们还会回到Diffie-Hellman协议
+concretely and somewhat informally. When
+we're gonna come back to Diffie-Hellman next week
+
+28
+00:01:55,769 --> 00:02:00,090
+我们将更为抽象地描述这个协议
+and we're gonna describe the protocol more
+abstractly and we're gonna do a much more
+
+29
+00:02:00,090 --> 00:02:04,198
+我们将对这个协议进行更为严格的安全性分析。
+那么Diffie-Hellman协议是如何工作的呢？
+rigorous security analysis of this
+protocol. Okay, so how does Diffie-Hellman
+
+30
+00:02:04,198 --> 00:02:08,173
+首先，我们选某个固定的大质数
+work? What we're gonna do is, first of
+all, we're gonna fix some large prime
+
+31
+00:02:08,334 --> 00:02:12,684
+记之为p。我通常用p表示质数
+which I'm gonna call p. Actually p I'll
+usually use to denote primes. And you
+
+32
+00:02:12,684 --> 00:02:16,820
+大家应该把它想象成非常大的质数。比如
+should be thinking of really gigantic
+primes. Like, primes that are made up of
+
+33
+00:02:16,820 --> 00:02:21,009
+有600个十进制位的质数。如果大家喜欢用二进制的话
+600 digits are so. And just for those of
+you who like to think in binary, a 600
+
+34
+00:02:21,009 --> 00:02:25,413
+600个十进制位大约相当于2000个二进制位
+digit prime roughly corresponds to about
+2000 bits. So just writing down the prime
+
+35
+00:02:25,413 --> 00:02:29,932
+写下了约两千位的质数。然后我们选一个
+固定的整数g
+takes about two kilo bits of data. And
+then we're also gonna fix an integer g
+
+36
+00:02:29,932 --> 00:02:35,067
+g正好在从1到p的范围中。这里的p和g
+that happens to live in the range one to
+p. So these values p and g are parameters
+
+37
+00:02:35,067 --> 00:02:40,014
+是Diffie-Hellman协议的参数。它们一经选择就不再改变
+of the Diffie-Hellman protocol. They are
+chosen once and they're fixed forever. Now
+
+38
+00:02:40,014 --> 00:02:45,087
+现在这个协议如下工作。这是我们的朋友Alice和Bob
+the protocol works as follow. So here's
+our friends Alice and Bob. So what Alice's
+
+39
+00:02:45,087 --> 00:02:50,347
+开始时Alice选择某个随机数a，范围是1到p-1
+going to do is she's gonna starts off by
+choosing some random number a in the range 1 to p-1
+
+40
+00:02:50,347 --> 00:02:55,420
+然后她将计算g^a mod p
+And then she is gonna compute
+the number g to the power of a modulo p.
+
+41
+00:02:55,420 --> 00:02:59,802
+她计算这个指数，然后将结果取质数p的模
+Okay, so she computes this exponention,
+and reduces the result modular the prime p.
+
+42
+00:02:59,802 --> 00:03:04,407
+下一章中我们将看到如何有效地计算这个有限域上的指数
+And we're actually going to see how to
+compute this efficiently the next module,
+
+43
+00:03:04,407 --> 00:03:07,817
+现在请大家姑且相信我，这是可以有效计算的
+so for now just believe me that this
+computation can be done efficiently.
+
+44
+00:03:07,817 --> 00:03:13,118
+现在，我们记A为这个计算的结果
+Now, let's call capital A the result of this
+value. So, what Alice will do is she will
+
+45
+00:03:13,118 --> 00:03:17,501
+那么Alice会把A发送给Bob。现在Bob做同样的事情
+send capital A over to Bob. Now Bob is
+going to do the same thing. He's going to
+
+46
+00:03:17,501 --> 00:03:22,161
+他选择一个随机数b，范围从1到p-1
+choose a random number b in the range 1
+to p-1. He's going to compute g to
+
+47
+00:03:22,161 --> 00:03:26,322
+Bob计算g^b mod p，我们记结果为B
+the b module of p and let's call this
+number B and he's going to send this
+
+48
+00:03:26,322 --> 00:03:31,114
+然后Bob把B发送给Alice。那么Alice发送了A给Bob，
+Bob发送了B给Alice
+number B over to Alice. So Alice sends A
+to Bob. Bob sends B To Alice. And now
+
+49
+00:03:31,114 --> 00:03:36,848
+现在他们俩宣布，他们已经共享了一个密钥。
+那么这个共享的密钥是什么呢？
+they claim that they can generate a shared
+secret key. So what's a shared secret key?
+
+50
+00:03:36,848 --> 00:03:41,968
+我们来定义它，我们先记之为K_AB
+Well, it's defined as. Let's call it
+K_AB. And it's basically defined as the
+
+51
+00:03:41,968 --> 00:03:47,410
+K_AB定义为g^ab mod p。现在Diffie-Hellman在
+1976年的一个惊人的观察结果是
+value g to the power of a times b. Now the
+amazing observation of Diffie-Hellman had
+
+52
+00:03:47,410 --> 00:03:53,040
+事实上双方都可以计算这个值g^ab mod p
+back in 1976 is that in fact both parties
+can compute this value g to the ab.
+
+53
+00:03:53,040 --> 00:03:58,738
+我们看，Alice可以计算这个值，因为她可以取值B
+So let's see, Alice can compute this value
+because she can take her value B that she
+
+54
+00:03:58,738 --> 00:04:04,232
+B是Bob给她的。她可以取值B，计算B^a mod p
+received from Bob. She can take this value
+B, raise it to the power of a and, let's
+
+55
+00:04:04,232 --> 00:04:09,116
+她会获得g^ab mod p
+see, what she'll get is g to the b to the
+power of b. And by the rules of
+
+56
+00:04:09,116 --> 00:04:14,935
+根据指数规则，(g^b)^a=(g^a)^b mod p
+exponentiation, g to the power of b to the
+power of a is equal to g to the ab. Bob
+
+57
+00:04:14,935 --> 00:04:19,986
+Bob实际上也可以做类似的事情，那么
+他的目标是计算(g^a)^b mod p
+turns out, can do something similar, so
+his goal is to compute g to the a to the b,
+
+58
+00:04:19,986 --> 00:04:24,972
+答案依然是g^ab mod p，所以Alice和Bob
+都可以计算出K_AB
+which again, is g to the ab, so both
+Alice and Bob will have computed K_AB, and
+
+59
+00:04:24,972 --> 00:04:32,567
+我问大家，Bob是怎么计算g^ab mod p的？
+let me ask you, how does Bob actually
+compute this quantity g to the ab?
+
+60
+00:04:32,567 --> 00:04:37,894
+他取Alice给他的A
+Well so all he does is he takes the value A that
+he received from Alice and he raises it to
+
+61
+00:04:37,894 --> 00:04:43,412
+计算A^b mod p，就得到了共享密钥g^ab mod p
+his own secret b and that gives him the
+shared secret g to the ab. So you can see
+
+62
+00:04:43,412 --> 00:04:48,450
+大家可以看到，尽管双方计算的值不一样
+now that both parties even though they
+seemingly computed different values. In
+
+63
+00:04:48,450 --> 00:04:53,495
+事实上他们会得到同样的值g^ab mod p
+fact they both end up with the same value
+namely g ab module p. I should mention by
+
+64
+00:04:53,495 --> 00:04:57,703
+我应该顺便提到，Martin Hellman和Whit Diffie
+于1976年提出这一协议
+the way that Martin Hellman and Wig
+Diffie came up with this protocol back in
+
+65
+00:04:57,703 --> 00:05:01,752
+当时Martin Hellman是斯坦福的教授，
+而Whit Diffie是他的研究生
+1976. Martin Hellman was a professor here
+at Stanford and Wig Diffie was his
+
+66
+00:05:01,752 --> 00:05:06,120
+他们提出的这个协议真正改变了这个世界
+graduate student. They came up with this
+protocol and this protocol really changed
+
+67
+00:05:06,120 --> 00:05:10,541
+它开创了密码学的新纪元
+the world. In that it introduced this new
+age in cryptography. Where now it's not just
+
+68
+00:05:10,541 --> 00:05:14,536
+现在不仅仅是关于开发分组密码，而且是关于
+about developing block ciphers but it's
+actually about designing algebraic
+
+69
+00:05:14,536 --> 00:05:19,293
+设计基于代数的协议，使之拥有类似我们这里的性质
+protocols that have properties like the
+one we see here. So you notice that what
+
+70
+00:05:19,293 --> 00:05:24,336
+大家注意，这个协议顺利工作的本质原因
+是指数的代数性质
+makes this protocol works is basically
+properties of exponentiation. Namely that,
+
+71
+00:05:24,525 --> 00:05:29,443
+即(g^b)^a = (g^a)^b
+g to the b to the power of a is the same
+as g to the a to the power of b, okay?
+
+72
+00:05:29,443 --> 00:05:33,568
+这些是指数的性质。现在当我描述
+These are just properties of
+exponentiations. Now when I describe a
+
+73
+00:05:33,568 --> 00:05:38,041
+一个像我刚才展示给大家的协议时，
+大家应该想到的真正问题
+protocol like the one I just showed you.
+The real question that should be in your
+
+74
+00:05:38,041 --> 00:05:41,941
+不是这个协议为什么能工作。换句话说，
+很容易验证这点
+mind is not why the protocol works. In
+other words, it's very easy to verify
+
+75
+00:05:41,941 --> 00:05:45,840
+事实上，Alice和Bob最后会得到同样的密钥
+that, in fact, both Alice and Bob end up
+with the same secret key. The bigger
+
+76
+00:05:45,840 --> 00:05:49,636
+更重要的问题是，为什么这个协议是安全的？
+换句话说，为什么一个窃听者
+question is why is this protocol secure?
+In other words, why is it that an
+
+77
+00:05:49,636 --> 00:05:53,847
+无法根据双方发出的A、B，解出共享密钥？
+eavesdropper cannot figure out the same
+shared key due to the AB that both Alice
+
+78
+00:05:53,847 --> 00:05:57,902
+让我们稍作分析，如我所说
+and Bob computed by themselves? So let's
+analyze this a little bit, then, like I
+
+79
+00:05:57,902 --> 00:06:02,114
+下周我们进行更进一步的分析
+said, we're gonna do a much more in-depth
+analysis next week. But, let's, for now,
+
+80
+00:06:02,114 --> 00:06:06,221
+现在我们先直观地看一下问什么这个协议是安全的
+just see intuitively why this protocol is
+gonna be secure. Well, what does the
+
+81
+00:06:06,566 --> 00:06:11,106
+窃听者能看到什么？他能看到质数和生成元
+eavesdropper see? Well, he sees the prime
+and the generator. These are just fixed
+(这里质数是指上文的p，生成元是指g)
+
+82
+00:06:11,106 --> 00:06:15,876
+这些值是永远固定不变的，每个人都知道它们。
+攻击者还能看到Alice发给Bob的值A
+forever and everybody knows who they are.
+He also sees the value that Alice sent to
+
+83
+00:06:15,876 --> 00:06:20,531
+他还能看到Bob发给Alice的值B
+Bob, namely this capital A. And he sees
+the value that Bob sent to Alice, namely
+
+84
+00:06:20,531 --> 00:06:25,187
+问题是，窃听者能计算出g^ab mod p
+this capital B. And the question is, can
+the, can the eavesdropper compute g to the
+
+85
+00:06:25,187 --> 00:06:29,899
+仅根据这四个值吗？更一般地
+ab just given these four values? So more
+generally, what we can do is we can define
+
+86
+00:06:29,899 --> 00:06:34,497
+我们可以定义这个Diffie-Hellman函数。
+我们说，Diffie-Hellman函数
+this Diffie-Hellman function. So we'll say
+that the Diffie-Hellman function is defined
+
+87
+00:06:34,497 --> 00:06:39,373
+定义在某个值g上，问题是，给定g^a和g^b
+based on some value g. And the question is
+given g to the a, and g to the b. Can you
+
+88
+00:06:39,373 --> 00:06:44,743
+能否计算g^ab？我们在问，计算这个
+compute g to the ab? And what we're
+asking is how hard is it to compute this
+
+89
+00:06:44,743 --> 00:06:49,580
+很大的质数模p乘法群上的函数，有多困难？
+记得p大约有600个十进制位
+function module over very large prime p.
+Remember p was something like 600 digits.
+
+90
+00:06:49,580 --> 00:06:53,968
+所以真正的问题是，这个Diffie-Hellman函数
+So the real question we need to answer is
+how hard is this, is this Diffie-Hellman
+
+91
+00:06:53,968 --> 00:06:58,850
+有多难解？我来告诉大家目前已知的事实。
+介绍这个质数正好有n位长
+function? So let me show you what's known
+about this. So suppose the prime happens
+
+92
+00:06:58,850 --> 00:07:04,406
+在我们这里比如说n=2000位
+to be n bits long. Okay, so in our case
+say n is 2,000 bits. It turns out the best
+
+93
+00:07:04,406 --> 00:07:08,783
+实际上计算Diffie-Hellman函数，已知最好的算法
+known algorithm for computing the
+Diffie–Hellman function. Is actually a
+
+94
+00:07:08,783 --> 00:07:12,853
+是一个更为一般的算法，用来计算离散对数函数
+more general algorithm that computes the
+discrete log function, which we're gonna
+
+95
+00:07:12,853 --> 00:07:16,822
+我们下周讨论它。但现在，我们就说这个算法
+talk about next week. But for now, let's
+just say that this algorithm computes a
+
+96
+00:07:16,822 --> 00:07:20,742
+能计算Diffie-Hellman函数。这个算法叫做
+普通数域筛法
+Diffie-Hellman function. The algorithm is
+called a general number field sieve. I'm
+
+97
+00:07:20,742 --> 00:07:24,912
+我这里不描述它是如何工作的，不过如果大家
+想听一听它是如何工作的
+not gonna describe how it works, although
+if you'd want to hear how it works, let me
+
+98
+00:07:24,912 --> 00:07:28,982
+告诉我们，我们会在课程的最后开一个特殊专题
+know, and that could be one of the special
+topics that we cover at the end of the
+
+99
+00:07:28,982 --> 00:07:33,002
+有趣的是，这个算法的运行时间是指数级的
+course. But the interesting thing is that
+its running time is exponential in
+
+100
+00:07:33,002 --> 00:07:36,771
+指数大约是n的立方根。换句话说，运行时间
+roughly the cube root of n. In other
+words, the running time is roughly e to
+
+101
+00:07:36,771 --> 00:07:41,028
+大约是e的n的立方根次方。事实上这个算法的
+运行时间的严格表达式
+the power of o of cube root of n. So in
+fact the exact expression for the running
+
+102
+00:07:41,028 --> 00:07:44,853
+要比这个复杂得多
+time, of this algorithm is much more
+complicated than this. I'm deliberately
+
+103
+00:07:44,853 --> 00:07:49,035
+我故意简化了，以求直击要点
+simplifying it here just to kind of get
+the point across. The point that I want to
+
+104
+00:07:49,035 --> 00:07:52,809
+我想强调的一点是，事实上，这不是严格的指数时间的算法
+emphasize is that in fact, this is not
+quite an exponential time algorithm.
+
+105
+00:07:52,809 --> 00:07:57,093
+指数时间是指e^n。这个算法有时叫做亚指数算法
+Exponential would be e to the power of n.
+This is sometimes called a sub-exponential
+
+106
+00:07:57,093 --> 00:08:01,377
+因为这里的指数项正比于n的立方根
+algorithm because the exponent is really
+just proportional to the cube root of n,
+
+107
+00:08:01,377 --> 00:08:05,847
+而不是n。这说明即使这个问题很难
+as opposed to linear n. What this says is
+that even though this problem is quite
+
+108
+00:08:05,847 --> 00:08:10,360
+他也不是真正的指数级时间的问题
+difficult, it's not really an exponential
+time problem. The running time in the
+
+109
+00:08:10,360 --> 00:08:15,175
+运行时间的指数是与n的立方根成正比的
+exponent is gonna be just proportional to
+the cube root of n. So let's look at some
+
+110
+00:08:15,175 --> 00:08:19,848
+那么我们来看几个例子。假设我正好在看一个模
+examples. Suppose I happen to be looking
+at a modulus that happens to be about a
+
+111
+00:08:19,848 --> 00:08:23,879
+有大于一千位长。这个算法是说
+thousand bits long. What this algorithm
+says is that we can solve the
+
+112
+00:08:23,879 --> 00:08:28,436
+我们可以解决Diffie-Hellman问题，以时间
+大约是e的1024的立方根次方
+Diffie-Hellman problem in time that's
+approximately e to the cube root of 1,024.
+
+113
+00:08:28,436 --> 00:08:33,285
+这不是很准确，事实上指数上有一些常数项
+Now this is not really correct, in fact
+there are more constants in the exponent.
+
+114
+00:08:33,285 --> 00:08:38,192
+但只看要点的话，我们可以说算法的运行时间
+But again, just to get, the point across,
+we can say that the running time would be
+
+115
+00:08:38,192 --> 00:08:42,866
+大约是e的1024的立方根次方，这个值其实很小，
+大约是e的10次方(约22000)
+roughly e to the cube root of 1,024; which
+is actually very small, roughly e to the 10.
+
+116
+00:08:42,866 --> 00:08:47,231
+这个简单的例子告诉大家，如果你有一个亚指数级算法
+So the simple example shows you that
+if you have a sub-exponential algorithm,
+
+117
+00:08:47,231 --> 00:08:51,589
+大家看到即使这个问题规模很大，比如1000位
+you see that even if the problem is quite
+large, like 1,000 bits. Because of the
+
+118
+00:08:51,589 --> 00:08:56,277
+因为这个立方根的作用，其实总体并没有那么大
+cube root effect the exponent actually is not
+that big overall. Now to be honest I'm
+
+119
+00:08:56,277 --> 00:09:00,849
+说实话我就讲到这里了。普通数域筛法
+actually lying here. General number field
+sieve actually have many other
+
+120
+00:09:00,849 --> 00:09:05,420
+在指数上有许多其他常数，不如事实上
+这个根本不是10
+constants in the exponents so in fact this
+is not going to be ten at all. It's
+
+121
+00:09:05,420 --> 00:09:09,816
+而是类似于80的样子。因为指数上的各种常数
+actually going to be something like 80.
+Because of various constants in the
+
+122
+00:09:09,816 --> 00:09:14,622
+但是大家看到这个问题依然比2的1000次方
+exponents. But nevertheless but you see
+the problem is much harder than say 2 to
+(这里讲反了。筛法降低了问题复杂性)
+
+123
+00:09:14,622 --> 00:09:19,428
+困难得多。尽管描述它需要1000位，但解决它
+the 1000. Even though describing it takes
+1,000 bits, solving it does not take time
+
+124
+00:09:19,428 --> 00:09:23,587
+不需要1000次方的时间。这里我把表往下拉
+to the 1,000. So here I roll down the
+table that kind of shows you the rough
+
+125
+00:09:23,587 --> 00:09:27,309
+给大家看大体上，比较一下破解Diffie-Hellman协议
+difficulty of breaking down the
+Diffie-Hellman protocol compared to the
+
+126
+00:09:27,309 --> 00:09:31,785
+和破解分组密码的难度，给定合适的位数。例如
+difficulty of breaking down a cipher with
+a appropriate number of bits. For example,
+
+127
+00:09:31,785 --> 00:09:36,261
+如果你的密码有80位密钥，那大概需要1000位的模
+if your cipher has 80 bit keys. That would
+be roughly comparable to using 1,000 bit
+
+128
+00:09:36,261 --> 00:09:40,792
+换句话说，破解一个80位的密码，大约需要2的80次方的时间
+modules. In other words breaking a cipher
+with 80 bit keys takes time roughly 2 to the 80
+
+129
+00:09:40,792 --> 00:09:45,053
+意味着如果你的Diffie-Hellman函数有1000位的模
+which means that breaking if you have Diffie-Hellman function with a 1,000
+
+130
+00:09:45,053 --> 00:09:47,701
+破解它需要2的80次方的时间
+bit module will take time 2 to the 80.
+
+131
+00:09:47,701 --> 00:09:53,989
+如果你的密码使用128位密钥，比如AES，那么
+你应该使用3000位的模
+If your cipher uses 128 bit keys like AES, you should be
+really using a 3,000 bit modulus,
+
+132
+00:09:53,989 --> 00:09:58,734
+即使没有人真正这样做。实际中，人们使用2000位的模
+even though nobody really does this. In reality
+people would use 2,000 bit modulus. And
+
+133
+00:09:58,734 --> 00:10:03,083
+那么如果你的密钥非常大，比如说如果
+我们使用256位AES密钥
+then if your key is very large, like if
+we're using a 256 bit AES key, then in
+
+134
+00:10:03,083 --> 00:10:07,715
+那么事实上你的模需要非常大。大家可以看到
+fact your modulus needs to be very, very
+large. Again, you, you can really see the
+
+135
+00:10:07,715 --> 00:10:12,346
+这里立方根的作用了。由于这个立方根的影响，
+我们将密钥大小翻倍时
+cube root effect here. We doubled the size
+of our key and because of the cube root
+
+136
+00:10:12,346 --> 00:10:16,752
+意味着我们必须增加模的大小，倍数为
+effect, what that means is we have to
+increase the size of, of our modulus by a
+
+137
+00:10:16,752 --> 00:10:21,327
+2的立方，也就是8倍，这就是这个15000的由来
+factor of two cubed, namely a factor of
+eight, which is where this 15,000 comes from.
+
+138
+00:10:21,327 --> 00:10:25,952
+我应该再提一下，这并不是严格的8倍
+from. And again I should mention there's
+not exactly a factor of eight because of
+
+139
+00:10:25,952 --> 00:10:30,251
+因为指数上有其他常数项。那么这张表不错
+the extra constants in the exponent. So
+this is a nice table that shows you that
+
+140
+00:10:30,251 --> 00:10:34,481
+它告诉大家，如果大家要使用Diffie-Hellman协议
+来交换会话密钥
+if you're gonna be using Diffie-Hellman to
+exchange, a session key. And that session
+
+141
+00:10:34,481 --> 00:10:38,608
+用于分组密码的会话密钥要有合适的密钥大小
+key is gonna be used for a block cipher
+with a certain key size, this table shows
+
+142
+00:10:38,608 --> 00:10:42,633
+这张表为大家展示了，需要使用的模大小，
+使得密钥交换协议的安全性
+you what modular size you need to use so
+that the security of the key exchange
+
+143
+00:10:42,633 --> 00:10:46,709
+和你之后使用的分组密码的安全性相当
+protocol is comparable to the security of
+the block cipher you're gonna be using after.
+
+144
+00:10:46,709 --> 00:10:50,837
+现在这个最后一行应该会困扰着大家
+Now this last row should
+really be disturbing to you. I should tell
+
+145
+00:10:50,837 --> 00:10:54,913
+我应该告诉大家，要使用如此之大的模很成问题
+you that working with such a large modulus
+is very problematic. This is actually
+
+146
+00:10:54,913 --> 00:10:59,040
+速度会很慢，那么问题是，我们能否做得更好？
+gonna be quite slow, and so the question
+is whether there is anything better that
+
+147
+00:10:59,040 --> 00:11:03,832
+实际上是有的。事实上，我描述Diffie-Hellman函数的方法
+we can do? And it turns out there is. In
+fact the way I describe the Diffie-Hellman
+
+148
+00:11:03,832 --> 00:11:08,984
+正是Diffie和Hellman在1976年描述的方法
+function is I describe it at the way
+Diffie and Hellman described it in 1976
+
+149
+00:11:08,984 --> 00:11:13,516
+使用了质数模的算术。质数模算术的问题是
+using arithmetic module of primes. The
+problem with arithmetic modular primes is
+
+150
+00:11:13,516 --> 00:11:17,539
+Diffie-Hellman函数难以计算，但不如大家想的那么难
+that the Diffie-Hellman function is hard
+to compute, but it's not as hard as you'd
+
+151
+00:11:17,539 --> 00:11:21,611
+有这个立方根的影响，使之比大家想的稍容易些
+like. There's this cube root effect that
+makes it a little easier than what you'd
+
+152
+00:11:21,611 --> 00:11:26,158
+那么问题是，我们能否在其他的设定下，
+运行Diffie-Hellman协议
+really like. And so the question is can we
+run the Diffie-Hellman protocol in other
+
+153
+00:11:26,158 --> 00:11:30,300
+实际上答案是肯定的。事实上我们可以
+settings. And it turns out the answer is
+yes. In fact we can literally translate
+
+154
+00:11:30,300 --> 00:11:34,308
+把Diffie-Hellman协议从质数模算术的设定
+the Diffie-Hellman protocol from an
+arithmetic model of primes to a different
+
+155
+00:11:34,308 --> 00:11:38,752
+翻译成不同类型的代数对象，然后在其他的
+type of algebraic object and solving the
+Diffie-Hellman problem on that other
+
+156
+00:11:38,752 --> 00:11:43,196
+代数对象上解Diffie-Hellman问题将是困难得多。
+这个其他的代数对象就是
+algebraic object is much, much harder.
+This other algebraic object is what's
+
+157
+00:11:43,196 --> 00:11:47,758
+所谓的椭圆曲线。如我所说，计算定义在椭圆曲线域上的
+Diffie-Hellman函数
+called an elliptic curve. And as I said,
+computing the Diffie-Hellman function on
+
+158
+00:11:47,758 --> 00:11:52,735
+要比计算质数模乘法群上的Diffie-Hellman困难得多
+these elliptic curves is much harder than
+computing the Diffie-Hellman modulo primes.
+
+159
+00:11:52,735 --> 00:11:57,476
+因为问题更加困难，现在我们可以使用小得多的代数对象
+Because the problem is so much harder, now
+we can use much smaller objects in
+
+160
+00:11:57,476 --> 00:12:02,453
+特别地，我们使用仅有160位或80位或
+particular, you know we'd be using primes
+that are only a 160 bits or 80 bit keys or
+
+161
+00:12:02,453 --> 00:12:06,780
+512位的质数，用于256位的分组密钥。那么因为这些模
+only 512 bits for 256 bit keys. So because
+these module don't grow as
+
+162
+00:12:06,780 --> 00:12:10,914
+在椭圆曲线上增长得不快，通常从使用模算术
+fast on elliptic curves, there's generally
+a slow transition away from using module
+
+163
+00:12:10,914 --> 00:12:14,949
+到使用椭圆曲线有一个缓慢的转换。
+我这里先不为大家描述椭圆曲线
+arithmetic, to using elliptic curves. I'm
+not going to describe elliptic curves
+
+164
+00:12:14,949 --> 00:12:18,735
+但如果这是大家想学习的
+right now for you, but if this is
+something you'd like to learn about I can
+
+165
+00:12:18,735 --> 00:12:22,421
+我可以留到本课程的最后一周，届时讨论更多高级话题
+do that at the very last week of the
+course, when we discuss more advanced
+(实际上在第二季，敬请期待)
+
+166
+00:12:22,421 --> 00:12:27,149
+但事实上当我们下周回到Diffie-Hellman时
+topics. But in fact when we come back to
+Diffie-Hellman next week I'm gonna describe it
+
+167
+00:12:27,149 --> 00:12:31,933
+我将更为抽象地描述它，这样你使用的代数结构就不重要了
+more abstractly so that it really doesn't
+matter which algebraic structure you use
+
+168
+00:12:31,933 --> 00:12:36,831
+无论使用质数模算术，还是使用椭圆曲线域
+whether you use arithmetic model of primes
+or whether you use a elliptic curve we
+
+169
+00:12:36,831 --> 00:12:41,557
+我们都可以将整个过程抽象出来，然后使用
+这个Diffie-Hellman概念
+can kinda abstract that whole issue away
+and then use the Diffie-Hellman concept a for
+
+170
+00:12:41,557 --> 00:12:46,109
+进行密钥交换，以及一些其他事情。如我所说
+key exchange and for other things as well.
+And as I said we'll see that more
+
+171
+00:12:46,109 --> 00:12:50,321
+我们下周还会看到更多的抽象。通常我想展示这个漂亮的协议
+abstractly next week. So as usual I wanna
+show that this beautiful protocol that I
+
+172
+00:12:50,321 --> 00:12:54,307
+就像我刚刚展示给大家的，Diffie-Hellman协议，
+对抗主动攻击时，是完全不安全的
+just showed you, the Diffie-Hellman protocol,
+is as is, is actually completely insecure
+
+173
+00:12:54,307 --> 00:12:58,195
+它是完全不安全的
+against an active attack. Namely, it's
+completely insecure against what's called
+
+174
+00:12:58,195 --> 00:13:02,132
+当存在所谓的中间人攻击。我们需要对这个协议
+the man in the middle attack. We need to
+do something more than this protocol to
+
+175
+00:13:02,132 --> 00:13:06,019
+做些补充，让它对中间人攻击也是安全的。
+下周，我们将再次回到Diffie-Hellman协议
+make is secure against man in the middle.
+And again we're gonna come back to Diffie
+
+176
+00:13:06,019 --> 00:13:10,135
+让它能安全地抵抗中间人攻击。好，那现在我们看
+Hellman and make it secure against man in
+the middle next week. Okay. So let's see
+
+177
+00:13:10,135 --> 00:13:14,649
+为什么我刚才展示给大家的这个协议
+对主动攻击是不安全的
+why the protocol that I just showed you is
+insecure against active attacks. Well
+
+178
+00:13:14,649 --> 00:13:18,767
+假设我们有这个中间人，他试图窃听
+suppose we have this man in the middle
+that's trying to eavesdrop on the
+
+179
+00:13:18,767 --> 00:13:23,393
+Alice和Bob之间的会话。协议开始时
+conversation between Alice and Bob. Well
+so, the protocol starts with Alice sending
+
+180
+00:13:23,563 --> 00:13:28,309
+Alice发送g^a给Bob。那么中间人截获了这个g^a
+g to the a over to Bob. Well, so the man
+in the middle is gonna intercept that and
+
+181
+00:13:28,309 --> 00:13:32,777
+他将取Alice发出的信息，换成他自己的信息
+he's gonna take the message that Alice
+sent and he's gonna replace it with his
+
+182
+00:13:32,777 --> 00:13:37,113
+我们记为A'，写成g^a'
+own message. So it's called A', And
+let's write that is g to the a'.
+
+183
+00:13:37,113 --> 00:13:41,939
+所以中间人选择了他自己的a'
+Okay? So the man in the middle chooses his
+own a' and what he sends to Bob is
+
+184
+00:13:41,939 --> 00:13:46,588
+把g^a'发送给Bob。现在可怜的Bob并不知道
+actually g to the a'. Now poor Bob
+doesn't know that the man in the middle
+
+185
+00:13:46,588 --> 00:13:51,356
+中间人对通信流量做了手脚，他只能获得值A'
+actually did anything to this traffic, all
+he sees is he got the value A'. As
+
+186
+00:13:51,356 --> 00:13:55,946
+他目前只知道，这个值来自Alice，那他怎么回复？
+far as he knows, that value came from
+Alice. So what is he gonna do in response?
+
+187
+00:13:55,946 --> 00:14:00,723
+Bob会回复他的值B=g^b给Alice
+Well, he's gonna send back his value B out
+which is g to the b back to Alice. Well
+
+188
+00:14:00,723 --> 00:14:05,457
+中间人截获了这个B
+again the man in the middle is gonna
+intercept this B. He's gonna generate his
+
+189
+00:14:05,457 --> 00:14:10,434
+他将产生自己的b'，然后发送B'=g^b'给Alice
+own b' and what he actually sends
+back to Alice is B' which is g to the b'.
+
+190
+00:14:10,434 --> 00:14:16,807
+现在会发生什么？Alice将计算她的密钥
+Okay, now what happens? Well
+Alice is gonna compute her part of the
+
+191
+00:14:16,807 --> 00:14:22,808
+她得到g^ab'。Bob也会计算他的密钥
+secret key and she's gonna get g to the ab'. Bob is gonna compute his part of
+
+192
+00:14:22,808 --> 00:14:28,281
+他会得到g^ba'
+the secret key and he's gonna get g to the
+b times a'. Okay, these now you
+
+193
+00:14:28,281 --> 00:14:33,592
+现在大家注意到这些不是一样的密钥。而对于中间人
+notice these are not the same keys. In the
+man in the middle because he knows both A'
+
+194
+00:14:33,592 --> 00:14:38,903
+他既知道A'又知道B'，他既可以计算g^ab'
+也可以计算g^ba'
+and B' he can compute both g to
+the ab' and g to ba'. Yeah it's
+
+195
+00:14:38,903 --> 00:14:44,215
+不难看出中间人同时知道两个值。因此
+not difficult to see the man in the middle
+knows both values. And as a result, now he
+
+196
+00:14:44,215 --> 00:14:49,526
+现在他可以扮演中间人，当Alice发送一个加密的信息
+can basically play this man in the middle
+and when Alice sends an encrypted message
+
+197
+00:14:49,526 --> 00:14:54,711
+给Bob，中间人可以轻松解密这个信息
+to Bob the man in the middle can simply
+decrypt this message because he knows the
+
+198
+00:14:54,711 --> 00:14:59,622
+因为他知道Alice加密信息的密钥。然后中间人
+重新使用Bob的密钥加密这个信息
+secret key that Alice encrypted message
+with, re-encrypt it using Bob's key. And
+
+199
+00:14:59,622 --> 00:15:04,105
+然后把信息发送给Bob。这样Alice发送信息给Bob
+then send the message on over to Bob. And
+this way Alice sent the message, Bob
+
+200
+00:15:04,105 --> 00:15:08,239
+Bob接收信息。Bob认为这个信息是安全的
+received the message. Bob thinks the
+message is secure. But in fact that
+
+201
+00:15:08,239 --> 00:15:12,605
+但事实上这个信息经过了中间人。中间人解密信息
+message went through the man in the
+middle. The man in the middle decrypted
+
+202
+00:15:12,605 --> 00:15:17,146
+然后为Bob重新加密了它。同时他可以完全读到信息内容
+it, re-encrypted it for Bob. At the same
+time he was able to completely read it,
+
+203
+00:15:17,146 --> 00:15:21,746
+如果他愿意，他可以修改它，等等。
+所以这个协议是完全不安全的
+modify it if he wants to, and so on. So,
+the protocol becomes completely insecure
+
+204
+00:15:21,746 --> 00:15:26,531
+如果有中间人。所以如我所说，我们必须增强
+give an man in the middle. And so as I
+said we're gonna have to enhance the
+
+205
+00:15:26,531 --> 00:15:30,697
+这个协议以抵抗中间人攻击
+protocol somehow to defend against men in
+the middle but it turns out that it's
+
+206
+00:15:30,697 --> 00:15:34,915
+实际上增强和防御中间人攻击并不是很难
+actually not that difficult to enhance and
+prevent man in the middle attacks.
+
+207
+00:15:34,915 --> 00:15:39,377
+我们这两周内还将回来看。最后我想做的是
+And we're gonna come back to that and see that
+in a week or two. The last think I want to
+
+208
+00:15:39,377 --> 00:15:43,658
+为大家展示一个有趣的Diffie-Hellman协议的性质
+do is show you an interesting property of
+the Diffie-Hellman protocol. In fact, I
+
+209
+00:15:43,658 --> 00:15:48,046
+事实上我想给大家展示，这个协议可以被视为
+一个非互动的协议
+want to show you that this protocol can be
+viewed as a non-interactive protocol. So,
+
+210
+00:15:48,046 --> 00:15:52,487
+我这话什么意思？设想我们有一组用户
+what do I mean by that? So Imagine we have
+a whole bunch of users, you know, millions
+
+211
+00:15:52,487 --> 00:15:56,340
+几百万用户。我们叫他们Alice, Bob, Charlie, David等等
+of users. Let's call them Alice, Bob,
+Charlie, David and so on and so forth.
+
+212
+00:15:56,500 --> 00:16:00,567
+他们中每个都将选取一个随机的私密值
+Each one of them is going to choose a
+random, secret value, and then on their
+
+213
+00:16:00,567 --> 00:16:04,419
+然后在他们的Facebook页面上，写下他们
+Facebook profiles, they're gonna write
+down, their contribution to the
+
+214
+00:16:04,419 --> 00:16:08,486
+对Diffie-Hellman协议的贡献。那么每个人写下了
+Diffie-Hellman protocol. Alright so
+everybody just writes down you know g to
+
+215
+00:16:08,486 --> 00:16:13,604
+g^a, g^b, g^c...现在，有趣的是
+the a, g to the b, g to the c and so on.
+Now the interesting thing about this is,
+
+216
+00:16:13,604 --> 00:16:18,942
+如果Alice和Charlie想建立一个共享密钥，他们无需相互通信
+if say Alice and Charlie wanna set up a
+shared key they don't need to communicate
+
+217
+00:16:18,942 --> 00:16:24,360
+Alice只要去Charlie的公共页面
+at all. Basically Alice would go and read
+Charlie's public profile. Charlie would go
+
+218
+00:16:24,360 --> 00:16:29,635
+Charlie只要去Alice的公共页面。刹那间，
+他们就共享了一个密钥
+and read Alice's public profile. And now,
+boom, they immediately have a secret key.
+
+219
+00:16:29,635 --> 00:16:34,976
+Alice知道了g^ca。Charlie知道了g^ac
+Namely, now, Alice knows, g to the c and
+a. Charlie knows g to the a and с. And as
+
+220
+00:16:34,976 --> 00:16:39,987
+因此双方都能计算g^ac。某种意义上
+a result, both of them can compute g to
+the ac. So, in some sense, once they've
+
+221
+00:16:39,987 --> 00:16:44,669
+一旦他们在公共页面发布了他们对Diffie-Hellman协议的共享
+posted their contributions to the
+Diffie-Hellman protocol to their public
+
+222
+00:16:44,669 --> 00:16:50,076
+他们就根本不需要互相通信，就能建立共享密钥
+profiles, they don't need to communicate
+with each other at all to set up a shared key.
+
+223
+00:16:50,076 --> 00:16:53,919
+他们立即就能有一个共享密钥，现在他们
+They immediately have a shared key
+and now they can start communicating
+
+224
+00:16:53,919 --> 00:16:58,194
+就通过Facebook来安全地通信了，而不会是和别人
+securely through Facebook or not with one
+another. And notice that this is true for
+
+225
+00:16:58,194 --> 00:17:02,121
+注意这对所有Facebook用户都可以。只要我
+去读某人的公共页面
+any Facebook user. So as soon as I read
+somebody's public profile, I immediately
+
+226
+00:17:02,121 --> 00:17:06,198
+我就能迅速得到一个共享密钥，无需互相通信
+have a shared key with them without ever
+communicating with them. This property is
+
+227
+00:17:06,198 --> 00:17:09,967
+这个性质有时叫做Diffie-Hellman的非互动性
+sometimes called a non-interactive
+property of the Diffie-Hellman. So now, let
+
+228
+00:17:09,967 --> 00:17:14,716
+让我给大家展示一个开放问题。这是一个开放问题
+me show you an open problem. And this is
+an open problem that's been open for ages
+
+229
+00:17:14,716 --> 00:17:19,407
+各个时代皆如此。如果大家有人能解决它，将是很好的
+and ages and ages. So it'd be really cool
+if one of you can actually solve it. The
+
+230
+00:17:19,407 --> 00:17:24,041
+问题是，我们能否对多于两方的用户做这些呢？换句话说
+question is, can we do this for more than
+two parties? In other words, say we have
+
+231
+00:17:24,041 --> 00:17:28,559
+比如说我们有四方。所有人都在他们的Facebook
+公共页面上发布了他们的值
+four parties. All of them post their
+values to their Facebook profiles. And now
+
+232
+00:17:28,559 --> 00:17:33,366
+现在我们想只通过阅读Facebook页面
+we'd like to make it that just by reading
+Facebook profiles, all of them can set up
+
+233
+00:17:33,366 --> 00:17:38,057
+所有人都可以建立共享密钥。换句话说
+a shared secret key. In other words, Alice
+is, what she'll, she'll do is she'll only
+
+234
+00:17:38,057 --> 00:17:42,427
+Alice会去读其他三个朋友
+Bob, Charlie和David的公共页面
+read the public profiles of, the three
+friends, Bob, Charlie and David. And
+
+235
+00:17:42,427 --> 00:17:47,650
+她已经可以计算和他们之间的共享密钥。
+类似地，David只需
+already she can compute a shared key with
+them. And similarly David is just gonna
+
+236
+00:17:47,650 --> 00:17:54,187
+读Charlie的公共页面。Bob和Alice
+read the public profile of Charlie. Bob
+and Alice. And already he has a shared key
+
+237
+00:17:54,187 --> 00:17:58,716
+他就有了他们4个的共享密钥。问题是，
+我们是否可以非互动地建立
+with all four of them. Okay, so the
+question is whether we can kind of setup
+
+238
+00:17:58,885 --> 00:18:03,546
+这些共享密钥，对多于两个人的组来说
+non-interactively these, these shared keys
+for groups that are larger than just two
+
+239
+00:18:03,546 --> 00:18:07,986
+如我所说，n=2就是Diffie-Hellman协议
+people. So as I said, for n equals two,
+this is just a Diffie-Hellman protocol. In
+
+240
+00:18:07,986 --> 00:18:12,594
+换句话说，如果只有双方想建立共享密钥
+other words, if just two parties want to
+set up a shared key without communicating
+
+241
+00:18:12,594 --> 00:18:16,696
+且无需相互通信，那么使用Diffie-Hellman即可
+with one another, that's just
+Diffie-Hellman. It turns out, for N equals
+
+242
+00:18:16,696 --> 00:18:21,473
+实际上对N=3的情况，我们也知道怎么做，
+有一个已知的协议
+three, we also know how to do it, there's
+a known protocol, it's called protocol due
+
+243
+00:18:21,473 --> 00:18:25,688
+是由Joux提出的，它使用了非常高级的数学
+to Joux. It already uses very, very fancy
+mathematics, much more complicated
+(Weil配对：e(B,C)^a=e(A,C)^b=e(A,B)^c=e(P,P)^abc)
+
+244
+00:18:25,688 --> 00:18:29,959
+比我刚刚为大家展示的要复杂得多的数学。
+对于N=4或5或任何更大的数
+mathematics than what I just showed you.
+And for N equals four, or five, or
+
+245
+00:18:29,959 --> 00:18:34,455
+大于4的，这个问题是完全开放的
+anything above this, above four, this
+problem is completely open. Nearly the
+
+246
+00:18:34,455 --> 00:18:38,790
+这个情况下，4人在他们的公共页面上发布信息
+case where four people post something to
+the public profiles and then everybody
+
+247
+00:18:38,790 --> 00:18:42,908
+这样其他人读这些公共页面，然后他们
+就有了一个公有的共享密钥
+else reads the public profile and then
+they have a joint shared key, this is
+
+248
+00:18:42,908 --> 00:18:47,459
+即使只有4人，我们也不知道怎么做
+something we don't know how to do even for
+four people. And this is a problem that's
+
+249
+00:18:47,459 --> 00:18:52,010
+这在各个时代都是一个开放的问题，是个有趣的问题
+been open for ages and ages, it's kind of
+a fun problem to think about and so see if
+
+250
+00:18:52,010 --> 00:18:56,073
+值得想一想，如果你能解决它，就会立即在密码学界有名气
+you can solve it, if you will, it's
+instant fame in the crypto world. Okay, so
+
+251
+00:18:56,073 --> 00:19:00,516
+我先说这么多，下节我们会继续讲另一个密钥交换机制
+I'll stop here, and we'll continue with
+another key exchange mechanism in the next segment.

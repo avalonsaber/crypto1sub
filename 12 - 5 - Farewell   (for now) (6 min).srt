@@ -1,0 +1,473 @@
+1
+00:00:00,000 --> 00:00:03,900
+为时六周的课程就要完结了。我这门课讲的很愉悦
+This brings us to the end of the six weeks
+course. I had a lot of fun teaching this
+
+2
+00:00:03,900 --> 00:00:07,566
+希望大家也是。我非常喜欢课程的内容
+course and I hope you enjoyed it too. I
+really love this material and I always
+
+3
+00:00:07,566 --> 00:00:11,232
+也总是乐意讲授它。在说再见之前，先快速回顾一下
+enjoy teaching it. Before we say our
+farewells, please do a quick review of the
+
+4
+00:00:11,232 --> 00:00:15,166
+我们讨论过的话题，看看还剩下什么东西没讲
+topics that we discussed and see what's
+left to cover. So here's a brief diagram
+
+5
+00:00:15,166 --> 00:00:19,411
+这是一个我们已经讨论过的密码学原型的简要图示。
+如果大家还记得在第一周里
+of the primitive that we discussed in the
+class. If you remember in week one we
+
+6
+00:00:19,411 --> 00:00:23,762
+我们从伪随机数发生器和流密码开始讨论
+started off by discussing pseudorandom
+generators and stream ciphers. In week two
+
+7
+00:00:23,762 --> 00:00:28,168
+第二周我们讨论了分组密码，我们说过正确的思考
+we talked about block ciphers and we said
+that the right way to think about block
+
+8
+00:00:28,168 --> 00:00:32,734
+分组密码的方式是当作伪随机置换和伪随机函数
+cipher is as pseudorandom permutations and
+pseudorandom functions. We said that using
+
+9
+00:00:32,734 --> 00:00:37,301
+我们说过，通过使用计数器模式，我们可以把一个
+分组密码转换成一个PRG。我们说过，使用GGM机制
+counter mode we can convert a block cipher
+into a PRG. And we said that using the GGM
+
+10
+00:00:37,301 --> 00:00:41,375
+我们可以从伪随机发生器构建分组密码
+construction. We can construct block
+ciphers from pseudorandom generators. Then
+
+11
+00:00:41,375 --> 00:00:45,271
+然后在第三周，我们讨论了数据完整性
+in week three, we talked about data
+integrity. In particular, we talked about
+
+12
+00:00:45,271 --> 00:00:48,906
+特别地，我们讨论了MAC，看了各种MAC机制
+MACs and we looked at various
+constructions of MACs from pseudorandom
+
+13
+00:00:48,906 --> 00:00:52,749
+它们是基于伪随机函数，比如CMAC，HMAC，PMAC等等
+functions like the CMAC, the HMAC, the
+PMAC constructions and so on. We also
+
+14
+00:00:52,749 --> 00:00:57,164
+我们还讨论了抗碰撞，我们说过抗碰撞可以被用来
+discussed collision resistance and we said
+that collision resistance can be used for
+
+15
+00:00:57,164 --> 00:01:01,111
+保护数据完整性，当有只读内存的访问权限时
+data integrity where one has access to
+read-only memory. Basically, you would
+
+16
+00:01:01,111 --> 00:01:05,110
+你可以使用抗碰撞的哈希函数计算数据的哈希值
+hash the data using a collision resistance
+hash function; write the hash into
+
+17
+00:01:05,110 --> 00:01:09,369
+向只读内存写哈希值。稍后当你想验证你的数据时
+read-only memory. And then later, when you
+want to verify authenticity of your data,
+
+18
+00:01:09,369 --> 00:01:13,633
+你只需比较它的哈希值和写在只读内存里的数据
+you just compare its hash to whatever is
+written in read-only memory. Then in week 4
+
+19
+00:01:13,633 --> 00:01:17,943
+那么在第四周，我们讨论了如何把完整性和私密性结合起来
+we talked about how to combine integrity
+and confidentiality, in particular we
+
+20
+00:01:17,943 --> 00:01:22,640
+特别地，我们讨论了把加密和MAC结合起来，以构建
+kinda talk about to combine encryption and
+MACs to build what we called Authenticated
+
+21
+00:01:22,640 --> 00:01:26,951
+所谓的认证加密。我告诉过大家，在实际中
+Encryption and I told you that really in
+practice, the only foremost Symmetric
+
+22
+00:01:26,951 --> 00:01:31,151
+在对称加密中，你们只能使用认证加密
+Encryption that you're allowed to use is
+Authenticated Encryption. Basically,
+
+23
+00:01:31,151 --> 00:01:35,461
+只对窃听保持安全的加密通常是不安全的
+encryption that's only secure against
+eavesdropping attacks is not generally
+
+24
+00:01:35,461 --> 00:01:39,827
+大家必须时时刻刻提防数据被篡改，因此
+secure, you must always also guard against
+tampering and as a result, you should only
+
+25
+00:01:39,827 --> 00:01:44,388
+大家应当只使用认证加密模式，来进行对称加密
+be using Authenticated Encryption modes to
+do Symmetric Encryption. So that was the
+
+26
+00:01:44,388 --> 00:01:48,574
+那么这是第四周。第五周和第六周中，我们转变了话题
+end of week four. And then for weeks five
+and six, we switched topics and talked
+
+27
+00:01:48,574 --> 00:01:52,759
+讨论了密钥交换和公钥加密。特别地，在第五周
+about key exchange and public key encryption.
+In particular, in week five we talked
+
+28
+00:01:52,759 --> 00:01:56,247
+我们讨论了陷门函数和Diffie-Hellman协议
+about Trapdoor Functions and the
+Diffie-Hellman Protocol within the
+
+29
+00:01:56,247 --> 00:02:00,594
+还有为了解释这些东西如何工作的必要的数学
+Mathematics that are necessary to explain
+how those things work. And then in week
+
+30
+00:02:00,594 --> 00:02:05,048
+然后在第六周，我们讨论了如何从陷门函数
+six we talked about how public key encryption
+can be built from trapdoor functions and,
+
+31
+00:02:05,048 --> 00:02:09,090
+和Diffie-Hellman协议构建公钥加密。
+我想强调一下，我们在第五周看到的
+the Diffie-Hellman Protocol. I wanna
+emphasize that the key exchange protocols
+
+32
+00:02:09,090 --> 00:02:13,573
+密钥交换协议只能安全地抵抗窃听攻击
+that we saw in week five are only secure
+against eavesdropping and should never be
+
+33
+00:02:13,573 --> 00:02:18,002
+在实际中永远不应该被使用。事实上在第八周
+我们将看到认证密钥交换协议
+used in practice. In fact in week eight
+we're gonna see authenticated key exchange
+
+34
+00:02:18,002 --> 00:02:22,485
+那些是在现实中实际被使用的
+protocols and those are the ones that are
+actually used in the world for example in
+
+35
+00:02:22,485 --> 00:02:26,698
+例如在SSL以及其他类似协议中。但是，我们在第五周
+SSL and other protocols like that. But,
+the ones that we saw in week five should
+
+36
+00:02:26,698 --> 00:02:31,018
+看到的内容，在实际中永远不应该被使用的。
+我们看这些简单密钥交换机制的原因
+never actually be deployed in the real
+world. The only reason we looked at those
+
+37
+00:02:31,018 --> 00:02:35,123
+只是为了给陷门函数和Diffie-Hellman群做铺垫
+simple key exchange mechanisms was as
+motivation for trapdoor functions and
+
+38
+00:02:35,123 --> 00:02:39,064
+现在如你所知，我们整个密码学课程还有四周
+Diffie-Hellman groups. Now as you know there
+are four more weeks to the full crypto
+
+39
+00:02:39,064 --> 00:02:42,934
+我们以后还要上四周。在第七周我们将讨论
+course which we're gonna do at a later
+time. In week seven we're gonna talk about
+
+40
+00:02:42,934 --> 00:02:46,996
+数字签名，以及如何认证数据，使得每个人
+digital signatures and how to authenticate
+data in a way that anyone can verify that
+
+41
+00:02:46,996 --> 00:02:50,866
+都能认证数据的真实性。然后我们讨论认证密钥交换协议
+the data is authentic. Then we're gonna
+talk about authenticated key exchanges as
+
+42
+00:02:50,866 --> 00:02:54,640
+如我所说的。然后我们将讨论用户认证，如何管理口令
+I said then we're gonna talk about user
+authentication, how to manage passwords,
+
+43
+00:02:54,640 --> 00:02:58,319
+一次性口令，挑战-应答协议，然后我们讨论
+one time passwords, challenge-response
+protocols. Then we'll talk about various
+
+44
+00:02:58,319 --> 00:03:02,190
+各种隐私机制。如何认证自己，同时又不会暴露自己身份？
+privacy mechanisms. How to authenticate
+yourself without revealing where you are,
+
+45
+00:03:02,190 --> 00:03:06,284
+如何在登录的同时，不会暴露自己是谁等等。。
+How to sign in a way it doesn't reveal who
+you are and so on and so forth. And in this part
+
+46
+00:03:06,284 --> 00:03:10,041
+在这一部分里，为这些机制构建分组，实际上
+of the building blocks for some of these
+mechanisms, actually, we'll talk about
+
+47
+00:03:10,041 --> 00:03:13,992
+我们将讨论零知识证明，这是一个通用的工具
+zero-knowledge protocols which is kind of
+a general purpose tool that's used very
+
+48
+00:03:13,992 --> 00:03:17,821
+在密码学中广泛使用。但是其实密码学已经超越了
+widely in cryptography. But let's just say
+that crypto goes way beyond this core
+
+49
+00:03:17,821 --> 00:03:21,687
+这个基本内容，事实上还有很多话题我想跟大家说
+topics and in fact, there are many, many
+more topics that I would love to tell you
+
+50
+00:03:21,687 --> 00:03:25,554
+如果时间允许的话。那么我制作了这张简短的表
+about if there was enough time. So I made
+this kind of a short list here and this isn't
+
+51
+00:03:25,554 --> 00:03:29,469
+这张表并不完全。还有很多其他内容我想跟大家讨论
+even an exhaustive list. There are many
+other things that I would like to tell you
+
+52
+00:03:29,469 --> 00:03:33,383
+那么如果反响够强，我可以开一门高等密码学课程
+about and so if there's enough demand, I
+might even run an advanced crypto class
+
+53
+00:03:33,383 --> 00:03:37,107
+通常是我给研究生上的
+which is usually what I do for graduate
+students which would cover these more
+
+54
+00:03:37,107 --> 00:03:40,831
+会涵盖更多的高级话题，但那将是明年的事了
+advanced topics but that would actually
+take place sometime next year so stay
+
+55
+00:03:40,831 --> 00:03:44,890
+所以不要走开，当做出决定时，我会给出通知
+tuned and I will send announcements on
+when that's coming. So my final words of
+
+56
+00:03:44,890 --> 00:03:49,427
+当然，我对本课的最后几句话是：密码学是强大的工具
+course remember my main message from this
+class. And that crypto is a tremendous
+
+57
+00:03:49,427 --> 00:03:53,298
+但是大家使用它时，应时刻小心谨慎
+tool but you should always be careful when
+you use it. If you implement crypto
+
+58
+00:03:53,298 --> 00:03:56,821
+如果你错误地实现了密码，系统也会正常运行
+incorrectly, the system will work
+perfectly fine. It would be no way to
+
+59
+00:03:56,821 --> 00:04:00,791
+无从判断其安全性，除非攻击者蓄意攻击系统时
+tell that anything is wrong except when
+attacker is trying to attack the system,
+
+60
+00:04:00,791 --> 00:04:04,571
+它将被轻易破解。所以密码学里
+it might be easily breakable. And so
+crypto is one of these things where a
+
+61
+00:04:04,571 --> 00:04:08,317
+一丁点知识都可能是危险的
+little bit of knowledge is quite
+dangerous. It's quite important to make
+
+62
+00:04:08,317 --> 00:04:12,531
+确保正确的实现是很重要的，一种确保的方法是
+sure you get the implementation correctly
+and one way to do that is to make sure
+
+63
+00:04:12,531 --> 00:04:16,850
+总是让别人来审查你的代码和设计
+that always other people review your code
+and your designs to find any bugs in the
+
+64
+00:04:16,850 --> 00:04:21,116
+找出密码实现里的漏洞，甚至是设计层面的更一般的漏洞
+crypto implementation or even more general
+bugs in the system design. And finally
+
+65
+00:04:21,116 --> 00:04:25,313
+最后我留给大家这些结束语：大家永远不要
+I'll leave you with these parting words, that you should never ever invent your own
+
+66
+00:04:25,313 --> 00:04:29,454
+自己发明密码，也不要去实现自己的密码和模式
+ciphers or your own modes and you should
+never even implement your own ciphers or
+
+67
+00:04:29,454 --> 00:04:33,242
+尽可能地坚持使用标准
+your own modes. Try to stick to the
+standards as much as possible. Try to
+
+68
+00:04:33,242 --> 00:04:37,535
+尽可能地坚持使用算法的标准实现
+stick to standard implementations of those
+algorithms as much as possible and if you
+
+69
+00:04:37,535 --> 00:04:41,778
+如果万不得已，那么要确保你的工作有充分的
+have to deviate from that, then just make
+sure there's sufficient third party review
+
+70
+00:04:41,778 --> 00:04:46,557
+第三方审查。好，那么我这里先说再见了
+of what you've done. Okay, so I will
+say my farewell here. And let me say that
+
+71
+00:04:46,557 --> 00:04:50,956
+告诉大家，期终考试将在第七周上线
+the final exam will be made available on
+week seven, basically, a week after the
+
+72
+00:04:50,956 --> 00:04:55,688
+第六周后一周，所有讲座将向公众开放。
+期终考试将涵盖六周的全部内容
+week six lectures become public. The final
+exam will cover material for all six weeks
+
+73
+00:04:55,688 --> 00:05:00,309
+它和问题集的格式差不多
+and it'll pretty much be the same format
+as the problem sets. I hope everybody will
+
+74
+00:05:00,309 --> 00:05:04,764
+我希望大家在考试中都能做得很好，当工作完成后可以领证书
+do well in the exam and we will send
+certificates once all those course work is
+
+75
+00:05:04,764 --> 00:05:09,348
+我希望在本课程的第二季里看到大家
+complete and I hope to see you in the next
+iteration of this course whenever that's
+
+76
+00:05:09,348 --> 00:05:12,992
+那么该说再见了，请在论坛里提交你们的
+made available. So farewell, and as
+always, please submit your comments and
+
+77
+00:05:12,992 --> 00:05:16,986
+评论和建议，我读了大家所有的评论，
+它们对于改善本课程很有帮助
+suggestions on the forum. I read all of
+your posts and they're very, very helpful
+
+78
+00:05:16,986 --> 00:05:19,582
+希望在这个秋天还能见到大家
+in improving the course. Hope to see you
+in the fall.

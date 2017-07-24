@@ -1,0 +1,890 @@
+1
+00:00:00,000 --> 00:00:03,574
+上一节我们看了ElGamal公钥加密系统
+In the last segment, we saw that the
+ElGamal public key encryption system is
+
+2
+00:00:03,574 --> 00:00:07,525
+是选择密文安全的，基于一个有点奇怪的假设。本节
+chosen cipher text secure under a somewhat
+strange assumption. In this segment, we're
+
+3
+00:00:07,525 --> 00:00:11,146
+我们要看一些ElGamal的变种，它们有着更好的
+gonna look at variants of ElGamal that
+have a much better chosen cipher text
+
+4
+00:00:11,146 --> 00:00:14,909
+选择密文安全的分析。现在，我应该说，在过去的十年里
+security analysis. Now, I should say that
+over the past decade, there's been a ton
+
+5
+00:00:14,909 --> 00:00:18,766
+有大量的构建选择密文安全的公钥加密的研究
+of research on constructing, public key
+encryptions that are chosen cipher text
+
+6
+00:00:18,766 --> 00:00:22,387
+其实关于如何最好地展示这部分内容，我一度拿不定主意
+secure. I actually debated for some time
+on how to best present this here. And
+
+7
+00:00:22,387 --> 00:00:26,197
+最终我决定为大家展示一遍过去十年主要结果的综述
+finally, I decided to kind of show you a
+survey of the main results from the last
+
+8
+00:00:26,197 --> 00:00:29,960
+特别是它们应用到ElGamal系统的方面。然后
+decades, specifically as they apply to the
+ElGamal system. And then, at the end of
+
+9
+00:00:29,960 --> 00:00:33,770
+在本章的最后，我会给大家介绍很多论文，
+大家可以做进一步的阅读
+the module, I suggest a number of papers
+that you can look at for further reading.
+
+10
+00:00:33,770 --> 00:00:38,332
+那么一开始让我提醒大家ElGamal加密系统的工作原理
+So let me start by reminding you how the
+ElGamal encryption system works. I'm sure
+
+11
+00:00:38,332 --> 00:00:42,783
+我确定到现在大家应该都记得ElGamal如何工作的，
+但为了万无一失，我还是提醒一下
+by now you all remember how ElGamal works,
+but just to be safe, let me remind you
+
+12
+00:00:42,783 --> 00:00:47,623
+ElGamal的密钥生成中，选取一个Z_N中的随机生成元
+that key generation in ElGamal picks a
+random generator, a random exponent from ZN
+
+13
+00:00:47,623 --> 00:00:51,963
+和一个随机指数，然后公钥由生成元和这个元素
+计算得到，即g^a
+and then the public key is simply the
+generator and this element g to the a,
+
+14
+00:00:51,963 --> 00:00:56,332
+同时，私钥就是离散对数log_g h，即这个值a
+whereas the secret key is simply the
+discrete log of h base g. This value A.
+
+15
+00:00:56,332 --> 00:01:01,255
+现在我们加密的方法是，选择一个Z_N中的随机指数b
+Now the way we encrypt is we pick a random
+exponent B from ZN. We compute the hash of
+
+16
+00:01:01,255 --> 00:01:05,947
+我们计算(g^b, h^b)的哈希值。我要提醒大家
+G to the B and H to the B. And I'm gonna
+remind you that H to the B is the Diffie
+
+17
+00:01:05,947 --> 00:01:10,233
+h^b是Diffie-Hellman密钥。然后我们加密信息
+Hellman secret, G to the AB. And then we
+actually encrypt a message using a
+
+18
+00:01:10,233 --> 00:01:15,156
+使用一个对称加密系统，以及密钥k，
+k是由这个哈希函数推导来的
+symmetric encryption system with the key K
+that's derived from the hash function. And
+
+19
+00:01:15,156 --> 00:01:19,731
+最后，输出密文是g^b和对称加密后的密文
+finally, the output cipher text is G to
+the B, and the symmetric cipher text. The
+
+20
+00:01:19,731 --> 00:01:24,654
+我们解密的方法是，就像我们之前看到的
+way we decrypt is you know, as we've seen
+before basically, by hashing U and the
+
+21
+00:01:24,654 --> 00:01:28,940
+计算u和Diffie-Hellman密钥的哈希值，解密对称密文
+Diffie Hellman secrets, decrypting the
+symmetric system, and outputting the
+
+22
+00:01:28,940 --> 00:01:33,645
+输出明文m。在上一节里，我们说过ElGamal是选择密文安全的
+message M. Now in the last segment we said
+that ElGamal is chosen ciphertext secure under
+
+23
+00:01:33,645 --> 00:01:37,881
+基于这个滑稽的交互Diffie-Hellman假设。
+我在这里就不再提醒大家
+this funny Interactive Diffie-Hellman
+assumption. I am not gonna remind you what
+
+24
+00:01:37,881 --> 00:01:42,447
+这个假设是什么了，但我要说，这个定理自然地
+the assumption is here but I'll also say
+that this theorem kind of raises two very
+
+25
+00:01:42,447 --> 00:01:46,683
+提出了两个问题：第一个是，我们能否证明
+natural questions. The first question is
+can we prove CCA security of
+
+26
+00:01:46,683 --> 00:01:50,864
+ElGamal的CCA安全性，基于标准的计算Diffie-Hellman假设？
+ElGamal just based on the standard
+Computational Diffie-Hellman assumption,
+
+27
+00:01:50,864 --> 00:01:55,011
+即由g^a, g^b，你不能计算出g^ab
+namely the G to the A, G to the B, you
+can't compute G to the AB. Can we prove
+
+28
+00:01:55,011 --> 00:01:59,259
+我们能否只根据这点，就能证明选择密文安全性？
+事实上有两种方法能做到这点
+chosen-ciphertext security just based on
+that? And the truth's that there are two
+
+29
+00:01:59,259 --> 00:02:03,454
+第一个方法是使用
+ways to do it. The first option is to use
+a group where the computational Diffie
+
+30
+00:02:03,454 --> 00:02:07,306
+计算Diffie-Hellman假设为困难的群。
+但可以证明它与交互式Diffie-Hellman假设等价
+Hellman assumption is hard. But is
+provably equivalent to the Interactive
+
+31
+00:02:07,306 --> 00:02:11,227
+实际上不难组建这样的群
+Diffie Hellman assumption. And it turns
+out it's actually not that hard to
+
+32
+00:02:11,227 --> 00:02:15,147
+这些群叫做双线性群
+construct such groups. These groups are
+called bilinear groups. And in such
+(双线性群上的二元运算是(0,2)型张量)
+
+33
+00:02:15,147 --> 00:02:19,544
+在这些群里，ElGamal系统是选择密文安全的
+groups, we know that the ElGamal system is
+chosen cipher text secure, strictly based
+
+34
+00:02:19,544 --> 00:02:23,782
+严格地基于计算Diffie-Hellman假设得证，
+至少是在随机神谕模型下得证的
+under the Computational Diffie Hellman
+assumption, at least in the random oracle
+
+35
+00:02:23,782 --> 00:02:28,983
+我告诉大家这些双线性群是根据非常特殊的
+model. I'll tell you that these bi-linear
+groups are actually constructed from very
+
+36
+00:02:28,983 --> 00:02:33,715
+椭圆曲线构建的，它们具有更多的代数结构
+special elliptic curves. So there's a bit
+more algebraic structure that enables us
+(可以参考Weil配对和Tate配对)
+
+37
+00:02:33,715 --> 00:02:38,404
+可以使得我们证明IDH和CDH的等价性。但一般地
+to prove this equivalence of IDH and CDH.
+But in general, who knows, maybe you don't
+
+38
+00:02:38,404 --> 00:02:42,928
+也许你根本就不想用椭圆曲线群，
+也许你就想用Z_p^*，出于某些原因
+want to use elliptic curve groups, maybe
+you want to use ZP star for some reason.
+
+39
+00:02:42,928 --> 00:02:47,817
+那么这是一个很自然的问题要问。
+我们能否修改ElGamal系统
+So it's a pretty natural question to ask.
+Can we change the ElGamal system such that
+
+40
+00:02:47,817 --> 00:02:52,828
+使得ElGamal的选择密文安全可以被证明，直接使用CDH即可
+chosen ciphertext security of ElGamal now can be proven, directly based on CDH, for any group
+
+41
+00:02:52,828 --> 00:02:57,840
+对于任意群CDH都是困难的？现在不用假设群上的任何附加结构
+where CDH is hard? Now without assuming
+any additional structure about the group,
+
+42
+00:02:57,840 --> 00:03:02,132
+实际上答案是肯定的，有一个优雅的机制
+And it turns out the answer is yes. And
+there's kind of an elegant construction
+
+43
+00:03:02,132 --> 00:03:06,696
+叫做孪生ElGamal，那么让我们为大家展示
+孪生ElGamal是怎么工作的
+called twin ElGamal, so let me show you
+how twin ElGamal works. It's a very simple
+
+44
+00:03:06,696 --> 00:03:10,607
+它是ElGamal的一个简单变种，如下工作：
+在密钥生成阶段，我们选择一个
+variation of ElGamal that does the
+following. Again, in key generation, we
+
+45
+00:03:10,607 --> 00:03:14,954
+随机生成元，但这次我们选择两个指数a1和a2
+choose a random generator. But this time,
+we're gonna choose two exponents, A1 and
+
+46
+00:03:14,954 --> 00:03:19,409
+作为私钥。那么私钥将由这两个指数a1和a2组成
+A2 as the secret key. So the secret key is
+gonna consist of these two exponents, A1
+
+47
+00:03:19,409 --> 00:03:23,783
+大家知道公钥当然是由我们的生成元组成
+and A2. You know the public key of course
+is gonna consist of our generator. And
+
+48
+00:03:23,783 --> 00:03:28,340
+然后我们公布g^a1和g^a2。记得在常规ElGamal中
+then we're gonna release G to the A1 and G
+to the A2. So remember that in regular
+
+49
+00:03:28,340 --> 00:03:32,840
+公钥只是g^a就行了。这里我们有两个指数
+ElGamal what the public key is simply g
+to the A and that's it. Here we have two
+
+50
+00:03:32,840 --> 00:03:37,340
+a1和a2，所以我们要公布g^a1和g^a2
+exponents A1 and A2 and therefore we, we
+release both G to the A1 and G to the A2.
+
+51
+00:03:37,340 --> 00:03:42,297
+现在我们加密的方法是，大家注意，
+这里公钥比常规ElGamal
+Now the way we encrypt, you'll notice the
+public key here is one element longer than
+
+52
+00:03:42,297 --> 00:03:47,137
+多出一个元素。我们使用公钥加密的方法
+regular ElGamal. The way we encrypt using
+this public key is actually very similar
+
+53
+00:03:47,137 --> 00:03:51,859
+与常规ElGamal很类似。我们选择一个随机数b，
+现在我们不去计算
+to regular ElGamal. We choose a random B,
+and now what we'll hash is actually not
+
+54
+00:03:51,859 --> 00:03:56,522
+(g^b,h1^b)的哈希，而是(g^b,h1^b,h2^b)的哈希
+just G to the B and H1 to the B, but,
+in fact, G to the B, H1 to the B, and H2
+
+55
+00:03:56,522 --> 00:04:01,691
+好，那么我们计算三个元素的哈希，而非两个
+to the B. Okay so we basically hashing
+three elements instead of two elements and
+
+56
+00:04:01,691 --> 00:04:06,642
+然后我们使用推出的对称加密密钥来加密信息
+then we basically encrypt the message
+using the derived symmetric encryption key
+
+57
+00:04:06,642 --> 00:04:11,410
+通常我们输出g^b和c作为我们最终的密文。那我们如何解密？
+and as usual we output g to the b and c as our
+final ciphertext. How do we decrypt?
+
+58
+00:04:11,410 --> 00:04:16,027
+那么现在私钥由两个指数a1和a2组成
+Well, so now the secret key consists of
+these two exponents, A1 and A2. And the
+
+59
+00:04:16,027 --> 00:04:20,584
+密文由u和对称密文c组成。那么让我问大家
+cipher text consists of U, and the
+symmetric cipher text C. So let me ask you
+
+60
+00:04:20,584 --> 00:04:25,501
+一个问题，看看大家是否能想出来，
+如何推出对称加密密钥k？
+a puzzle, and see if you can figure out
+how to derive the symmetric encryption key
+
+61
+00:04:25,501 --> 00:04:31,934
+只有私钥和值u。那么这道题很有意思
+K, just given the secret key and the value
+U. So it's kind of a cute puzzle and I
+
+62
+00:04:31,934 --> 00:04:37,250
+我希望大家都能解出来。答案是
+hope everybody worked out, the solution
+which is basically what we can do is we
+
+63
+00:04:37,250 --> 00:04:42,566
+我们可以取u的a1次方，即g^(ba1)，以及u^a2
+can take U to the power of A1, and that is
+basically G to the B A1 And U to the A2
+
+64
+00:04:42,566 --> 00:04:48,012
+即g^(ba2)。这会给我们一模一样的值
+which is G to the B A2. And that basically
+gives us exactly the same values, as H1 to
+
+65
+00:04:48,012 --> 00:04:53,069
+也就是h1^b和h2^b。那么这样子，解密者会得到与加密者同样的
+the B and H2 to the B. So this way the
+decryptor arrives at the same symmetric
+
+66
+00:04:53,069 --> 00:04:58,515
+对称密钥。然后他使用对称系统的密钥解密了密文
+key that the encryptor did. Then he decrypts
+the ciphertext using the symmetric system
+
+67
+00:04:58,515 --> 00:05:03,389
+最终输出明文m。那么大家注意到这是一个非常简单的
+and finally outputs the message M. So you
+notice this is a very simple modification
+
+68
+00:05:03,389 --> 00:05:07,802
+对常规ElGamal的修改。我们在公钥里添加一个元素
+to regular ElGamal. All we do is we stick
+one more element to the public key. When
+
+69
+00:05:07,802 --> 00:05:11,888
+当我们计算哈希时，我们多计算一个元素，不只有2个
+we do the hashing, we hash one more
+element, as opposed to just two elements.
+
+70
+00:05:11,888 --> 00:05:16,246
+我们求三个元素的哈希值。类似地，我们进行解密，没什么变化
+We hash three elements. And similarly, we
+do doing decryption, and nothing else
+
+71
+00:05:16,246 --> 00:05:20,491
+密文长度也不变，就完事了
+changes. The cipher text is the same
+length as before, and that's it, Now the
+
+72
+00:05:20,491 --> 00:05:24,647
+现在惊人的是，这个简单的改变可以让我们
+amazing thing is that this simple
+modification allows us to now prove chosen
+
+73
+00:05:24,647 --> 00:05:28,640
+根据计算Diffie-Hellman假设来证明选择密文安全了
+cipher text security directly based on
+standard Computational Diffie-Hellman
+
+74
+00:05:28,640 --> 00:05:32,795
+不过我们依然需要假设，我们有一个
+assumption, okay? Still we're going to
+need to assume that we have a symmetric
+
+75
+00:05:32,795 --> 00:05:36,897
+提供了认证加密的对称加密系统
+encryption system that provides us
+authenticated encryption and that the hash
+
+76
+00:05:36,897 --> 00:05:41,430
+我们使用的哈希函数是一个理想的哈希函数，即所谓随机神谕
+function that we're using is an ideal hash
+function in what we call a random oracle
+
+77
+00:05:41,430 --> 00:05:45,747
+不过有了这个，我们就可以证明选择密文安全
+But nevertheless given that, we can
+prove chosen cipher text security strictly
+
+78
+00:05:45,747 --> 00:05:49,803
+严格地根据计算Diffie-Hellman假设了。那么代价是什么？
+based on a Computational Diffie-Hellman
+assumption. So now what's the cost of this?
+
+79
+00:05:49,803 --> 00:05:53,966
+当然，如果大家想想，在加密、解密过程中
+Of course, if you think about this, during
+encryption and decryption, encryption has
+
+80
+00:05:53,966 --> 00:05:57,418
+加密必须多做一次指数，解密必须多做一次指数
+to do one more exponentiation, and the
+decryption has to do one more
+
+81
+00:05:57,418 --> 00:06:01,581
+所以加密者现在要做3次指数，而非2次
+exponentiation. So the encryptor now does
+three exponentiations instead of two, and
+
+82
+00:06:01,581 --> 00:06:05,490
+解密者要做2次指数而非1次。现在的问题是
+the decryptor does two exponentiations
+instead of one. So the question is now,
+
+83
+00:06:05,490 --> 00:06:09,965
+这是个哲学问题。这种多余的开销值得做吗？
+now it's a philosophical question. Is this
+extra effort worth it? So you do more work
+
+84
+00:06:09,965 --> 00:06:14,228
+那么加解密的工作变多了。公钥变长了
+during encryption and decryption. And your
+public key is a little bit bigger, but
+
+85
+00:06:14,228 --> 00:06:18,331
+但效果并不重要。在加解密上的工作
+that doesn't really matter. The work
+during encryption and decryption is more
+
+86
+00:06:18,331 --> 00:06:22,434
+更为重要些。因此大家获得了选择密文安全
+significant. And as a result you get
+chosen ciphertext security based on kind
+
+87
+00:06:22,434 --> 00:06:26,644
+基于某种自然的假设，即计算Diffie-Hellman
+of a more natural assumption, namely
+Computational Diffie-Hellman as opposed to
+
+88
+00:06:26,644 --> 00:06:30,480
+而非这些奇怪的交互Diffie-Hellman假设
+these odd-looking Interactive
+Diffie-Hellman assumption. But is it worth
+
+89
+00:06:30,480 --> 00:06:34,743
+但这样做值得吗？这些CDH成立，但IDH不成立的群
+it? Kind of the question is are there
+groups where CDH holds but IDH does not
+
+90
+00:06:34,743 --> 00:06:38,815
+如果存在这样的群，那么这么做当然是值得的
+hold? If there were such groups, then it
+would definitely be worth it, because
+
+91
+00:06:38,815 --> 00:06:43,050
+因为在这些群上，孪生ElGamal将是安全的，
+而常规ElGamal将不是CCA安全的
+those groups, the twin ElGamal would be
+secure, but the regular ElGamal would not
+
+92
+00:06:43,050 --> 00:06:47,508
+但不幸的是，我们不知道这样的群是否存在
+be CCA secure. But unfortunately we don't
+know if there is any such group and in
+
+93
+00:06:47,508 --> 00:06:51,383
+事实上我们目前只知道，有的群上CDH成立
+fact as far as we know, it's certainly
+possible that any group where CDH holds,
+
+94
+00:06:51,383 --> 00:06:55,307
+IDH也成立。那么答案是，我们不知道多余的开销
+IDH also holds. So the answer is, really,
+we don't know whether the extra cost is
+
+95
+00:06:55,307 --> 00:06:59,530
+是否值得，但是这个结果很可爱，证实了
+worth it or not but then nevertheless it's
+a cute result that shows that if you want
+
+96
+00:06:59,530 --> 00:07:03,256
+如果你想直接从CDH获得选择密文安全
+to achieve chosen ciphertext
+security directly from CDH, you could do
+
+97
+00:07:03,256 --> 00:07:08,051
+你是可以做到的，无需对ElGamal系统做太多修改。下个问题是
+it without too many changes to the ElGamal
+system. The next question is whether we
+
+98
+00:07:08,051 --> 00:07:12,230
+我们能否回避这个哈希函数是理想的假设？
+can get rid of this assumption that the
+hash function is an ideal hash function
+
+99
+00:07:12,230 --> 00:07:16,617
+即假设哈希函数是随机神谕。这是一个很大的研究方向
+mainly that it's a random oracle. And this
+is actually a huge topic. There's a lot of
+
+100
+00:07:16,617 --> 00:07:20,482
+这个方向里有很多研究工作，研究
+如何构建公钥加密系统
+work in this area on how to build
+efficient public key encryption systems
+
+101
+00:07:20,482 --> 00:07:24,922
+以达到不借助随机神谕的选择密文安全
+that are chosen ciphertext secure without
+random oracles. This is a very active area
+
+102
+00:07:24,922 --> 00:07:29,192
+这一个很活跃的研究领域，如我所说，在过去的十年
+甚至更长的时间里
+of research as I said in the past decade
+and even longer. And I'll mention that as
+
+103
+00:07:29,192 --> 00:07:33,379
+应用到ElGamal的，主要有两类机制
+it applies to ElGamal, they are basically,
+again two families of constructions. The
+
+104
+00:07:33,379 --> 00:07:37,515
+第一个机制使用了特殊的群
+first construction's a construction that
+uses these special groups called these
+
+105
+00:07:37,515 --> 00:07:41,599
+叫做双线性群，我刚刚提过。实际上
+bilinear groups that I just mentioned
+before. It turns out the extra structure
+
+106
+00:07:41,599 --> 00:07:45,682
+这些双线性群的多余结构允许我们构建很有效的
+of these bilinear groups allows us to
+build very efficient chosen ciphertext
+
+107
+00:07:45,682 --> 00:07:50,128
+选择密文安全的系统，无需依靠随机神谕，如我所说
+secure systems without referring to random
+oracles and as I said at the end of the
+
+108
+00:07:50,128 --> 00:07:54,367
+在本章最后。我将指出很多论文进行进一步解释
+module, I point to a number of papers that
+explain how to do that. This is quite an
+
+109
+00:07:54,367 --> 00:07:58,876
+这是一个很有趣的机制。但它会花掉我几个小时
+interesting construction. But it will take
+me several hours to kind of explain how it
+
+110
+00:07:58,876 --> 00:08:03,434
+去解释它是怎么工作的。其他机制则是使用了特定群
+works. The other alternative is actually
+to use groups where a stronger assumption
+
+111
+00:08:03,434 --> 00:08:07,830
+这些群上满足更强的假设，叫做判定Diffie-Hellman假设
+called the Decision Diffie-Hellman assumption
+holds. Again, I am not gonna define this
+
+112
+00:08:07,830 --> 00:08:11,798
+我这里也不给出其定义了。我只是告诉大家这个假设
+assumption here. I'll just tell you that
+this assumption actually holds in
+
+113
+00:08:11,798 --> 00:08:16,141
+在Z_p^*中成立，特别地，如果我们看Z_p^*的质数阶子群
+subgroups of ZP star, in particular if we
+look at the prime order of a subgroup of
+
+114
+00:08:16,141 --> 00:08:19,812
+判定Diffie-Hellman假设似乎在这些群上成立
+ZP star. The Decision Diffie-Hellman
+assumption seems to hold in those groups
+
+115
+00:08:19,812 --> 00:08:23,852
+那么在这些群上我们就可以构建一种ElGamal的变种
+and then in those groups we can actually
+build a variant of ElGamal, called the
+
+116
+00:08:23,852 --> 00:08:27,141
+叫做Cramer-Shoup系统，它是选择密文安全的
+Cramer Shoup system that is chosen
+ciphertext secure and the Decision
+
+117
+00:08:27,141 --> 00:08:30,665
+在判定Diffie-Hellman假设下，且无需随机神谕。
+这是一个漂亮的结果
+Diffie-Hellman assumption without random
+oracles. Again, this is a beautiful,
+
+118
+00:08:30,665 --> 00:08:34,659
+但是它也需要几个小时去解释，我这里就不做了
+beautiful result but again it would take a
+couple of hours to explain and so I'm not
+
+119
+00:08:34,659 --> 00:08:38,324
+这很可能是我留作高级课题
+gonna do that here. This is probably one
+of these things that I gonna leave to
+
+120
+00:08:38,324 --> 00:08:42,083
+或高级课程的内容之一，这样我们以后再说
+either the advanced topics or to do an
+advanced course so that we'll do it at a
+
+121
+00:08:42,083 --> 00:08:46,335
+我在章末指出一篇论文
+later time. But again I points to a paper
+at the end of the module just in case you
+
+122
+00:08:46,335 --> 00:08:50,626
+如果大家想了解更多。这里的论文列表提供了更多的阅读材料
+want to read more about this. So here is a
+list of papers that provides more reading
+
+123
+00:08:50,626 --> 00:08:54,208
+那么如果大家想了解更多的Diffie-Hellman假设
+material. So if you wanna read about
+Diffie Hellman assumptions, I guess I
+
+124
+00:08:54,208 --> 00:08:58,036
+我想我很早写过一篇论文是关于这个的，
+讨论了大量的Diffie-Hellman的相关假设
+wrote a paper about this a long time ago,
+that talks about various assumptions
+
+125
+00:08:58,036 --> 00:09:01,716
+特别地，研究了判定Diffie-Hellman假设
+related to, to Diffie Hellman. And in
+particular, studies the Decision Diffie
+
+126
+00:09:01,716 --> 00:09:05,685
+如果大家想学习如何构建选择密文安全的系统
+Hellman assumption. And if you wanna learn
+about how to build chosen ciphertext
+
+127
+00:09:05,685 --> 00:09:10,098
+根据判定Diffie-Hellman和类似假设
+secure system from Decision Diffie-Hellman
+and assumptions like it. There's a very
+
+128
+00:09:10,098 --> 00:09:14,563
+Kramer和Shoup在2002年有一篇很好的文章是讨论这个的
+cute paper by Kramer and Shoup back
+from 2002 that shows how to do it. This is
+
+129
+00:09:14,563 --> 00:09:18,618
+这也是一篇非常推荐的论文。如果大家想学习
+again a very highly recommended paper. If
+you want to learn how to build chosen
+
+130
+00:09:18,618 --> 00:09:22,672
+如何从双线性群构建选择密文安全性，那么这篇论文
+ciphertext security from these
+bilinear groups, then the paper to read is
+
+131
+00:09:22,672 --> 00:09:26,983
+在这里引用的这篇，使用了一个一般的机制叫做
+the one, cited here, which actually uses a
+general mechanism called Identity Based
+
+132
+00:09:26,983 --> 00:09:30,884
+基于身份的加密，令人惊讶的是它实际上给了我们
+Encryption which very surprisingly it
+turns out to actually gives us chosen
+
+133
+00:09:30,884 --> 00:09:34,638
+选择密文安全，几乎没有开销。那么一旦我们构建了
+ciphertext security almost for free.
+So, once we build identity-based
+
+134
+00:09:34,638 --> 00:09:38,486
+基于身份的加密，立即就有选择密文安全
+encryption chosen ciphertext security falls
+immediately. And that's covered in this
+
+135
+00:09:38,486 --> 00:09:42,283
+这些是在我讲的这篇论文里讨论的。孪生Diffie-Hellman机制
+paper that I, that I describe here. The
+Twin Diffie-Hellman construction and its
+
+136
+00:09:42,283 --> 00:09:46,381
+及其证明在这篇论文里描述，我在这里引用的
+proof is described in this paper that I
+reference here And finally, if you kind of
+
+137
+00:09:46,381 --> 00:09:50,135
+最后如果大家想看一篇很近的论文，给出了很一般的框架
+want to see a very recent paper. That
+gives a very general framework for
+
+138
+00:09:50,135 --> 00:09:54,345
+用来构建选择密文安全的系统，使用所谓的易解哈希证明
+building, chosen ciphertext secure systems, using
+what's called extractable hash proofs that
+
+139
+00:09:54,345 --> 00:09:58,506
+这是Hoeteck Wee的一篇好文章，就是最近发表的
+is again a nice paper by Hoeteck Wee, that
+was just recently published. I definitely
+
+140
+00:09:58,506 --> 00:10:02,416
+我当然推荐都读一读，它们都有着非常优美的想法
+recommend reading it all, all have
+very, very elegant ideas in them. I wish I
+
+141
+00:10:02,416 --> 00:10:06,426
+我希望我可以在密码学基础课程里把它们都讲一讲
+could cover all of them in the basic
+course but I'm gonna have to leave some of
+
+142
+00:10:06,426 --> 00:10:10,436
+但我想把它们中的一部分留到更高阶的课程里，
+也许就是本课程的最后部分
+these to the more advanced course or
+perhaps the more advanced topics at the
+
+143
+00:10:10,436 --> 00:10:14,446
+好，我就讲到这里，下节我将把
+end of this course. Okay, so I'll stop
+here and in the next segment I'm gonna tie
+
+144
+00:10:14,446 --> 00:10:18,506
+ElGamal和RSA加密联系在一起，这样大家会看到
+ElGamal and RSA encryption
+together so that you see how the two kind
+
+145
+00:10:18,506 --> 00:10:20,512
+两者遵循着更一般的原理
+of follow from a more general principle.

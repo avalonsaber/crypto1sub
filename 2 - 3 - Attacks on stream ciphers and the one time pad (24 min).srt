@@ -1,0 +1,1945 @@
+1
+00:00:00,000 --> 00:00:03,518
+这一节，我们看针对一次性密码本的攻击
+In this segment, we're gonna look at
+attacks on the one time pad, and some
+
+2
+00:00:03,518 --> 00:00:06,542
+以及使用流密码时需要注意的事项
+things you need to be careful with when
+you use the stream cipher. But before we
+
+3
+00:00:06,542 --> 00:00:10,012
+在这之前，我们先简要回顾
+do that, let's do a quick review of where
+we were. So recall that the one time
+
+4
+00:00:10,012 --> 00:00:14,121
+一次性密码本通过异或明文和密钥
+来加密，这里的密钥
+pad encrypts messages by XORing the
+message and a secret key, where the secret
+
+5
+00:00:14,121 --> 00:00:18,653
+和明文一样长。类似地
+解密通过异或
+key is as long as the message. Similarly,
+decryption is done by similarly
+
+6
+00:00:18,653 --> 00:00:22,637
+密文和密钥来实现
+XORing the cipher text, and the same
+secret key. When the key is uniform and
+
+7
+00:00:22,637 --> 00:00:27,123
+当密钥是均匀随机分布时，我们证明了
+一次性密码本的理论安全性
+random, we prove that the one-time pad has
+this information theoretic security that
+
+8
+00:00:27,123 --> 00:00:31,292
+就是香农的完美安全。显然
+问题是密钥要和明文一样长
+Shannon called perfect secrecy. A problem
+was, of course, the keys are as long as
+
+9
+00:00:31,292 --> 00:00:35,610
+这导致一次性密码本很难使用
+the message, so the one-time pad is very
+difficult to use. We then talked about a
+
+10
+00:00:35,610 --> 00:00:40,109
+我们讨论了如何将一次性密码本实用化
+通过使用伪随机数发生器
+way to make the one time pad practical by
+using a pseudo random generator that
+
+11
+00:00:40,109 --> 00:00:44,438
+将短的种子扩展成长得多的信息
+expands a short seed into a much larger
+message and the way a stream cypher
+
+12
+00:00:44,438 --> 00:00:49,109
+流密码的工作方式是使用
+伪随机数发生器，与一次性密码本一样
+worked, essentially using a pseudo random
+generator, was in the same way as the one
+
+13
+00:00:49,109 --> 00:00:53,666
+一次性密码本使用真随机序列
+time pad, basically, but rather than using a
+truly random pad, we used this pseudo
+
+14
+00:00:53,666 --> 00:00:58,337
+流密码使用伪随机序列，也是
+与明文信息一样长的
+random pad that's expanded to be as long
+as the message from the short key that's
+
+15
+00:00:58,337 --> 00:01:02,402
+密钥作为发生器的输入
+我们说它的安全性
+given as input to the generator. We said
+now the security no longer relies on
+
+16
+00:01:02,402 --> 00:01:06,090
+并不依赖于完美安全，因为
+流密码不可能是完美安全的
+perfect secrecy because stream ciphers
+cannot be perfectly secure. Instead
+
+17
+00:01:06,090 --> 00:01:09,978
+流密码安全性依赖于伪随机数
+发生器的性质
+security relies on properties of the
+pseudo random generator and we said that
+
+18
+00:01:09,978 --> 00:01:14,014
+我们说伪随机数发生器
+必须是不可预测的
+the pseudo random generator essentially
+needs to be unpredictable, but in fact it
+
+19
+00:01:14,014 --> 00:01:18,251
+但事实上这个定义使用起来有点困难
+turns out that definition is a little bit
+hard to work with and we're going to see a
+
+20
+00:01:18,251 --> 00:01:22,288
+于是我们将看一个PRG安全性更好的定义
+用两节的内容
+better definition of security for PRGs in
+about two segments. But in this segment
+
+21
+00:01:22,288 --> 00:01:26,326
+这一节我们讨论对一次性密码本的攻击
+we're going to talk about attacks on the
+one time pad. And the first attack I want to
+
+22
+00:01:26,326 --> 00:01:30,623
+第一种攻击叫做两次密码本攻击
+talk about is what's called the two time pad
+attack, okay? so remember that the
+
+23
+00:01:30,623 --> 00:01:36,149
+记住一次性密码本之所以叫一次
+是因为密码本只能加密
+one time pad is called "one time" pad because
+the pad can only be used to encrypt a
+
+24
+00:01:36,149 --> 00:01:41,058
+单个信息。我将为大家展示
+如果同样的密码本
+single message. I want to show you that if
+the same pad is used to encrypt more than
+
+25
+00:01:41,058 --> 00:01:45,678
+为不同的明文加密，就不再安全了
+one message, then security goes out the
+window, and basically an eavesdropper can
+
+26
+00:01:45,678 --> 00:01:50,240
+一个窃听者可以完全解密出明文
+那么我们看一个例子
+completely decrypt encrypted messages.
+So let's look at an example. So here we
+
+27
+00:01:50,240 --> 00:01:54,513
+两个明文信息m1和m2，
+使用相同密码本加密
+have two messages m1 and m2 that are
+encrypted using the same pad. So the
+
+28
+00:01:54,513 --> 00:01:58,729
+得到密文C1和C2
+分别是m1和m2的加密
+resulting ciphertext, C1 and C2, again
+basically are encryptions of these
+
+29
+00:01:58,729 --> 00:02:03,238
+使用相同的密码本加密的
+messages, m1 and m2, but both are
+encrypted using the same pad. Now suppose
+
+30
+00:02:03,238 --> 00:02:09,507
+现在假设窃听者截获了C1和C2
+an eavesdropper intercepts C1 and C2, and
+he obtains, he basically has both C1 and C2.
+
+31
+00:02:09,507 --> 00:02:15,168
+窃听者很自然地计算C1和C2的异或
+The natural thing for the eavesdropper
+to do is actually compute the XOR of C1
+
+32
+00:02:15,168 --> 00:02:20,948
+他会得到什么？
+and C2 and what does he get when he
+computes this XOR? So I hope everybody
+
+33
+00:02:20,948 --> 00:02:25,178
+大家应该看出，C1异或C2
+密码本被异或抵消了
+sees that, basically, once you XOR
+C1 and C2, the pads cancel out, and
+
+34
+00:02:25,178 --> 00:02:29,747
+本质上得到的就是两段明文的异或
+essentially, what comes out of this is the
+XOR of the plaintext messages.
+
+35
+00:02:29,747 --> 00:02:34,372
+英语实际上有着足够的冗余
+And it turns out that English basically
+has enough redundancy, such that if I give
+
+36
+00:02:34,372 --> 00:02:38,772
+导致如果给定两明文的异或
+you the XOR of two plaintext
+messages, you can actually recover those
+
+37
+00:02:38,772 --> 00:02:43,115
+是可以完全还原出两个明文的
+对我们来说更重要的是
+two mesages completely. More importantly
+for us is these messages are encoded
+
+38
+00:02:43,115 --> 00:02:47,515
+这些信息用ASCII码编码
+本身就有着足够的冗余了
+using ASCII. In fact, ASCII encodings has
+enough redundancy, such that given the
+
+39
+00:02:47,515 --> 00:02:52,027
+给定两个ASCII码信息的异或
+可以还原出明文
+XOR of two ASCII encoded messages,
+you can recover the original messages
+
+40
+00:02:52,027 --> 00:02:56,711
+本质上，给定这些异或
+可以还原出两条明文信息
+back. So, essentially, given these XORs,
+you can recover both messages. So the
+
+41
+00:02:56,711 --> 00:03:01,535
+要点是，如果你使用同样的密码本
+去加密多条信息
+thing to remember here is if you ever use
+the same pad to encrypt multiple messages
+
+42
+00:03:01,535 --> 00:03:06,071
+攻击者截获密文，最终可以
+an attack who intercepts the resulting
+ciphertexts can eventually recover the
+
+43
+00:03:06,071 --> 00:03:10,818
+不费力地还原出明文
+existing plaintexts without too much
+work. So, the stream cipher key or the
+
+44
+00:03:10,818 --> 00:03:16,167
+所以流密码的密钥使用次数
+永远不应超过一次
+one time pad key should never ever, ever,
+ever be used more than once. So, let's
+
+45
+00:03:16,167 --> 00:03:20,904
+我们看几个实际当中的例子
+look at some examples where this comes up
+in practice. It's a very common mistake to
+
+46
+00:03:20,904 --> 00:03:25,360
+多次使用流密钥是常见错误
+use the stream cipher key, or a one time
+pad key more than once. Now, let me show
+
+47
+00:03:25,360 --> 00:03:30,210
+看几个例子，在你自己的系统中
+不要再犯这些错误
+you some examples where this comes up. So
+you know to avoid these mistakes, when you
+
+48
+00:03:30,210 --> 00:03:35,060
+第一个例子是历史上的
+build your own systems. The first example
+is a historic example. At the beginning of
+
+49
+00:03:35,060 --> 00:03:39,402
+1940年代初，苏联使用一次性密码本
+the 1940s, where the Russians actually
+used a one time pad to encrypt various
+
+50
+00:03:39,402 --> 00:03:43,970
+加密大量信息。很不幸
+密码本由人掷骰子来生成
+messages. Unfortunately, the pads that they
+were using were generated by a human by
+
+51
+00:03:43,970 --> 00:03:48,394
+人掷骰子并记录下结果
+throwing dice. And so, you know, the human
+would throw these dice, and write down the
+
+52
+00:03:48,394 --> 00:03:52,884
+收集的结果就被用作加密的密码本
+results of these throws. And the collected
+throws would then form the pads that were
+
+53
+00:03:52,884 --> 00:03:57,053
+由于生成密码本颇费人工
+used for encryption. Now, because it was
+kind of laborious for them to generate
+
+54
+00:03:57,053 --> 00:04:01,330
+只用来加密一条信息就显得很浪费
+these pads, it seems wasteful to use the
+pads to encrypt just one message. So the
+
+55
+00:04:01,330 --> 00:04:05,762
+所以最后用来加密多条信息
+ended up using these pads to encrypt
+multiple messages. And US intelligence was
+
+56
+00:04:05,762 --> 00:04:10,366
+实际上美国智囊可以截获这些二次密码本
+actually able to intercept these two time
+pads. These ciphertexts that were
+
+57
+00:04:10,366 --> 00:04:14,865
+这些密文由不同明文，经相同密码本
+加密而成
+encrypted using the same pad, applied to
+different messages. And it turns out, over
+
+58
+00:04:14,865 --> 00:04:19,177
+经过几年，他们可以解密约
+a period of several years, they we're able
+to decrypt something like 3,000 plain
+
+59
+00:04:19,177 --> 00:04:23,273
+3000条明文，仅凭截获密文即可
+这就叫做Venona计划
+texts just by intercepting these ciphertexts.
+The project is called Project Venona
+
+60
+00:04:23,273 --> 00:04:27,478
+这是密码分析很精彩的一幕
+It's actually a fascinating
+of cryptanalysis, just because the two
+
+61
+00:04:27,478 --> 00:04:31,985
+仅仅因为两次密码本是不安全的
+我更想讲一些更近代的例子
+time pad is insecure. More importantly, I
+want to talk about more recent examples
+
+62
+00:04:31,985 --> 00:04:36,450
+以网络协议为背景的
+看一个Windown NT的例子
+that come up in networking protocols, so
+let me give you an example from Windows NT,
+
+63
+00:04:36,450 --> 00:04:40,697
+是关于其点到点传输协议的
+in a product called the,
+point-to-point transfer protocol. This is
+(注意不是Peer-to-Peer)
+
+64
+00:04:40,697 --> 00:04:44,726
+它是关于客户端希望于服务端安全通信的
+a protocol for a client wishing to
+communicate securely with a server. The
+
+65
+00:04:44,726 --> 00:04:49,355
+客户端和服务端共享一个密钥
+并且相互通信
+client and the server both share a secret
+key here, and they both send messages to
+
+66
+00:04:49,355 --> 00:04:53,438
+这里客户端发送的明文信息记为m1
+one another. So, here, we'll denote the
+messages from the client by m1. So, the
+
+67
+00:04:53,438 --> 00:04:57,903
+客户端发送信息，服务端应答
+client sends a message, the server
+responds, the client sends a message, the
+
+68
+00:04:57,903 --> 00:05:02,710
+客户端发送信息，服务端应答
+server responds, the client sends a
+message, the server responds, and so on
+
+69
+00:05:02,710 --> 00:05:07,723
+等等。。PPTP协议的工作原理
+将双方的整个互动
+and so forth. Now, the way PPTP works is,
+basically, the entire interaction, from
+
+70
+00:05:07,723 --> 00:05:12,996
+当作一个流，换句话说
+the client to the server, is considered as
+one stream. In other words, what happens
+
+71
+00:05:12,996 --> 00:05:17,944
+这里的m1, m2, m3被视作一个长流
+is, the messages m1, and m2 and m3, are
+kind of viewed as one long stream.
+
+72
+00:05:17,944 --> 00:05:22,501
+这里双竖线表示联结
+Here, these two parallel lines means
+concatenation. So, essentially, we're
+
+73
+00:05:22,501 --> 00:05:27,840
+本质上我们将客户端和服务端的
+信息全部联结成一个长流
+concatenating all the messages from the
+client to the server into one long stream.
+
+74
+00:05:27,840 --> 00:05:34,649
+整个长流使用流密钥K来加密
+And all that stream is encrypted using the
+stream cipher with key K. So that's
+
+75
+00:05:34,649 --> 00:05:38,463
+感觉非常好。并没有错误
+perfectly fine. I mean, there's nothing
+wrong with that. This messages are
+
+76
+00:05:38,463 --> 00:05:42,807
+加密的信息被当成一个长流
+使用相同密钥加密
+encrypted, are treated as one long stream,
+and they're all encrypted using the same
+
+77
+00:05:42,807 --> 00:05:46,727
+问题在于，服务端也在发生着相同的事
+key. The problem is, the same thing is
+happening also on the server side. In
+
+78
+00:05:46,727 --> 00:05:50,647
+换句话说，从服务端发出的信息
+other words, all the messages from the
+server are also treated as one long
+
+79
+00:05:50,647 --> 00:05:54,890
+它们都被联结起来了
+stream. So here, they're all concatenated
+together. And encrypted using,
+
+80
+00:05:54,890 --> 00:06:01,010
+很不幸，加密使用了相同的伪随机种子
+unfortunately, the same pseudo-random
+seed, in other words, using the same
+
+81
+00:06:01,010 --> 00:06:05,930
+也就是相同的流密钥
+所以这里发生的
+stream cipher key. So basically what's
+happening here is you see an effect that
+
+82
+00:06:05,930 --> 00:06:10,265
+与二次密码本别无二致
+客户端加密使用的一次密码本
+the two time pad is taking place where the
+set of messages from the client is
+
+83
+00:06:10,265 --> 00:06:14,656
+和服务端使用的一样
+encrypted using the same one time pad as a
+set of messages from the server. The
+
+84
+00:06:14,656 --> 00:06:19,158
+这里的教训是永远不要用相同密钥
+lesson here is that you should never use
+the same key to encrypt traffic in both
+
+85
+00:06:19,158 --> 00:06:23,548
+加密两个方向的流量
+事实上，你需要一个密钥
+directions. In fact, what you need to do
+is have one key for interaction between
+
+86
+00:06:23,548 --> 00:06:28,050
+加密从客户端到服务端的信息
+以及另一个密钥加密服务端到客户端
+the client and the server and one key for
+interaction between the server and the
+
+87
+00:06:28,050 --> 00:06:32,651
+我喜欢这样写，共享密钥k
+client. The way I like to write this is
+really that the shared key k really is a
+
+88
+00:06:32,651 --> 00:06:38,059
+其实是一对密钥，一个加密服务端到客户端
+pair of keys. One key is used to encrypt
+messages from server to client, and one
+
+89
+00:06:38,059 --> 00:06:42,920
+另一个加密客户端到服务端
+key is used to encrypt messages from
+client to server. So these are two
+
+90
+00:06:42,920 --> 00:06:48,054
+这里使用了两个不同的密钥
+当然双方都知道这对密钥
+separate keys that are used, and both
+sides, of course, know this key. So both
+
+91
+00:06:48,054 --> 00:06:52,663
+双方都有这对密钥，对吧？
+双方都可以进行加密
+sides have this pair of keys, okay? and
+they can both encrypt. So one is used to
+
+92
+00:06:52,663 --> 00:06:57,107
+一个加密一个方向，
+另一个加密另一个方向
+encrypt messages in one direction and one
+is used to encrypt messages in the other
+
+93
+00:06:57,107 --> 00:07:01,230
+另一个二次密码本的重要例子
+direction. So another important example of
+the two time pad comes up in Wi-Fi
+
+94
+00:07:01,230 --> 00:07:05,728
+是在WiFi通信中，特别在802.11b协议中
+communication, particularity in the 802.11b
+protocol. So all of you I'm sure know that
+
+95
+00:07:05,728 --> 00:07:10,225
+802.11包含了一层加密层
+最初的加密层叫做WEP
+the 802.11 contains an encryption layer and
+the original encryption layer was called
+
+96
+00:07:10,225 --> 00:07:14,723
+WEP对我们来说其实是一个很糟糕的协议
+WEP and WEP fortunately for us is actually
+a very badly designed protocol so that I
+
+97
+00:07:14,723 --> 00:07:18,792
+我总是拿它来当反面教材
+can always use it as an example of how not
+to do things. There are many, many
+
+98
+00:07:18,792 --> 00:07:23,236
+WEP包含很多很多错误
+这里举它二次密码本的例子
+mistakes inside of WEP and here I want to
+use it as an example of how the two time
+
+99
+00:07:23,236 --> 00:07:27,362
+我解释一下WEP的工作原理
+WEP中，有一个客户端
+pad came about. So let me explain how WEP
+works. So in WEP, there's a client and,
+
+100
+00:07:27,362 --> 00:07:31,423
+和一个接入点。这是客户端
+这是接入点
+and access point. Here's the client,
+here's the access point. They both share a
+
+101
+00:07:31,423 --> 00:07:35,589
+它们共享一个密钥K。然后
+当它们想相互通信时
+secret key K. And then, when they wanna
+transmit a message to one another. Say
+
+102
+00:07:35,589 --> 00:07:39,492
+它们互相传递帧
+these are frames, that they
+transmit to one another. Let's say the
+(frame: 帧，一种数据报文)
+
+103
+00:07:39,492 --> 00:07:44,274
+比如客户端想发送一个包含明文M
+的帧给接入点
+client wants to send a frame containing
+the plain text M to the access point, what
+
+104
+00:07:44,274 --> 00:07:49,319
+他首先要把一些校验和附在明文后面
+he would do is first of all he appends
+some sort of check sum to this plain text.
+
+105
+00:07:49,319 --> 00:07:54,301
+这里校验和并不重要
+The check sum is not important at this
+point, what is important is then this new
+
+106
+00:07:54,301 --> 00:07:59,595
+重要的是然后使用流密码加密
+calculation gets encrypted using a stream
+cypher where the stream cypher key is this
+
+107
+00:07:59,595 --> 00:08:06,570
+这里流密钥是一个值IV和一个长期的密钥K
+的联结，这个IV为24位字符串
+concatenation of a value IV and a long
+term key K. So this IV is a 24 bit string.
+
+108
+00:08:06,570 --> 00:08:11,742
+好，这个IV为24位字符串
+可知它从0开始取值
+Okay, this IV is a 24 bit string, and you
+can imagine that it starts from zero and
+
+109
+00:08:11,742 --> 00:08:16,468
+它可以是一个数据包的计数器
+perhaps it's a counter that counts
+increments by one for every packet. The
+
+110
+00:08:16,468 --> 00:08:21,769
+它们这样做的原因是，WEP的设计者们
+知道在流密码中
+reason they did this was the designers of
+WEP realized that in a stream cypher, the
+
+111
+00:08:21,769 --> 00:08:27,006
+一个密钥只能加密一个明文信息
+key is only supposed to be used to encrypt
+one message. So they said well, let's go
+
+112
+00:08:27,006 --> 00:08:31,860
+那么就每帧使用不同的密钥吧
+ahead and change the key after every
+frame. And the way they changed the key
+
+113
+00:08:31,860 --> 00:08:36,931
+它们改变密钥的方法是
+把这个IV放在密钥前面
+essentially was by prepending this IV to
+it. And you notice this IV changes on
+
+114
+00:08:36,931 --> 00:08:42,036
+每个数据包的IV不同，于是每个数据包
+的IV加一。这个想法
+every packet. So it increments by one on
+every packet. And the idea, then, is sent
+
+115
+00:08:42,036 --> 00:08:47,335
+然后就直接发送密文
+接收方也知道密钥K
+in the clear along with the cipher text.
+So the recipient knows the key K. He knows
+
+116
+00:08:47,335 --> 00:08:52,440
+也知道IV，就能通过联结IV和K
+来重新推出PRG来
+what the IV is. He can rederive the PRG
+of IV concatenating K. And then decrypts
+
+117
+00:08:52,440 --> 00:08:57,541
+然后就能解密密文，还原明文M了
+the cipher text to recover the original
+message M. Now the problem with this
+
+118
+00:08:57,541 --> 00:09:02,749
+当然，问题在于IV只有24位
+也就是说只有2的24次方个
+of course is the IV is only 24 bits long.
+Which means that there are only two to the
+
+119
+00:09:02,749 --> 00:09:07,646
+可能的IV，也就是说，
+经过1600万帧的传输后
+24 possible IV's. Which means that after
+sixteen million frames are transmitted.
+
+120
+00:09:07,646 --> 00:09:12,291
+IV又要重0开始循环了
+每经过1600万帧循环一次
+Essentially the IV has to cycle. And once
+it cycles after 16 million frames.
+
+121
+00:09:12,291 --> 00:09:16,934
+这就有了二次密码本
+同样的IV被用来
+Essentially we get a two time pad. The
+same IV will be used to encrypt two
+
+122
+00:09:16,934 --> 00:09:21,699
+加密两个不同的信息，密钥K不变
+它是一个长期的密钥
+different messages. The key K never changes.
+It's a long term key. And as a result,
+
+123
+00:09:21,699 --> 00:09:26,586
+于是，相同的密钥，即IV联结K
+会被用来加密两个不同的帧
+that same key, namely the IV concatenated K
+would be used to encrypt two different
+
+124
+00:09:26,586 --> 00:09:31,349
+然后攻击者可以解出两个帧来
+frames, and the attacker can then figure
+out the plain text of both frames. So
+
+125
+00:09:31,349 --> 00:09:36,297
+这是一个问题，更严重的问题是
+在很多802.11片上系统里
+that's one problem. And the worst problem
+is in fact that on many 802.11 cards, if
+
+126
+00:09:36,297 --> 00:09:41,216
+如果你重启系统，IV会被重置到0
+you powercycle the card, the IV will reset
+back to zero. And as a result, everytime
+
+127
+00:09:41,216 --> 00:09:45,531
+于是，每次重启系统，你会使用
+you powercycle the card, essentially
+you'll be encrypting the next payload
+
+128
+00:09:45,531 --> 00:09:49,847
+0联结K来加密下一个数据包
+每次重启，你都要使用
+using zero concatenated K. So after every
+powercycle, you'll be using the zero
+
+129
+00:09:49,847 --> 00:09:54,279
+0联结K来加密许多报文
+concatenated K key to encrypt many, many,
+many times the same packets. So you see
+
+130
+00:09:54,279 --> 00:09:59,178
+所以在WEP中，同样的密码本会被用来
+加密许多不同的信息
+how in WEP, the same pad could be used to
+encrypt many different messages as soon as
+
+131
+00:09:59,178 --> 00:10:03,668
+只要IV被重置。我们无法防止重启后
+IV被重置的现象
+the IV is repeated. There is nothing to
+prevent the IV from repeating after a
+
+132
+00:10:03,668 --> 00:10:08,220
+或者1600万帧后归零
+powercycle. Or am repeating after every
+sixteen million frames which isn't that
+
+133
+00:10:08,220 --> 00:10:12,946
+1600万帧在忙碌的网络中并不算多
+我们在讨论WEP
+many frames in a busy network. So while we
+are talking about WEP. I want to mention
+
+134
+00:10:12,946 --> 00:10:17,540
+我还会提到WEP的更多错误
+这个错误确实挺严重
+one more mistake that was done in WEP.
+This is a pretty significant mistake and
+
+135
+00:10:17,540 --> 00:10:22,366
+我们来看如何更好地设计它
+大家注意到WEP的设计者
+let's see how we might design it better.
+So you notice that the designers of WEP
+
+136
+00:10:22,366 --> 00:10:27,017
+想为每个数据包使用不同的密钥
+basically wanted to use a different key
+for every packet. Okay. So every frame is
+
+137
+00:10:27,017 --> 00:10:31,145
+每个帧使用不同密钥加密
+即不同的IV和K的联结
+encrypted using a different key
+is concatonation of IV and K.
+
+138
+00:10:31,145 --> 00:10:35,325
+很遗憾，它们没有随机选取密钥
+Unfortunately, they didn't randomize the
+keys and the keys are actually, if you
+
+139
+00:10:35,325 --> 00:10:38,849
+如果单看第一帧的密钥
+look at the key for frame number one,
+well, you know, it will be this
+
+140
+00:10:38,849 --> 00:10:43,004
+它一定会是1与K的联结
+我们刚刚提到这24位IV
+concatenation of one and k. We'll just
+feel this 24 bits. Then the key for frame
+
+141
+00:10:43,004 --> 00:10:47,369
+第二帧的密钥是2和K的联结
+number two is the concatenation of two and
+k. The key for frame number three is the
+
+142
+00:10:47,369 --> 00:10:51,629
+第三帧的密钥是3和K的联结
+所以这些密钥之间非常接近
+concatenation of three and k. So the keys
+are very closely related to one another.
+
+143
+00:10:51,629 --> 00:10:55,889
+我还应该提到这些密钥本身可以是104位
+And I should probably mention also that
+these keys themselves can be 104 bits so
+
+144
+00:10:55,889 --> 00:11:00,362
+PRG生成密钥实际上是104+24=128位
+that the resulting PRG key is actually
+104 plus 24 bytes which is 128 bytes.
+
+145
+00:11:00,362 --> 00:11:05,097
+很不幸，这些密钥之间太过相近
+Unfortunately these keys are very much
+related to one another. These are not
+
+146
+00:11:05,097 --> 00:11:10,268
+它们并不是随机密钥。大家注意到
+它们的后缀104位都是一样的
+random keys. You notice they all have the
+same suffix of 104 bytes. And it turns out
+
+147
+00:11:10,268 --> 00:11:15,377
+事实上WEP里的伪随机密钥
+并没有设计得很安全
+the pseudo-random generator used in WEP is
+not designed to be secure when you use
+
+148
+00:11:15,377 --> 00:11:20,548
+你使用了相近的密钥
+换句话说，大部分密钥之间
+related keys that are so closely related.
+In other words, the majority of these keys
+
+149
+00:11:20,548 --> 00:11:25,477
+基本上是一样多。事实上
+对于WEP中的PRG
+are basically the same. And in fact, for
+the PRG that's used in WEP. That PRG is
+
+150
+00:11:25,477 --> 00:11:30,860
+叫做RC4。我们下一节会讲到它
+called, RC 4. We'll talk about that
+more in the next segment. It turns out
+
+151
+00:11:30,860 --> 00:11:36,243
+对其有一个有效攻击，
+由Fluhrer, Mantin, Shamir三人
+there's an attack. It was discovered by
+Fluhrer, Mantin and Shamir
+
+152
+00:11:36,243 --> 00:11:41,763
+于2001年发现，证实经过10的6次方
+back in 2001, that shows that after about
+ten to the six of, after about a million
+
+153
+00:11:41,763 --> 00:11:47,105
+约一百万帧后，你就可以还原密钥了
+frames. You can recover the secret key.
+Can recover key. So, this is kind of a
+
+154
+00:11:47,105 --> 00:11:52,497
+这是个很严重的攻击，你只需要
+监听一百万帧就可以了
+disastrous attack that says essentially
+all you have to do is listen to a million
+
+155
+00:11:52,497 --> 00:11:57,707
+刚才说了，这些帧全部由一个种子生成
+frames. These frames basically, as we said
+they're all generated from a very common
+
+156
+00:11:57,707 --> 00:12:02,813
+104位是全部一样的
+seed, namely a 104 bits of these seeds are
+all the same. The fact that they've used
+
+157
+00:12:02,813 --> 00:12:07,794
+这足以还原出密钥了
+such closely related keys is enough to
+actually recover the original key. And it
+
+158
+00:12:07,794 --> 00:12:12,527
+事实上经历了2001年的攻击
+又涌现出了更好的攻击方案
+turns out even after the 2001 attack,
+better attacks have come out that show
+
+159
+00:12:12,527 --> 00:12:17,010
+证实了这种密钥关联是灾难性的
+that these related keys are very much
+disastrous and in fact these days
+
+160
+00:12:17,010 --> 00:12:21,298
+最近又发现四万帧就足以破解
+something like 40,000 frames are
+sufficient. And so that, within a matter
+
+161
+00:12:21,298 --> 00:12:25,334
+几分钟内，你就可以还原任何WEP网络
+所使用的密钥了
+of minutes, you can actually recover the
+secret key in any WEP network. So
+
+162
+00:12:25,334 --> 00:12:29,535
+所以WEP无法提供任何的安全性
+原因有二：第一
+WEP provides no security at all
+for two reasons. First of all, it can
+
+163
+00:12:29,535 --> 00:12:33,792
+它像二次密码本一样脆弱
+更重要的，由于这些密钥
+resolve in the two time pad. But more
+significantly, because these keys are so
+
+164
+00:12:33,792 --> 00:12:38,271
+互相之间紧密关联，仅监听少量密文
+就足以还原密钥
+closely related, it's actually possible to
+recover the key by watching just a few
+
+165
+00:12:38,271 --> 00:12:42,532
+顺便说下，当我们对加密机制里的步骤
+cipher texts. And by the way, we'll see
+that well, when we do a security analysis
+
+166
+00:12:42,532 --> 00:12:46,987
+进行安全分析时，在下几节里
+我们会开始讨论如何分析
+of these steps of constructions. In a few
+segments, we'll start talking about how to
+
+167
+00:12:46,987 --> 00:12:51,174
+加密机制里的步骤。我们将看到
+analyze these steps of constructions.
+We'll see that when we have related keys
+
+168
+00:12:51,174 --> 00:12:55,361
+这样紧密关联的密钥事实上会导致
+我们的安全分析失败
+like this, in fact, our security analysis
+will fail. We won't be able to get the
+
+169
+00:12:55,361 --> 00:12:59,870
+我们无法完成安全性证明
+所以WEP设计者们应当怎么办？
+proof to go through. So one could ask what
+should the designers of a WEP should have
+
+170
+00:12:59,870 --> 00:13:03,949
+一个方法是对帧进行处理
+done, instead? Well, one approach is to
+basically treat the frames, you know M1,
+
+171
+00:13:03,949 --> 00:13:08,350
+M1, M2, M3每一帧都由客户端发向服务端
+M2, M3. Each, each one is a separate frame
+transmitted from the client to the server.
+
+172
+00:13:08,350 --> 00:13:13,620
+我们可以当成一个长流处理
+He could have treated them as one
+long stream, and then XOR them
+
+173
+00:13:13,620 --> 00:13:18,075
+然后进行异或操作，对长流
+使用伪随机数发生器
+potentially. Using the pseudo random
+generator as one long stream. So the first
+
+174
+00:13:18,075 --> 00:13:21,651
+密码本的第一节用来加密M1
+segment of the pad would have been used to
+encrypt M1. The second
+
+175
+00:13:21,651 --> 00:13:25,548
+密码本的第二节用来加密M2
+segment of the pad would have been used to
+encrypt M2. The third segment
+
+176
+00:13:25,548 --> 00:13:29,400
+密码本的第三节用来加密M3，等等
+of the pad would have been used to encrypt
+M3. And so on and so forth.
+
+177
+00:13:29,400 --> 00:13:33,323
+所以设计者们本来就不应该
+对每一帧都改变密钥
+So they basically could never have had to
+change the key because the entire
+
+178
+00:13:33,323 --> 00:13:38,106
+因为整个会话应被视为长流
+但是他们为每一帧选不同的密钥
+interaction is viewed as one long stream.
+But they chose to have a different key for
+
+179
+00:13:38,106 --> 00:13:42,881
+如果你想那么做，有更好的办法
+every frame. So if you want to do that, a
+better way to do that is, rather than
+
+180
+00:13:42,881 --> 00:13:47,718
+不是小改IV，不是小改PRG密钥前缀
+slightly modifying this IV that just
+slightly modifies the prefix of the key,
+
+181
+00:13:47,718 --> 00:13:52,742
+更好的办法是再次使用PRG
+of the PRG key. A better way to do that is
+to use a PRG again. So essentially, what
+
+182
+00:13:52,742 --> 00:13:57,517
+这样你可以获得一个长期密钥
+然后把密钥输入给PRG
+you could do is you will take your long
+term key. And then feed that directly
+
+183
+00:13:57,517 --> 00:14:02,726
+现在我们得到了一个长流
+而且它看起来很随机的
+through a PRG. So now we get a long stream
+of bits that look essentially random.
+
+184
+00:14:02,726 --> 00:14:07,563
+可以使用最初的密码本分段
+第一段可以当作密钥
+And then the initial segment could be
+used, the first segment could be used as
+
+185
+00:14:07,563 --> 00:14:14,577
+来加密第一帧。第二段当作密钥
+the key, for frame number one. And then the
+second segment would be used as the key
+
+186
+00:14:14,577 --> 00:14:20,173
+来加密第二帧，等等
+for, you know, key for frame number two.
+And so on and so forth. The third segment
+
+187
+00:14:20,173 --> 00:14:25,138
+第三段加密第三帧，等等
+would be used to encrypt frame #three and
+so on and so forth, okay? So the nice
+
+188
+00:14:25,138 --> 00:14:30,361
+这样一来每一帧都有一个伪随机密钥了
+thing about this is now, essentially, by
+doing this, each frame has a pseudo-random
+
+189
+00:14:30,361 --> 00:14:35,390
+这些密钥之间没有关系了
+它们看起来像是随机密钥
+key. These keys, now, have no relation to
+one another. They look like random keys.
+
+190
+00:14:35,390 --> 00:14:40,613
+于是，如果PRG对随机密文C是安全的
+它对输入也是安全的
+And as a result, if the PRG is secure for
+random Cs, it was also be secure on this
+
+191
+00:14:40,613 --> 00:14:44,871
+因为密钥看起来互相之间是独立的
+input. Because these keys essentially look
+as though they're independent of one
+
+192
+00:14:44,871 --> 00:14:49,379
+等我们讨论加密机制类型时
+我们再来形式化地看如何分析这些
+another. We'll see how to do this analysis
+formally once we talk about these types of
+
+193
+00:14:49,379 --> 00:14:53,621
+由于二次密码本攻击很常用
+constructions. Since this two-time pad
+attack comes up so often in practice, it's
+
+194
+00:14:53,621 --> 00:14:58,076
+这也是个常见错误
+这个例子就是想让大家避免之
+such a common mistake, I want to give one
+more example where it comes up so you know
+
+195
+00:14:58,076 --> 00:15:02,000
+我的最后一个例子是关于硬盘加密的
+how to avoid it. The last example I want
+to give is in the context of disk
+
+196
+00:15:02,000 --> 00:15:06,243
+设想我们有一文件
+encryption. So imagine we have a certain
+file and maybe the file begins with, you
+
+197
+00:15:06,243 --> 00:15:10,447
+文件以"给Bob的话"开头
+后面跟着文件内容
+know, the words to Bob. And then the
+content of the file follows when this is
+
+198
+00:15:10,447 --> 00:15:14,920
+内容存在硬盘上，当然
+文件从这里的硬盘里读取
+stored on disk of course the file is gonna
+get so here we have our disk here, the
+
+199
+00:15:14,920 --> 00:15:19,404
+文件被分块放置，对每一块
+file is going to get broken into blocks.
+And each block will be, you know, when we
+
+200
+00:15:19,404 --> 00:15:23,726
+当我们把分块存放在硬盘上时
+就会对其进行加密
+actually store this on a disk, you know,
+things will be encrypted. You know, so
+
+201
+00:15:23,726 --> 00:15:28,446
+那么Bob可能会看第一分块
+余下内容在剩下分块里
+maybe to Bob will go into the first block
+and then the rest of the content will go
+
+202
+00:15:28,446 --> 00:15:33,109
+当然这全被加密了
+into the remaining blocks. But of course
+this is all encrypted so I'll kind of use
+
+203
+00:15:33,109 --> 00:15:37,829
+我用这些线表示这被加密了
+these lines here to denote the fact that
+this is encrypted. And an attacker looking
+
+204
+00:15:37,829 --> 00:15:42,605
+一个攻击者来看硬盘
+却无法知道文件内容是什么
+at the disk has no idea what the contents
+of the message is. But now suppose that at
+
+205
+00:15:42,605 --> 00:15:46,700
+假设经过一段时间后，用户做出修改
+比如使用了编辑器
+a later time, user goes ahead and
+modifies, basically fires up the editor.
+
+206
+00:15:46,700 --> 00:15:51,745
+它修改了文件，现在不再是给Bob，而是要给Eve了
+It modifies the file, so now instead of
+saying to Bob, it says to Eve. And nothing
+
+207
+00:15:51,745 --> 00:15:56,853
+文件其余内容不变，仅改变接收方
+else changes in the file, that's the only
+change that was made. When the user then
+
+208
+00:15:56,853 --> 00:16:01,520
+然后用户把修改好的文件存到硬盘里
+还要再加密一次
+saves this modified file to disk,
+basically he's gonna re encrypt it again.
+
+209
+00:16:01,780 --> 00:16:06,345
+同样的事情又要发生一遍
+文件又会被分块
+And so the same thing is gonna happen. The
+file is gonna get broken into blocks. You
+
+210
+00:16:06,345 --> 00:16:10,416
+现在文件是给Eve的，一切都被加密
+know, now the file's gonna say to Eve. And
+everything, of course, is gonna be
+
+211
+00:16:10,416 --> 00:16:15,037
+我又在这写下这些线。现在攻击者来看硬盘了
+encrypted. So again, I'll, put these lines
+here. Now an attacker looking at the disc,
+
+212
+00:16:15,202 --> 00:16:19,713
+在用户修改前对原内容做了保存
+现在攻击者又来看修改后的内容
+taking a snapshot of the disc before the
+edits. And then looking again at the disc
+
+213
+00:16:19,713 --> 00:16:24,334
+他会发现改变的仅仅是
+after the edits. What he will see is that
+the only thing that changed is this little
+
+214
+00:16:24,334 --> 00:16:29,311
+这一小段不一样了，其他地方都是一模一样的
+segment here. That's now different.
+Everything else looks exactly the same. So
+
+215
+00:16:29,311 --> 00:16:34,134
+即使攻击者不知道文件如何修改的
+the attacker, even though he doesn't know
+what actually happened to the file within
+
+216
+00:16:34,134 --> 00:16:38,900
+他却知道修改的严格位置
+the file or what changed, he knows exactly
+the location where the edits took place.
+
+217
+00:16:38,900 --> 00:16:43,840
+事实上，一次性密码本或
+流密码一次加密一位
+And so the fact that the one-time pad or
+a stream cypher encrypts one bit at a time
+
+218
+00:16:43,840 --> 00:16:48,839
+意味着如果一处发生变化，
+很容易分辨出发生改变的位置
+means that if one change takes place, then
+it's very easy to tell where that change
+
+219
+00:16:48,839 --> 00:16:53,430
+这就泄露了攻击者不应知道的信息
+occurred instantly. That leaks information
+that the attacker shouldn't actually
+
+220
+00:16:53,430 --> 00:16:58,080
+理想地，即使文件有一丁点改动
+learn. Ideally you'd like to say that even
+if the file changed just a little bit.
+
+221
+00:16:58,080 --> 00:17:02,818
+整个文件的加密结果都能被改变
+或者至少所有分块内容都能有所改变
+Entire contents of the file should change.
+Or maybe at least the entire contents of
+
+222
+00:17:02,818 --> 00:17:07,557
+这里攻击者甚至知道改变
+the blocks should change. Here you can see
+the attacker even knows within the block
+
+223
+00:17:07,557 --> 00:17:12,125
+发生在哪一个分块，事实上
+正因如此，在硬盘上使用流密码
+where the change was actually made, okay.
+So in fact, because of this, it's usually
+
+224
+00:17:12,125 --> 00:17:16,522
+不是一个好点子，本质上
+a bad idea to use stream cyphers for disk
+encryption. And essentially this is
+
+225
+00:17:16,522 --> 00:17:21,146
+这是二次密码本攻击的又一个例子
+因为相同的密码本被用来
+another example of a two-time pad attack
+because the same pad is used to encrypt
+
+226
+00:17:21,146 --> 00:17:26,057
+加密两条不同的信息，似曾相识
+two different messages. This, they happen
+to be very similar, but nevertheless these
+
+227
+00:17:26,057 --> 00:17:30,582
+确是两条不同的信息
+攻击者可以学到改变了什么
+are two different messages, and the
+attacker can learn what the change was and
+
+228
+00:17:30,582 --> 00:17:35,339
+他还可能知道内容如何改变的
+in fact he might be able to even learn
+what the actual changed words were, as a
+
+229
+00:17:35,339 --> 00:17:39,192
+所以这里的教训是，加密硬盘时
+我们需要做些不同的工作
+result of this. Okay, so the lesson here
+is generally we need to do something
+
+230
+00:17:39,192 --> 00:17:43,249
+在后面的章节里我们再来讨论硬盘加密
+different for disk encryption. We'll talk
+about what to do for disk encryption in a
+
+231
+00:17:43,249 --> 00:17:46,965
+但是一次性密码本绝对不是
+later segment, but essentially the
+one-time pad is generally not a good idea
+
+232
+00:17:46,965 --> 00:17:50,631
+硬盘加密的好方法
+那么再总结一下二次密码本攻击
+for encrypting blocks on disks. So just
+again to summarize the two-time pad
+
+233
+00:17:50,631 --> 00:17:54,493
+如你所想，我希望我已说服你
+attack, we saw that you're supposed, I
+hope I've convinced you that you're never
+
+234
+00:17:54,493 --> 00:17:58,551
+千万不要重复使用流密钥
+ever, ever supposed to use a stream cypher
+key more than once. Even though there are
+
+235
+00:17:58,551 --> 00:18:02,560
+即使有先例，你也需要小心
+natural settings where that might happen,
+you have to take care and make sure that
+
+236
+00:18:02,560 --> 00:18:06,440
+确保不要重复使用同样的密钥。对于网络流量
+you're not using the same key more than
+once. So for network traffic typically
+
+237
+00:18:06,440 --> 00:18:10,566
+每个会话有自己的密钥
+what you're supposed to do is every
+session would have its own key. Within the
+
+238
+00:18:10,566 --> 00:18:14,742
+会话内从客户端到服务端的信息
+可视为一个完整流
+session the message from the client and
+the server look as one complete stream. It
+
+239
+00:18:14,742 --> 00:18:18,765
+它可只使用一个密钥加密
+从服务端到客户端的信息
+would be encrypted using one key. Is, the
+messages from the server to the client
+
+240
+00:18:18,765 --> 00:18:22,636
+可被视为一个流并使用不同密钥加密
+would be treated as one stream and
+encrypted using a different key. And then
+
+241
+00:18:22,636 --> 00:18:26,761
+然后这个加密一般不使用流密码
+for this encryption typically would not
+use a stream cypher because, as changes
+
+242
+00:18:26,761 --> 00:18:31,509
+因为对文件的修改，会泄露文件内容
+are made to the file, he would be leaking
+information about the contents of the
+
+243
+00:18:31,509 --> 00:18:36,136
+好，我们的二次密码本的讨论完结了
+file. Okay, so that concludes our brief
+discussion of the two time pad.
+
+244
+00:18:36,136 --> 00:18:41,092
+下面我谈一个攻击
+即事实上，一次性密码本
+Next attack I want to mention. Is a fact
+that the one time pad and stream cyphers
+
+245
+00:18:41,092 --> 00:18:45,578
+和流密码不提供完整性保护
+它们所做的仅仅是
+in general provide no integrity at all.
+All they do is they try to provide
+
+246
+00:18:45,578 --> 00:18:50,610
+私密性保护，当密钥只用一次时
+它们根本不提供完整性
+confidentiality when the key's only used
+once. They provide no integrity at all but
+
+247
+00:18:50,610 --> 00:18:55,581
+更糟的是，实际上很容易修改密文
+even worse than that it's actually very
+easy to modify cypher text and have known
+
+248
+00:18:55,581 --> 00:19:00,310
+来对还原明文造成显著影响
+让我来解释一下
+effects on the corresponding plain text.
+So let me explain what I mean by that.
+
+249
+00:19:00,486 --> 00:19:05,025
+顺便说下，这个性质叫可修改性
+This property, by the way, is called
+malleability, and we'll see what I mean by
+
+250
+00:19:05,025 --> 00:19:09,682
+我们待会将看到。设想有明文M被加密
+that in just a second. So imagine we have
+some message M that gets encrypted. So,
+
+251
+00:19:09,682 --> 00:19:14,279
+使用流密码加密，当然
+here, it gets encrypted using a stream
+cipher. And the cipher text, of course, is
+
+252
+00:19:14,279 --> 00:19:18,690
+密文为M异或密钥K
+现在一攻击者截获了密文
+then gonna be, M XOR a K. Now an
+attacker intercepts the cypher text. Well,
+
+253
+00:19:18,690 --> 00:19:23,175
+他还不知道密文是什么
+不过除了窃听以外
+that doesn't tell him what's, what the
+plain text is but what he can do is now
+
+254
+00:19:23,175 --> 00:19:27,660
+攻击者还可以积极篡改密文
+beyond eavesdropping he can actually
+become an active attacker and modify the
+
+255
+00:19:27,660 --> 00:19:31,742
+当我可以篡改密文时
+cypher text. So when I say modify the
+cypher text let's suppose that he
+
+256
+00:19:31,742 --> 00:19:36,955
+假设他将密文和一特定值P异或
+P叫做子置换密钥
+XOR the cypher text with a certain
+value P. Whats called a sub-permutation key.
+
+257
+00:19:37,160 --> 00:19:42,020
+这样密文就变成了M异或K异或P
+Well, the resulting cipher text then
+becomes M XOR K, XOR P. So now I'll
+
+258
+00:19:42,020 --> 00:19:48,207
+我问大家，当我们解密时
+我们能得到什么？
+ask you, when we decrypt the cipher text,
+what is it going to decrypt to? Well I
+
+259
+00:19:48,207 --> 00:19:53,613
+大家应该会操作异或
+解密后是M异或P
+hope everybody sees manipulating the XORs
+Basically the decryption becomes M XOR P
+
+260
+00:19:53,613 --> 00:19:58,952
+注意到异或密码本P后
+So you notice that by XOR with this
+pad P, the attacker was able to
+
+261
+00:19:58,952 --> 00:20:03,700
+攻击者可以对明文造成特定影响
+have a very specific effect on the
+resulting plain text. Okay. So a summary
+
+262
+00:20:03,700 --> 00:20:08,135
+总结一下，大家可以修改密文
+这些修改将不会被检测出来
+is basically you can modify the cypher
+text. These modifications are undetected.
+
+263
+00:20:08,135 --> 00:20:12,289
+更糟的是，它们无法检测
+它们对还原的明文有特定影响
+But even worse, they're undetected, they
+have a very specific impact on the
+
+264
+00:20:12,289 --> 00:20:16,893
+不管拿什么跟密文异或
+resulting plain text. Namely whatever you
+XOR the cipher text with is going to have
+
+265
+00:20:16,893 --> 00:20:21,384
+都会对明文产生影响
+看得出这是危险的
+that exact effect on the plain text. So to
+see where this can be dangerous, let's
+
+266
+00:20:21,384 --> 00:20:25,987
+我们看一个特别的例子
+假设用户发送了份Email
+look at a particular example. Suppose the
+user sends an email that starts with the
+
+267
+00:20:25,987 --> 00:20:30,661
+以“自Bob”开头，攻击者截获了密文
+words from Bob. In the attacker
+intercepts the corresponding cypher text.
+
+268
+00:20:30,661 --> 00:20:35,236
+他不知道明文是什么
+He doesn't know what the cypher text is
+but let's just for the sake of it let's
+(口误cypher，应为plain)
+
+269
+00:20:35,236 --> 00:20:39,851
+不过我们不妨假定他知道这信来自Bob
+pretend that he actually knows that this
+message is actually from Bob. What he
+
+270
+00:20:39,851 --> 00:20:44,240
+他想修改密文，让明文变成
+wants to do is he wants to modify the
+ciphertext so that the plain text would
+
+271
+00:20:44,240 --> 00:20:48,686
+来自于另外某个人
+比如说，他想让它变成
+now look like it came from somebody else.
+Say, he wants to make it look like this
+
+272
+00:20:48,686 --> 00:20:53,131
+这份信来自Alice。攻击者只有密文
+message actually came from Alice. All he
+has is the ciphertext. Well, what he can
+(根据下文，此处应为Eve)
+
+273
+00:20:53,131 --> 00:20:57,521
+不过他可以异或特定的三个字母
+do is he can XOR with a certain
+three characters. We'll see
+
+274
+00:20:57,521 --> 00:21:01,799
+我们待会将看到是哪三个字母
+what those three characters are in just a
+second. And such that the resulting
+
+275
+00:21:01,799 --> 00:21:06,411
+这样子密文就变成从Eve发来的
+ciphertext is actually an encryption of
+the message from Eve. And so that now when
+
+276
+00:21:06,411 --> 00:21:10,490
+等用户解密时，他会认为这份信来自Eve
+the user decrypts that. All of a sudden
+he'll see, Hey, this message is from Eve.
+
+277
+00:21:10,490 --> 00:21:14,564
+来自Eve，而不是Bob
+It's not, he'll think this message is from
+Eve, not from Bob. And that might cause
+
+278
+00:21:14,564 --> 00:21:18,677
+明显有错误发生了
+you know, the wrong thing to take place.
+So here the attacker, even though he
+
+279
+00:21:18,677 --> 00:21:23,405
+即使攻击者自己不能创造密文
+声称是来自Eve
+himself could not have created a cypher
+text that says from Eve, by modifying an
+
+280
+00:21:23,405 --> 00:21:28,192
+通过修改已有的密文
+他也可以达到目的
+existing cypher text all of a sudden he
+was able to make the cypher text that he
+
+281
+00:21:28,192 --> 00:21:32,802
+密文必须被截获到，否则还做不了
+could not have done without intercepting
+at least one cypher text. So again by
+
+282
+00:21:32,802 --> 00:21:37,529
+截获一段密文，修改一下
+就可以使其看起来是来自Eve
+intercepting one cypher text he was able
+to change it so now it looks like it's
+
+283
+00:21:37,529 --> 00:21:42,316
+而不是Bob。特别地
+我们来看这三个字母是什么
+from Eve, rather than from Bob. So just to
+be specific, let's look what these three
+
+284
+00:21:42,316 --> 00:21:47,756
+我们看单词Bob，我用ASCII表示
+characters need to be, so let's look at
+the word Bob. And I'm going to write it in
+
+285
+00:21:47,756 --> 00:21:54,285
+Bob的ASCII码为十六进制42，6F和62
+ASCII. So Bob in ASCII corresponds to 42
+hex six f hex and 62 hex. So little b is
+
+286
+00:21:54,285 --> 00:22:00,815
+b=62H, o=6FH.单词Eve被编码成
+encoded as 62, little o is encoded as six
+f. The word eve is encoded as 45 hex, 76
+(一般地，后缀H表十六进制)
+
+287
+00:22:00,815 --> 00:22:07,262
+45H, 76H和65H。当我异或这两个词时
+我以字符串的形式进行异或
+hex, and 65 hex. Now when I XOR these
+two words, I'm literally going to XOR
+
+288
+00:22:07,262 --> 00:22:13,791
+Bob异或Eve，不难看出
+them as bit strings. So Bob XOR eve,
+it's not difficult to see that what I get
+
+289
+00:22:13,791 --> 00:22:19,798
+我得到了这三个字符07, 19, 07
+are the three characters zero, seven.
+Nineteen and 07. So really what these
+
+290
+00:22:19,798 --> 00:22:25,536
+就是简单的字符07, 19, 07
+three characters here are going to be. Are
+simply 07, nineteen, and 07. And by
+
+291
+00:22:25,536 --> 00:22:31,340
+在密文正确的位置异或这三个字母
+XORing these three characters at the
+right positions into the cipher text, the
+
+292
+00:22:31,340 --> 00:22:37,003
+攻击者可以将内容改成自Eve来
+attacker was able to change the cipher
+text to look like it came from Eve rather
+
+293
+00:22:37,003 --> 00:22:41,892
+而非Bob。这便是一例
+than from Bob. So this is an example
+where having a predictable impact on the
+
+294
+00:22:41,892 --> 00:22:46,410
+密文的可预测影响会导致问题
+cipher text can actually cause quite a bit
+of problems. And this is this property
+
+295
+00:22:46,410 --> 00:22:50,817
+这就是可修改性，我们说
+一次性密码本是可修改的
+called malleability. And we say that the
+one time pad is malleable because it's
+
+296
+00:22:50,817 --> 00:22:54,833
+因为它的密文容易计算
+将特定改变应用到明文上
+very easy to compute in cipher texts, and
+make prescribed changes to the
+
+297
+00:22:54,833 --> 00:22:59,184
+为了防止这点，我将花两三讲时间
+corresponding plain text. So to prevent
+all this, I'm gonna do that, actually, in
+
+298
+00:22:59,184 --> 00:23:03,479
+为大家展示如何为加密机制增加完整性
+two or three lectures. And we're gonna
+basically show how to add integrity to
+
+299
+00:23:03,479 --> 00:23:07,689
+这里我希望大家记住
+encryption mechanisms in general. But
+right now I want you to remember that the
+
+300
+00:23:07,689 --> 00:23:11,551
+一次性密码本本身是没有完整性保护的
+对可修改密文的攻击者而言
+one time pad by itself has no integrity
+and is completely insecure against
+
+301
+00:23:11,551 --> 00:23:14,024
+它毫无安全性可言
+attackers that actually modify the cipher
+texts.

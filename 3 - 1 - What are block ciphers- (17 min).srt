@@ -1,0 +1,1396 @@
+1
+00:00:00,000 --> 00:00:03,553
+现在我们理解了流密码，那么我们继续下一话题
+Now that we understand stream ciphers,
+we're gonna move on and talk about a more
+【伊卡酱 译注】
+
+2
+00:00:03,553 --> 00:00:07,430
+我们来看看更为强大的原型：分组密码
+一个分组密码由两部分构成
+powerful primitive called a block cipher.
+So a block cipher is made up of two
+
+3
+00:00:07,430 --> 00:00:11,800
+E和D，分别是加密和解密算法
+algorithms, E and D. These are encryption
+and decryption algorithms. And both of
+
+4
+00:00:11,800 --> 00:00:17,183
+这两个算法都以一个密钥K为输入
+现在，分组密码的特点是
+these algorithms take, as input, a key K.
+Now, the point of a block cipher is that
+
+5
+00:00:17,183 --> 00:00:23,572
+它取N位明文作为输入
+它的输出与输入具有严格相同的位数
+it takes an N bit plain text as input, and
+it outputs exactly the same number of bits
+
+6
+00:00:23,572 --> 00:00:28,538
+所以他将输入的N位字符串
+映射到输出的N位字符串
+as outputs. So it maps N bits on inputs to
+exactly N bits of outputs. Now there are
+
+7
+00:00:28,538 --> 00:00:33,000
+有两个分组密码的经典例子
+第一个叫做3DES
+two canonical examples of block ciphers.
+The first one is called triple-DES. In
+
+8
+00:00:33,000 --> 00:00:37,895
+在3DES中，分组大小，即输入位数，为64
+triple-DES the block size, namely the
+number of input bits, is 64. So triple-DES
+
+9
+00:00:37,895 --> 00:00:44,388
+所以3DES将64位分组映射到64位分组
+它使用一个128位长的密钥
+will map 64-bit blocks to 64-bit blocks
+and it does it using a key that's 168 bits long.
+
+10
+00:00:44,388 --> 00:00:48,276
+我们在下一节讨论3DES的构建
+We're gonna talk about how Triple DES 
+is built in the next segment.
+
+11
+00:00:48,276 --> 00:00:51,934
+另一个更新的分组密码叫AES
+Another block cipher, which is more
+recent, is called AES. Now, AES has
+
+12
+00:00:51,934 --> 00:00:55,846
+AES的参数略有不同，它的分组大小为128位
+slightly different parameters. So, here
+the block size is 128 bits.
+
+13
+00:00:55,846 --> 00:01:01,687
+所以AES将128位分组映射到128位分组
+So, AES will map a 128 bits of input 
+to 128 bits of output.
+
+14
+00:01:01,687 --> 00:01:07,169
+实际上AES有三种可能的密钥大小
+我把这些密钥大小写在这里
+And it actually has three possible sizes 
+of keys, and I wrote down these sizes over here.
+
+15
+00:01:07,169 --> 00:01:11,205
+密钥越长，密码工作的速度越慢
+Basically the longer the key, the slower the cipher is,
+
+16
+00:01:11,205 --> 00:01:13,445
+但是大概越安全
+but presumably the
+more secure it is to break and we're gonna
+
+17
+00:01:13,445 --> 00:01:18,208
+我们稍后讨论分组密码安全性的意义
+talk about what it means for block ciphers
+to be secure in just a minute. Now block
+
+18
+00:01:18,208 --> 00:01:21,990
+典型的分组密码以迭代的形式构建。
+它们输入密钥K，例如
+ciphers are typically built by iteration. They
+take in as input a key K, for example
+
+19
+00:01:21,990 --> 00:01:26,169
+在AES中，密钥可以是128位长。首先
+in the case of AES the key could be 128
+bits long, and the first thing that
+
+20
+00:01:26,169 --> 00:01:31,467
+将密钥扩张成一系列的回合密钥K1到Kn
+happens to the key is that it gets expanded
+into a sequence of keys K1 to Kn called
+
+21
+00:01:31,467 --> 00:01:36,523
+现在，使用这些回合密钥的方法
+round keys. Now, the way the cipher
+uses these round keys is by iteratively
+
+22
+00:01:36,523 --> 00:01:41,024
+是一次又一次地迭代加密明文信息
+并使用一个叫回合函数的
+encrypting the message again and again and
+again using what's called a round
+
+23
+00:01:41,024 --> 00:01:45,760
+这里我们有这个两输入的函数R
+function. So here we have this function R
+that take two inputs. This function R is
+
+24
+00:01:45,760 --> 00:01:50,612
+这个函数R叫做回合函数
+它的一个输入是回合密钥
+gonna be called a round function. It takes
+as input the round key, and it takes as
+
+25
+00:01:50,612 --> 00:01:55,113
+另一个输入是当前的信息状态
+这里我们有输入的明文信息
+input the current state of the message.
+So here we have our input message. Say,
+
+26
+00:01:55,113 --> 00:01:59,685
+对于AES，明文信息是严格的128位，
+这是因为AES的明文分组为严格的128位。
+for AES, the message would be 128 bits
+exactly, because each block in AES is
+
+27
+00:01:59,685 --> 00:02:04,920
+首先我们应用第一个回合函数
+exactly 128 bits. And then the first thing
+that happens is we apply the first round
+
+28
+00:02:04,920 --> 00:02:09,713
+使用回合密钥K1来对信息操作
+然后我们得到了一些新信息
+function using the key K1 to the
+message. And we get some new message out,
+
+29
+00:02:09,713 --> 00:02:14,548
+然后我们取这个新信息m1，应用下一个回合函数
+as a result. Then we take this message m1,
+we apply the next round function to
+
+30
+00:02:14,548 --> 00:02:19,100
+使用一个不同的密钥k2。然后我们得到了下一轮的信息
+it using a different key, using the key k2.
+Then we get the next round message out.
+
+31
+00:02:19,100 --> 00:02:23,533
+一直下去，直到所有的回合都完事了
+And so on and so forth until all the
+rounds have been applied and then the
+
+32
+00:02:23,533 --> 00:02:28,262
+最后的输出实际上就是加密结果。AES也是这种情况
+final output is actually the result of the
+cipher. And again this would be also
+
+33
+00:02:28,262 --> 00:02:32,645
+AES是128位的。加密结果也是128位的
+in the case of AES, this was 128 bits. And
+the resulting cipher text would also be
+
+34
+00:02:32,645 --> 00:02:36,593
+现在，不同的密码有不同的回合数
+128 bits. Now, different ciphers have
+different number of rounds, and they have
+
+35
+00:02:36,593 --> 00:02:40,439
+有不同的回合函数。例如
+3DES的回合数是48
+different round functions. So, for
+example, for triple DES the number
+
+36
+00:02:40,439 --> 00:02:44,438
+我们会看到3DES的回合函数是怎样工作的
+of rounds is 48. And we're gonna see
+exactly how the round function for triple
+
+37
+00:02:44,438 --> 00:02:48,488
+例如AES的回合数只有10
+DES works. For AES, for
+example, the number of rounds
+
+38
+00:02:48,488 --> 00:02:52,282
+稍后我们也会看到AES的回合函数
+is only ten, and again, we're gonna look
+at how the round functions for AES
+
+39
+00:02:52,282 --> 00:02:54,209
+是怎样工作的
+work as well in just a minute.
+
+40
+00:02:54,563 --> 00:02:57,665
+在这之前，我想提一下相关性能参数
+Before we do that, I just wanted to 
+mention performance numbers.
+
+41
+00:02:57,665 --> 00:02:59,513
+大家看，这些是相关性能参数
+So you can see here, these are 
+the performance numbers
+
+42
+00:02:59,513 --> 00:03:04,721
+两个典型分组密码，3DES和AES的参数
+for the two typical block ciphers,
+triple DES and AES.
+
+43
+00:03:04,721 --> 00:03:08,490
+这些是流密码的相关性能参数
+And these are the corresponding
+numbers for the stream ciphers
+
+44
+00:03:08,490 --> 00:03:10,508
+流密码我们上一章看过了
+that we looked at in the previous module.
+
+45
+00:03:13,155 --> 00:03:15,019
+可以看出分组密码
+And if you see that the block ciphers are
+
+46
+00:03:15,019 --> 00:03:18,209
+比流密码慢得多，但我们将看到
+considerably slower than stream ciphers.
+But we'll see that we can
+
+47
+00:03:18,209 --> 00:03:22,486
+分组密码能做的很多事情
+使用类似RC4的流密码的话
+do many things with block ciphers that we
+couldn't do very efficiently with,
+
+48
+00:03:22,486 --> 00:03:27,262
+不能很有效地完成。现在我这周的目标是
+告诉大家分组密码是如何工作的
+constructions like RC4. Now my goal for
+this week is to show you how block ciphers work,
+
+49
+00:03:27,262 --> 00:03:31,700
+更重要的，我想告诉大家
+如何正确地使用分组密码
+but more importantly I want to show
+you how to use block ciphers correctly,
+
+50
+00:03:31,700 --> 00:03:36,210
+对于加密或完整性，或者
+不管什么你能想到的应用
+for either encryption or integrity or
+whatever application you have in mind.
+
+51
+00:03:36,210 --> 00:03:40,606
+为了告诉大家怎么正确使用分组密码
+So to show you how to use block ciphers 
+correctly, it actually makes a lot of sense
+
+52
+00:03:40,606 --> 00:03:45,345
+适当地抽象一点概念会更有道理
+这样我们可以有一个分组密码的
+to abstract the concept a little bit so we have a clean,
+abstract concept of a block cipher
+
+53
+00:03:45,345 --> 00:03:49,856
+清晰的定义。然后我们可以证明和推断
+哪些加密机制是正确的
+to work with. And then we can argue and reason
+about what constructions are correct and
+
+54
+00:03:49,856 --> 00:03:54,423
+哪些是错误的。一个分组密码的非常优雅的抽象概念
+what constructions are incorrect. And so
+an abstraction, it's a very elegant abstraction of a
+
+55
+00:03:54,423 --> 00:03:58,590
+叫做伪随机函数
+block cipher is what's called a 
+pseudorandom function, a pseudorandom
+
+56
+00:03:58,590 --> 00:04:03,518
+伪随机置换。让我解释一下这些概念：
+一个伪随机函数
+permutation. So let me explain what these
+things are. So a pseudorandom function
+
+57
+00:04:03,518 --> 00:04:08,831
+定义在密钥空间，输入空间和输出空间上
+basically is defined over a key space, an
+input space, and an output space.
+
+58
+00:04:08,831 --> 00:04:14,428
+伪随机函数取一个密钥、输入,
+And all it is, is basically a function that takes
+a key and an input as inputs and outputs
+
+59
+00:04:14,428 --> 00:04:20,095
+输出输出空间中某个元素。好，
+它从K和X中各取一个元素
+some element in the output space. Okay, so
+it takes an element in K, an element in X,
+
+60
+00:04:20,095 --> 00:04:24,746
+输出Y中的一个元素。然后唯一的要求是
+and outputs an element in Y. And the only
+requirement essentially, is that there's
+
+61
+00:04:24,746 --> 00:04:29,132
+有一个有效的方法来计算这个函数。
+对于我们不需要是可逆的函数
+an efficient way to evaluate the function.
+For functions we're not requiring that
+
+62
+00:04:29,132 --> 00:04:33,882
+我们只需要它们是可计算的，给定密钥和输入x
+they be invertible, we just need them to
+be evaluatable, given the key and the input x.
+
+63
+00:04:33,882 --> 00:04:38,118
+现在，有一个有关概念可以更准确地抓住分组密码的特征
+Now, a related concept that more 
+accurately captures what a block cipher is
+
+64
+00:04:38,118 --> 00:04:41,698
+叫做伪随机置换
+it's called a pseudo-random
+permutation. So a pseudo-random
+
+65
+00:04:41,698 --> 00:04:46,261
+伪随机置换也是定义在密钥空间和一个集合X上
+permutation is, again, defined over a key
+space, and then just a set X. And what it
+
+66
+00:04:46,261 --> 00:04:50,362
+它取密钥空间中的一个元素和X中一个元素
+does is it takes an element in the key
+space, an element of X, and outputs,
+
+67
+00:04:50,362 --> 00:04:54,579
+输出X中的一个元素。现在
+通常函数E是容易计算的
+basically, one element in X. Now, as
+usual, the function E should be easy to
+
+68
+00:04:54,579 --> 00:04:59,026
+所以应当有一个算法来计算函数E
+evaluate. So there should be an algorithm
+to evaluate the function E. But more
+
+69
+00:04:59,026 --> 00:05:04,382
+但更重要的，一旦固定密钥K，
+函数E是一一对应的，这点是重要的
+importantly, once we fix the key K, it's
+important that this function E be one-to-one.
+
+70
+00:05:04,382 --> 00:05:09,731
+换句话说，如果你考虑这里的集合X
+In other words, if you think of the
+space X as the set here, and here's the
+
+71
+00:05:09,731 --> 00:05:14,805
+函数也映射到X，然后函数E是双射的
+same set X again, then basically the
+function E, what it does, is, it's a one-to-one
+
+72
+00:05:14,805 --> 00:05:20,360
+所以X中的每一个元素被严格映射到X中的一个元素
+function, so every element in X
+gets mapped to exactly one element in X.
+
+73
+00:05:20,360 --> 00:05:24,796
+然后因为它是一一映射的，它当然是可逆的
+And then because it's one to one, of
+course it's also invertible. So given some
+
+74
+00:05:24,796 --> 00:05:30,228
+所以给定一些输出，当然有一个输入
+可以被映射到那个输出
+output there's only one input that maps to
+that output. And the requirement is that
+
+75
+00:05:30,228 --> 00:05:35,660
+要求有一个有效的逆向算法
+叫做D，输入特定输出
+there is an efficient inversion algorithm,
+call it D, that given a particular output,
+
+76
+00:05:35,660 --> 00:05:39,984
+会输出特定输出的原像
+will output the original preimage that
+mapped to that output. So really, a
+
+77
+00:05:39,984 --> 00:05:44,718
+一个伪随机置换非常精确地
+抓住了分组密码的特点
+pseudorandom permutation captures very
+accurately and syntactically what a block
+
+78
+00:05:44,718 --> 00:05:49,393
+通常我不区分这些术语：
+分组密码，或是伪随机置换
+cipher is, and often I'll use the terms
+interchangeably, either a block cipher or
+
+79
+00:05:49,393 --> 00:05:53,834
+我会根据上下文选择术语
+a pseudorandom permutation. I'll use
+whichever term depending on the context
+
+80
+00:05:53,834 --> 00:05:58,706
+好的，我们有两个例子，前面说过
+where we're discussing things. Okay,
+so we have two examples, as we said, of
+
+81
+00:05:58,706 --> 00:06:04,031
+关于伪随机置换的，3DES和AES
+比如说AES128
+pseudorandom permutations, triple DES and
+AES, say for AES-128. The key space would
+
+82
+00:06:04,031 --> 00:06:09,225
+密钥空间是128位，输出也是128位。
+我们说过，对于3DES
+be 128 bits and the output space would be
+128 bits. For Triple DES, as we said, the
+
+83
+00:06:09,225 --> 00:06:13,721
+分组大小仅为64位。密钥空间168位
+block size is only 64 bits. And the key
+size is 168 bits, okay. So we'll use
+
+84
+00:06:13,721 --> 00:06:18,108
+这些例子贯穿本课程，只要我一说PRP
+these running examples actually 
+throughout, so whenever I say a PRP, concretely
+(PRP:伪随机置换)
+
+85
+00:06:18,108 --> 00:06:21,667
+你就应当具体地想到AES或3DES
+you should be thinking AES or
+triple DES. Now one thing that I
+
+86
+00:06:21,667 --> 00:06:26,994
+我想指出，事实上任何伪随机置换
+wanted to point out is that in fact any
+pseudo-random permutation, namely any block
+
+87
+00:06:26,994 --> 00:06:31,326
+即任何分组密码，你可想到一个PRF。
+事实上PRP是个具有更多结构的PRF
+cipher, you can also think of it as a PRF.
+In fact a PRP is a PRF that has more structure.
+(PRF:伪随机函数)
+
+88
+00:06:31,326 --> 00:06:35,935
+特别地，一个PRP是一个输入空间等于输出空间的PRF
+In particular, a PRP is a PRF where
+the input space and the output space are
+
+89
+00:06:35,935 --> 00:06:40,322
+即X等于Y，事实上可以有效地求逆
+the same, so X is equal to Y, and in
+fact is efficiently invertible once you
+
+90
+00:06:40,322 --> 00:06:44,944
+一旦你有密钥k，好的，某种意义上
+PRP是PRF的特例
+have the secret key k. Okay. So
+in some sense a PRP is a special case of a
+
+91
+00:06:44,944 --> 00:06:48,849
+尽管这并不准确，我们待会解释
+PRF, although that's not entirely accurate,
+and we'll see why in just a second.
+
+92
+00:06:48,849 --> 00:06:53,359
+目前，我们描述了伪随机置换
+So, so far, we just described the,
+kind of, the syntactic definition of what
+
+93
+00:06:53,359 --> 00:06:57,760
+和伪随机函数的字面定义。现在
+is a pseudo random permutation and a
+pseudo random function. So now, let's talk
+
+94
+00:06:57,760 --> 00:07:01,936
+我们来讨论PRF或PRP安全的意义
+about what it means for a PRF or a PRP to
+be secure. And this concept will
+
+95
+00:07:01,936 --> 00:07:06,393
+这个概念抓住了分组密码安全的本质
+essentially capture what it means for a
+block cipher to be secure, okay? So this
+
+96
+00:07:06,393 --> 00:07:09,778
+这是为什么我想在看具体加密机制前
+is why I wanted to show you these
+definitions, before we look at actual
+
+97
+00:07:09,778 --> 00:07:13,029
+为大家展示这些定义，这样一来
+大家就很清楚我们要构建什么样的密码
+block cipher constructions, so at least
+it's clear in your mind what it is we're
+
+98
+00:07:13,029 --> 00:07:19,267
+好，那么这里我有个PRF，这里我需要一点记号
+trying to construct. Okay, so here we have
+a PRF. And I'm gonna need a little bit of
+
+99
+00:07:19,267 --> 00:07:24,133
+不太多，我需要定义集合“X,Y的函数”
+notation, not too much though, so I'm gonna
+need to define the set "Funs of X, Y".
+
+100
+00:07:24,133 --> 00:07:30,133
+这是所有从集合X映射到集合Y的函数的集合
+This is basically the set of all functions from
+the set X to the set Y, denoted here as a
+
+101
+00:07:30,133 --> 00:07:35,467
+用一个大圈来表示之。现在这个集合
+非常之大，它的大小
+big circle, Funs[X, Y]. Now this set is
+gigantic. Its size is basically, you know,
+
+102
+00:07:35,467 --> 00:07:41,120
+是Y的大小的|X|次方，以AES为例
+the size of Y to the size of X, so for
+example for AES, remember both X and Y
+
+103
+00:07:41,120 --> 00:07:45,600
+记得X和Y都是2的128次方，故对于AES，
+这个函数集合的大小非常庞大
+would be 2 to the 128, so for AES the
+size of the set is enormous. It'll be
+
+104
+00:07:45,600 --> 00:07:52,686
+大小是2的128次方的2的128次方次方，
+是双重指数
+2 to the 128 times 2 to the 128.
+So it's kind of a double exponential.
+
+105
+00:07:52,686 --> 00:07:57,797
+非常大的数，比宇宙中的粒子数都多
+So this is a gigantic number, this is more
+particles than there are in the universe.
+
+106
+00:07:57,797 --> 00:08:02,070
+先不管这个，我们可以抽象地考虑这个集合
+But regardless, we can kind of think of 
+this set abstractly. We never have to kind of
+
+107
+00:08:02,070 --> 00:08:06,936
+我们不必要写下来，我们可以脑补之，
+不必担心如何计算它
+write it down, we can just keep it in 
+our head and not worry about computing on it.
+
+108
+00:08:06,936 --> 00:08:11,627
+这是个非常大的集合，所有从X到Y的函数的集合
+So this is a particular gigantic set 
+of the set of all functions from X to Y.
+
+109
+00:08:11,627 --> 00:08:16,261
+现在我们看一个小很多的函数集合
+Now we're gonna look at a much smaller 
+set of functions, namely I'll call this set
+
+110
+00:08:16,261 --> 00:08:20,945
+我把它叫做S_F，表示从X到Y的全体函数
+S sub F, and that's gonna denote the
+set of all functions from X to Y that are
+
+111
+00:08:20,945 --> 00:08:25,253
+由PRF指定的，而且固定密钥k
+specified by the PRF as soon as we
+fix the particular key k. Okay so,
+
+112
+00:08:25,253 --> 00:08:30,444
+好的，我们固定密钥k，让第二个参数浮动
+we fixed the key k, we let the second
+argument float, and that basically defines
+
+113
+00:08:30,444 --> 00:08:34,554
+这就定义了一个从X到Y的函数。然后
+我们看对所有密钥空间中可能的密钥，
+a function from X to Y. Then we're going
+to look at the set of all such functions
+
+114
+00:08:34,554 --> 00:08:39,600
+对所有这样的函数组成的集合。
+好，如果大家再想想
+for all possible keys in the key space.
+Okay, so, if you think about it again,
+
+115
+00:08:39,600 --> 00:08:47,921
+对于AES，我们用128位密钥，这个的大小，
+我们说S_AES，是2的128次方
+for AES, if we're using 128-bit keys, the size of
+this, I'll say S-AES, is basically going to be
+
+116
+00:08:47,921 --> 00:08:53,201
+比X到Y全体函数的个数少得多
+2 to the 128, so much, much, much
+smaller than the set of all possible
+
+117
+00:08:53,201 --> 00:08:58,165
+现在，我们说，一个PRF是安全的
+functions from X to Y. And now, we say
+that a PRF is secure, basically if a
+
+118
+00:08:58,165 --> 00:09:03,455
+如果一个随机函数从X映射到Y，
+这里随机的意思是任取一个函数
+random function in, from X to Y. So we
+literally, we pick some arbitrary function
+
+119
+00:09:03,455 --> 00:09:09,079
+从X到Y全体函数这个大集合里面任取。
+我们说这个PRF是安全的
+in this gigantic set of all functions from
+X to Y. And we say that the PRF is secure,
+
+120
+00:09:09,079 --> 00:09:14,637
+如果事实上一个从X到Y的随机函数，
+与从X到Y的伪随机函数
+if, in fact, a random function from X to Y
+is indistinguishable from a pseudo-random
+
+121
+00:09:14,637 --> 00:09:19,717
+不可区分。当我们从集合S_F里
+选取一个随机函数时
+function from X to Y. Namely, when we pick
+a random function from the set SF.
+
+122
+00:09:19,717 --> 00:09:21,867
+好，说得再清楚点
+Okay. So, more precisely basically again,
+
+123
+00:09:21,867 --> 00:09:25,267
+在伪随机函数集合上的均匀分布
+the uniform distribution on the set
+of pseudorandom functions
+
+124
+00:09:25,267 --> 00:09:29,632
+与全体函数上的均匀分布不可区分
+is indistinguishable from the
+uniform distribution on the set of all functions.
+
+125
+00:09:29,632 --> 00:09:32,067
+让我讲得再精确点
+Let me be just a little bit more precise,
+
+126
+00:09:32,067 --> 00:09:35,483
+给大家更直观的表达我这里的意思
+just to give you a little bit more
+intuition about what I mean by that and then we'll
+
+127
+00:09:35,483 --> 00:09:38,711
+然后我们再去看实际的加密机制。
+我更准确地说明PRF安全的意义
+move on to actual constructions. So let me
+a bit more precise about what it means for
+
+128
+00:09:38,711 --> 00:09:43,600
+那么我们做如下事情
+a PRF to be secure. And so what we'll do
+is basically the following. So we have our
+
+129
+00:09:43,600 --> 00:09:48,150
+我们有攻击者，他试图区分真随机函数和伪随机函数
+adversary, who's trying to distinguish
+truly random function from a pseudo-random
+
+130
+00:09:48,150 --> 00:09:52,030
+我们让它们互相互动
+function. So what we'll do is let them
+interact with one of the two. So here in
+
+131
+00:09:52,030 --> 00:09:56,013
+在这个顶端的云，我们选择一个真随机函数。
+在底端的云
+the top cloud, we're choosing a truly
+random function. In the bottom cloud,
+
+132
+00:09:56,013 --> 00:10:00,377
+我们选择一个随机密钥，计算伪随机函数
+we're just choosing a random key for a
+pseudo-random function. And now what this
+
+133
+00:10:00,377 --> 00:10:04,906
+现在这个攻击者上传一些X中的点
+adversary's gonna do is he's gonna submit
+points in X. So he's gonna submit a bunch
+
+134
+00:10:04,906 --> 00:10:09,293
+他将上传一些X。事实上，他将反复做这件事情
+of Xs. In fact, he's gonna do this again
+and again and again. So he's gonna
+
+135
+00:10:09,293 --> 00:10:14,722
+他会提交X1, X2. X3, X4,然后对每一个询问
+submit X1, X2. X3, X4, and then for each
+one of, of those queries, we're gonna give him
+
+136
+00:10:14,722 --> 00:10:19,693
+我们给他真随机函数在点X处的值
+either the value of the truly random
+function at the point X, or the value of
+
+137
+00:10:19,693 --> 00:10:24,676
+或是伪随机函数在点X处的值
+好，攻击者不知道他得到的
+the pseudorandom function at the point X.
+Okay, so the adversary doesn't know which
+
+138
+00:10:24,676 --> 00:10:29,299
+是哪一种。顺便一提，对所有询问
+他总是得到随机函数值
+ones he's getting. By the way, for all
+queries, he's always getting either the truly
+
+139
+00:10:29,299 --> 00:10:33,320
+或者是伪随机函数。换句话说
+random function, or the pseudorandom
+function. In other words, he's either
+
+140
+00:10:33,320 --> 00:10:37,522
+攻击者的所有询问和一个真随机函数互动
+interacting with a truly random function
+for all his queries, or he's interacting
+
+141
+00:10:37,522 --> 00:10:41,724
+或者和一个伪随机函数互动
+with a pseudorandom function for all his
+queries. And we say that the PRF is
+
+142
+00:10:41,724 --> 00:10:45,926
+我们说PRF是安全的，如果可怜的攻击者
+无法区别其中的不同
+secure if this poor adversary can't tell the
+difference. He cannot tell whether he's
+
+143
+00:10:45,926 --> 00:10:49,921
+攻击者无法区分他是和一个真随机函数互动
+还是和一个伪随机函数互动
+interacting with a truly random function
+or interacting with a pseudo random
+
+144
+00:10:49,921 --> 00:10:53,912
+好，我们稍后还会回来
+并更精确地定义PRF
+function. Okay, and we're gonna come back
+actually later on and define PRFs more
+
+145
+00:10:53,912 --> 00:10:58,649
+现在，我想给大家介绍安全PRF的直观思想
+precisely but for now, I wanted to give
+you the intuition for what it means for PRFs to be secure
+
+146
+00:10:58,649 --> 00:11:03,155
+这样大家就能理解我们在构建什么
+so you'll understand what it is that we're
+trying to construct when we construct
+
+147
+00:11:03,155 --> 00:11:06,333
+当我们构建伪随机函数时。我想说
+these pseudorandom functions. And I
+should say that the definition for a
+
+148
+00:11:06,333 --> 00:11:11,242
+伪随机置换的定义其实差不多一样
+pseudorandom permutation is pretty much
+the same, except instead of choosing a
+
+149
+00:11:11,242 --> 00:11:15,910
+除了不是选择随机函数，我们在集合X上
+选择一个随机置换
+random function, we're going to choose a
+random permutation on the set X. In other
+
+150
+00:11:15,910 --> 00:11:21,964
+换句话说，集合X上一个随机一一映射的函数。
+攻击者可以询问
+words, a random one-to-one function on the
+set X. The adversary can either query this
+
+151
+00:11:21,964 --> 00:11:27,306
+这个X上的随机函数，或者询问
+一个伪随机函数
+random function on the set X, or he can
+query a pseudorandom permutation, and the
+
+152
+00:11:27,306 --> 00:11:32,256
+PRP是安全的，如果攻击者不能区分
+PRP is secure if the adversary cannot
+tell the difference. Okay, so again the
+
+153
+00:11:32,256 --> 00:11:36,946
+好，目标是让这些函数和置换
+goal is to make these functions and
+permutations look like truly random
+
+154
+00:11:36,946 --> 00:11:42,271
+看起来像真的随机函数和置换，好
+我们看一个简单问题
+functions or permutations. Okay. So let's
+look at a simple question. So suppose we
+
+155
+00:11:42,271 --> 00:11:48,050
+假设我们有一个安全PRF，记为F
+它定义在集合X上
+have a secure PRF. So we know this PRF
+F. Happens to be defined in the set X. And
+
+156
+00:11:48,050 --> 00:11:53,691
+它一次输出128位
+it so happens, you know, it outputs 128
+bits every time. It so happens that this
+
+157
+00:11:53,691 --> 00:11:59,694
+这个PRF不能从X到｛0，1｝^128的
+随机函数中被区分出来
+PRF cannot be distinguished from a truly
+random function from X to ｛0,1｝ to the 128.
+
+158
+00:11:59,694 --> 00:12:05,335
+现在我们要构建一个新PRF，记为G
+Now we're gonna build a new PRF. Let's
+call this PRF G. And the PRF G is gonna be
+
+159
+00:12:05,335 --> 00:12:11,121
+G如下定义，若x等于0，G总是输出0
+defined as follows. We say, if x is equal
+to zero, always output zero. Otherwise,
+
+160
+00:12:11,121 --> 00:12:15,654
+否则，若x不等于0，G输出F的值
+那么我的问题是
+if x is not equal to zero, just output the
+value of F. So, my question to you is,
+
+161
+00:12:15,654 --> 00:12:19,414
+G是安全的PRF吗？
+do you think this G is a secure PRF?
+
+162
+00:12:19,476 --> 00:12:22,179
+答案当然不是
+Well, so, the answer, of course, is that its very easy
+
+163
+00:12:22,179 --> 00:12:26,455
+我们很容易区分函数G和真随机函数
+to distinguish the function G from a random
+function. All the adversary has to do
+
+164
+00:12:26,455 --> 00:12:30,930
+攻击者只需要询问X=0的函数值
+对于一个真的随机函数
+is just query the function at X=0.
+For a random function, the probability
+
+165
+00:12:30,930 --> 00:12:35,405
+这一点上函数值等于0的概率是
+1除以2的128次方
+that the result is gonna be zero is one
+over 2 to the 128. Whereas for the
+
+166
+00:12:35,405 --> 00:12:40,174
+而对于这个伪随机函数，他总是得到0
+因为在0这个点处
+pseudo-random function, he's always gonna
+get zero. Because at zero, the function is
+
+167
+00:12:40,174 --> 00:12:44,847
+函数总是定义为0，无论什么密钥
+always defined to be zero, no matter what
+the key. And so all he would do is he
+
+168
+00:12:44,847 --> 00:12:49,717
+他会说，我在和一个伪随机函数互动
+如果他在X=0处得到0
+would say, hey, I'm interacting with a
+pseudo-random function if he gets zero at X=0,
+
+169
+00:12:49,717 --> 00:12:54,525
+他会说，我在和一个真随机函数互动
+如果他在X=0处得到的不是0
+and he'll say I'm interacting with
+a random function if he gets nonzero at X=0.
+
+170
+00:12:54,525 --> 00:12:59,148
+所有很容易区分G和真随机函数
+So it's very easy to distinguish
+this G from random. So what this example shows
+
+171
+00:12:59,148 --> 00:13:04,080
+这个例子说明了即使你有一安全PRF
+对于一个已知的输入
+is that even if you have a secure PRF, 
+it's enough that on just one known input
+
+172
+00:13:04,080 --> 00:13:08,844
+若输出不随机，被固定了，
+那么这个PRF就被破解了
+the output is kinda not random, the
+output is fixed, and already the PRF is broken,
+
+173
+00:13:08,844 --> 00:13:13,178
+即使你知道这个PRF的其他地方
+even though you realize that
+everywhere else the PRF is perfectly
+
+174
+00:13:13,178 --> 00:13:17,691
+和真随机一点都无法区分
+好，我来告诉大家PRF的威力
+indistinguishable from random. Okay, so
+let's just show you the power of PRFs.
+
+175
+00:13:17,691 --> 00:13:22,322
+我们看一个很简单的应用
+我想告诉大家事实上
+Let's look at a very easy application. I want to
+show you that in fact pseudorandom functions
+
+176
+00:13:22,322 --> 00:13:27,432
+伪随机函数可以直接给我们一个
+伪随机数发生器
+directly give us a pseudorandom generator. 
+Okay. So, let's assume we have
+
+177
+00:13:27,432 --> 00:13:32,779
+那么，假设有一伪随机函数
+从N位字符串映射到N位字符串
+a pseudo random function. So this one
+happens to go from N bits to N bits. And then,
+
+178
+00:13:32,779 --> 00:13:37,720
+然后我们定义如下发生器
+种子空间取这个PRF的密钥空间
+let's define the following generator.
+Its seed space is going to be the
+
+179
+00:13:37,720 --> 00:13:42,491
+发生器的输出空间为t个
+key space for the PRF, and its output
+space is gonna be, basically, t blocks of
+
+180
+00:13:42,491 --> 00:13:49,657
+N位的分组。好，大家可以看到，输出一共有nt位
+n bits each. Okay, so you can see the
+output is a total of n times t bits for
+
+181
+00:13:49,657 --> 00:13:53,740
+我们可以选择某个参数t
+some parameter T that we can choose. And
+it turns out, basically, you can do this
+
+182
+00:13:53,740 --> 00:13:57,642
+实际上你可以做这个简单的构造
+这有时叫做计数器模式
+very simple construction, this is
+sometimes called counter mode,
+
+183
+00:13:57,642 --> 00:14:00,392
+取PRF，计算其在0的值
+where essentially, you take the PRF and you
+evaluate it at zero, you evaluate it at one,
+
+184
+00:14:00,392 --> 00:14:05,166
+计算其在1的值，计算其在2的值，3的值，
+4的值，直到t，然后将这些值联结起来
+you evaluate it at two, at three, at
+four, up to T, and you concatenate all these values.
+
+185
+00:14:05,166 --> 00:14:09,940
+这是个发生器，对吧？
+我们取PRF的密钥
+That's the generator, okay?
+So we basically took the key for the PRF
+
+186
+00:14:09,940 --> 00:14:15,966
+把它扩张成nt位字符串
+好的，这个生成器的一个重要性质是
+and we expanded it into n times t bits.
+Okay. A key property of this generator is
+
+187
+00:14:15,966 --> 00:14:21,019
+它是可并行计算的。我的意思是
+如果你有两个处理器或两核
+that it's parallelizable. What I mean by that
+is if you have two processors or two cores
+
+188
+00:14:21,019 --> 00:14:25,952
+可供计算，那么你就可以让一核
+计算所有偶数位置的输出
+that you can compute on, then you can have
+one core compute the even entries of the
+
+189
+00:14:25,952 --> 00:14:30,629
+另一核计算所有奇数位置的输出
+output, and you can have another core
+compute the odd entries of the output.
+
+190
+00:14:30,629 --> 00:14:34,926
+所有如果你有两核，你运行这个发生器
+So basically, if you have two cores, you can
+make this generator run twice as fast as
+
+191
+00:14:34,926 --> 00:14:38,906
+会比单核的快出一倍。这个性质好
+it would if you only have a single core.
+So the nice thing about this is, of
+
+192
+00:14:38,906 --> 00:14:42,885
+当然，我们知道伪随机数发生器
+给我们带来流密码
+course, we know that pseudo-random
+generators give us stream ciphers, and so
+
+193
+00:14:42,885 --> 00:14:47,183
+所以这是一个可并行的流密码的例子。我想指出
+this is an example of a parallelizable stream
+cipher. And I just wanted to point out
+
+194
+00:14:47,183 --> 00:14:51,375
+我们看过的很多流密码，比如RC4
+that many of the stream ciphers that we
+looked at before, for example, RC4,
+
+195
+00:14:51,375 --> 00:14:55,725
+它们是先天串行的，即使你有两个处理器
+those were inherently sequential. So even if you
+had two processors, you couldn't make the
+
+196
+00:14:55,725 --> 00:15:00,148
+你也无法让这个流密码工作地比单处理器快
+stream cipher work any faster than if you
+just had a single processor. Now the main
+
+197
+00:15:00,148 --> 00:15:04,451
+现在主要问题是，为什么这个发生器安全？
+这里我给大家一点直观的解释
+question is why is this generator secure?
+And so here I'm only gonna give you a
+
+198
+00:15:04,451 --> 00:15:08,164
+今后我们会更准确地补完之
+little bit of intuition and we're gonna
+come back and argue this more precisely
+
+199
+00:15:08,164 --> 00:15:13,113
+这个安全性直接由PRF的安全性而来
+later on. But I'll just say that security
+basically falls directly from the PRF property.
+
+200
+00:15:13,113 --> 00:15:17,090
+我们推导其安全性的方法，
+是根据PRF安全性的定义
+And the way we reason about security,
+is we say, well this PRF by definition
+
+201
+00:15:17,090 --> 00:15:21,985
+与128位真随机函数不可区分
+is indistinguishable from a truly
+random function on 128 bits.
+
+202
+00:15:21,985 --> 00:15:27,000
+换句话说，如果我取这个发生器，
+而不是用一个真随机函数
+So in other words, if I take this generator and
+instead I define a generator using a truly
+
+203
+00:15:27,000 --> 00:15:30,800
+定义的发生器，我把两者的输出结果写成
+random function, in other words, I'll
+write the output of the generator as
+
+204
+00:15:30,800 --> 00:15:37,933
+f(0)和f(1)，等等，使用真随机函数
+f(0) concatenated f(1), and so on
+and so forth, using a truly random function,
+
+205
+00:15:37,933 --> 00:15:42,083
+使用真随机函数的发生器的输出
+then the output of the
+generator using the truly random function
+
+206
+00:15:42,083 --> 00:15:47,414
+和使用伪随机函数的发生器的输出
+would be indistinguishable from
+the output of the generator using
+
+207
+00:15:47,414 --> 00:15:52,507
+不可区分。这是PRF安全性的本质
+a pseudorandom function. That is the essence of
+the security property of a PRF. But with
+
+208
+00:15:52,507 --> 00:15:57,200
+使用真随机函数，大家注意到
+输出结果是真随机的
+a truly random function, you notice that
+the output is just truly random. Because
+
+209
+00:15:57,200 --> 00:16:02,068
+因为对于一个真随机函数，f(0)是随机值
+f(1)是一个独立的随机值
+for a truly random function, f(0) is
+a random value. f(1) is an independent
+
+210
+00:16:02,068 --> 00:16:06,702
+f(2)是一个独立的随机值，等等
+random value. f(2) is an independent
+random value, and so on and so forth.
+
+211
+00:16:06,702 --> 00:16:11,218
+所以整个输出是一个随机的输出
+所以用真随机函数
+So the entire output is a truly random
+output. And so with a truly random function,
+
+212
+00:16:11,218 --> 00:16:15,793
+发生器可以生成真随机输出，
+所以是完美的安全
+a generator produces truly random outputs,
+and is therefore a perfectly secure
+
+213
+00:16:15,793 --> 00:16:20,028
+这样大家就看出为什么PRF有安全性
+generator. And so you see how the PRF
+security property lets us argue security.
+
+214
+00:16:20,028 --> 00:16:24,375
+我们说，当我们用真随机函数
+替换掉伪随机函数PRF时
+Basically, we argue that when we replace
+the PRF with a truly random function, the
+
+215
+00:16:24,375 --> 00:16:28,614
+加密机制必须是安全的
+construction is necessarily secure, and
+that says that the construction with a
+
+216
+00:16:28,614 --> 00:16:32,800
+这也意味着用伪随机函数的加密也是安全的
+对吧？我们稍后看几个例子
+pseudorandom function is also secure.
+Okay? And we're gonna see a couple more
+
+217
+00:16:32,800 --> 00:16:37,092
+现在大家理解分组密码是什么了
+examples like this later on. So now you
+understand what a block cipher is, and you
+
+218
+00:16:37,092 --> 00:16:40,587
+也直观地理解了
+我们要获得什么样的安全性
+have intuition for what security
+properties it's trying to achieve.
+
+219
+00:16:40,587 --> 00:16:44,820
+下一节里我们看具体的分组密码机制
+And in the next segment, we're gonna look at
+constructions for block ciphers.

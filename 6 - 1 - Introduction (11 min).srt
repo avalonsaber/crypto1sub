@@ -1,0 +1,895 @@
+1
+00:00:00,000 --> 00:00:04,006
+本章我们讨论一个新概念：抗碰撞
+In this module, we're gonna talk about a
+new concept called collision resistance,
+
+2
+00:00:04,006 --> 00:00:08,007
+这在提供信息完整性中扮演着重要角色
+which plays an important role in providing
+message integrity. Our end goal is to
+
+3
+00:00:08,007 --> 00:00:11,078
+我们的最终目标是描述一个非常流行的MAC算法，叫做HMAC
+describe a very popular MAC algorithm
+called HMAC, that's widely used in
+
+4
+00:00:11,078 --> 00:00:15,090
+HMAC在因特网协议中广为使用。
+HMAC本身是基于抗碰撞的哈希函数构建的
+internet protocols. HMAC itself, is built
+from collision resistant hash functions.
+
+5
+00:00:15,090 --> 00:00:20,014
+在这之前，我们简要回顾一下。上一章
+Before we do that, let's do a quick recap
+of where we are. In the last module we
+
+6
+00:00:20,014 --> 00:00:25,019
+我们讨论了信息完整性，我们说MAC系统是安全的
+talked about message integrity where we
+said that the MAC system is secure if it's
+
+7
+00:00:25,019 --> 00:00:30,007
+如果它在选择信息攻击下，是不可被存在性伪造的
+existentially unforgeable under a chosen
+message attack. This means that even an
+
+8
+00:00:30,007 --> 00:00:35,025
+这意味着即使一个攻击者有了他选择的任意信息
+的标签，他也无法构建
+attacker who is given the tag on arbitrary
+messages of his choice cannot construct a
+
+9
+00:00:35,025 --> 00:00:39,064
+新信息的标签。然后我们证明了事实上
+tag for some new message. And then we
+showed that in fact any secure PRF
+
+10
+00:00:39,064 --> 00:00:44,076
+任何安全PRF都能立即给我们一个安全MAC
+immediately gives us a secure MAC. And so
+then we turned around and said well can we
+
+11
+00:00:44,076 --> 00:00:49,040
+我们转而问，能否构建安全PRF，以长信息为输入呢？
+build secure PRFs that take large messages
+as inputs? And so we looked at four
+
+12
+00:00:49,040 --> 00:00:54,008
+我们看了四种MAC机制。第一种是基于CBC的
+constructions. The first construction was
+based on CBC, we call it when we looked at
+
+13
+00:00:54,008 --> 00:00:58,079
+我们看了它的两种变体，一个叫做加密CBC，一个叫做CMAC
+two variants of it, one called encrypted
+CBC and one called CMAC. And we said that
+
+14
+00:00:58,079 --> 00:01:04,016
+我们说过，它们常与AES一起使用。事实上在802.11i标准里
+these are commonly used with AES. In fact,
+in the 802.11i standard, a CBC-MAC is used
+
+15
+00:01:04,016 --> 00:01:09,034
+CBC-MAC被用于信息完整性。特别地，配合AES算法
+for message integrity. In particular, with
+the AES algorithm. We looked at another
+
+16
+00:01:09,034 --> 00:01:14,045
+我们看另一种模式叫做NMAC，也能把处理短输入的PRF
+mode called NMAC, which also converts a
+PRF for short inputs into a PRF that's
+
+17
+00:01:14,045 --> 00:01:19,081
+转变成一个能处理很长信息输入的PRF
+capable of taking very large messages as
+inputs. And these two were both sequential
+
+18
+00:01:19,081 --> 00:01:24,047
+两个都是串行的MAC。之后我们看可并行的MAC，叫做PMAC
+MAC-s. We then looked at the parallelizable
+MAC called PMAC which again was able to
+
+19
+00:01:24,047 --> 00:01:29,014
+它也可以将处理短输入的PRF，转变成一个
+能处理很长输入的PRF
+convert a PRF for small inputs into a PRF
+for very large inputs. But it did so in a
+
+20
+00:01:29,014 --> 00:01:33,052
+但是它可以并行处理，所以一个多处理器的系统
+parallel fashion so a multiprocessor
+system would be more efficient with PMAC
+
+21
+00:01:33,052 --> 00:01:37,074
+使用PMAC的话比使用CBC-MAC更有效。
+所有这些构建长信息的MAC
+than, say, with CBC-MAC. All three of
+these built a MAC for large messages by
+
+22
+00:01:37,074 --> 00:01:42,036
+都是基于长信息的PRF的。然后我们看了Carter-Wegman MAC
+constructing a PRF for large messages. And
+then we looked at the Carter-Wegman MAC
+
+23
+00:01:42,036 --> 00:01:46,063
+一个并非基于PRF的MAC。它是一个随机MAC
+which is actually not a PRF. It's a
+randomized MAC so a single message could
+
+24
+00:01:46,063 --> 00:01:51,025
+所以单个信息可以有许多不同的有效标签
+actually have many, many different valid
+tags and therefore a Carter-Wegman MAC is
+
+25
+00:01:51,025 --> 00:01:56,000
+所以Carter-Wegman MAC不是PRF。如果大家还记得
+actually not a PRF. And if you remember,
+the Carter-Wegman MAC was built by
+
+26
+00:01:56,000 --> 00:02:00,087
+首先Carter-Wegman MAC取大量的信息，计算哈希值,
+得到一个小标签
+first of all, taking the bulk message and
+hashing it down to a small tag using a
+
+27
+00:02:00,087 --> 00:02:05,061
+计算是用了快速的一次性MAC，然后用PRF加密
+fast one-time MAC and then encrypting that
+tag using a PRF. The benefit of the
+
+28
+00:02:05,061 --> 00:02:10,009
+Carter-Wegman MAC的好处是，我们说过
+大量信息的哈希值计算使用了
+Carter-Wegman MAC was that, as we said, the
+hashing of the bulk message is done using
+
+29
+00:02:10,009 --> 00:02:13,085
+一个快速的一次性MAC。在本章中，我们将
+a fast one time MAC. And then in this
+module, we're gonna construct MAC-s from
+
+30
+00:02:13,085 --> 00:02:17,052
+从抗碰撞这一新概念出发，构建MAC
+this new concept called collision
+resistance. And so the first thing we're
+
+31
+00:02:17,052 --> 00:02:21,050
+首先我们要构建抗碰撞的哈希函数
+gonna do is construct collision resistant
+hash functions. So let's first of all
+
+32
+00:02:21,050 --> 00:02:25,081
+我们首先来定义什么是抗碰撞的哈希函数
+start by defining what does it mean for a
+hash function to be collision resistant.
+
+33
+00:02:25,081 --> 00:02:29,086
+考虑一个哈希函数，能将某个信息空间映射到一个标签空间T
+So think of a hash function from some
+message space to a tag space T, and you
+
+34
+00:02:29,086 --> 00:02:34,017
+信息空间应当比标签空间大得多
+should be thinking of the message space as
+much, much bigger than the tag space. So
+
+35
+00:02:34,017 --> 00:02:38,055
+信息可以是几个G长，但标签只能约160位
+the messages could be gigabytes long, but
+the tags would only be like 160 bits. Now
+
+36
+00:02:38,055 --> 00:02:42,082
+函数H的一个碰撞是一对信息(m0,m1)，它们不一样
+a collision for the function H is a pair
+of messages m0, m1, that happen to be
+
+37
+00:02:42,082 --> 00:02:46,097
+但是当你应用函数H时，你会得到同样的输出
+distinct. However, when you apply the
+function H to them, you end up with the
+
+38
+00:02:46,097 --> 00:02:51,058
+所以大家应当记住，有两个输入
+same output. So the image you should have
+in your mind is essentially there are two
+
+39
+00:02:51,058 --> 00:02:56,001
+m0和m1，它们同属这个大信息空间。但是
+inputs, m0 and m1, and they belong to this
+gigantic message space. However, when we
+
+40
+00:02:56,001 --> 00:03:00,045
+当我们应用这个哈希函数时，它们发生碰撞
+apply the hash function to them, they
+happen to collide and they both map to the
+
+41
+00:03:00,045 --> 00:03:04,094
+同被映射到标签空间中的同一个输出。
+现在我们说这个函数H是抗碰撞的
+same output in the tag space. Now we say
+that the function is collision resistant
+
+42
+00:03:04,094 --> 00:03:09,038
+如果很难找到这个函数的碰撞
+if it's hard to find collisions for this
+function. Now this should seem a little
+
+43
+00:03:09,038 --> 00:03:13,080
+这有点违背直觉，因为我们知道与输入空间相比
+bit counterintuitive because, we know that
+the output space is tiny compared to the
+
+44
+00:03:13,080 --> 00:03:17,071
+输出空间是非常小的。所以根据鸽巢原理，一定有
+input space. So, by the pigeonhole
+principle, there must be lots and lots and
+
+45
+00:03:17,071 --> 00:03:21,060
+很多的信息被映射到同样的输出。因为输出空间中
+lots of messages that map to the same
+output. Just because there isn't enough
+
+46
+00:03:21,060 --> 00:03:25,048
+没有足够的空间来不碰撞地容纳所有信息
+space in the output space to accommodate
+all the messages without collisions. And
+
+47
+00:03:25,048 --> 00:03:29,025
+所以我们知道有很多碰撞，而问题是
+so, we know that there are lots of
+collisions, and the question is, is there
+
+48
+00:03:29,025 --> 00:03:33,058
+有没有一个能直接找出这些碰撞的有效算法
+an efficient algorithm that finds any such
+collisions explicitly. So we say the, the
+
+49
+00:03:33,058 --> 00:03:38,008
+我们说这个函数H是抗碰撞的，如果对所有的有效算法A
+function is collision resistant, if, for
+all explicit efficient algorithms A. And
+
+50
+00:03:38,008 --> 00:03:42,087
+这些算法都不能输出函数H的碰撞
+these algorithms are not able to print the
+collision for the function H, okay? And as
+
+51
+00:03:42,087 --> 00:03:47,049
+通常，我们用算法A能够输出一个碰撞的概率
+usual, we'll define the advantage as the
+probability that the algorithm A is able
+
+52
+00:03:47,049 --> 00:03:51,048
+来定义这个优势。现在我形式化地表述一下
+to output a collision. Now I'm not gonna
+formalize a term explicit here. All I'll
+
+53
+00:03:51,048 --> 00:03:55,027
+我说，仅仅说这种算法是存在的，还远远不够
+say is that it's not enough to just say
+that an algorithm exists, and algorithm
+
+54
+00:03:55,027 --> 00:03:58,092
+(要提出)输出碰撞的算法。因为我们知道有很多碰撞
+that simply prints a collision. Cause we
+know many collisions exist. What we
+
+55
+00:03:58,092 --> 00:04:02,085
+我们想要一个直接的算法，可以写下来的算法
+actually want is an explicit algorithm
+that we can actually write down and run on
+
+56
+00:04:02,085 --> 00:04:06,074
+并能在计算机上运行的，生成碰撞的算法。
+有一些形式化表述的方法
+a computer to generate these collisions.
+There are ways to formalize that, but I'm
+
+57
+00:04:06,074 --> 00:04:10,074
+但我这里不展开说它们。现在一个抗碰撞的
+哈希函数的例子是SHA-256
+not gonna do that here. Now a classic
+example of a collision resistant hash
+
+58
+00:04:10,074 --> 00:04:15,002
+SHA-256输出256位，但可以输入任意长的信息
+function is SHA-256 which happens
+to output at 256 bits but can take
+
+59
+00:04:15,002 --> 00:04:19,058
+例如，它可以取几个G的数据
+arbitrary large input. For example, it can
+take gigabytes and gigabytes of data and
+
+60
+00:04:19,058 --> 00:04:24,003
+并把输入映射到256位字符串。目前还没有人
+it will map it all to 256 bits. And yet
+nobody knows how to find collisions for
+
+61
+00:04:24,003 --> 00:04:28,026
+能为这个函数找出碰撞。这里仅仅是为大家证明
+this particular function. So just to show
+you that this concept of collision
+
+62
+00:04:28,026 --> 00:04:32,020
+这个抗碰撞的概念是非常有用的，我们看一个简单应用
+resistance is very useful, let's see a
+very quick application for it. In
+
+63
+00:04:32,020 --> 00:04:36,077
+特别地，给定一个抗碰撞的哈希函数，我们看
+如何简单地构建一个MAC
+particular, let's see how we can trivially
+build a MAC given a collision resistant
+
+64
+00:04:36,077 --> 00:04:41,029
+假设我们对短信息有一个MAC
+hash function. So, suppose we have a MAC
+for short messages. So you should be
+
+65
+00:04:41,029 --> 00:04:46,027
+大家应该想到了类似于AES的算法，AES可以计算
+16字节信息的MAC
+thinking something like AES, which can MAC
+sixteen byte messages. And then, suppose
+
+66
+00:04:46,027 --> 00:04:51,007
+假设我们有一个哈希函数，是抗碰撞的，
+它从一个很大的信息空间里取值
+we have a hash function, a collision
+resistant hash function from a large message
+
+67
+00:04:51,007 --> 00:04:55,074
+将几个G的信息映射到小的信息空间里
+space, that contains gigabyte messages
+into our small message space. Say, into
+
+68
+00:04:55,074 --> 00:05:00,060
+映射到16字节输出。然后我们定义一个新MAC
+sixteen byte outputs. Then, basically, we
+can define a new MAC, let's call it Ibig,
+
+69
+00:05:00,060 --> 00:05:05,027
+为长信息的MAC。我们用哈希函数输出值的MAC
+which happens to be MAC-ing large
+messages. And we'll define it simply by
+
+70
+00:05:05,027 --> 00:05:10,044
+来定义它。那如何验证MAC呢？
+applying the small MAC to the output of
+the hash function. And how do we verify a
+
+71
+00:05:10,044 --> 00:05:15,067
+给定一个标签，我们通过重新计算给定信息的哈希值
+MAC? Well, basically, given a tag we
+verify it by rehashing the given message
+
+72
+00:05:15,067 --> 00:05:19,095
+来验证，检查小MAC值是否能验证给定的标签
+and then checking that small MAC actually
+verifies under the given tag. Okay, so
+
+73
+00:05:19,095 --> 00:05:24,012
+这是一个非常简单的方法，来为大家证明，
+抗碰撞可以取一个原型
+this is a very simple way to show you how
+collision resistance can take a primitive
+
+74
+00:05:24,012 --> 00:05:28,019
+这个原型可以处理短输入，把这个原型扩展成一个
+为非常长的输入而构建的原型
+that's built for small inputs and expand it
+into a primitive that's built for very
+
+75
+00:05:28,019 --> 00:05:32,021
+事实上我们将看到这不是MAC特有的
+large inputs. And in fact we're going to
+see this not just for MAC-s. Later on when
+
+76
+00:05:32,021 --> 00:05:36,028
+稍后当我们讨论数字签名时，我们将做同样的事情
+we talk about digital signatures, we're
+going to do the same thing. We're going to
+
+77
+00:05:36,028 --> 00:05:40,015
+我们将构建一个可以处理短输入的数字签名机制
+build a digital signature scheme for small
+inputs and then we're going to use
+
+78
+00:05:40,015 --> 00:05:44,025
+然后我们再使用抗碰撞把它的输入空间进行扩展
+使其和我们想要的一样大
+collision resistance to expand the input
+space and make it as large as we want. So
+
+79
+00:05:44,025 --> 00:05:48,087
+这个安全性定理并不简单
+the security theorem basically isn't
+something that's trivial here. Basically
+
+80
+00:05:48,087 --> 00:05:53,056
+这个定理说，如果底层MAC是安全的，并且H是抗碰撞的
+it says if the underlying MAC is secure
+and H is collision resistant, then the
+
+81
+00:05:53,056 --> 00:05:58,060
+那么这个组合可以计算长信息的MAC了，得到的MAC也是安全的
+combination which can actually MAC large
+messages, is also a secure MAC. And as
+
+82
+00:05:58,060 --> 00:06:03,022
+作为一个简单例子，我们把这个应用到AES。
+那么我们用一个我们提到过的例子
+a quick example, let's apply this to AES.
+So let's use the one example that we
+
+83
+00:06:03,022 --> 00:06:09,003
+SHA-256。在SHA-256里，输出256位
+mentioned, SHA-256. So in this
+case SHA-256 outputs 256 bit outputs,
+
+84
+00:06:09,003 --> 00:06:15,022
+即32字节。我们必须构建一个能处理32字节的MAC
+which is 32 bytes. So we have to build a
+MAC that can MAC 32 byte messages. And the
+
+85
+00:06:15,022 --> 00:06:20,083
+我们可以应用16字节的AES
+way we could do that is basically by
+applying the sixteen byte AES, plugging it
+
+86
+00:06:20,083 --> 00:06:26,024
+把它带入到一个两个分组的CBC里。
+两个分组的CBC把AES从一个16字节的PRF
+into a two block CBC. A two block CBC
+would expand AES from a PRF on sixteen
+
+87
+00:06:26,024 --> 00:06:32,000
+扩展成了一个32字节的PRF。然后取SHA-256的输出
+bytes to a PRF on 32 bytes. And then take
+the output of SHA-256 and plug it into
+
+88
+00:06:32,000 --> 00:06:37,090
+把它带入到两分组的基于AES的CBC里，
+然后我们获得了一个非常简单的MAC
+this two block CBC based on AES. And then
+we get a very, very simple, MAC which is
+
+89
+00:06:37,090 --> 00:06:43,036
+这个MAC是安全的，假设AES是个PRF，
+并且SHA-256是抗碰撞的
+secure assuming AES is a PRF and SHA-256
+is collision resistant. So one thing I
+
+90
+00:06:43,036 --> 00:06:47,078
+我想指出一点，事实上为了让这个MAC机制工作，
+抗碰撞是必须的
+wanted to point out is that in fact
+collision resistance is necessary for this
+
+91
+00:06:47,078 --> 00:06:51,097
+事实上，抗碰撞不仅仅是人造的术语
+construction to work. So in fact,
+collision resistance is not just a made-up
+
+92
+00:06:51,097 --> 00:06:56,067
+抗碰撞是这个组合MAC的安全性的本质
+term. Collision resistance really is kind
+of the essence of why this combined MAC is
+
+93
+00:06:56,067 --> 00:07:00,081
+让我们暂时假设我们使用的哈希函数H
+secure. And so let's just assume for a
+minute that the function H, the hash
+
+94
+00:07:00,081 --> 00:07:05,000
+不是抗碰撞的。换句话说
+function we're using, is not collision
+resistant. In other words, there is an
+
+95
+00:07:05,000 --> 00:07:09,031
+存在一个算法，可以找到两个不同的信息
+algorithm that can find two distinct
+messages that happen to map to the same
+
+96
+00:07:09,031 --> 00:07:14,007
+它们的MAC是一样的。这种情况下，这个组合MAC是不安全的
+output. In this case, the combined MAC is
+not going to be secure because what the
+
+97
+00:07:14,007 --> 00:07:19,009
+因为攻击者可以简单地使用一个选择信息攻击来获得m0的标签
+adversary can do is simply use a chosen
+message attack to get a tag for m0. And
+
+98
+00:07:19,009 --> 00:07:25,074
+然后输出(m1,标签)作为一个伪造。确实，
+T是m1的一个有效的MAC
+then output m1 comma that tag as a forgery
+and indeed T is a valid MAC for m1 because
+
+99
+00:07:25,074 --> 00:07:30,088
+因为H(m1)正好等于H(m0)。只用一个
+H(m1) happens to be equal to H(m0). And
+so in doing so just with a one chosen
+
+100
+00:07:30,088 --> 00:07:35,039
+选择信息攻击，攻击者可以破解这个组合MAC
+message attack the attacker was able to
+break this combined MAC simply because the
+
+101
+00:07:35,039 --> 00:07:39,097
+因为这个哈希函数不是抗碰撞的。所以哈希函数
+应当是抗碰撞的。我想强调
+hash function was not collision resistant.
+So it should be, again I want to emphasize
+
+102
+00:07:39,097 --> 00:07:43,083
+如果有人宣布了哪怕只有一个SHA-256的碰撞
+that if someone advertised even one
+collision for SHA-256, you know two
+
+103
+00:07:43,083 --> 00:07:48,002
+只有两个信息，只有一对信息在SHA-256下
+拥有相同的输出
+messages, just one pair of messages that
+happen to have the same output under
+
+104
+00:07:48,002 --> 00:07:52,010
+就足以让SHA-256这个机制不安全了
+SHA-256 that would already make this
+construction insecure cause an attacker
+
+105
+00:07:52,010 --> 00:07:56,072
+因为一个攻击者可以询问其中一个信息的标签，
+同时他也获得了另一信息的标签
+could then ask for the tag on one message
+and in doing so he would obtain the tag on
+
+106
+00:07:56,072 --> 00:08:01,017
+这就形成了一个存在性伪造
+the other message as well, and that would
+count as an existential forgery. Okay, so
+
+107
+00:08:01,017 --> 00:08:05,081
+我们已经看到抗碰撞是一个非常有用的原型
+already, we see the collision resistance
+is a very useful primitive, in that it
+
+108
+00:08:05,081 --> 00:08:10,027
+它让我们得以扩展密码学原型的输入空间
+lets us expand the input space of
+cryptographic primitives. I wanna show you
+
+109
+00:08:10,027 --> 00:08:14,097
+我想给大家再展示一个应用，这里抗碰撞
+被直接用于信息的完整性
+one more application where a collision
+resistance is directly used for message
+
+110
+00:08:14,097 --> 00:08:19,079
+想像一下，我们有想要保护的文件
+integrity. Imagine again, we have files that we
+wanna protect. Let's imagine these files
+
+111
+00:08:19,079 --> 00:08:24,066
+我们把这些文件想象成软件包，
+我们想把这些软件安装在系统里
+are actually software packages that, we
+wanna install on our system. So here are
+
+112
+00:08:24,066 --> 00:08:29,024
+这有三个不同的软件包。也许一个是GCC，一个是Emacs
+three different software packages. You
+know, maybe one is GCC, on is Emacs, and
+
+113
+00:08:29,024 --> 00:08:33,079
+另一个是，我不确定，比如是Vi。现在用户想下载软件包
+another one is, I don't know, Vi. Now the
+user wants to download the software
+
+114
+00:08:33,079 --> 00:08:38,078
+他想确保他下载的软件包的版本
+package and he wants to make sure that he
+really did get a version of the package
+
+115
+00:08:38,078 --> 00:08:43,051
+不是某个被攻击者篡改后的版本
+that he downloaded and it's not some
+version that the attacker tampered with
+
+116
+00:08:43,051 --> 00:08:48,044
+内容被攻击者修改了。那么用户可以参考
+and modified its contents. So what he
+could do is basically refer to a read-only
+
+117
+00:08:48,044 --> 00:08:53,061
+一个比较小的公共空间。这个公共空间只需
+public space that's relatively small. All
+it has to do is hold small hashes of these
+
+118
+00:08:53,061 --> 00:08:58,078
+保存这些软件包的哈希值。不需要很多这样的空间
+software packages. So there isn't a lot of
+space needed here. The only requirement is
+
+119
+00:08:58,078 --> 00:09:03,059
+公共空间唯一的要求是只读。换句话说，
+攻击者无法篡改这个空间里的哈希值
+that this space is read-only. In other
+words, the attacker cannot modify the
+
+120
+00:09:03,059 --> 00:09:08,088
+然后，一旦用户参考了公共空间
+hashes stored in this space. And then,
+once he consults this public space, he can
+
+121
+00:09:08,088 --> 00:09:13,094
+他可以很容易地计算下载的软件包的哈希值
+very easily compute the hash of a package
+that he downloaded. Compare it to the
+
+122
+00:09:13,094 --> 00:09:18,098
+把结果与公共空间进行比较，如果它们相同
+value in the public space. And if the two
+match. Then he knows that the version of
+
+123
+00:09:18,098 --> 00:09:23,034
+用户就知道他下载的版本是正确的。为什么？
+the package he downloaded is, in fact, a
+correct one. Why is that true? Well,
+
+124
+00:09:23,034 --> 00:09:29,015
+因为函数H是抗碰撞的，攻击者无法找到一个
+because the function H is collision
+resistant. The attacker cannot find an F1
+
+125
+00:09:29,015 --> 00:09:35,027
+戴帽子的F1，可以让它拥有与F1同样的哈希值
+hat, they would have the same hash as F1.
+And as a result, the attacker cannot
+
+126
+00:09:35,027 --> 00:09:40,005
+因此攻击者无法修改F1，且不会被发现，
+因为无法让这个戴帽子的F1
+modify F1 without being detected because
+there's no way that the hash of his F1
+
+127
+00:09:40,005 --> 00:09:45,000
+拥有与公共空间里一样的哈希值
+hat would map to the value that's
+stored in the public space. So, the reason
+
+128
+00:09:45,000 --> 00:09:49,072
+我举这个例子的原因是，我想把它和MAC的例子做对比
+I brought up this example is, I wanted to
+contrast this with the MAC example. We
+
+129
+00:09:49,072 --> 00:09:54,062
+我们看一个MAC的类似情况。在这个MAC的例子里
+kinda saw a similar situation with MAC-s.
+In the MAC example, we needed a secret key
+
+130
+00:09:54,062 --> 00:09:59,020
+我们需要一个密钥来验证单个文件的标签。
+但我们不需要一个只读的公共空间
+to verify the individual file tags. But we
+didn't need a resource that was a read
+
+131
+00:09:59,020 --> 00:10:02,072
+用抗碰撞的哈希函数
+only public space. With
+collision-resistant hashes, we kind of get
+
+132
+00:10:02,072 --> 00:10:06,090
+我们就可以不需要用一个密钥来验证
+the exact compliment where in fact we
+don't need a key to verify. Anyone can
+
+133
+00:10:06,090 --> 00:10:11,013
+任何人都可以验证。你不需要一个密钥来验证。但是
+verify. You don't need a secret key for
+it. However, now all of a sudden we need
+
+134
+00:10:11,013 --> 00:10:15,040
+但是我们突然需要这个多余的资源，即攻击者不能修改的空间
+this extra resource which is some space
+that the attacker cannot modify. And, in
+
+135
+00:10:15,040 --> 00:10:19,063
+事实上，我们稍后将看到使用数字签名
+fact, later on, we're gonna see that with
+digital signatures, we can kind get to the
+
+136
+00:10:19,063 --> 00:10:23,076
+我们可以在完整性和资源两方面都达到最优。
+届时我们可以既让公众可以自行验证
+best of both worlds, where we have both
+public verifiability, and we don't need a
+
+137
+00:10:23,076 --> 00:10:27,090
+又不需要只读空间。但目前，只用MAC或抗碰撞哈希函数
+read only space. But so far, with either
+MAC-s or collision resistance, we can have
+
+138
+00:10:27,090 --> 00:10:32,003
+我们只能达成单方面的要求。我将告诉大家，
+事实上，这种机制是非常流行的
+one, but not the other. So, I'll tell you
+that, in fact, this kind of scheme is very
+
+139
+00:10:32,003 --> 00:10:35,080
+实际上Linux发行版通常使用公共空间
+popular. In fact, Linux distributions
+often use public space where they
+
+140
+00:10:35,080 --> 00:10:39,062
+来发布它们软件包的哈希值
+advertise hashes of their software
+packages. And anyone can make sure that
+
+141
+00:10:39,062 --> 00:10:44,001
+任何人可以确保他们下载了正确的软件包，
+在电脑上安装之前
+they downloaded the right software package
+before installing it on their computer. So
+
+142
+00:10:44,001 --> 00:10:48,002
+这是在现实中广泛应用的
+this is, in fact, something that's used
+quite extensively in the real world. Okay,
+
+143
+00:10:48,002 --> 00:10:51,018
+下一节我们讨论对抗碰撞的通用攻击
+so in the next segment we'll talk about
+generic attack on collision resistance and
+
+144
+00:10:51,018 --> 00:10:53,092
+我们还会继续构建抗碰撞哈希函数
+then we'll go ahead and build collision
+resistant hash functions.

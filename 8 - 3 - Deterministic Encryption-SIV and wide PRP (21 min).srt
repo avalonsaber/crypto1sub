@@ -1,0 +1,1622 @@
+1
+00:00:00,000 --> 00:00:03,416
+现在我们理解了什么是确定性的加密
+Now that we understand what is
+deterministic encryption, let's see some
+
+2
+00:00:03,416 --> 00:00:07,025
+我们来看一些机制，能提供对抗
+确定性的选择明文攻击的安全性
+constructions that provide security
+against deterministic chosen plaintext
+
+3
+00:00:07,025 --> 00:00:11,297
+首先我提醒大家，确定性的加密是需要的
+attacks. So, first let me remind you that
+the deterministic encryption is needed,
+
+4
+00:00:11,297 --> 00:00:15,733
+例如，当加密数据库索引时，稍后我们想查找记录
+for example, when encrypting a database
+index and later we wanna look up records
+
+5
+00:00:15,733 --> 00:00:19,675
+使用这个加密的索引。因为加密是确定性的
+using the encrypted index. Because the
+encryption is deterministic we're
+
+6
+00:00:19,675 --> 00:00:24,275
+我们保证，当我们查找加密的索引时
+guaranteed that when we do the lookup the
+encrypted index is gonna be identical to the
+
+7
+00:00:24,275 --> 00:00:28,491
+这个索引和当初记录被写进数据库时，给数据库的索引
+encrypted index that was sent to the
+database when the record was written to
+
+8
+00:00:28,491 --> 00:00:33,145
+是一样的。这样，这个确定性的加密可以让我们
+the database. And so, this deterministic
+encryption allows us a very simple or fast
+
+9
+00:00:33,145 --> 00:00:37,363
+以非常简单快捷的方式，根据加密的索引查找记录
+way to do lookups based on encrypted
+indices. The problem was that we said the
+
+10
+00:00:37,363 --> 00:00:41,506
+问题是我们说过，确定性加密不可能
+对选择明文攻击是安全的
+deterministic encryption can't possibility
+be secure against a general chosen
+
+11
+00:00:41,506 --> 00:00:46,075
+因为如果攻击者看到两个相等的密文
+plaintext attack because if the attacker
+sees two cipher texts that are equal
+
+12
+00:00:46,075 --> 00:00:50,377
+他就知道了底层加密的明文信息是一样的
+it learns that the underlying encrypted
+messages are the same. So, then we defined
+
+13
+00:00:50,377 --> 00:00:54,734
+然后我们定义了确定性选择明文安全的概念
+this concept of deterministic chosen plain
+text security which means that we have
+
+14
+00:00:54,734 --> 00:00:58,983
+其意思是只要加密者不使用一个密钥多次加密同样的明文信息
+security as long as the encryptor never
+encrypts the same message more than once
+
+15
+00:00:58,983 --> 00:01:03,468
+我们就有安全性。特别地，这个密钥、明文信息对
+只能使用一次
+using a given key. In particular, this
+key, message pair is only used once, for
+
+16
+00:01:03,468 --> 00:01:08,152
+对每次加密来说，要不密钥改变，要不明文信息改变
+every encryption, either the key changes,
+or the message changes. And then as I
+
+17
+00:01:08,152 --> 00:01:12,775
+然后我说过，我们形式化地定义这个CPA，
+确定性的CPA安全游戏
+said, formally we define this CPA,
+deterministic CPA security game, and our
+
+18
+00:01:12,775 --> 00:01:17,764
+我们的本节的目标是给出确定性CPA安全的机制
+goal in this segment is to actually give
+constructions that are deterministic CPA
+
+19
+00:01:17,764 --> 00:01:22,463
+我们要看的第一个机制叫做SIV
+secure. So the first construction we're
+gonna look at is what's called SIV,
+
+20
+00:01:22,463 --> 00:01:26,552
+合成IV。这个机制的工作流程如下
+synthetic IV's. And the way this
+construction works is as follows. Imagine
+
+21
+00:01:26,552 --> 00:01:30,873
+我们有一个通用的CPA安全加密系统。这是密钥
+we have a general CPA secure encryption
+system. So here's the key and here's the
+
+22
+00:01:30,873 --> 00:01:35,302
+这是明文信息，我们把加密算法里使用的随机性记为R
+message and we are gonna denote by R the
+randomness that's used by the encryption
+
+23
+00:01:35,302 --> 00:01:39,623
+记得一个CPA安全系统不使用新鲜值的话
+algorithm. Remember that a CPA secure
+system that doesn't use nonce has to be
+
+24
+00:01:39,623 --> 00:01:44,051
+必须是随机的，所以我们直接写下这个变量R
+randomized and so we're explicitly gonna
+write down this variable R to denote the
+
+25
+00:01:44,051 --> 00:01:47,940
+来表示这个被用于加密算法的随机字符串
+random string that's used by the
+encryption algorithm as it's doing the
+
+26
+00:01:47,940 --> 00:01:52,045
+例如，如果我们使用随机计数器模式
+encryption. For example if we're using
+randomized counter mode, r would be the
+
+27
+00:01:52,045 --> 00:01:56,664
+R是随机IV，在随机计数器模式中被使用。
+当然C是得到的密文
+random IV that's used by randomized counter
+mode. And of course C is the resulting
+
+28
+00:01:56,664 --> 00:02:01,904
+现在，我们还需要一个伪随机函数f
+ciphertext. Now, in addition, we're also
+going to need a pseudo random function, f,
+
+29
+00:02:01,904 --> 00:02:06,691
+这个函数f取信息空间里的任意信息作为输入
+that what it does, is it takes our
+arbitrary messages in the message space
+
+30
+00:02:06,691 --> 00:02:11,477
+输出一个字符串R，这个CPA安全的加密系统
+可使用R作为随机性
+and outputs a strings, R, that can be used
+as randomness for the CPA secure
+
+31
+00:02:11,477 --> 00:02:16,502
+这里的r实际上是集合R的一个元素
+encryption scheme. So, the little, r, over
+here is actually a member of the big R set. Okay.
+
+32
+00:02:16,502 --> 00:02:21,592
+我们假设这个函数f是一个伪随机函数
+And we're going to assume this is a, f is
+a pseudo random function that maps messages
+
+33
+00:02:21,592 --> 00:02:26,500
+将明文信息映射到随机字符串。现在SIV如下工作
+to random strings. Now the way SIV works
+is as follows. It's going to use two keys
+
+34
+00:02:26,500 --> 00:02:31,348
+它使用两个密钥K1和K2来加密明文信息M
+K1 and K2 to encrypt the message M. And
+what it does, is the first thing is going
+
+35
+00:02:31,348 --> 00:02:36,437
+首先SIV应用伪随机函数f，根据明文M来推导
+to apply the pseudo random function f to
+the message M to derive randomness for the
+
+36
+00:02:36,437 --> 00:02:41,406
+用于CPA安全的加密机制E的随机性。然后
+SIV使用推导出的随机性来加密明文M
+CPA secure encryption scheme E. And then
+it's going to encrypt the message M using
+
+37
+00:02:41,406 --> 00:02:46,253
+这会给我们一个密文C
+the randomness that it just derived. This
+is going to give us a cipher text C and
+
+38
+00:02:46,253 --> 00:02:51,273
+然后它将输出密文C。这就是SIV模式的工作流程
+then it's going to output this cipher text
+C Okay. So that's how this SIV mode works.
+
+39
+00:02:51,273 --> 00:02:56,342
+首先它从被加密的明文推导随机性
+Basically it first derives the randomness
+from the message being encrypted, and then
+
+40
+00:02:56,342 --> 00:03:01,049
+然后它使用这个推出的随机性来加密信息
+it uses this derived randomness to
+actually encrypt the message to obtain the
+
+41
+00:03:01,049 --> 00:03:05,696
+以获得密文。现在我想指出，比如说，如果加密机制E
+cipher text. Now I'd like to point out for
+example, if the encryption scheme E
+
+42
+00:03:05,696 --> 00:03:10,173
+正好是随机计数器模式的，那么随机性R
+happened to be randomized counter mode.
+Then the randomness R would just be the
+
+43
+00:03:10,173 --> 00:03:14,525
+就是随机IV，这个IV会随密文一并输出
+random IV which would actually be output
+along with the cipher text. So this means
+
+44
+00:03:14,525 --> 00:03:18,665
+这意味着密文比明文略长
+that the cipher text is a little bit
+longer than the plain text. But the point
+
+45
+00:03:18,665 --> 00:03:22,698
+但这里不是要去生成短密文，而是要确保
+here isn't to generate a short cipher
+text. Rather the point here is to make
+
+46
+00:03:22,698 --> 00:03:26,679
+加密机制的确定性，所以如果我们多次加密了同样的明文
+sure that the encryption scheme is
+deterministic, so if we encrypt the same
+
+47
+00:03:26,679 --> 00:03:30,713
+每次我们应当获得同样的密文
+message multiple times, every time we
+should obtain the same cipher text. And
+
+48
+00:03:30,713 --> 00:03:34,959
+其实每次我们都会获得同样的随机性R。因此
+indeed every time, we'll obtain the same
+randomness, R, and as a result, every time
+
+49
+00:03:34,959 --> 00:03:39,050
+每次我们都会获得同样的密文C。很容易证明
+we'll obtain the same cipher text C. So
+it's fairly easy to show that this
+
+50
+00:03:39,050 --> 00:03:43,584
+这个加密机制在确定的选择明文攻击下
+encryption scheme really is semantically
+secure under the deterministic chosen
+
+51
+00:03:43,584 --> 00:03:48,060
+是语义安全的。其原因是我们应用伪随机函数F
+plaintext attack. The reason that's so
+is because we apply the pseudo random
+
+52
+00:03:48,060 --> 00:03:52,708
+来处理多个信息。如果我们应用F来处理多个信息
+function F to distinct messages. Well if
+we apply F to distinct messages then the
+
+53
+00:03:52,708 --> 00:03:57,357
+那么F生成的随机字符串将看起来像是真随机字符串
+random string that F generates is going to
+look like just truly random strings. A
+
+54
+00:03:57,357 --> 00:04:02,177
+每条信息都有不同的随机字符串。因此
+different random string for every message.
+And as a result the CPA secure encryption
+
+55
+00:04:02,177 --> 00:04:06,596
+这个CPA安全的加密机制总是使用真随机字符串
+scheme E is always applied using truly
+random strings. And that's exactly the
+
+56
+00:04:06,596 --> 00:04:10,463
+这正是它是CPA安全的情形。因为这些R是随机的
+situation where it is CPA secure. So
+because these R's are just random
+
+57
+00:04:10,463 --> 00:04:14,838
+与新字符串不可区分，所以实际上得到的机制
+indistinguishable from brand new strings,
+the resulting system is in fact gonna be
+
+58
+00:04:14,838 --> 00:04:18,999
+是CPA安全的。这只是为什么SIV有效的直观理解
+CPA secure. So this is just the intuition
+for why this works and it's actually
+
+59
+00:04:18,999 --> 00:04:23,040
+实际上很容易就能形式化为一个完整的证明
+fairly straightforward to actually
+formalize this into a complete proof. Now,
+
+60
+00:04:23,040 --> 00:04:27,057
+我应该强调，这对多于一个AES分组的明文来说
+I should emphasize that this is actually
+well suited for messages that are more
+
+61
+00:04:27,057 --> 00:04:30,722
+特别合适。事实上，对于短明文信息，我们将看到
+than one AES block. In fact, for short
+messages, we're gonna see a slightly
+
+62
+00:04:30,722 --> 00:04:34,438
+一个稍有不同的加密机制，更适合这些短明文信息
+different encryption scheme that's
+actually better suited for these short
+
+63
+00:04:34,438 --> 00:04:38,505
+现在SIV的一个很好是事实是
+messages. Okay, now the really cool thing
+about SIV is that, actually, we get cipher
+
+64
+00:04:38,505 --> 00:04:42,803
+我们免费获得了密文完整性。事实上，
+我们不必使用特定的MAC，如果想加上完整性的话
+text integrity for free. In fact we don't
+have to use a special MAC if we want to
+
+65
+00:04:42,803 --> 00:04:47,307
+某种意义上SIV已经构建了完整性机制
+add integrity. In a sense SIV already has
+a built in integrity mechanism. And let me
+
+66
+00:04:47,307 --> 00:04:51,486
+我来解释一下我的意思。首先，我们的目标是构建
+explain what I mean by that. First of all,
+our goal was to build what's called
+
+67
+00:04:51,486 --> 00:04:55,340
+所谓的确定性的认证加密(DAE)
+deterministic authenticated encryption.
+DAE. Deterministic Authenticated
+
+68
+00:04:55,340 --> 00:04:59,681
+确定性的认证加密意思是：确定性的CPA安全加上
+Encryption. Which basically means that
+deterministic CPA security and cipher text
+
+69
+00:04:59,681 --> 00:05:04,023
+密文完整性。记得密文完整性的意思是，攻击者询问
+integrity. Remember cipher text integrity
+means that the attacker gets to ask for
+
+70
+00:05:04,023 --> 00:05:08,527
+他选择的信息的加密结果，而他不能产生
+the encryptions of messages of his choice
+and then he shouldn't be able to produce
+
+71
+00:05:08,527 --> 00:05:12,831
+另一个密文可以被解密成有效的明文
+another cipher text that decrypts to a
+valid message. Okay, so I want to claim
+
+72
+00:05:12,831 --> 00:05:17,892
+我想断言，事实上SIV自动地给出了一个密文完整性
+that in fact SIV automatically gives a
+cipher text integrity without the need for
+
+73
+00:05:17,892 --> 00:05:22,831
+不需要嵌入MAC或其他东西。我们来看为什么
+an embedded MAC or anything else. So let's
+see why. In particular, let's look at a
+
+74
+00:05:22,831 --> 00:05:27,769
+我们看一个SIV的特例，其底层的加密机制是
+special case of SIV when the underlying
+encryption scheme is randomized counter
+
+75
+00:05:27,769 --> 00:05:32,398
+随机计数器模式。我们记之为SIV-CTR，表示
+mode. Okay, so we'll call this SIV-CTR
+again to denote SIV where we're using
+
+76
+00:05:32,398 --> 00:05:37,388
+使用随机计数器模式的SIV。我再提醒一下大家
+randomized counter mode. Alright. So let
+me remind you again how SIV works in this
+
+77
+00:05:37,388 --> 00:05:42,189
+这种情况下SIV是如何工作的。我们取明文信息
+case. Well, so we take our message, here,
+we take our message, and then we apply a
+
+78
+00:05:42,189 --> 00:05:46,682
+然后对明文应用PRF，推导出一个IV，然后IV被用在
+PRF to it. And that derives an IV. And
+then that IV is going to be used to
+
+79
+00:05:46,682 --> 00:05:51,122
+加密明文信息，使用随机计数器模式。特别地
+encrypt the message using randomized
+counter mode. Okay. So in particular,
+
+80
+00:05:51,122 --> 00:05:55,890
+我们要使用这个PRF Fctr表示F计数器，随机计数器模式
+we're gonna use this PRF Fctr for F
+counter, for randomized counter mode and
+
+81
+00:05:55,890 --> 00:06:00,659
+计算Fctr在IV处的值，在IV+1处的值，一直到IV+L
+essentially evaluate this Fctr at IV, IV
+plus one up to IV plus L. And, then, we
+
+82
+00:06:00,659 --> 00:06:05,613
+然后得到这么样的一个信息。那就给了我们最终的密文
+had sort of that with the message. And that
+gives us the final ciphertext. Okay. So,
+
+83
+00:06:05,613 --> 00:06:10,258
+这是用随机计数器模式的SIV。现在，我们看如何解密
+this is SIV with a randomized counter
+mode. Now, let's see how decryption is
+
+84
+00:06:10,258 --> 00:06:15,139
+在解密过程中，我们增加一个检查
+gonna work. And during decryption we're
+gonna add one more check, and that's
+
+85
+00:06:15,139 --> 00:06:20,859
+以提供密文完整性。我们看解密如何工作的
+going to provide ciphertext integrity. So let's see
+how decryption is going to work. So here
+
+86
+00:06:20,859 --> 00:06:25,420
+这里我们有包含IV和密文的输入密文
+we have our input cipher text that
+contains the IV and the cipher text. Well,
+
+87
+00:06:25,420 --> 00:06:30,514
+首先我们将使用给定的IV解密密文
+the first thing we're going to do is we're
+going to decrypt the cipher text using the
+
+88
+00:06:30,514 --> 00:06:35,252
+我们会得到一个候选明文。现在我们再次应用
+given IV, and that will give us candidate
+plain text. Now we're gonna reapply the
+
+89
+00:06:35,252 --> 00:06:39,813
+PRF F来处理这个得到的明文信息，
+根据SIV的定义。如果得到的明文有效
+PRF F from the definition of SIV to this
+message. Now if a message is valid, we
+
+90
+00:06:39,813 --> 00:06:44,492
+我们应该获得与攻击者在密文中所提供的同样的IV
+should be getting the same IV that the
+adversary supplied as part of the cipher
+
+91
+00:06:44,492 --> 00:06:48,994
+如果我们得到一个不同的IV，那么我们知道了
+这个得到的明文不是有效的
+text. If we get a different IV, then we
+know that this message is not a valid
+
+92
+00:06:48,994 --> 00:06:53,863
+我们就拒绝这个密文。这真犀利
+message and we simply reject the cipher
+text. So this is really acute. It's a very
+
+93
+00:06:53,863 --> 00:06:58,838
+很容易构建检查以确保密文是有效的
+simple kinda built in check to make sure
+that the cipher text is valid, right. We
+
+94
+00:06:58,838 --> 00:07:03,875
+我们在解密后检查，我们重新推出的IV是否
+simply check that after decryption if
+we re-derive the IV we would actually get
+
+95
+00:07:03,875 --> 00:07:08,425
+是正确的IV。如果不是我们就拒绝。我说
+the correct IV. And if not we reject the
+message. And I claim that this simple check
+
+96
+00:07:08,425 --> 00:07:12,461
+解密中的这个检查实际上足以提供密文完整性。所以
+during decryption is enough to actually provide
+ciphertext integrity. And therefore,
+
+97
+00:07:12,461 --> 00:07:17,095
+确定性的认证加密。我要用一个简单的定理来表述之
+deterministic authenticated encryption. So
+I'll state this in a simple theorem.
+
+98
+00:07:17,095 --> 00:07:22,100
+如果F是一个安全的PRF，在计数器模式中
+Basically to say, that if F is a secure
+PRF, and in counter mode that's derived
+
+99
+00:07:22,100 --> 00:07:27,560
+这是由CPA安全的Fctr推出的，然后事实上
+得到的机制是确定性的认证加密系统
+from Fctr is CPA secure, then the result
+is in fact a deterministic authenticated
+
+100
+00:07:27,560 --> 00:07:32,231
+现在这个定理的证明不难。两句话
+encryption system. Now the proof for this
+is not too difficult. In two sentences,
+
+101
+00:07:32,231 --> 00:07:36,707
+我就告诉大家这个定理成立的直观理解
+let me just show you the rough intuition
+for why this is true. So, all we have to
+
+102
+00:07:36,707 --> 00:07:41,471
+我们只需要证明密文完整性。我们之前已经证明了
+argue is just cipher text integrity. So we
+already argued before that the system has
+
+103
+00:07:41,471 --> 00:07:46,235
+这个系统有确定性的CPA安全性。我们只需证
+它具有密文完整性
+deterministic CPA security, all we have to
+argue is just cipher text integrity. So to
+
+104
+00:07:46,235 --> 00:07:50,425
+为了证明这个系统有密文完整性，我们看
+argue that the system has cipher text
+integrity, let's think again how the
+
+105
+00:07:50,425 --> 00:07:54,442
+这个密文完整性是如何工作的。攻击者询问
+cipher text integrity game works.
+Adversary asks for the encryption of a
+
+106
+00:07:54,442 --> 00:07:58,919
+一组他选择的明文的加密结果，然后他获得相应的密文
+bunch of messages of his choice. And he
+gets the resulting cipher text. Then, his
+
+107
+00:07:58,919 --> 00:08:03,807
+攻击者的目标是产生一个新的有效的密文。
+如果这个有效密文在解密时
+goal is to produce a new valid cipher
+text. Well, if that valid cipher text upon
+
+108
+00:08:03,807 --> 00:08:09,712
+被解密成了某个全新的明文，那么我们
+decryption, decrypts to some completely
+new message. Then when we plug this new
+
+109
+00:08:09,712 --> 00:08:14,978
+把这个新信息带入PRF F，我们将获得某个随机IV
+message into the PRF F, we're just going to
+get some random IV and it's very unlikely
+
+110
+00:08:14,978 --> 00:08:20,181
+这个IV基本上不可能是攻击者在输出的密文中提供的IV
+to hit the IV that the adversary supplied
+in the cipher text that he output. So
+
+111
+00:08:20,181 --> 00:08:25,070
+所以这就是说，当攻击者输出他的伪造的密文时
+therefore that says that when the adversary
+outputs his forged cipher text, the
+
+112
+00:08:25,070 --> 00:08:29,772
+伪造的密文里的信息应该等于他在
+message in that forged cipher text
+basically should be equal to one of the
+
+113
+00:08:29,772 --> 00:08:34,770
+选择明文询问里得到的信息之一。否则，得到的IV
+messages in his chosen message queries.
+Otherwise, again the IV that you get is
+
+114
+00:08:34,770 --> 00:08:39,623
+以很高的概率不等于伪造的密文中提供的IV
+simply not gonna be equal to the IV in the
+forged cipher text with very high
+
+115
+00:08:39,623 --> 00:08:44,262
+但如果明文等于攻击者问过我们的明文之一
+probability. But if the message is equal
+to one of the messages that the adversary
+
+116
+00:08:44,262 --> 00:08:48,577
+那么我们得到的密文将等于
+queried us on, well then, the cipher text
+that we're gonna get is also gonna be
+
+117
+00:08:48,577 --> 00:08:53,003
+我们提供给攻击者的密文之一
+equal to one of the cipher texts that we
+supplied to the adversary. But then his
+
+118
+00:08:53,003 --> 00:08:57,484
+那就是说，攻击者的伪造密文就是我们曾给他的密文之一
+forgery is simply one of the cipher texts
+that we gave to him. And therefore, this
+
+119
+00:08:57,484 --> 00:09:02,021
+所以这不是一个有效的伪造。攻击者必须给我们
+一个新的密文，来赢得这场密文完整性游戏
+is not a valid forgery. He has to give us
+a new cipher text to win the cipher text
+
+120
+00:09:02,021 --> 00:09:06,332
+但他给我们一个老的密文。那么这是大致的想法
+integrity game. But he gave us one of our
+old cipher texts. So, this is the rough
+
+121
+00:09:06,332 --> 00:09:10,530
+我想快速讲完，并且有道理
+intuition. I hope, I kinda went through it
+quickly. I hope it kinda makes sense. If
+
+122
+00:09:10,530 --> 00:09:14,781
+如果不明白也没多大事。我将参考一篇关于SIV的论文
+it doesn't then it's not the end of the
+world. I'm gonna reference the paper that
+
+123
+00:09:14,781 --> 00:09:18,980
+在本章最后。如果大家想了解更多细节
+describes SIV at the end of the module.
+And if you wanna see this in more detail
+
+124
+00:09:18,980 --> 00:09:22,916
+可以去阅读这篇论文。但是
+you can read and take a look inside of
+that paper. But, regardless, this is a
+
+125
+00:09:22,916 --> 00:09:27,167
+这个想法很犀利，我想展示给大家这个事实
+very acute idea that I wanted to show you
+where kinda the fact that we derive the
+
+126
+00:09:27,167 --> 00:09:31,418
+我们使用PRF从确定性的计数器模式来推导出随机性
+randomness for deterministic counter mode
+using a PRF. Also, gives us an integrity
+
+127
+00:09:31,418 --> 00:09:35,999
+我们在解密时进行一个完整性检查。这个SIV是个好模式
+check when we actually do the decryption.
+Okay. So this SIV is a good mode for doing
+
+128
+00:09:35,999 --> 00:09:40,800
+当你需要进行确定性的加密时，特别是当明文很长时
+deterministic encryption when you need to,
+particularly if the messages are long. If
+
+129
+00:09:40,800 --> 00:09:45,542
+如果明文很短，比如说少于16个字节的话
+the messages are very short, say they're
+less than sixteen bytes, in fact there's a
+
+130
+00:09:45,542 --> 00:09:50,285
+事实上有个更好的办法，我现在想告诉大家这个办法
+better way to do it, and that's the method
+that I wanna show you now. So the second
+
+131
+00:09:50,285 --> 00:09:54,739
+这第二个机制很简单。我们只需要直接使用PRP
+construction is actually trivial. All
+we're gonna do is we're gonna use a PRP
+
+132
+00:09:54,739 --> 00:09:59,482
+我们这样做，假设(E,D)是一个安全的PRP。E是加密
+directly. So here's what we do. So suppose
+(E, D) is a secure PRP. So E will encrypt, and
+
+133
+00:09:59,482 --> 00:10:06,052
+D是解密。我断定，如果我们直接使用E
+D will decrypt. And I claim that if we use
+E directly, that already gives us
+
+134
+00:10:06,052 --> 00:10:11,642
+就已经给了我们确定性CPA安全性。我来简单证明一下。
+假设F是从X到X的真随机可逆函数
+deterministic CPA security. So let me show you very quickly why. So suppose F is a truly random invertible function from X
+
+135
+00:10:11,642 --> 00:10:15,642
+记得PRP与真随机可逆函数不可区分
+to X. Okay. So remember a PRP is
+indistinguishable from a truly random
+
+136
+00:10:15,642 --> 00:10:20,106
+那么我们假定我们所有的就是一个
+invertible function, so let's pretend that
+we actually do have a truly random
+
+137
+00:10:20,106 --> 00:10:24,801
+真随机可逆函数。现在在实验0里，攻击者将看到
+invertible function. Now in experiment
+zero what the attacker is gonna see while
+
+138
+00:10:24,801 --> 00:10:29,470
+他提交的一组明文信息，也就是左边的信息
+he submits a bunch of messages, you know
+the messages on the left. And what he's
+
+139
+00:10:29,470 --> 00:10:34,550
+攻击者会看到函数f在左边信息上的值
+gonna see is basically the evaluation of f
+on the messages on the left that he
+
+140
+00:10:34,550 --> 00:10:39,694
+在这个确定性的CPA游戏里，所有这些信息都不一样
+supplied. Well, in the deterministic CPA
+game, all these messages are distinct, and
+
+141
+00:10:39,694 --> 00:10:44,838
+他会得到q个不同的X中的随机值。他只能看到这些
+so all he's gonna get back are just q
+distinct random values in X. That's all he
+
+142
+00:10:44,838 --> 00:10:50,006
+是的，有q个X中的不同的值。现在，我们想想实验1
+sees. Yes, there's Q distinct random
+values in X. Now let's think about
+
+143
+00:10:50,006 --> 00:10:55,989
+在实验1中，攻击者收到右边信息的加密
+experiment one. In experiment one, he gets
+to see the encryptions of messages on the
+
+144
+00:10:55,989 --> 00:11:01,757
+从M11到Mq1。所有这些信息也都是不相同的
+right, okay, the M11 to MQ1. Well, again,
+all these messages are all distinct so all
+
+145
+00:11:01,757 --> 00:11:07,227
+所以攻击者还是获得q个X中的随机的不同值
+he gets to see are just Q random distinct
+values in X. Well these two distributions,
+
+146
+00:11:07,227 --> 00:11:11,308
+实验0和实验1的这两个分布是相等的
+in experiment zero and experiment one,
+therefore are identical. Basically, in
+
+147
+00:11:11,308 --> 00:11:15,606
+在两种情况下，攻击者都只能收到q个随机的X中的不同值
+both cases what he gets to see are just Q
+distinct random values in X. And as a
+
+148
+00:11:15,606 --> 00:11:19,795
+因此，他不能区分实验0和实验1
+result, he can't distinguish experiment
+zero from experiment one. And since he
+
+149
+00:11:19,795 --> 00:11:24,251
+由于他对真随机函数不能区分，他对这个PRP也不能
+can't do this for a truly random function,
+he also can't do this for the PRP. Ok,
+
+150
+00:11:24,251 --> 00:11:29,529
+这就解释了为什么直接用PRP加密已经给了我们
+so that explains why directly encrypting
+with a PRP already gives us a CPA secure
+
+151
+00:11:29,529 --> 00:11:34,485
+一个CPA安全系统，非常容易使用。这说明，如果我们
+system very, very, very simple to use.
+That says that if all we wanna do is
+
+152
+00:11:34,485 --> 00:11:39,441
+只想加密短信息，比如说，少于16字节的信息
+encrypt short messages, say, less than
+sixteen bytes, then all we need to do is
+
+153
+00:11:39,441 --> 00:11:44,655
+我们只需要直接使用AES加密它们，得到的结果事实上
+to directly encrypt them using AES and the
+result will, in fact, be deterministic CPA
+
+154
+00:11:44,655 --> 00:11:49,997
+就是确定性的CPA安全的。那么如果你的目录少于16字节
+secure. So, if your indices are less than
+sixteen bytes directly using AES is a fine
+
+155
+00:11:49,997 --> 00:11:53,821
+完全可以直接使用AES。但是，注意这不会提供任何完整性
+thing to do. Notice however, that's not
+gonna provide any integrity. And we're
+
+156
+00:11:53,821 --> 00:11:57,989
+我们待会将看到如何加入完整性。不过给大家的问题是
+gonna see how to add integrity in just a
+minute. But the question for you is, what
+
+157
+00:11:57,989 --> 00:12:02,544
+如果我们的明文长于16个字节，怎么办？
+do we do if we have longer than sixteen
+byte messages? Well, one option is to use
+
+158
+00:12:02,544 --> 00:12:07,157
+一个方法是使用SIV。但是如果我还想使用这个机制
+SIV. But what if we actually wanted to use
+this construction too. It's actually an
+
+159
+00:12:07,157 --> 00:12:11,598
+这是个有趣的问题。我们能不能构建PRP
+interesting question. Can we construct
+PRP's that have message spaces that are
+
+160
+00:12:11,598 --> 00:12:16,154
+它的明文空间比16个字节大？如果大家还记得
+bigger than just sixteen bytes? If you
+remember in the past we constructed PRFs
+
+161
+00:12:16,154 --> 00:12:20,652
+我们曾根据小明文空间的PRF，组建过大明文空间的PRF
+on that had large message spaces from
+PRFs that had small message spaces. Here,
+
+162
+00:12:20,652 --> 00:12:25,436
+这里，我们要组建大明文空间的PRP
+we're going to construct PRPs with large
+message spaces from PRFs that have small
+
+163
+00:12:25,436 --> 00:12:30,172
+从小明文空间的PRF出发。我们这么做。
+假设E,D是一个安全的PRP
+message spaces. So, here's how we do it.
+So suppose E D is a secure PRP that
+
+164
+00:12:30,172 --> 00:12:35,611
+定义在n位分组上。有一个标准模式叫做EME
+operates on N bit blocks. There's a
+standard mode called EME that actually
+
+165
+00:12:35,611 --> 00:12:41,491
+会组建一个定义在N位分组上的PRP
+will construct a PRP that operates on
+capital N bit blocks, where capital N is
+
+166
+00:12:41,491 --> 00:12:46,284
+N远远大于n。那么这使得我们可以进行确定性加密
+much, much bigger than little n. So this
+would allow us to do deterministic
+
+167
+00:12:46,284 --> 00:12:50,866
+能加密长于16字节的明文信息。事实上
+encryption on much larger messages than
+just sixteen bytes. In fact it could be as
+
+168
+00:12:50,866 --> 00:12:55,262
+只要我们想，就可以的。我们看看EME然后工作的
+开始时会有点吓人
+long as we want. So let's see how EME
+works. It's a bit daunting at first but
+
+169
+00:12:55,262 --> 00:12:59,698
+但这个机制并不难。我们看看它是如何工作的
+it's not a difficult construction. So,
+let's see how it works. So, EME uses two
+
+170
+00:12:59,698 --> 00:13:04,484
+EME使用了两个密钥K和L，事实上在EME中，L是由K推出的
+keys, K and L, and in fact in the real EME
+L is derived from K. But for our purposes,
+
+171
+00:13:04,484 --> 00:13:09,096
+不过为了我们的目标，我们假定K和L是不同的密钥
+let's just pretend that K and L are two
+distinct keys. The first thing we do, is
+
+172
+00:13:09,096 --> 00:13:13,840
+首先我们取明文X，把它分解成若干分组
+we take our message X and we break it up
+into blocks. And then we XOR each block
+
+173
+00:13:13,840 --> 00:13:18,730
+然后把每个分组都异或一个特定的密码本函数。
+我们使用密钥L来推导一个密码本
+with a certain padding function, okay? So
+we use the secret key L to derive a pad
+
+174
+00:13:18,913 --> 00:13:23,681
+使用这个函数P。我这里解释一下
+using this, you know function P that I'm
+not gonna explain here. We derive a
+
+175
+00:13:23,681 --> 00:13:28,949
+我们对每个分组推导一个不同的密码本，然后
+我们计算这个密码本和分组的异或
+different pad for each one of the blocks
+and we XOR that pad into the block. The
+
+176
+00:13:28,949 --> 00:13:35,348
+接下来我们应用PRP E，使用密钥K，对每个分组进行操作
+next thing we do is we apply the PRP E
+using the Key K, to each of these blocks,
+
+177
+00:13:35,348 --> 00:13:41,230
+我们叫这些输出为PP0, PP1和PP2。接下来
+and we're gonna call these outputs PP0,
+PP1, and PP2. The next thing we do is we
+
+178
+00:13:41,230 --> 00:13:46,350
+我们把所有PPP异或起来，我们叫异或结果为MP
+XOR all these ppp's together and we call
+the result MP. Actually this XOR
+
+179
+00:13:46,350 --> 00:13:51,341
+实际上这步异或不是必需的。我们把这个结果的异或称为MP
+doesn't need to be there. We call the
+result of the XOR MP. The next thing we
+
+180
+00:13:51,341 --> 00:13:56,591
+接下来我们把这些PPP异或起来，称结果为MP
+do we XOR all these ppp's together and we
+call the result MP. We encrypt this MP
+
+181
+00:13:56,591 --> 00:14:01,781
+我们用E和密钥K来加密这个MP。我们把加密的输出叫做MC
+using E and the key K. We call the outputs of
+this encryption MC. Okay. So then we use
+
+182
+00:14:01,781 --> 00:14:06,792
+然后我们计算MP异或MC，得到另一个PM，我们使用这个PM
+the XOR MP and MC and this gives us
+another PM, which we use to derive one
+
+183
+00:14:06,792 --> 00:14:12,064
+来推导更多的密码本，然后我们把这个密码本的输出
+和所有PPP异或
+more pad, and then we XOR this output
+of this pad with all the PPP's to get
+
+184
+00:14:12,064 --> 00:14:17,205
+得到这些CCC，然后我们把所有这些CCC异或
+these CCC's, ha, and then we XOR
+all these CCC's together that gives us
+
+185
+00:14:17,205 --> 00:14:22,411
+我们得到一个值叫CCC0，然后我们再加密一次，使用这些E
+a value of CCC zero, which we then
+encrypt one more time with all these E's,
+
+186
+00:14:22,411 --> 00:14:27,878
+我们用这些P做更多的密码本。最后我们得到
+we do one more padding with all these P's
+and that actually finally gives us the
+
+187
+00:14:27,878 --> 00:14:32,975
+EME的输出。所有我说了，这可能看起来有点吓人
+output of EME. Okay, so like I said,
+this may look a little daunting, but in
+
+188
+00:14:32,975 --> 00:14:38,483
+但事实上，有个定理证明了，如果底层分组密码E
+fact there's a theorem that shows that if
+the underlying block cipher E is a secure
+
+189
+00:14:38,483 --> 00:14:42,971
+是个安全的PRP，这个EME机制在这个大分组上是安全的PRP
+PRP, then in fact. This construction, EME,
+is a secure PRP on this larger block, you
+
+190
+00:14:42,971 --> 00:14:47,140
+即｛0,1｝^N。这个机制的好处是
+know, zero, one to the capital N. The nice
+thing about this construction is you
+
+191
+00:14:47,140 --> 00:14:50,877
+它是可并行的，这也是它为什么有点复杂的原因
+notice that it's very parallel and
+actually that's why it's a little
+
+192
+00:14:50,877 --> 00:14:55,082
+每个分组并行加密，如果你有一个多核处理器
+complicated. Counted every block. It's
+encrypted in parallel, so if you have a
+
+193
+00:14:55,082 --> 00:14:59,577
+你可以使用你的所有核来同时加密这些分组
+multi-core processor, you can use all your
+cores to encrypt all the blocks at the
+
+194
+00:14:59,577 --> 00:15:04,635
+然后有一点串行的步骤要计算
+same time and then there would be one kind
+of sequential step to compute this, check
+
+195
+00:15:04,635 --> 00:15:09,242
+计算输出的校验和，然后再来一次并行操作
+sum of, all the outputs and then one more
+parallel around to encrypt one more time
+
+196
+00:15:09,242 --> 00:15:13,232
+再加密一次，然后最终获得输出。这些函数P
+and then finally you get the outputs.
+These function Ps, by the way, that
+
+197
+00:15:13,232 --> 00:15:17,503
+用于生成密码本的，是非常简单的函数。它们需要常数的时间
+generate the pads, are very, very simple
+functions. They take constant time so
+
+198
+00:15:17,503 --> 00:15:22,130
+所以评估性能时，我们将忽略它们
+we're just going to ignore them in terms
+of performance. So the bottom line is
+
+199
+00:15:22,130 --> 00:15:27,661
+所以这里性能的底线是，大家注意对每个输入分组
+它要求运用E两次
+performance here. You notice it requires
+two applications of E per input block. And
+
+200
+00:15:27,661 --> 00:15:33,362
+事实上EVE可能比SIV慢很多，如果SIV被合理实现
+it turns out this can actually be slower
+than SIV, if SIV is implemented properly
+
+201
+00:15:33,362 --> 00:15:38,711
+使用了很快的PRF来推导随机性。然后事实上
+with a very fast PRF to derive the
+randomness. Then in fact SIV can be twice
+
+202
+00:15:38,711 --> 00:15:43,790
+SIV可以比这种操作模式快出一倍。其原因，我说
+as fast, as this particular mode of
+operation. For this reason I say that the
+
+203
+00:15:43,790 --> 00:15:48,234
+PRP机制擅长处理短明文信息，而SIV擅长处理
+PRP construction is very good for short
+messages, whereas SIV is good if you h, if
+
+204
+00:15:48,234 --> 00:15:52,892
+长信息的加密，以确定的方式。但现在
+you want to encrypt longer messages in a
+deterministic fashion. But now what if we
+
+205
+00:15:52,892 --> 00:15:57,320
+如果我们想对这个基于PRP的机制加上完整性，怎么办？
+wanted to add integrity to this PRP-based
+mechanism? So, can we achieve
+
+206
+00:15:57,320 --> 00:16:02,635
+我们能否获得确定的认证加密，使用PRP机制
+deterministic authenticated encryption
+using the PRP mechanism where we directly
+
+207
+00:16:02,635 --> 00:16:06,971
+直接用PRP来加密信息呢？实际上答案是肯定的
+encrypt the message using a PRP? And it
+turns out the answer is yes and it's
+
+208
+00:16:06,971 --> 00:16:10,587
+实际上是一个非常简单的加密机制，大家应该知道的
+actually again, a very simple
+encryption scheme that you should know
+
+209
+00:16:10,587 --> 00:16:14,637
+我们取我们的明文信息
+about. Basically what we're going to do is
+we're going to take our message and we're
+
+210
+00:16:14,637 --> 00:16:18,639
+然后在信息后面附一堆0，然后应用PRP
+going to append a bunch of zeros to this
+message and then we're going to apply the
+
+211
+00:16:18,639 --> 00:16:22,304
+就完事了。这样做会给我们密文。非常简单
+PRP and that's it. And that's going to
+give us the cipher text. Now, very, very
+
+212
+00:16:22,304 --> 00:16:26,017
+只要附0，然后用PRP加密。当我们解密时
+simple. Just append zeros and encrypt
+using a PRP. When we decrypt, we're going
+
+213
+00:16:26,017 --> 00:16:30,018
+我们看获得的明文的这些低位
+to look at these least significant bits of
+the resulting plain text and if they're
+
+214
+00:16:30,018 --> 00:16:33,731
+如果它们不等于0，我们将拒绝这个密文
+not equal to zero, we're just going to
+reject the cipher text. And if they are
+
+215
+00:16:33,731 --> 00:16:37,430
+如果它们等于0，我们将输出有效信息。好了，完事
+equal to zero, we're going to output the
+message as valid. Okay, so that's it,
+
+216
+00:16:37,430 --> 00:16:41,074
+这是整个系统，非常简单。加密时把0附在后面
+that's the whole system, very, very
+simple. Simply append zeroes during
+
+217
+00:16:41,074 --> 00:16:45,511
+然后解密时，检查这些零还在不在
+encryption, and then check that the zeroes
+are there when you decrypt. And I claim
+
+218
+00:16:45,511 --> 00:16:49,630
+我说，这个非常简单的机制实际上提供了确定的
+that this very simple mechanism actually
+provides deterministic authenticated
+
+219
+00:16:49,630 --> 00:16:53,433
+认证加密，当然前提是你附了足够多的0
+encryption, assuming, of course, that
+you've appended enough zeroes. And in
+
+220
+00:16:53,433 --> 00:16:57,183
+特别地，如果你附了N个0，你需要1除以2的N次方
+particular, if you append N zeroes, you
+need one over two to the N to be
+
+221
+00:16:57,183 --> 00:17:01,144
+是可忽略的。如果是这样，事实上，这个直接的
+基于PRP的加密，事实上
+negligible. And if so, then, in fact, this
+direct PRP based encryption, in fact,
+
+222
+00:17:01,144 --> 00:17:05,146
+提供了确定性的认证加密。让我看看为什么
+provides deterministic authenticated
+encryption. So let me see why. Well, we
+
+223
+00:17:05,146 --> 00:17:10,310
+我们已经论证了这个系统是CPA安全的
+already argued that the system is CPA
+secure, so all we have to argue is that it
+
+224
+00:17:10,310 --> 00:17:15,352
+所以我们只需论证，它提供了密文完整性。
+这是容易看出来的。我们看这个
+provides cipher text integrity. And again,
+that's easy to see. Let's look at the
+
+225
+00:17:15,352 --> 00:17:20,619
+密文游戏。攻击者选择，我们说一个真随机置换
+cipher text game. So the adversary
+is gonna choose let's say a truly random
+
+226
+00:17:20,619 --> 00:17:25,700
+那么，一个输入空间上的真随机可逆函数
+permutation. So a truly random, invertible
+function, on the input space. In this case
+
+227
+00:17:25,700 --> 00:17:30,348
+在这个情况下，输入空间是明文空间和N位0
+the input space is the message space and
+the N zero bits. Now what does the
+
+228
+00:17:30,348 --> 00:17:34,995
+攻击者怎么办？他会提交q个明文信息
+adversary get to do? Well he gets to
+submit q messages, and then he receives
+
+229
+00:17:34,995 --> 00:17:40,138
+然后他收到了这q个明文信息的加密结果。
+他收到了他选择的点联结上N位0后对应的PRP的值
+the encryption of those Q messages. Mainly
+he receives the PRP at his chosen points
+
+230
+00:17:40,138 --> 00:17:45,516
+好，这就是他要问CPA挑战者的
+concatenated with N zeros. Okay, that's
+what it basically it means to query the
+
+231
+00:17:45,733 --> 00:17:50,355
+对于随机置换来说，他会看到
+CPA challenger. So in case of a random
+permutation, he simply gets to see, the
+
+232
+00:17:50,355 --> 00:17:54,829
+这个置换在他选的q个点的值，别忘了附上N位0
+value of this permutation at Q points of
+his choice, but only concatenated with N
+
+233
+00:17:54,829 --> 00:17:59,193
+现在，在这个密文完整性游戏中，攻击者的目标是什么？
+zeroes. And now, what's his goal in the
+cipher text integrity game? Well, his goal
+
+234
+00:17:59,193 --> 00:18:03,888
+他的目标是产生一些新的密文，与他之前获得的密文都不同
+is to produce some new cipher text that's
+different from the cipher text that he was
+
+235
+00:18:03,888 --> 00:18:08,087
+这些新密文可以顺利解密。那顺利解密是什么意思？
+given, that's gonna decrypt properly.
+Well, what does it mean that it decrypts
+
+236
+00:18:08,087 --> 00:18:12,935
+它的意思是，当我们对密文C应用逆置换后
+properly? It means that if, when we apply,
+Pi inverse to the cipher text C, it had
+
+237
+00:18:12,935 --> 00:18:17,568
+C的最低N位最好都是0
+better be the case that the N least
+significant bytes of C are all zeros. And
+(这里的C已经是应用过逆置换后的值)
+
+238
+00:18:17,568 --> 00:18:22,141
+问题是这个发生的可能性有多大呢？我们想一想
+the question is how likely is that to
+happen? Well, so let's think about this.
+
+239
+00:18:22,141 --> 00:18:26,774
+那么我们有一个真随机置换，攻击者可以看到
+So basically we have a truly random
+permutation and the adversary got to see
+
+240
+00:18:26,774 --> 00:18:31,707
+这个置换在q个点的值。他产生一个新点
+the value of this permutation as Q points.
+How likely is he to produce a new point
+
+241
+00:18:31,707 --> 00:18:36,643
+当求逆过后，最低N位正好都是0的概率是多少？
+that, when inverted, happens to have N zeroes
+as the least significant bits? What we're
+
+242
+00:18:36,643 --> 00:18:41,646
+我们这里在计算这个逆置换在点C的值
+doing here is basically we're evaluating
+the permutation Pi inverse at the point c.
+
+243
+00:18:41,646 --> 00:18:46,108
+因为逆置换是一个随机置换
+And since Pi inverse is a random
+permutation, how likely is it to have its
+
+244
+00:18:46,108 --> 00:18:52,206
+它最低N位正好都是0的可能性有多大？
+不难看出答案是
+n least significant bits be equal to zero?
+So it isn't hard to see that the answer
+
+245
+00:18:52,206 --> 00:18:56,137
+这个概率最多是1除以2的N次方
+is, is, at most, the probability's at
+most, one over two to the N. Because,
+
+246
+00:18:56,137 --> 00:19:00,967
+因为这个置换会输出X乘以｛0,1｝^N中的一个随机元素
+again, basically, the permutation is gonna
+output a random element inside of, X times
+(这里的乘法乃字符串联结使然)
+
+247
+00:19:00,967 --> 00:19:05,459
+这个元素以N位0结尾
+0 1 to the N. And that element is gonna end
+with N zeroes, but basically
+
+248
+00:19:05,459 --> 00:19:10,065
+以概率1除以2的N次方。因此攻击者
+with the probability one over two to the
+N. And as a result, the adversary wins the
+
+249
+00:19:10,065 --> 00:19:14,707
+以可忽略的概率赢得这场游戏，因为这个值是可忽略的
+game with negligible probability, Because,
+this value is negligible. So that's the
+
+250
+00:19:14,707 --> 00:19:18,761
+本节完结。我想让大家看两个非常犀利的
+end of this segment. I wanted you to see
+these two very acute deterministic
+
+251
+00:19:18,761 --> 00:19:23,145
+认证加密机制。第一个叫做SIV
+authenticated encryption schemes. The
+first one we called SIV, where I said you
+
+252
+00:19:23,145 --> 00:19:27,803
+我说过大家可以使用随机计数器模式，可以获得随机性
+would use randomized counter mode and you
+just arrived at randomness for randomized
+
+253
+00:19:27,803 --> 00:19:32,077
+对明文信息应用PRF的随机计数器模式。
+这里一个很犀利的想法是
+counter mode from a PRF applied to the
+message. And the very acute idea here is
+
+254
+00:19:32,077 --> 00:19:36,241
+在解密过程中，你可以根据解密的信息重新计算IV
+that during decryption you can simply
+recompute the IV from the, from the decrypted
+
+255
+00:19:36,241 --> 00:19:40,789
+并验证这个IV是否是在密文中给的IV
+message and verify that that IV is what's
+given to you in the cipher text. And that
+
+256
+00:19:40,789 --> 00:19:44,789
+这个简单的检查实际上足以保证认证加密
+simple check is actually enough to
+guarantee authenticated encryption or
+
+257
+00:19:44,789 --> 00:19:49,198
+甚至能保证确定的认证加密
+rather deterministic authenticated
+encryption. So this mode is, is the way
+
+258
+00:19:49,198 --> 00:19:54,046
+如果数据库的索引很长，大家可以用这个模式
+来加密这个索引
+you would encrypt an index in a database
+if the index was large. If the index
+
+259
+00:19:54,046 --> 00:19:59,209
+如果这个索引正好较短，比如说，可能是8字节的用户ID
+happens to be short, maybe say, its eight
+bytes if it's an 8-byte user ID, then you
+
+260
+00:19:59,209 --> 00:20:04,246
+那么大家可以直接使用PRP，可以在这8个字节后面附0
+can directly use a PRP and the way you
+would do is, is you would append zeros to
+
+261
+00:20:04,246 --> 00:20:09,026
+然后这些0可以被用来作为完整性检测
+those eight bytes. And then those zeros
+will be used as an integrity check when
+
+262
+00:20:09,026 --> 00:20:13,642
+当大家解密后，如果能够附足够多的0
+you decrypt and again if you append, are
+able to append enough zeros, then in fact
+
+263
+00:20:13,813 --> 00:20:17,915
+那么事实上，这也提供了确定的认证加密
+this also provides deterministic
+authenticated encryption. As an aside, I
+
+264
+00:20:17,915 --> 00:20:22,758
+另外，我还给大家看了一个构建宽分组的PRP的方法
+showed you that there's a way to build the
+wide block PRP from a narrow PRP and that
+
+265
+00:20:22,758 --> 00:20:26,843
+是由窄分组的PRP构建的，这个操作模式叫做EME
+particular mode of operation is called
+EME. So we're gonna refer EME
+
+266
+00:20:26,843 --> 00:20:28,355
+下节中我们还要看EME
+actually in the next segment.

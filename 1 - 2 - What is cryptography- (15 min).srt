@@ -1,0 +1,1396 @@
+1
+00:00:00,000 --> 00:00:02,951
+在开始技术内容之前，我想简要介绍
+Before we start with the technical
+material, I wanna give you a quick
+
+2
+00:00:02,951 --> 00:00:06,487
+密码学是什么，及其不同领域
+overview of what cryptography is about and
+the different areas of cryptography. So
+
+3
+00:00:06,487 --> 00:00:10,487
+密码学的核心当然是安全通信
+the core of cryptography of course is
+secure communication that essentially
+
+4
+00:00:10,487 --> 00:00:14,539
+通常含两部分，首先是安全的密钥建立
+consists of two parts. The first is
+secured key establishment and then how do
+
+5
+00:00:14,539 --> 00:00:18,697
+然后是共享密钥，安全的通信
+we communicate securely once we have a
+shared key. We already said that secured
+
+6
+00:00:18,697 --> 00:00:22,854
+我们说过安全的密钥建立是指
+Alice和Bob互相通信
+key establishment essentially amounts to
+Alice and Bob sending messages to one
+
+7
+00:00:22,854 --> 00:00:26,906
+在协议的最后，双方达成共享的密钥K
+another such that at the end of this
+protocol, there's a shared key that they
+
+8
+00:00:26,906 --> 00:00:30,906
+除了共享密钥K，事实上
+both agree on, shared key K, and beyond
+that, beyond just a shared key, in fact
+
+9
+00:00:30,906 --> 00:00:35,274
+Alice应知道她在和Bob通信
+Bob应知道他在和Alice通信
+Alice would know that she's talking to Bob
+and Bob would know that he's talking to
+
+10
+00:00:35,274 --> 00:00:39,964
+可怜的攻击者监听该会话
+无法得知共享的密钥
+Alice. But a poor attacker who listens in
+on this conversation has no idea what the
+
+11
+00:00:39,964 --> 00:00:44,011
+本讲稍后我们来看
+shared key is. And we'll see how to do
+that later on in the course. Now once they
+
+12
+00:00:44,011 --> 00:00:47,657
+一旦达成共享密钥，
+他们希望使用该密钥安全地交换信息
+have a shared key, they want exchange
+messages securely using this key, and
+
+13
+00:00:47,657 --> 00:00:51,698
+我们会讨论所用的加密机制
+we'll talk about encryption schemes that
+allow them to do that in such a way that
+
+14
+00:00:51,698 --> 00:00:55,491
+使得攻击者无从得知传递的信息
+an attacker can't figure out what messages
+are being sent back and forth. And
+
+15
+00:00:55,491 --> 00:00:59,630
+进一步地，攻击者无法篡改通信内容
+一经篡改即被检测到
+furthermore an attacker cannot even tamper
+with this traffic without being detected.
+
+16
+00:00:59,630 --> 00:01:03,227
+换句话说，加密机制提供了机密性和完整性
+In other words, these encryption schemes
+provide both confidentiality and
+
+17
+00:01:03,227 --> 00:01:06,774
+不过密码学的功能比这两点多得多
+integrity. But cryptography does much,
+much, much more than just these two
+
+18
+00:01:06,774 --> 00:01:10,519
+我想给大家看几个那样的例子
+things. And I want to give you a few
+examples of that. So the first example I
+
+19
+00:01:10,519 --> 00:01:14,468
+第一个例子叫做数字签名
+want to give you is what's called a
+digital signature. So a digital signature,
+
+20
+00:01:14,468 --> 00:01:18,892
+基本上，数字签名是实际手写签名的类似
+basically, is the analog of the signature
+in the physical world. In the physical
+
+21
+00:01:18,892 --> 00:01:23,372
+在实际中，当你给一封文档签字时
+world, remember when you sign a document,
+essentially, you write your signature on
+
+22
+00:01:23,372 --> 00:01:27,740
+你的签名总是保持一致的
+that document and your signature is always
+the same. You always write the same
+
+23
+00:01:27,740 --> 00:01:32,164
+不同的文档你签同样的字
+signature on all documents that you wanna
+sign. In the digital world, this can't
+
+24
+00:01:32,164 --> 00:01:36,812
+数字签名不能像这样，因为一旦
+攻击者获得我的一个文档签名
+possibly work because if the attacker just
+obtained one signed document from me, he
+
+25
+00:01:36,812 --> 00:01:41,180
+他可以复制粘贴到别的
+我并不想签字的文档上
+can cut and paste my signature unto some
+other document that I might not have
+
+26
+00:01:41,180 --> 00:01:45,247
+所以数字签名对我想签的不同文档
+wanted to sign. And so, it's simply not
+possible in a digital world that my
+
+27
+00:01:45,247 --> 00:01:49,590
+通常不可能一样
+signature is the same for all documents
+that I want to sign. So we're gonna talk
+
+28
+00:01:49,590 --> 00:01:53,830
+本课的后半段我们讨论如何构建数字签名
+about how to construct digital signatures
+in the second half of the course. It's
+
+29
+00:01:53,830 --> 00:01:58,123
+这是一个很有趣的原型
+我们将看到如何做
+really quite an interesting primitive and
+we'll see exactly how to do it. Just to
+
+30
+00:01:58,123 --> 00:02:02,098
+提示一下，数字签名基本上就是
+give you a hint, the way digital
+signatures work is basically by making the
+
+31
+00:02:02,098 --> 00:02:06,232
+待签内容的一个函数值
+digital signature via function of the
+content being signed. So an attacker who
+
+32
+00:02:06,232 --> 00:02:10,313
+所以攻击者复制签名将无法成功
+tries to copy my signature from one
+document to another is not gonna succeed
+
+33
+00:02:10,313 --> 00:02:14,541
+新文件的函数值于旧签名不一致
+because the signature. On the new document
+is not gonna be the proper function of the
+
+34
+00:02:14,541 --> 00:02:18,526
+所以签名验证失败
+data in the new document, and as a result,
+the signature won't verify. And as I said,
+
+35
+00:02:18,526 --> 00:02:22,608
+我说过，稍后我们将看到如何构建数字签名
+we're gonna see exactly how to construct
+digital signatures later on and then we'll
+
+36
+00:02:22,608 --> 00:02:27,193
+我们将证明这些构建是安全的
+我想说的密码学的另一个应用是
+prove that those constructions are secure.
+Another application of cryptography that I
+
+37
+00:02:27,193 --> 00:02:31,096
+匿名通信。想象一下
+wanted to mention, is anonymous
+communication. So, here, imagine user
+
+38
+00:02:31,096 --> 00:02:35,828
+Alice想和某个聊天服务器Bob说话
+也许她想谈论病情
+Alice wants to talk to some chat server,
+Bob. And, perhaps she wants to talk about
+
+39
+00:02:35,828 --> 00:02:40,382
+所以她想匿名
+a medical condition, and so she wants to
+do that anonymously, so that the chat
+
+40
+00:02:40,382 --> 00:02:45,113
+聊天服务器并不知道她是谁
+有一个标准方法叫
+server doesn't actually know who she is.
+Well, there's a standard method, called a
+
+41
+00:02:45,113 --> 00:02:49,946
+mixnet，可以允许Alice通过
+公共互联网与Bob通信
+mixnet, that allows Alice to communicate
+over the public internet with Bob through
+
+42
+00:02:49,946 --> 00:02:54,856
+经过一系列代理，
+最终让Bob无从得知对方身份
+a sequence of proxies such that at the end
+of the communication Bob has no idea who he
+
+43
+00:02:54,856 --> 00:02:59,537
+mixnet的工作原理基本上是
+当Alice发出信息
+just talked to. The way mixnets work
+is basically as Alice sends her messages
+
+44
+00:02:59,537 --> 00:03:03,818
+经过一系列代理时
+to Bob through a sequence of proxies,
+these messages get encrypted and
+
+45
+00:03:03,818 --> 00:03:08,271
+信息被适当地加密、解密
+以至于Bob不知道对方身份
+decrypted appropriately so that Bob has no
+idea who he talked to and the proxies
+
+46
+00:03:08,271 --> 00:03:12,724
+代理们也不知道Alice在和Bob通信
+themselves don't even know that Alice is
+talking to Bob, or that actually who is
+
+47
+00:03:12,724 --> 00:03:16,750
+以及更一般的通信双方。
+匿名通信的一个有趣事实是
+talking to whom more generally. One
+interesting thing about this anonymous
+
+48
+00:03:16,750 --> 00:03:20,498
+它是双向的，换句话说
+communication channel is, this is
+bi-directional. In other words, even
+
+49
+00:03:20,498 --> 00:03:24,743
+尽管Bob不知道他在跟谁说
+他依然可以回应Alice
+though Bob has no idea who he's talking
+to, he can still respond to Alice and
+
+50
+00:03:24,743 --> 00:03:29,153
+Alice可以收到回复。一旦我们有了匿名通信
+Alice will get those messages. Once we
+have anonymous communication, we can build
+
+51
+00:03:29,153 --> 00:03:33,784
+我们可以建立其他隐私机制
+我想为大家举个叫匿名数字现金的例子
+other privacy mechanisms. And I wanna give
+you one example which is called anonymous
+
+52
+00:03:33,784 --> 00:03:37,643
+记得在现实中如果我有一美元
+digital cash. Remember that in the
+physical world if I have a physical
+
+53
+00:03:37,643 --> 00:03:42,108
+我可以去书店买本书，书店老板并不知道我是谁
+dollar, I can walk into a bookstore and
+buy a book and the merchant would have no
+
+54
+00:03:42,108 --> 00:03:46,876
+问题是在数字世界里我们能不能做同样事情
+idea who I am. The question is whether we
+can do the exact same thing in the digital
+
+55
+00:03:46,876 --> 00:03:50,963
+在数字世界里，Alice可能有一个数字美元
+world. In the digital world, basically,
+Alice might have a digital dollar,
+
+56
+00:03:50,963 --> 00:03:55,984
+一个数字美元硬币。她可能想在网上购物
+花掉这一美元
+a digital dollar coin. And she might wanna
+spend that digital dollar at some online
+
+57
+00:03:55,984 --> 00:04:00,760
+比如网上书店之类
+现在我们要让Alice
+merchants, perhaps some online bookstore.
+Now, what we'd like to do is make it so
+
+58
+00:04:00,760 --> 00:04:05,539
+在书店里花掉这块硬币
+书店不知道Alice是谁
+that when Alice spends her coin at the
+bookstore, the bookstore would have no
+
+59
+00:04:05,539 --> 00:04:10,629
+所以我们提供了与现实一样的匿名
+idea who Alice is. So we provide the same
+anonymity that we get from physical cash.
+
+60
+00:04:10,629 --> 00:04:15,470
+问题是在数字世界里，Alice使用的硬币
+Now the problem is that in the digital
+world, Alice can take the coin that she
+
+61
+00:04:15,470 --> 00:04:20,250
+她可以在花掉之前复制该硬币
+had, this one dollar coin, and before she spent
+it, she can actually make copies of it.
+
+62
+00:04:20,250 --> 00:04:24,086
+突然间就不是一块美元硬币了
+And then all of a sudden instead of just
+having just one dollar coin now all
+
+63
+00:04:24,093 --> 00:04:27,936
+她突然就有了3美元硬币
+它们当然是一样的
+of a sudden she has three dollar coins and
+they're all the same of course, and
+
+64
+00:04:27,936 --> 00:04:31,828
+没什么能阻止她复制硬币并花掉
+there's nothing preventing her from taking
+those replicas of a dollar coin and
+
+65
+00:04:31,828 --> 00:04:35,819
+那我们该如何提供匿名数字现金？
+spending it at other merchants. And so the
+question is how do we provide anonymous
+
+66
+00:04:35,819 --> 00:04:39,849
+同时还要防止Alice重复花费
+digital cash? But at the same time, also
+prevent Alice from double spending the
+
+67
+00:04:39,849 --> 00:04:43,760
+在不同的商家。
+某些情况下，安全和匿名是相悖的
+dollar coin at different merchants. In
+some sense there's a paradox here where
+
+68
+00:04:43,760 --> 00:04:47,879
+因为如果我们有匿名现金
+anonymity is in conflict with security
+because if we have anonymous cash there's
+
+69
+00:04:47,879 --> 00:04:51,999
+将没什么能阻止Alice重复花费
+nothing to prevent Alice from double
+spending the coin and because the coin is
+
+70
+00:04:51,999 --> 00:04:56,244
+因为硬币是匿名的，我们没法找到责任人
+anonymous we have no way of telling who
+committed this fraud. And so the question
+
+71
+00:04:56,244 --> 00:05:00,394
+那我们如何解决该问题？
+事实上，这是完全可行的
+is how do we resolve this tension. And it
+turns out, it's completely doable. And
+
+72
+00:05:00,394 --> 00:05:04,757
+我们将会讨论到匿名数字现金。提示大家一下
+we'll talk about anonymous digital cash
+later on. Just to give you a hint, I'll
+
+73
+00:05:04,757 --> 00:05:09,173
+我们的方法是确保当Alice只花费一次时
+say that the way we do it is basically by
+making sure that if Alice spends the coin
+
+74
+00:05:09,173 --> 00:05:13,764
+没人知道她是谁。
+但如果她花费多于一次
+once then no one knows who she is, but if
+she spends the coin more than once, all of
+
+75
+00:05:13,764 --> 00:05:17,878
+她的个人信息将会突然全部暴露
+a sudden, her identity is completely
+exposed and then she could be subject to
+
+76
+00:05:17,878 --> 00:05:22,096
+她将面临各种法律问题。
+那就是匿名数字现金如何工作的
+all sorts of legal problems. And so that's
+how anonymous digital cash would
+
+77
+00:05:22,096 --> 00:05:26,158
+从高层次来说的。
+本课稍后将介绍如何实现之
+work at a high level and we'll see how to
+implement it later on in the course.
+
+78
+00:05:26,158 --> 00:05:30,219
+密码学的另一应用是关于更多抽象的协议
+Another application of cryptography has to
+do with more abstract protocols, but
+
+79
+00:05:30,219 --> 00:05:34,333
+不过在我说一般结果之前
+我想给大家看两个例子
+before I speak the general result, I
+want to give you two examples. So the
+
+80
+00:05:34,333 --> 00:05:38,343
+第一个例子与选举系统有关
+这是关于选举问题
+first example has to do with election
+systems. So here's the election problem.
+
+81
+00:05:38,343 --> 00:05:42,656
+假设有两个党派，0和1，供选民投票
+Suppose ... we have two parties, party zero
+and party one. And voters vote for these
+
+82
+00:05:42,656 --> 00:05:47,101
+比如说，这个选民投给了0
+parties. So for example, this voter could
+have voted for party zero, this voter voted for
+
+83
+00:05:47,101 --> 00:05:52,313
+这个选民投给了1，等等
+在本次选举中，0得3票，1得2票
+party one. And so on. So in this election,
+party zero got three votes and party two
+
+84
+00:05:52,313 --> 00:05:56,590
+0当然是本次选举的胜者
+got two votes. So the winner of the
+election, of course, is party zero. But
+
+85
+00:05:56,590 --> 00:06:01,579
+但更一般地，胜者是获得多数票的一方
+more generally, the winner of the election
+is the party who receives the majority of
+
+86
+00:06:01,579 --> 00:06:06,453
+现在，投票问题如下
+投票者可能会计算多数投票结果
+the votes. Now, the voting problem is the
+following. The voters would somehow like
+
+87
+00:06:06,453 --> 00:06:11,720
+不过却不用知道每个人的投票结果
+to compute the majority of the votes, but
+do it in such a way such that nothing else
+
+88
+00:06:11,720 --> 00:06:16,797
+怎么样？问题是怎么办？
+is revealed about their individual votes.
+Okay? So the question is how to do that?
+
+89
+00:06:16,797 --> 00:06:21,493
+为此我们引入一个选举中心
+And to do so, we're gonna introduce an
+election center who's gonna help us
+
+90
+00:06:21,493 --> 00:06:26,633
+用来计算大多数票，不过保密投票结果
+compute the majority, but keep the votes
+otherwise secret. And what the parties
+
+91
+00:06:26,633 --> 00:06:32,027
+各派将把他们的投票加密后送给选举中心
+will do is they will each send the funny
+encryption of their votes to the election
+
+92
+00:06:32,027 --> 00:06:36,949
+投票结束时，选举中心可以计算出胜者
+center in such a way that at the end of
+the election, the election center is able
+
+93
+00:06:36,949 --> 00:06:41,615
+但除了选举胜者之外
+to compute and output the winner of the
+election. However, other than the winner
+
+94
+00:06:41,615 --> 00:06:46,580
+各个投票结果无从知晓
+of the election, nothing else is revealed
+about the individual votes. The individual
+
+95
+00:06:46,580 --> 00:06:51,366
+个人投票是完全私密的
+当然，选举中心还要验证
+votes otherwise remain completely private.
+Of course the election center is also
+
+96
+00:06:51,366 --> 00:06:56,331
+投票者是否能投票
+以及只能投一次
+gonna verify that this voter for example
+is allowed to vote and that the voter has
+
+97
+00:06:56,331 --> 00:07:00,818
+除了那些信息，选举中心及其他人
+only voted once. But other than that
+information the election center and the
+
+98
+00:07:00,818 --> 00:07:05,484
+无从知道各投票人的选择
+rest of the world learned nothing else
+about that voter's vote other than the
+
+99
+00:07:05,484 --> 00:07:10,104
+除了最终选举结果。所以
+这是一个涉及六方的协议的例子
+result of the election. So this is an
+example of a protocol that involves six
+
+100
+00:07:10,104 --> 00:07:14,430
+在这个情况下，有5个投票者在一个选举中心
+parties. In this case, there are five
+voters in one election center. These
+
+101
+00:07:14,430 --> 00:07:19,417
+参与者计算他们自己的投票结果
+最后选举的结果可以得出
+parties compute amongst themselves. And at
+the end of the computation, the result of
+
+102
+00:07:19,417 --> 00:07:24,404
+不过个人投票决定是不被泄漏的
+the election is known but nothing else is
+revealed about the individual inputs. Now
+
+103
+00:07:24,404 --> 00:07:29,156
+对于私密的拍卖也有类似问题
+a similar problem comes up in the context
+of private auctions. So in a private
+
+104
+00:07:29,156 --> 00:07:34,160
+在私密拍卖中每个买家都有自己愿出的标价
+auction every bidder has his own bid that
+he wants to bid. And now suppose the
+
+105
+00:07:34,160 --> 00:07:39,356
+假设拍卖机制使用的是Vickrey拍卖
+auction mechanism that's being used is
+what's called a Vickrey auction where the
+
+106
+00:07:39,356 --> 00:07:45,287
+Vickrey拍卖的中标者为出价最高者
+definition of a Vickrey auction is that
+the winner is the highest bidder. But the
+
+107
+00:07:45,287 --> 00:07:50,099
+但中标者付的钱为第二高的出价
+amounts that the winner pays is actually
+the second highest bid. So he pays the
+
+108
+00:07:50,099 --> 00:07:54,850
+所以他付第二高。这就是Vickrey拍卖机制
+second highest bid. Okay, so this is a
+standard auction mechanism called the
+
+109
+00:07:54,850 --> 00:08:00,028
+现在我们想做的是让参与者能计算
+Vickrey auction. And now what we'd like to
+do is basically enable the participants to
+
+110
+00:08:00,028 --> 00:08:04,779
+算出最高出价者和其该付的钱
+compute, to figure out who the highest
+bidder is and how much he's supposed to
+
+111
+00:08:04,779 --> 00:08:09,165
+但除了这些，所有其他关于个人投票的信息保密
+pay, but other than that, all other
+information about the individual bids
+
+112
+00:08:09,165 --> 00:08:14,160
+例如，最高出价的数额保密
+should remain secret. So for example, the
+actual amount that the highest bidder bid
+
+113
+00:08:14,160 --> 00:08:19,225
+为公众所知的只有第二高价的数额
+should remain secret. The only thing that
+should become public is the second highest
+
+114
+00:08:19,225 --> 00:08:23,526
+和最高出价者是谁
+有一次的，现在我们需要
+bid and the identity of the highest
+bidder. So again now, the way we will do
+
+115
+00:08:23,526 --> 00:08:28,172
+引入拍卖中心，类似地
+that is we'll introduce an auction center, and
+in a similar way, essentially, everybody
+
+116
+00:08:28,172 --> 00:08:32,588
+每个人会把其加密的投标送给拍卖中心
+will send their encrypted bids to the
+auction center. The auction center will
+
+117
+00:08:32,588 --> 00:08:37,119
+拍卖中心会计算中标者是谁
+以及第二高价
+compute the identity of the winner and in
+fact he will also compute the second
+
+118
+00:08:37,119 --> 00:08:41,822
+不过除了这些，个人标价不被泄漏
+highest bid but other than these two
+values, nothing else is revealed about the
+
+119
+00:08:41,822 --> 00:08:46,126
+这其实是一个更广泛的问题
+individual bids. Now, this is actually an
+example of a much more general problem
+
+120
+00:08:46,126 --> 00:08:50,264
+叫做安全多方计算
+让我解释一下安全多方计算是什么
+called secure multi-party computation. Let
+me explain what secure multi-party
+
+121
+00:08:50,264 --> 00:08:54,618
+抽象地，参与者自己有一个秘密输入
+computation is about. So here, basically
+abstractly, the participants have a secret
+
+122
+00:08:54,618 --> 00:08:58,649
+在选举中，输入将是投票
+inputs to themselves. So, in the case of
+an election, the inputs would be the
+
+123
+00:08:58,649 --> 00:09:02,787
+在拍卖中，输入将是秘密投标
+votes. In the case of an auction, the
+inputs would be the secret bids. And then
+
+124
+00:09:02,787 --> 00:09:06,959
+然后他们想计算一个关于这些输入的函数
+what they would like to do is compute some
+sort of a function of their inputs.
+
+125
+00:09:06,959 --> 00:09:10,840
+在选举中，函数为大多数
+Again, in the case of an election, the
+function's a majority. In the case of
+
+126
+00:09:10,840 --> 00:09:15,088
+在拍卖中，函数为第二高价
+x1到x4的最大值
+auction, the function happens to be the
+second highest, largest number among x one
+
+127
+00:09:15,088 --> 00:09:19,179
+问题是，怎么办才能得知函数值
+to x four. And the question is, how can
+they do that, such that the value of the
+
+128
+00:09:19,179 --> 00:09:23,375
+同时个人投票信息保密呢？
+function is revealed, but nothing else is
+revealed about the individual votes? So
+
+129
+00:09:23,375 --> 00:09:27,675
+我展示一个蠢笨不安全的方法
+我们引入一个可信赖方
+let me show you kind of a dumb, insecure
+way of doing it. What we do is introduce a
+
+130
+00:09:27,675 --> 00:09:31,774
+这个可信赖方收集个人输入
+trusted party. And then, this trusted
+authority basically collects individual
+
+131
+00:09:31,774 --> 00:09:36,223
+它保证不泄露个人输入
+inputs. And it kinda promises to keep the
+individual inputs secret, so that only it
+
+132
+00:09:36,223 --> 00:09:40,510
+它自己是知道的。
+然后，可信赖方公开发布函数结果
+would know what they are. And then, it
+publishes the value of the function, to
+
+133
+00:09:40,510 --> 00:09:44,742
+目的是，函数值公开了
+the world. So, the idea is now that the
+value of the function became public, but
+
+134
+00:09:44,742 --> 00:09:48,812
+但个人输入依然未泄漏
+nothing else is revealed about the
+individual inputs. But, of course, you got
+
+135
+00:09:48,812 --> 00:09:52,990
+当然，你是信任这一方的
+若出于某些原因，它不可信了
+this trusted authority that you got to
+trust, and if for some reason it's not
+
+136
+00:09:52,990 --> 00:09:57,168
+你就有问题了
+密码学有一个非常核心的定理
+trustworthy, then you have a problem. And
+so, there's a very central theorem in
+
+137
+00:09:57,168 --> 00:10:01,001
+揭示了一个惊人的事实。定理说
+crypto and it really is quite a
+surprising fact. That says that any
+
+138
+00:10:01,001 --> 00:10:05,204
+任何你想做的计算，任何函数F
+computation you'd like to do, any function
+F you'd like to compute, that you can
+
+139
+00:10:05,204 --> 00:10:09,302
+只要你能用可信任方计算
+你一定也可以不借助可信任方完成
+compute with a trusted authority, you can
+also do without a trusted authority.
+
+140
+00:10:09,302 --> 00:10:13,559
+让我从高层次来解释下
+Let me at a high level explain what this
+means. Basically, what we're gonna do, is
+
+141
+00:10:13,559 --> 00:10:17,816
+我们想做的就是去掉可信任方
+这样各方不会把他们的输入
+we're gonna get rid of the authority. So
+the parties are actually not gonna send
+
+142
+00:10:17,816 --> 00:10:21,807
+给可信任方。事实上
+系统中没有可信任方了
+their inputs to the authority. And, in
+fact, there's no longer going to be an
+
+143
+00:10:21,807 --> 00:10:26,011
+取而代之的是，各参与者使用某些协议
+authority in the system. Instead, what the
+parties are gonna do, is they're gonna
+
+144
+00:10:26,011 --> 00:10:30,567
+互相通信。在协议的最后
+talk to one another using some protocol.
+Such that at the end of the protocol all
+
+145
+00:10:30,567 --> 00:10:34,890
+函数值突然为大家所知
+of a sudden the value of the function
+becomes known to everybody. And yet
+
+146
+00:10:34,890 --> 00:10:39,390
+除此之外无任何信息泄漏
+nothing other than the value of the
+function is revealed. In other words, the
+
+147
+00:10:39,390 --> 00:10:43,639
+换句话说，个人投票依然保密
+没有可信任方
+individual inputs is still kept secret.
+But again there's no authority, there's
+
+148
+00:10:43,639 --> 00:10:47,867
+各方互相交流即可算出最终结果
+just a way for them to talk to one another
+such that the final output is revealed. So
+
+149
+00:10:47,867 --> 00:10:51,846
+这是一个很一般的结果
+其普适性有点惊人
+this is a fairly general result, it's kind
+of a surprising fact that is at all
+
+150
+00:10:51,846 --> 00:10:56,024
+事实上在本课的最后，我们将看到
+doable. And in fact it is and towards the
+end of the class we'll actually see how to
+
+151
+00:10:56,024 --> 00:11:00,577
+这是如何做到的。
+密码学还有些应用
+make this happen. Now, there are some
+applications of cryptography that I can't
+
+152
+00:11:00,577 --> 00:11:05,560
+我无法分类，只能说它们很神奇
+classify any other way other than to say
+that they are purely magical. Let me give
+
+153
+00:11:05,560 --> 00:11:10,240
+我给两个例子。第一个叫做私有外包计算
+you two examples of that. So the first is
+what's called privately outsourcing
+
+154
+00:11:10,240 --> 00:11:15,224
+为了阐明这一点，我会举一个谷歌搜索的例子
+computation. So I'll give you an example
+of a Google search just to illustrate the
+
+155
+00:11:15,224 --> 00:11:20,329
+假设Alice有一个搜索请求
+point. So imagine Alice has a search query
+that she wants to issue. It turns out that
+
+156
+00:11:20,329 --> 00:11:25,434
+事实上有很特殊的加密机制
+可以把Alice的请求加密后交给谷歌
+there are very special encryption schemes
+such that Alice can send an encryption of
+
+157
+00:11:25,434 --> 00:11:30,368
+由于加密机制的特性
+her query to Google. And then because of
+the property of the encryption scheme
+
+158
+00:11:30,368 --> 00:11:35,304
+谷歌可以在加密后的值上运算
+无需知道原文是什么
+Google can actually compute on the
+encrypted values without knowing what the
+
+159
+00:11:35,304 --> 00:11:40,368
+所以谷歌可以在加密的请求上
+运行庞大的搜索算法
+plain texts are. So Google can actually
+run its massive search algorithm on the
+
+160
+00:11:40,368 --> 00:11:44,903
+得到的是加密的结果
+好的，谷歌将加密后的结果
+encrypted query and recover in encrypted
+results. Okay. Google will send the
+
+161
+00:11:44,903 --> 00:11:49,242
+返回给Alice。Alice解密后
+就会得到搜索结果了
+encrypted results back to Alice. Alice
+will decrypt and then she will receive the
+
+162
+00:11:49,242 --> 00:11:53,689
+神奇的地方在于谷歌只能看到
+请求的加密形式，别无他物
+results. But the magic here is all Google
+saw was just encryptions of her queries
+
+163
+00:11:53,689 --> 00:11:57,493
+所以谷歌不知道Alice刚才搜索的什么
+and nothing else. And so, Google as a
+result has no idea what Alice just
+
+164
+00:11:57,493 --> 00:12:01,672
+尽管Alice学到了她想学的东西
+searched for and nevertheless Alice
+actually learned exactly what she
+
+165
+00:12:01,672 --> 00:12:05,812
+好，这些是加密机制里很神奇的内容
+wanted to learn. Okay so, these are
+magical kind of encryption schemes. They're
+
+166
+00:12:05,812 --> 00:12:09,985
+它们相对较新，只有两三年的发展历史
+fairly recent, this is only a new
+development from about two or three years
+
+167
+00:12:09,985 --> 00:12:14,436
+允许加密数据上的计算
+尽管我们不知道加密的内容
+ago, that allows us to compute on encrypted
+data, even though we don't really know
+
+168
+00:12:14,436 --> 00:12:18,667
+在大家急着去想怎么实现这个之前
+what's inside the encryption. Now, before
+you rush off and think about implementing
+
+169
+00:12:18,667 --> 00:12:22,470
+我应当警告大家目前这只是理论结果
+this, I should warn you that this is
+really at this point just theoretical, in
+
+170
+00:12:22,470 --> 00:12:26,422
+也就是说基于加密数据的谷歌搜索
+the sense that running a Google search on
+encryption data probably would take a
+
+171
+00:12:26,422 --> 00:12:30,521
+很可能会花十亿年
+不过这个事实揭示的可能已经很惊人了
+billion years. But nevertheless, just the
+fact that this is doable is already really
+
+172
+00:12:30,521 --> 00:12:34,473
+对于相对简单的计算也很实用
+surprising, and is already quite useful
+for relatively simple computations. So in
+
+173
+00:12:34,473 --> 00:12:38,671
+事实上我们稍后会看到这个的一些应用
+另一神奇的应用我将展示的
+fact, we'll see some applications of this
+later on. The other magical application I
+
+174
+00:12:38,671 --> 00:12:42,474
+叫做零知识。特别地
+want to show you is what's called zero
+knowledge. And in particular, I'll tell
+
+175
+00:12:42,474 --> 00:12:46,080
+我会告诉大家知识的零知识证明
+you about something called the zero
+knowledge proof of knowledge. So here ...
+
+176
+00:12:46,080 --> 00:12:50,177
+Alice知道一个特定的数N
+what happens is there's a certain
+number N, which Alice knows. And the way
+
+177
+00:12:50,177 --> 00:12:54,169
+数N为两个大质数的积
+the number N was constructed is as a
+product of two large primes. So, imagine
+
+178
+00:12:54,169 --> 00:12:58,835
+设想我们有两个质数P和Q
+每个认为有1000位
+here we have two primes, P and Q. Each one
+you can think of it as like 1000 digits.
+
+179
+00:12:58,835 --> 00:13:03,892
+你很可能知道乘两个1000位的数容易计算
+And you probably know that multiplying
+two 1000-digit numbers is fairly easy. But if
+
+180
+00:13:03,892 --> 00:13:08,235
+但如果给定乘积，求质数分解
+I just give you their product, figuring
+out their factorization into primes is
+
+181
+00:13:08,235 --> 00:13:12,427
+将非常困难
+事实上，我们将利用这一事实
+actually quite difficult. And, in fact,
+we're gonna use the fact that factoring is
+
+182
+00:13:12,427 --> 00:13:16,566
+用因子分解的困难性建立公钥密码系统
+将在本课程后半段介绍
+difficult to build public key cryptosystems
+in the second half of the course.
+
+183
+00:13:16,566 --> 00:13:20,968
+好，那么Alice有数N
+她知道N的因子分解
+Okay, so Alice happens to have this number
+N, and she also knows the factorization of
+
+184
+00:13:20,968 --> 00:13:24,898
+Bob只知道数N
+他不知道N的因子分解
+N. Now Bob just has the number N. He
+doesn't actually know the factorization.
+
+185
+00:13:24,898 --> 00:13:28,723
+知识的零知识证明的神奇之处在于
+Now, the magical fact about the zero
+knowledge proof of knowledge, is that
+
+186
+00:13:28,723 --> 00:13:33,144
+Alice能向Bob证明她知道N的因子分解
+Alice can prove to Bob that she knows the
+factorization of N. Yes, you can actually
+
+187
+00:13:33,144 --> 00:13:37,457
+是的，你可以把这个证明给Bob
+Bob检查后确信Alice知道如何分解
+give this proof to Bob, that Bob can
+check, and become convinced that Alice
+
+188
+00:13:37,457 --> 00:13:42,386
+但是，Bob不知道因子P和Q
+knows the factorization of N, however Bob
+learns nothing at all. About the factors P
+
+189
+00:13:42,386 --> 00:13:47,034
+这是可证明的。Bob完全不知道P和Q两个因子
+and Q, and this is provable. Bob
+absolutely learns nothing at all about the
+
+190
+00:13:47,034 --> 00:13:50,997
+这个论断实际上很广泛
+factors P and Q. And the statement
+actually is very, very general. This is
+
+191
+00:13:50,997 --> 00:13:55,275
+它不仅仅是证明N的因子分解
+事实上很多谜题
+not just about proving the factorization
+of N. In fact, almost any puzzle that you
+
+192
+00:13:55,275 --> 00:13:59,606
+你希望证明你知道答案
+你可以证明它是你的知识
+want to prove that you know an answer to,
+you can prove it is your knowledge. So if
+
+193
+00:13:59,606 --> 00:14:03,831
+如果你解决了一个填字游戏
+可能填字游戏不是最好的例子
+you have a crossword puzzle that you've
+solved. Well, maybe crosswords is not the
+
+194
+00:14:03,831 --> 00:14:07,845
+如果你有一个数独谜题，例如
+best example. But if you have like a
+Sudoku puzzle, for example, that you want
+
+195
+00:14:07,845 --> 00:14:12,282
+你想证明你已解决了
+你可以向Bob证明
+to prove that you've solved, you can prove
+it to Bob in a way that Bob would learn
+
+196
+00:14:12,282 --> 00:14:16,718
+Bob无法知道怎么解的
+不过Bob会相信你对本题有解
+nothing at all about the solution, and yet
+Bob would be convinced that you really do
+
+197
+00:14:16,718 --> 00:14:20,930
+好，那些是很神奇的应用
+have a solution to this puzzle. Okay. So
+those are kind of magical applications.
+
+198
+00:14:20,930 --> 00:14:25,000
+最后我想说的是现代密码学
+And so the last thing I want to say is
+that modern cryptography is a very
+
+199
+00:14:25,000 --> 00:14:29,015
+是很严格的科学。事实上
+我们描述的每一个概念
+rigorous science. And in fact, every
+concept we're gonna describe is gonna
+
+200
+00:14:29,015 --> 00:14:33,129
+都依照非常严格的三步
+我们将反复用到这三步
+follow three very rigorous steps, okay,
+and we're gonna see these three steps
+
+201
+00:14:33,129 --> 00:14:37,338
+我想解释一下它们是什么
+again and again and again so I wanna
+explain what they are. So the first thing
+
+202
+00:14:37,338 --> 00:14:41,493
+第一件是当我们引入新的原型时
+例如数字签名
+we're gonna do when we introduce a new
+primitive like a digital signature is
+
+203
+00:14:41,493 --> 00:14:45,540
+我们要准确描述威胁模型是什么
+we're gonna specify precisely what the
+threat model is. That is, what can an
+
+204
+00:14:45,540 --> 00:14:49,534
+就是说攻击者如何攻击数字签名
+伪造签名目的何在？
+attacker do to attack a digital signature
+and what is his goal in forging
+
+205
+00:14:49,534 --> 00:14:53,851
+好，我们将严格定义签名的含义
+signatures? Okay, so we're gonna define
+exactly what does it mean for a signature
+
+206
+00:14:53,851 --> 00:14:57,760
+例如，用于防伪
+for example to be unforgeable.
+Unforgeable. Okay and I'm giving digital
+
+207
+00:14:57,760 --> 00:15:01,998
+我拿数字签名做为一个例子
+对每个我们描述的原型
+signatures just as an example. For every
+primitive we describe we're gonna
+
+208
+00:15:01,998 --> 00:15:06,464
+我们将准确定义威胁模型
+然后我们要提出架构
+precisely define what the threat model is.
+Then we're gonna propose a construction
+
+209
+00:15:06,464 --> 00:15:10,931
+证明任何攻击者在这个威胁模型下
+and then we're gonna give a proof that any
+attacker that's able to attack the
+
+210
+00:15:10,931 --> 00:15:15,955
+可以攻击这个架构的
+这个攻击者也可以用来解决根本性难题
+construction under this threat model. That
+attacker can also be used to solve some
+
+211
+00:15:15,955 --> 00:15:20,150
+如果问题真的很难
+underlying hard problem. And as a result,
+if the problem really is hard, that
+
+212
+00:15:20,150 --> 00:15:24,350
+实际上就证明了攻击者无法
+在威胁模型下，破解这个架构
+actually proves that no attacker can break
+the construction under the threat model.
+
+213
+00:15:24,350 --> 00:15:27,843
+不过这三步非常重要
+Okay. But these three steps are actually
+quite important. In the case of
+
+214
+00:15:27,843 --> 00:15:31,928
+对于签名，我们会定义签名不可伪造的意义
+signatures, we'll define what it means for
+a signature to be unforgeable, then we'll
+
+215
+00:15:31,928 --> 00:15:35,914
+然后我们给一个架构，例如
+我们会说任何人若能破解我们的架构
+give a construction, and then for example
+we'll say that anyone who can break our
+
+216
+00:15:35,914 --> 00:15:39,801
+他也可以用他破解的方法来解决因子分解问题
+construction can then be used to say
+factor integers, which is believed to be a
+
+217
+00:15:39,801 --> 00:15:43,541
+后者为公认难题。好的。我们将通篇遵循这三步
+hard problem. Okay, so we're going to
+follow these three steps throughout, and
+
+218
+00:15:43,541 --> 00:15:47,331
+大家将看到这是如何发生的
+好，本节结束
+then you'll see how this actually comes
+about. Okay, so this is the end of the
+
+219
+00:15:47,331 --> 00:15:51,218
+下一节我们简要谈一下密码学历史
+segment. And then in the next segment
+we'll talk a little bit about the history
+
+220
+00:15:51,218 --> 00:15:52,006
+of cryptography.

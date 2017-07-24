@@ -1,0 +1,1305 @@
+1
+00:00:00,000 --> 00:00:02,833
+关于攻击分组密码，有大量文献
+There is an immense literature on attacking block ciphers.
+
+2
+00:00:02,833 --> 00:00:06,667
+本节中，我想给大家看一看这些攻击长什么样
+In this segment, I just want to give you a taste for
+what these attacks look like.
+
+3
+00:00:06,667 --> 00:00:10,217
+我希望说服大家永远不要使用你自己设计的分组密码
+And I hope I'll convince you that you should never
+ever design your own block cipher,
+
+4
+00:00:10,217 --> 00:00:14,164
+坚持使用标准，比如3DES和AES
+and just stick to the standards like Triple DES
+and AES.
+
+5
+00:00:14,164 --> 00:00:16,161
+我想讨论的第一种类型的攻击
+The first set of attacks that I want to talk about
+
+6
+00:00:16,161 --> 00:00:18,297
+是基于分组密码实现上的攻击
+are attacks on the implementation of the block cipher.
+
+7
+00:00:18,297 --> 00:00:23,400
+比如说，设想你有一个智能卡，上面实现了一个分组密码
+As an example, imagine you have a smart card that's implementing a block cipher.
+
+8
+00:00:23,400 --> 00:00:27,214
+那么这个智能卡可以被用来支付信用卡，比如说
+So the smart card, for example, could be used for
+credit card payments. It might have a
+
+9
+00:00:27,214 --> 00:00:31,486
+它内部可能含有一个密钥，用来认证你的信用卡支付
+secret key inside of it to authenticate
+your credit card payments as you stick the
+
+10
+00:00:31,486 --> 00:00:36,510
+当你把卡插入支付终端里。现在，如果一个攻击者获得了你的智能卡
+card into a payment terminal, say. So now, if an attacker obtains your smart card,
+
+11
+00:00:36,510 --> 00:00:41,039
+他可以拿着这张智能卡到实验室里
+what he could do is he could actually take
+the smart card to a lab, and then run the
+
+12
+00:00:41,039 --> 00:00:45,407
+然后运行这张卡，非常精确地测量这张卡加密和解密的时间
+card, and measure very precisely how much time the card took to do encryption and
+
+13
+00:00:45,407 --> 00:00:48,901
+这些加密花掉的时间
+decryption. Now, if the amount of time that the implementation took to do
+
+14
+00:00:48,901 --> 00:00:53,529
+取决于密钥的内容，通过测量时间
+encryption depends on bits of the secret
+key, then by measuring the time, the
+
+15
+00:00:53,529 --> 00:00:57,284
+攻击者可以学习到你的密钥内容
+attacker will learn something about your
+secret key and in fact, he might be able
+
+16
+00:00:57,284 --> 00:01:02,044
+事实上，他可能可以完全提取出你的密钥。有很多例子
+to completely extract your secret key. And
+there are many examples of implementations
+
+17
+00:01:02,044 --> 00:01:06,667
+是通过非常精确地测量加密算法的时间
+that simply by measuring the time very
+precisely for many operations of
+
+18
+00:01:06,667 --> 00:01:11,587
+来完全提取密钥的。另一个例子是
+encryption algorithms, you can completely
+extract the secret key. Another example is,
+
+19
+00:01:11,587 --> 00:01:16,336
+不是测量时间，而是测量功耗
+rather than just measuring the time, you
+can actually measure the power consumption
+
+20
+00:01:16,336 --> 00:01:20,570
+当卡运行时的功耗。你可以联结一个设备
+of the card as it's operating. So,
+literally, you can connect it to a device
+
+21
+00:01:20,570 --> 00:01:24,805
+用来测量智能卡需要的电流
+that will measure the current that the
+card is drawing and then graph the
+
+22
+00:01:24,805 --> 00:01:29,303
+然后非常精确地记录电流。这些智能卡不是非常快
+currents very, very precisely. Now, these
+cards are not very fast, and as a result,
+
+23
+00:01:29,303 --> 00:01:33,993
+因此你可以测量每个时钟周期内的精确功耗
+you can actually measure the exact amount
+of power consumed at every clock cycle as
+
+24
+00:01:33,993 --> 00:01:38,405
+当智能卡运行时。届时你会得到类似这样的图
+the card was executing. When you do that,
+you actually get graphs of this form.
+
+25
+00:01:38,405 --> 00:01:42,257
+这是一个智能卡工作的例子
+So this is an example of a smart card
+operating, while it's doing the
+
+26
+00:01:42,257 --> 00:01:46,557
+当它在计算DES时。大家可以清楚地看到
+DES computation. So you can see
+very clearly, here's when it was doing
+
+27
+00:01:46,557 --> 00:01:50,912
+这是当它在进行初始置换时
+这是当它在进行最终置换时
+the initial permutation. Here's when it's
+doing the final permutation. And then,
+
+28
+00:01:50,912 --> 00:01:54,709
+然后这里，大家可以数数，有16个峰值和谷
+here, you can count. There are actually
+sixteen hills and troughs
+
+29
+00:01:54,709 --> 00:01:59,104
+分别对应16轮回合。当像这样放大这张图时
+corresponding to the sixteen rounds. And
+essentially when you zoom in on a graph
+
+30
+00:01:59,104 --> 00:02:03,529
+你可以一位一位地读出来
+like this, you can basically read the key
+bits off one by one, just by looking at
+
+31
+00:02:03,529 --> 00:02:08,421
+就看智能卡的功耗变化，在做不同操作时
+how much power the card consumed as it was
+doing the different operations. It turns out
+
+32
+00:02:08,421 --> 00:02:11,564
+实际上，即使智能卡采取措施来屏蔽这种信息
+that, even cards that take steps to mask
+this type of information, are still
+
+33
+00:02:11,564 --> 00:02:15,133
+它依然是脆弱的。有一种攻击叫做差分功耗分析
+vulnerable. There's an attack called differential power analysis, where
+
+34
+00:02:15,133 --> 00:02:21,619
+运行加密算法很多次，测量智能卡功耗
+basically, you measure the power consumed
+by the card over many, many, many, runs of
+
+35
+00:02:21,619 --> 00:02:26,067
+只要有电流上的小差异
+the encryption algorithm. And as long as
+there's any even small dependence between
+
+36
+00:02:26,067 --> 00:02:31,464
+密钥的各位的依赖性
+the amount of current consumed and the
+bits of the secret key, basically that
+
+37
+00:02:31,464 --> 00:02:35,857
+经过足够多的加密算法运行次数就能显现出来
+dependence will show up after enough runs of the encryption algorithm. And as a
+
+38
+00:02:35,857 --> 00:02:39,967
+因此大家可以完全提取出密钥来。好
+result you'll be able to completely
+extract the secret key. Okay, so these
+
+39
+00:02:39,967 --> 00:02:43,988
+这些攻击实际上是Paul Kocher和他同事发现的
+attacks were actually discovered by Paul
+Kocher and his colleagues up at
+
+40
+00:02:43,988 --> 00:02:48,468
+在密码学研究所。工业界有很多技术
+Cryptography Research and there's actually
+a fairly large industry devoted to just
+
+41
+00:02:48,468 --> 00:02:52,732
+是用来抵抗这些功耗攻击的。如果考虑计时攻击
+defending against these power attacks. As
+far as timing attacks are concerned,
+
+42
+00:02:52,732 --> 00:02:55,467
+我想说这些是真的，不仅仅是针对智能卡
+I want to mention that these are real.
+They're not just about smart cards.
+
+43
+00:02:55,467 --> 00:03:00,094
+例如，设想一个多核处理器，其中一核运行加密算法
+For example, you can imagine a multicore
+processor where the encryption algorithm
+
+44
+00:03:00,094 --> 00:03:04,297
+而攻击者代码却同时在另一核上运行
+is running on one core and the attacker
+code happens to be running on another
+
+45
+00:03:04,297 --> 00:03:09,427
+现在这些代码共享同一缓存，于是
+core. Now these cores actually share the
+same cache. And as a result, an attacker
+
+46
+00:03:09,427 --> 00:03:13,627
+攻击者可以测量或观测加密算法带来的
+can actually measure or can actually look
+at the exact cache misses that the
+
+47
+00:03:13,627 --> 00:03:18,100
+缓存缺失。实际上通过观察这些缓存缺失
+encryption algorithm incurred. It turns
+out that by looking at cache misses, you
+
+48
+00:03:18,100 --> 00:03:22,464
+你可以完全解出算法使用的密钥
+can completely figure out the secret key
+used by the algorithms. So, one core can
+
+49
+00:03:22,464 --> 00:03:26,828
+一核可以从另一核中提取信息，通过看缓存缺失
+essentially extract information from the
+other core, just by looking at cache misses.
+
+50
+00:03:26,828 --> 00:03:30,349
+所以实现这些密码略复杂
+So implementing these block ciphers is actually quite subtle
+
+51
+00:03:30,349 --> 00:03:33,778
+因为必须确保旁道攻击不会
+because you have to make sure that the
+side channel attacks don't leak
+
+52
+00:03:33,778 --> 00:03:38,320
+泄漏任何关于密钥的信息
+另一类被很多文献讨论的攻击
+information about your secret key. Another
+type of attack that's been discussed in
+
+53
+00:03:38,320 --> 00:03:41,733
+叫做错误攻击
+the literature is what's called a fault
+attack. So here, basically, if you're
+
+54
+00:03:41,733 --> 00:03:45,535
+攻击智能卡时，可以造成智能卡异常工作
+attacking a smart card, you can actually
+cause the smart card to malfunction,
+
+55
+00:03:45,535 --> 00:03:50,226
+可以调高时钟频率，可以加热芯片
+perhaps by overclocking it, perhaps by
+warming it up. Essentially, you can cause
+
+56
+00:03:50,226 --> 00:03:55,838
+你可以让这个处理器异常工作，输出错误的数据
+the processor to, malfunction, and output
+erroneous data. It turns out that, if,
+
+57
+00:03:55,838 --> 00:04:00,558
+实际上加密时，最后一回合有错误
+during encryption, there are errors in the
+last round of the encryption process, the
+
+58
+00:04:00,558 --> 00:04:05,336
+产生的密文就可以暴露密钥K了
+resulting ciphertexts that are produced are
+enough to actually expose the secret key K.
+
+59
+00:04:05,336 --> 00:04:09,682
+一个很有意思的结果是，如果有任何错误
+That's quite an interesting result that
+in fact if you have any errors, if you ever
+
+60
+00:04:09,682 --> 00:04:13,632
+如果输出了一个错误的结果，那么实际上密钥就暴露了
+output a wrong result, that actually could
+completely compromise your secret key.
+
+61
+00:04:13,632 --> 00:04:18,508
+当然，抵抗这种攻击，意味着在输出算法结果前
+So, of course, the defense against this means
+that before you output the result of your
+
+62
+00:04:18,508 --> 00:04:23,045
+应当检查以确保计算结果的正确性
+algorithm, you should check to make sure
+that the correct result was computed.
+
+63
+00:04:23,045 --> 00:04:26,379
+现在这点是不容易的，因为你怎么知道
+Now of course that's nontrivial, because how do
+you know that the error didn't happen
+
+64
+00:04:26,379 --> 00:04:31,058
+你的检查算法有没有发生错误呢？
+不过还是有些方法的
+in your checking algorithm. But there are
+known ways around that. So basically you
+
+65
+00:04:31,058 --> 00:04:35,037
+你可以计算三次或四次，取结果中占多数的
+can actually compute something three or
+four times, take the majority over all those
+
+66
+00:04:35,037 --> 00:04:39,341
+以确保输出是正确的
+results, and be assured that the output
+really is correct as long as not too many
+
+67
+00:04:39,341 --> 00:04:43,763
+只要计算中不发生太多错误就行。这些都是针对实现的攻击
+faults occurred inside of your computation. These are attacks on the implementation.
+
+68
+00:04:43,763 --> 00:04:47,205
+希望这些例子能说服大家不仅不要
+I hope these examples can assure you that not only should you not
+
+69
+00:04:47,205 --> 00:04:51,168
+发明自己的分组密码，而且甚至不要去自己实现
+invent your own block ciphers, you should
+never even implement these crypto
+
+70
+00:04:51,168 --> 00:04:55,188
+这些密码原型。因为一来，必须确保
+primitives yourself. Because (a), you have
+to make sure there are no side channel
+
+71
+00:04:55,188 --> 00:04:58,836
+你的实现没有旁道攻击，而来，必须确保
+attachments on your implementation and (b),
+you have to make sure that the
+
+72
+00:04:58,836 --> 00:05:02,838
+实现对错误攻击是安全的。所以
+implementation is secure against fault
+attacks. Okay so, instead you should just
+
+73
+00:05:02,838 --> 00:05:06,586
+大家应该只使用标准库，比如OpenSSL等等
+use standard libraries like the ones
+available in OpenSSL and many other
+
+74
+00:05:06,586 --> 00:05:11,043
+所以不要自己去实现这些密码原型
+libraries out there. So don't implement
+these primitives yourself, just use
+
+75
+00:05:11,043 --> 00:05:16,016
+只使用现有的标准库。好的，现在我想讨论
+existing libraries. All right, so now I want
+to turn to kind of more sophisticated
+
+76
+00:05:16,016 --> 00:05:20,482
+一些针对分组密码更为复杂的攻击
+我特别讨论一下针对DES的这类攻击
+attacks on block ciphers and I'll particularly
+talk about how these attacks apply to DES.
+
+77
+00:05:20,482 --> 00:05:25,753
+好，这些攻击由Biham和Shamir在1989年发现
+Okay so these attacks were discovered by
+Biham and Shamir back in 1989, and I'll
+
+78
+00:05:25,753 --> 00:05:31,446
+我还要特别描述1993年松井充发现的一个攻击版本
+particularly describe a version of the
+attack discovered by Matsui in 1993.
+
+79
+00:05:31,446 --> 00:05:36,500
+目标是给定很多输入输出对
+So the goal here is basically given many,
+many input-output pairs, can we actually
+
+80
+00:05:36,500 --> 00:05:41,524
+我们能否比穷举攻击更好地还原出密钥？
+recover the key better than exhaustive
+search? So anything that runs better than
+
+81
+00:05:41,524 --> 00:05:45,400
+任何比穷举更好的攻击都算是分组密码的攻击
+exhaustive search already counts as an
+attack on the block cipher. Okay, so the
+
+82
+00:05:45,400 --> 00:05:50,400
+我要说的例子叫做线性密码分析
+example I want to give you is what's called
+linear cryptanalysis. And here imagine it
+
+83
+00:05:50,400 --> 00:05:56,037
+试想一下，c是m用密钥k加密得到的
+so happens that, you know, c is the
+encryption of m using key k, and
+
+84
+00:05:56,037 --> 00:06:00,895
+如果我看一个随机密钥和随机信息
+suppose it so happens that if I look at
+random key and a random message, somehow
+
+85
+00:06:00,895 --> 00:06:05,366
+那么明文和密文之间存在某种依赖
+there's a dependence between the message,
+ciphertext, and the key bits. In
+
+86
+00:06:05,366 --> 00:06:10,113
+特别地，如果我逐位异或一组明文
+particular, if I XOR a subset of
+the message bits, so this is just a
+
+87
+00:06:10,113 --> 00:06:17,375
+这是一组明文，如果我异或特定的一组密文
+subset of the message bits, if I XOR that with a certain subset of the ciphertext
+
+88
+00:06:17,375 --> 00:06:21,697
+这两组攻击者都能看到
+bits. —So these two the attacker
+sees. The attacker has the message and the
+
+89
+00:06:21,697 --> 00:06:26,183
+攻击者同时有明文和对应密文
+然后和密钥的异或进行比较
+attacker has the ciphertext. And then you
+compare that to an XOR of a subset of
+
+90
+00:06:26,183 --> 00:06:30,395
+如果这两者是完全独立的
+the key bits. Now if the two were
+completely independent which is what you'd
+
+91
+00:06:30,395 --> 00:06:34,553
+我们当然不想能用明文和密文
+like, you definitely don't want your
+message and your ciphertext to somehow
+
+92
+00:06:34,553 --> 00:06:38,710
+就能用某种方式预测密钥
+如果两者是完全独立的
+predict your key bits, if the two are
+like, completely independent, then this
+
+93
+00:06:38,710 --> 00:06:42,868
+那么这个等式成立的概率就严格地为1/2
+equality will hold with probability
+exactly one-half. But suppose it so
+
+94
+00:06:42,868 --> 00:06:47,080
+设想有一点不均匀导致这个等式以概率
+happens that there's a bias and this
+probability holds with probability half
+(口误probability->equality)
+
+95
+00:06:47,080 --> 00:06:52,158
+1/2加上某个小Epsilon成立。事实上，对DES
+plus epsilon for some small epsilon. It so
+happens that, in fact, for DES, there is
+
+96
+00:06:52,158 --> 00:06:56,868
+有这么个关系。这个关系之所以成立
+such a relation. The relation holds
+specifically because of a bug in the design
+
+97
+00:06:56,868 --> 00:07:03,534
+是因为第5个S盒子的设计有点问题
+事实上第5个S盒子有点太接近线性函数了
+of the fifth S-box. It turns out the fifth
+S-box happens to be too close to a linear
+
+98
+00:07:03,534 --> 00:07:07,000
+那个线性函数传遍了整个
+function. And that linear function,
+basically, as it propagates through the
+
+99
+00:07:07,000 --> 00:07:10,893
+DES的计算过程，产生了这么一个关系
+entire DES circuit, generates a relation
+of this type. You notice, this is
+
+100
+00:07:10,893 --> 00:07:16,582
+注意这里计算的是一个线性关系
+basically a linear relation that's being
+computed here. So, this small tiny, tiny
+
+101
+00:07:16,582 --> 00:07:21,086
+第5个S盒子的微弱的线性关系会对整个算法产生这个关系
+linearity in the fifth S-box generates
+this relation over the entire circuit,
+
+102
+00:07:21,086 --> 00:07:25,769
+这里Epsilon是很小的，约1除以2的21次方
+where the epsilon is tiny. Epsilon is one
+over 2^21, and I wrote down what
+
+103
+00:07:25,769 --> 00:07:29,528
+写在这了。这个不均匀很微小，但是
+that is. So the bias is really, really,
+really small. But nevertheless, there is a
+
+104
+00:07:29,528 --> 00:07:33,336
+使用这些特定位，也有不均匀发生
+bias using these particular subsets of bits. Now, I'm not going to show you how to
+
+105
+00:07:33,336 --> 00:07:37,095
+现在我不推导这个关系，也不告诉大家这是什么意思
+derive this relation, or I'm not going to show you even what it is. I'll just tell you
+
+106
+00:07:37,095 --> 00:07:41,534
+我只说怎么怎么使用这么个找到的关系
+好的，这是我们的关系
+how to use a relation like this once you find it. Okay. So here's our relation
+
+107
+00:07:41,534 --> 00:07:45,533
+问题是怎么使用它。那么用一点统计的知识
+that we have. And the question is how to
+use it. So with a little bit of statistics
+(参考 二项分布)
+
+108
+00:07:45,533 --> 00:07:50,484
+你可以使用像这样的一个方程来决定某些位
+you can actually use an equation like this
+to determine some of the key bits. And
+
+109
+00:07:50,484 --> 00:07:54,844
+这么做：假设你有1除以Epsilon的平方那么多个明文密文对
+here's you do it. Suppose you were given one over epsilon squared message-ciphertext pairs.
+
+110
+00:07:54,844 --> 00:07:58,612
+这些必须是互相独立的随机明文和对应密文
+And these have to be
+independently random messages and the
+
+111
+00:07:58,612 --> 00:08:03,026
+应用这上面的公式
+corresponding ciphertexts. What you would
+do is you would use the formula above. In
+
+112
+00:08:03,026 --> 00:08:07,547
+事实上你可以使用公式左边来计算这个
+fact you would use the left-hand side of
+the formula above to compute this relation
+
+113
+00:08:07,547 --> 00:08:11,907
+明文和密文之间的关系，用所有你有的明文密文对
+between the message and ciphertext for
+all the pairs you were given. Now what do
+
+114
+00:08:11,907 --> 00:08:16,122
+怎么办？对于这些值中一半加上Epsilon的值
+you know? You know that for half plus
+epsilon of these values, you know that
+
+115
+00:08:16,122 --> 00:08:20,605
+这些值等于密钥各个位的异或
+these things will be equal to an
+XOR of the key bits. So if you
+
+116
+00:08:20,605 --> 00:08:25,087
+所有如果取你计算所得的所有值中的大多数
+take majority over all the values you've
+computed, it turns out it's not so
+
+117
+00:08:25,087 --> 00:08:30,107
+不难看出事实上你的这种对密钥所有位异或的预测
+difficult to see that in fact you'll get
+the correct prediction for the XOR of the
+
+118
+00:08:30,107 --> 00:08:34,888
+以97.7%的概率是正确的。换句话说
+如果这个关系在多于一半的时间里是正确的
+key bits with a probability of 97.7%. In
+other words, if this relation happens to
+
+119
+00:08:34,888 --> 00:08:39,775
+那么大多数的结果将是正确的
+be correct more than half the time, then
+the majority will be right. And because
+
+120
+00:08:39,775 --> 00:08:44,912
+因为有不均匀Epsilon，以多于一半，99.7%的概率
+there's a bias, there's an epsilon bias, the probability that you will be correct
+
+121
+00:08:44,912 --> 00:08:49,566
+我们的预测是正确的
+more than half the time is, in fact,
+97.7%. In which case, the majority, in
+
+122
+00:08:49,566 --> 00:08:53,763
+这里大多数的结果，会给你正确的密钥所有位的异或
+对吧？是不是很不错
+fact, will give you the correct XOR of the
+key bits. Okay? So this is kinda cool.
+
+123
+00:08:53,763 --> 00:08:58,667
+在1除以Epsilon平方的次数内，你可以解出
+Within one over epsilon squared time, you
+can figure out an XOR of a bunch of key
+
+124
+00:08:58,667 --> 00:09:03,392
+密钥所有位的异或。现在，我们把它应用到DES
+DES的Epsilon等于1除以2的21次方
+bits. So now, let's apply this to DES.
+So, for DES, we have epsilon, which is one
+
+125
+00:09:03,392 --> 00:09:08,117
+意思是如果给我2的42次方个输入输出对
+over 2^21. Which means that if you give me
+2^42 input-output pairs, I can
+
+126
+00:09:08,117 --> 00:09:12,961
+我可以解出密钥所有位的异或值。实际上我告诉大家
+figure out an XOR of the key bits. And now,
+it turns out, I'm not gonna exactly show
+
+127
+00:09:12,961 --> 00:09:17,652
+不严格地讲，使用这个方法，你还不知道密钥中任何一位
+you how, roughly speaking, using this
+method, you don't just get one key bit. In
+
+128
+00:09:17,652 --> 00:09:22,352
+事实上，你可以取密钥中任意两位，也可以使用这个方法
+fact, you get two key bits. You can kind
+of use this relation. One's going in a
+
+129
+00:09:22,352 --> 00:09:27,297
+一个向前，一个向后
+forward direction and one's going in a
+backwards direction. So that gives you two
+
+130
+00:09:27,297 --> 00:09:31,825
+这样就给你一些密钥中这两位的异或值
+好，这样就有了密钥中两位的信息了
+XORs of bits of the secret key. Okay, so
+that's two bits of information about the
+
+131
+00:09:31,825 --> 00:09:35,591
+其实你还可以获得另外12位
+secret key. And then it turns out you can
+get twelve more bits, because,
+
+132
+00:09:35,591 --> 00:09:39,786
+因为你可以解出第5个S盒子的输入
+essentially, you can figure out what the
+inputs are to the fifth S-box. Okay, so,
+
+133
+00:09:39,786 --> 00:09:44,143
+那么我就不细说具体过程了。但其实是可以得到另外12位的
+I'm not going to exactly show you how. But it
+turns out you can get twelve more bits,
+
+134
+00:09:44,143 --> 00:09:48,124
+这样一共就14位了。现在，使用这个方法
+which is a total of fourteen bits overall.
+So now, using this method, you've
+
+135
+00:09:48,124 --> 00:09:52,427
+你已经还原了密钥中的14位内容
+当然，这需要2的42次方的时间
+recovered fourteen bits of the secret key.
+And of course, it took you time 2^42.
+
+136
+00:09:52,427 --> 00:09:56,438
+好，然后干什么？剩下的就很简单了
+Okay, so then, what do you do?
+Well, so the rest of it is easy. Now what
+
+137
+00:09:56,438 --> 00:10:00,750
+你只需要穷举密钥中剩下的位就可以了
+you're going to do is you're going to do
+exhaustive search on the remaining bits.
+
+138
+00:10:00,750 --> 00:10:04,954
+还剩下多少位呢？有42位
+Well how many remaining bits are there?
+Well, there are 42 remaining bits, so
+
+139
+00:10:04,954 --> 00:10:07,898
+穷举密钥也会花掉2的42次方的时间。那么一共攻击所花时间是多少？
+the exhaustive search will take you time 2^42. So what's the total attack time?
+
+140
+00:10:07,898 --> 00:10:12,450
+攻击的第一步，确定14位需要2的42次方的时间
+Well, the first step of the algorithm
+to determine the fourteen bits took 2^42 time,
+
+141
+00:10:12,450 --> 00:10:16,667
+剩下位的穷举需要另一个2的42次方的时间
+and the remaining brute force
+search also took 2^42 time.
+
+142
+00:10:16,667 --> 00:10:22,211
+所以整个攻击需要2的43次方的时间，对吧？
+So overall, the attack took two to the 43
+time. Okay? So now, this is much better
+
+143
+00:10:22,211 --> 00:10:27,225
+这比穷举攻击好很多了。在2的43次方时间里
+我们破解了DES。不过当然
+than exhaustive search. Within two to the
+43 time, we broke DES. But of course, this
+
+144
+00:10:27,225 --> 00:10:32,178
+这需要2的42次方个输入输出对
+required two to the 42 random input-output
+pairs whereas exhaustive search only
+
+145
+00:10:32,178 --> 00:10:37,131
+而穷举攻击只需要3对。好，这里要求的明文密文对
+required three pairs. Okay, so this is a
+fairly large number of input-output
+
+146
+00:10:37,131 --> 00:10:42,332
+数目还是很多的，但给了这么多
+pairs that are needed, but given such a
+large number, you can actually recover the
+
+147
+00:10:42,332 --> 00:10:46,560
+确实可以更快地还原DES密钥。好，这里的教训是什么？
+key faster than exhaustive search. Okay,
+so what's the lesson in all this?
+
+148
+00:10:46,560 --> 00:10:51,227
+第一，任何细微的线性关系
+The lesson is, firstly, any tiny bit of
+linearity, basically, in this— in the
+
+149
+00:10:51,227 --> 00:10:56,219
+比如这里第5个S盒子没有其他S盒子设计得好
+fifth S-box, which was not designed as
+well as the other S-boxes, basically led
+
+150
+00:10:56,219 --> 00:11:01,908
+就导致了一种攻击算法。好，任一细微的线性关系
+to an attack on the algorithm. Okay. A tiny
+bit of linearity already introduced this
+
+151
+00:11:01,908 --> 00:11:06,461
+都会引入线性攻击。再强调一下
+linear attack. And I want to emphasize
+again that this is not the sort of thing
+
+152
+00:11:06,461 --> 00:11:10,499
+这些不是在设计密码时你就能考虑到的。所以结论是
+you would think of when you design a cipher. And so again, the conclusion here is,
+
+153
+00:11:10,499 --> 00:11:15,345
+对分组密码有很复杂的攻击，仅凭自己一人
+there are very subtle attacks on block
+ciphers, ones which you will not be able to
+
+154
+00:11:15,345 --> 00:11:19,484
+往往是无法找到的。所以说要坚持使用标准
+find yourself. And so just stick to the
+standards. Don't ever, ever, ever, ever
+
+155
+00:11:19,484 --> 00:11:23,133
+永远不要自己设计分组密码。好，这就是
+我想说的关于分组密码的复杂攻击
+design your block cipher. Okay, so that's
+all I want to say about sophisticated
+
+156
+00:11:23,133 --> 00:11:27,548
+现在我们看最后一种根据
+attacks. Now let's move on to the last
+type of attack that I want to mention, which
+
+157
+00:11:27,548 --> 00:11:31,769
+我称之为量子攻击，它对分组密码是通用的
+I'll call quantum attacks, which are
+again— these are generic attacks on
+
+158
+00:11:31,769 --> 00:11:35,333
+我来解释一下什么意思
+all block ciphers. So let me explain what
+I mean by this.
+
+159
+00:11:35,333 --> 00:11:40,453
+首先我们看一个普遍的问题，一个普遍的搜索问题
+So first of all, let's look at a generic problem, a generic search problem. Suppose I have a function
+
+160
+00:11:40,453 --> 00:11:45,222
+假设我有一个定义在大集合X上的函数，输出有两种值，0或1
+on some large domain X, that happens to be
+two outputs, either zero or one.
+
+161
+00:11:45,222 --> 00:11:49,771
+这个函数的值大部分都是0
+And it so happens that this function is mostly
+zero. And there's, like, maybe one input
+
+162
+00:11:49,771 --> 00:11:54,375
+也许只有一个输入，所对应的函数值为1
+where the function happens to evaluate to
+one. And your goal is basically, you know,
+
+163
+00:11:54,375 --> 00:11:58,812
+目标是找出这些输入，满足函数值为1
+find me the inputs where the function
+happens to be one. Maybe there's only one
+
+164
+00:11:58,812 --> 00:12:02,991
+可能只有一个这样的输入。但目标是找到它
+那么在一台经典的计算机上
+such input. But your goal is to find it.
+Well, so on a classical computer, what can
+
+165
+00:12:02,991 --> 00:12:07,172
+你能做什么呢？函数给你了，作为一个黑盒
+you do? The function is given to you. It's
+given to you as a black box. So the best
+
+166
+00:12:07,172 --> 00:12:11,094
+你能做的最好的只能是尝试所有可能的输入
+you can do is just try all possible
+inputs. So this is gonna take time which
+
+167
+00:12:11,094 --> 00:12:15,378
+所以需要的时间和定义域的大小是线性相关的
+现在，实际上却有一个绝对魔法的结果
+in linear in the size of the domain. Now,
+it turns out there's an absolutely magical
+
+168
+00:12:15,378 --> 00:12:19,913
+告诉我们如果你构建了一台基于量子物理的计算机
+result that says that if you build a
+computer that's based on quantum physics
+
+169
+00:12:19,913 --> 00:12:24,381
+而非经典物理的话，那么你可以更快地解决这个问题
+as opposed to classical physics, you can
+solve this problem faster. So let me
+
+170
+00:12:24,381 --> 00:12:29,142
+那么让我解释这个的意义。首先在20世纪七八十年代
+explain what I mean by this. So first of
+all in the 70s and 80s it was observed, I
+
+171
+00:12:29,142 --> 00:12:33,845
+我想实际上是Richard Feynman最早观察到
+think it was actually Richard Feynman who observed this initially, that said
+
+172
+00:12:33,845 --> 00:12:38,313
+实际上在经典计算机上模拟量子实验是非常困难的
+that it turns out to be very difficult to
+simulate quantum experiments on a
+
+173
+00:12:38,313 --> 00:12:42,706
+所以Feyman说，如果是这样的话
+classical computer. So Feynman said, if
+that's the case, maybe these quantum
+
+174
+00:12:42,706 --> 00:12:47,233
+也许这些量子实验是经典计算机所无法计算的东西
+experiments are computing things that a
+classical computer can't compute.
+
+175
+00:12:47,233 --> 00:12:51,939
+所有某种意义上它们可以计算得很快
+So they're somehow able to compute very
+quickly things that are very difficult to
+
+176
+00:12:51,939 --> 00:12:56,526
+而同样的问题经典计算机很难做到。这是正确的，事实上
+do classically. And that turned out to be
+correct. And in fact, the example I want
+
+177
+00:12:56,526 --> 00:13:01,470
+我想给大家看的例子是这些惊奇事实中的一个
+事实上，如果你可以构建一个量子计算机
+to show you is one of these amazing things that in fact, if you could build a
+
+178
+00:13:01,470 --> 00:13:06,117
+用于计算量子物理，那么它可以被用来
+quantum computer that's using quantum
+physics, then it's, in fact, you can solve
+
+179
+00:13:06,117 --> 00:13:10,636
+解决这个搜索问题，用不着|X|的时间
+而是|X|的平方根的时间即可
+this search problem not in time X but in
+time square root of X. So somehow, even
+
+180
+00:13:10,636 --> 00:13:14,612
+即使计算机不知道任何函数F的信息
+though the computer doesn't know anything
+about the function F, it's treating it as
+
+181
+00:13:14,612 --> 00:13:18,397
+F被视为黑盒，但是，依然可以找到一个点，其函数值为1
+a black box, nevertheless, it's able to
+find a point where the function is one, in
+
+182
+00:13:18,397 --> 00:13:22,037
+在|X|的平方根的时间内。我不想在这里解释为什么
+time square root of X. I'm not going to explain this here, but, at the end of the
+(参见 Grover算法)
+
+183
+00:13:22,037 --> 00:13:25,966
+在本课程结尾，我们会有个高级课题讲座
+class, we're gonna have an advanced topics
+lecture. And if you'd like me to explain
+(可能是第二季了)
+
+184
+00:13:25,966 --> 00:13:29,798
+届时我会解释这个算法的工作过程
+how this algorithm works, I can explain it
+in that advanced topics lecture.
+
+185
+00:13:29,798 --> 00:13:33,678
+这是很有趣的，事实上，量子计算机对密码学
+It's actually quite interesting, and, in fact,
+quantum computers have quite an impact on
+
+186
+00:13:33,678 --> 00:13:37,000
+影响很大。我说了，我在最后一讲解释这个量子算法
+crypto. And again, as I said, I can
+explain this in the very last lecture.
+
+187
+00:13:37,000 --> 00:13:42,190
+好的，那这和破解分组密码有何关系呢？
+All right. So what does this have to do with
+breaking block cyphers? So far it's just a
+
+188
+00:13:42,190 --> 00:13:46,177
+目前这仅仅是个普遍问题。
+噢，在谈应用之前我还要说一点
+generic search problem. Well, oh actually
+I should say before I show you the
+
+189
+00:13:46,177 --> 00:13:50,377
+大家可以想知道
+application, I should mention that, well,
+you might be wondering, well, can someone
+
+190
+00:13:50,377 --> 00:13:54,417
+能不能制造量子计算机？这个还完全不知道
+build a quantum computer. And this is
+still completely unknown. At this point,
+
+191
+00:13:54,417 --> 00:13:58,936
+目前没人知道我们是否能够构造量子计算机
+nobody really knows if we can build
+large enough quantum computers to actually
+
+192
+00:13:58,936 --> 00:14:03,348
+来利用这个漂亮的Grover算法提供的优势
+take advantage of this beautiful algorithm
+due to Grover. Alright, so what does this
+
+193
+00:14:03,348 --> 00:14:07,548
+好，这和分组密码有何关系？假设给你一个明文密文对
+have to do with block ciphers? Well, so
+suppose I give you a message-ciphertext pair.
+
+194
+00:14:07,548 --> 00:14:12,221
+一个或几个。我们可以如下定义一个函数
+Just one or just a few. We can
+define a function as follows. It's a
+
+195
+00:14:12,221 --> 00:14:17,366
+这是一个定义在密钥空间K上的函数
+function on K, it's a function on, the key
+space. And the function will basically
+
+196
+00:14:17,366 --> 00:14:22,198
+这个函数会在k处输出1，如果正好满足用k加密m得到c
+output one if it so happens that the
+encryption of m with k maps to c, and it
+
+197
+00:14:22,198 --> 00:14:27,406
+否则函数输出0。现在我们说这个函数
+will output zero otherwise. Now we argue
+that basically this is exactly the type of
+
+198
+00:14:27,406 --> 00:14:32,363
+正是在密钥空间中一点处为1
+function that's one at one point in the
+key space and that's it. So by Grover's
+
+199
+00:14:32,363 --> 00:14:37,541
+那么根据Grover算法，我们可以找到密钥
+用|K|的平方根的时间
+algorithm, we can actually find the secret
+key in time square root of K.
+
+200
+00:14:37,541 --> 00:14:41,609
+什么意思？对于DES，这可以完全摧毁DES了
+So what does that mean? For DES, this would
+totally destroy DES. This would say
+
+201
+00:14:41,609 --> 00:14:46,267
+这仅用时2的28次方，就能找出密钥！
+2的28次方仅为2亿
+that in time 2^28, you could
+find a key. 2^28 is about 200 million.
+
+202
+00:14:46,267 --> 00:14:50,747
+现代计算机上2亿步只需毫秒级
+So 200 million steps which is, you know, just takes a millisecond on a modern computer.
+(这样讲有点夸张了)
+
+203
+00:14:50,747 --> 00:14:55,110
+足以摧毁DES了，即便是AES的128位密钥
+This would totally destroy DES. But even AES with 128-bit keys,
+
+204
+00:14:55,110 --> 00:14:59,827
+你也可以仅用2的64次方的时间，就可以找到密钥
+you would be able to find the secret
+key in time, roughly 2^64.
+
+205
+00:14:59,827 --> 00:15:04,248
+2的64次方的时间，在今天也算不安全的
+And 2^64 is these days, considered
+insecure. That's within the realm of
+
+206
+00:15:04,248 --> 00:15:08,353
+它还在穷举法的范围内。所以，如果有人可以造量子计算机
+exhaustive search. And so, basically, if
+somebody was able to build a quantum
+
+207
+00:15:08,353 --> 00:15:12,625
+我们说AES128不再安全！
+computer, we would then say that AES-128
+is no longer secure. Instead, if somebody,
+
+208
+00:15:12,625 --> 00:15:16,683
+如果明天的报纸上你能看到文章说
+you know, if tomorrow, you open up the
+newspaper, and you read an article that
+
+209
+00:15:16,683 --> 00:15:20,942
+某某造出量子计算机了
+says, you know, so-and-so built a
+quantum computer, the conclusion, the
+
+210
+00:15:20,942 --> 00:15:25,919
+那就可以下结论，大家必须立刻使用256位密钥的分组密码了
+consequence of all that is that you should
+immediately move to block ciphers that use
+
+211
+00:15:26,092 --> 00:15:30,837
+因为256为密钥的Grover算法运行时间是2的128次方
+256 bits, because then the running time
+of Grover's algorithm is 2^128,
+
+212
+00:15:30,837 --> 00:15:35,061
+目前还是安全的很
+which is more time than we consider
+feasible, and the, basically there are
+
+213
+00:15:35,061 --> 00:15:39,112
+有256位的密码的，比如AES256
+example ciphers with 256 bits, for
+example, AES-256. This is one of the
+
+214
+00:15:39,112 --> 00:15:43,567
+这也是AES要设计256位密钥的原因之一
+reasons why AES was designed with 256
+bits in mind. But to be honest, this is
+
+215
+00:15:43,567 --> 00:15:48,312
+但其实不是唯一的原因，还有其他原因的
+not the only reason. There are other reasons why you want it to have larger key sizes.
+
+216
+00:15:48,312 --> 00:15:53,529
+完事，我说过，这只是带大家初尝针对分组密码的不同攻击
+Okay, so this is, as I said, just a taste of the different attacks on block ciphers,
+
+217
+00:15:53,529 --> 00:15:58,896
+暂告一段落了。如果我们决定最后一讲讨论量子算法
+and I'm gonna leave it at that. If we decide on quantum for the last
+
+218
+00:15:58,896 --> 00:16:02,700
+我们最后还会来看Grover算法的
+topic of the course, then we'll recover
+that in the very last lecture.

@@ -1,0 +1,2136 @@
+1
+00:00:00,365 --> 00:00:02,577
+上一讲中我们看了一个公钥加密系统
+In the previous lecture, we looked at a public key
+
+2
+00:00:02,577 --> 00:00:04,714
+是基于RSA构建的
+encryption system that is built from the RSA,
+
+3
+00:00:04,714 --> 00:00:06,733
+或者更一般的讲，是基于陷门函数的
+or more generally from trapdoors functions.
+
+4
+00:00:06,733 --> 00:00:08,986
+本讲我们看另一种公钥加密系统
+In this lecture, we are going to look at public key encryption
+
+5
+00:00:08,986 --> 00:00:12,516
+这种是基于Diffie-Hellman协议的
+schemes that are build from the Diffie-Hellman protocol.
+
+6
+00:00:12,516 --> 00:00:14,327
+那么首先回忆一下，一个公钥加密系统
+So, first recall that a public key encryption system is
+
+7
+00:00:14,327 --> 00:00:16,370
+由三个算法组成。有一个
+made up of three algorithms. There is a key
+
+8
+00:00:16,370 --> 00:00:19,017
+密钥生成算法，我记为Gen
+generation algorithm that I will denote by Gen,
+
+9
+00:00:19,017 --> 00:00:20,968
+它会生成一个公钥
+that basically generates a public key and a
+
+10
+00:00:20,968 --> 00:00:23,057
+和一个私钥，然后有两个算法
+secret key. And then there are two algorithms: E
+
+11
+00:00:23,057 --> 00:00:27,237
+E和D，分别负责加密和解密。关键是
+and D that encrypt and decrypt. And the point is
+
+12
+00:00:27,237 --> 00:00:29,467
+加密算法使用了公钥
+the encryption algorithm encrypts using the
+
+13
+00:00:29,467 --> 00:00:31,788
+而解密算法使用了私钥进行解密
+public key and the decryption algorithm decrypts
+
+14
+00:00:31,788 --> 00:00:35,736
+在物理世界中，公钥加密的类似物是
+using the secret key. The physical world analogy for
+
+15
+00:00:35,736 --> 00:00:39,600
+一个保险箱
+public key encryption is a locked box, where anyone
+
+16
+00:00:39,600 --> 00:00:42,609
+放一条信息在这个箱子里，然后给箱子上锁
+can put a message inside the box and then lock the
+
+17
+00:00:42,609 --> 00:00:45,200
+这个锁就对应于公钥
+box, that corresponds to the public key and then
+
+18
+00:00:45,200 --> 00:00:47,733
+然后没人可以打开这个箱子，除了有私钥的那个人
+no one can open this box, except the person who has
+
+19
+00:00:47,733 --> 00:00:50,736
+也就是有钥匙的，可以把钥匙放进锁里
+the secret key, that has the key can put it in the
+
+20
+00:00:50,736 --> 00:00:52,872
+解锁箱子，找回箱子里的信息
+lock, unlock the box and the recover the message in
+
+21
+00:00:52,872 --> 00:00:56,912
+现在，上一讲里我们看了
+the box. Now, in the previous lecture, we looked at
+
+22
+00:00:56,912 --> 00:00:59,141
+很多公钥加密的应用
+a number of applications for public key encryption.
+
+23
+00:00:59,141 --> 00:01:01,928
+特别地，我们看了密钥交换的应用
+In particular, we looked at the key exchange
+
+24
+00:01:01,928 --> 00:01:03,878
+事实上，这是公约加密
+application, in fact, this is how public key encryption
+
+25
+00:01:03,878 --> 00:01:06,107
+在SSL中使用的方法，服务器发送它的公钥
+is used in SSL, where the server sends its public
+
+26
+00:01:06,107 --> 00:01:08,667
+给浏览器，浏览器选择一个密钥
+key to the browser, the browser chooses a secret
+
+27
+00:01:08,667 --> 00:01:11,434
+然后使用服务器的公钥把密钥加密
+and then encrypts the secret using the server's
+
+28
+00:01:11,434 --> 00:01:13,538
+然后把解密结果发给服务器
+public key, sends it back to the server, the
+
+29
+00:01:13,538 --> 00:01:15,860
+服务器解密，现在浏览器和服务器
+server decrypts and now both the browser and the
+
+30
+00:01:15,860 --> 00:01:18,042
+就有了一个共享的密钥，他们可以使用这个密钥
+server have a common secret that they can then
+
+31
+00:01:18,042 --> 00:01:20,600
+来加密双方互相通信的数据
+use to encrypt data, going back and forth, between
+
+32
+00:01:20,600 --> 00:01:23,383
+那么在交互设定中，比如
+them. So, in the interactive settings, such as in a
+
+33
+00:01:23,383 --> 00:01:25,983
+在网络协议中，公钥加密
+networking protocol, public key encryption would
+
+34
+00:01:25,983 --> 00:01:28,667
+主要用来建立共享的对称密钥
+primarily be used for setting up shared symmetric key
+
+35
+00:01:28,667 --> 00:01:30,999
+双方使用对称密钥来(安全)交换信息
+which the two parties can then use to exchange
+
+36
+00:01:30,999 --> 00:01:33,228
+不过，还有很多情形是
+information. However, there are many settings
+
+37
+00:01:33,228 --> 00:01:35,922
+交互是不可能的
+where interaction is simply not possible and then
+
+38
+00:01:35,922 --> 00:01:38,429
+那么公钥加密直接用来加密信息
+public key encryption is directly used to encrypt
+
+39
+00:01:38,429 --> 00:01:41,587
+一个例子是安全电子邮件
+messages. One example of this is secure email.
+
+40
+00:01:41,587 --> 00:01:44,002
+某种意义上，这个电子邮件系统设计成非交互的
+The email system in some sense is designed to be non-
+
+41
+00:01:44,002 --> 00:01:46,696
+这里发送方发送一封电子邮件
+interactive, in the sense that the sender sends an
+
+42
+00:01:46,696 --> 00:01:49,250
+这封邮件会被接力转发
+email, the email travels from relay to relay, to
+
+43
+00:01:49,250 --> 00:01:52,067
+直到到达目的地
+relay, until it finally arrives at the destination
+
+44
+00:01:52,067 --> 00:01:54,133
+目的地应该能解密邮件
+and the destination should be able to decrypt,
+
+45
+00:01:54,133 --> 00:01:56,262
+这里不需要与发送方互动
+without interacting with the sender at that point.
+
+46
+00:01:56,262 --> 00:01:57,731
+这可以通过让发送方
+That can be done basically, by the sender
+
+47
+00:01:57,731 --> 00:02:00,467
+使用接收方的公钥来加密信息实现
+encrypting the message using the recipient's public
+
+48
+00:02:00,467 --> 00:02:04,250
+密文会沿着SMTP链传递
+key. The ciphertext would travel along the SMTP chain
+
+49
+00:02:04,250 --> 00:02:06,990
+直到到达接收方
+until it reaches the recipient. The recipient would
+
+50
+00:02:06,990 --> 00:02:09,544
+接收方会使用密钥解密并还原原先发送的信息
+use a secret key and recover the original sent
+
+51
+00:02:09,544 --> 00:02:13,074
+不过，有很多的情况是
+message. However, there are many other cases
+
+52
+00:02:13,074 --> 00:02:15,227
+交互是不可能的，我想给大家展示
+where interaction is not possible and I want to show
+
+53
+00:02:15,227 --> 00:02:17,857
+两种这样的情况。第一个例子是
+you two such cases. The first example is
+
+54
+00:02:17,857 --> 00:02:20,922
+文件系统。事实上公钥加密
+file systems. And in fact, public key encryption is a
+
+55
+00:02:20,922 --> 00:02:23,277
+是一个很好的管理文件共享的方法，在一个加密的文件系统里
+good way to manage file sharing, in an encrypted file
+
+56
+00:02:23,277 --> 00:02:24,934
+让我给大家展示这是什么意思
+system. So, let me show you what I mean
+
+57
+00:02:24,934 --> 00:02:27,379
+那么设想这里，我们有我们的朋友Bob
+by that. So, imagine we have our friend Bob
+
+58
+00:02:27,379 --> 00:02:29,792
+他想在某个存储服务器上存储一个加密的文件
+here, who wants to store an encrypted file on some
+
+59
+00:02:29,792 --> 00:02:31,603
+那么他会写这个加密的文件
+storage server. So, he will go ahead and write the
+
+60
+00:02:31,603 --> 00:02:34,533
+写到这个存储服务器上
+encrypted file to the storage server. What he
+
+61
+00:02:34,533 --> 00:02:36,867
+Bob实际上向服务器写入了如下内容
+actually writes in the server is basically the
+
+62
+00:02:36,867 --> 00:02:40,334
+他会生成一个随机文件加密密钥
+following: he will generate a random file encryption key, we
+
+63
+00:02:40,334 --> 00:02:42,667
+我们称之为K_F，然后他会使用
+will call it 'K sub F' and then he will use the
+
+64
+00:02:42,667 --> 00:02:45,674
+这个对称加密系统来加密文件
+symmetric encryption system to encrypt the file
+
+65
+00:02:45,674 --> 00:02:49,715
+使用密钥K_F。然后他会解密这个密钥K_F
+using the key 'K sub F'. Then, he will encrypt the
+
+66
+00:02:49,715 --> 00:02:52,780
+使用他自己的公钥
+key 'K sub F', using his own public key. So public key
+
+67
+00:02:52,780 --> 00:02:56,402
+也就是Bob的公钥，这会让Bob可以在稍后的时间里访问这个文件
+of Bob. This will give Bob access to the file at a later
+
+68
+00:02:56,402 --> 00:02:59,188
+使用他的私钥，Bob就可以解密这个头部
+time, right. Using his secret key, Bob can decrypt
+
+69
+00:02:59,188 --> 00:03:02,532
+还原出K_F，然后他会
+this header, recover 'K sub F'. Then he will
+
+70
+00:03:02,532 --> 00:03:04,933
+解密实际被加密的文件内容
+decrypt the actual encrypted file and recover the
+
+71
+00:03:04,933 --> 00:03:08,523
+还原出文件的明文内容。那么，解密工作分两步
+plaintext file. So, decryption will work in two steps.
+
+72
+00:03:08,523 --> 00:03:11,216
+不过，现在Bob想让Alice也有
+However, Bob now wants also to give access to
+
+73
+00:03:11,216 --> 00:03:13,678
+访问该文件的权限
+Alice, to this file. What he will do is, he will go
+
+74
+00:03:13,678 --> 00:03:16,400
+Bob会在这个头部里
+ahead and in addition he will also include in the
+
+75
+00:03:16,400 --> 00:03:19,529
+放上使用Alice的公钥加密后的K_F
+file header, an encyption of 'K sub F' under Alice's
+
+76
+00:03:19,529 --> 00:03:22,315
+好，那么注意这里没有任何交互
+public key. OK. So, notice that there was no
+
+77
+00:03:22,315 --> 00:03:24,916
+Bob知道的只是Alice的公钥
+interaction here. All that Bob knows is Alice's public
+
+78
+00:03:24,916 --> 00:03:27,192
+他可以让Alice稍后得以
+key and yet he was able to the make the file
+
+79
+00:03:27,192 --> 00:03:29,699
+访问这个文件
+accesible to Alice at a later time.
+
+80
+00:03:29,699 --> 00:03:32,767
+那么现在Bob消失了，然后Alice来了
+So, now Bob disappears and then Alice
+
+81
+00:03:32,767 --> 00:03:35,272
+她要访问硬盘
+comes and accesses the disk at a later time.
+
+82
+00:03:35,272 --> 00:03:37,966
+她会读这个密文，解密属于她的密文头部
+She will read the ciphertext, decrypt her part of
+
+83
+00:03:37,966 --> 00:03:41,542
+还原K_F，然后她就能解密
+the header, recover Kf and then she can decrypt
+
+84
+00:03:41,542 --> 00:03:44,533
+这个被对称加密的文件了
+the symmetrically encrypted file and recover the
+
+85
+00:03:44,533 --> 00:03:47,207
+并还原实际的文件内容。好，那么大家可以看到
+actual file contents. Ok, so you can see that without
+
+86
+00:03:47,207 --> 00:03:49,576
+没有任何交互，Bob就可以写这个文件系统
+any interaction, Bob was able to write to the file
+
+87
+00:03:49,576 --> 00:03:55,195
+并让Alice也可以访问这个文件
+system and enable Alice to access the file, as well.
+
+88
+00:03:55,195 --> 00:03:57,825
+同样的，在Alice读文件的时候
+Again, at the time that Alice was reading the file, there is no
+
+89
+00:03:57,825 --> 00:04:00,443
+与Bob也没有交互，因为也许Bob联系不上了
+interaction with Bob, because maybe Bob is already
+
+90
+00:04:00,443 --> 00:04:02,267
+但Alice依然可以读取文件的内容
+inaccesible and yet Alice can still read the file
+
+91
+00:04:02,267 --> 00:04:04,754
+自己去解密还原
+recovered by herself.
+
+92
+00:04:05,800 --> 00:04:07,933
+那么，另一个非交互的例子
+So, another example of a non-interactive
+
+93
+00:04:07,933 --> 00:04:10,667
+公钥加密的应用是所谓的
+application of public key encryption is what's called
+
+94
+00:04:10,667 --> 00:04:14,003
+密钥契约。现在密钥契约可能听起来
+key escrow. Now, key escrow may actually sound
+
+95
+00:04:14,003 --> 00:04:16,186
+有点不好，但实际上在企业的工作环境里
+like a bad thing but in fact it is a mandatory
+(小圆告诉我们，契约确实不是什么好东西！)
+
+96
+00:04:16,186 --> 00:04:18,740
+这是一个强制性的特色。那么
+feature in corporate environments. So, the idea
+
+97
+00:04:18,740 --> 00:04:21,573
+其想法是这样的。假设Bob向硬盘里写了数据
+here is this. So imagine Bob writes data to a
+
+98
+00:04:21,573 --> 00:04:25,733
+稍后，Bob联系不上了
+disk and then later Bob becomes inaccesible.
+
+99
+00:04:25,733 --> 00:04:28,600
+也许Bob被炒了，也许Bob病了
+Maybe Bob is fired. Maybe Bob is out sick.
+
+100
+00:04:28,600 --> 00:04:30,675
+公司需要访问Bob的文件
+And somehow the company needs to have access to
+
+101
+00:04:30,675 --> 00:04:33,667
+那么规定Bob是唯一
+Bob's files. So having Bob be the only one
+
+102
+00:04:33,667 --> 00:04:36,133
+能够解密这些文件的人，在企业的环境里是行不通的
+able to decrypt these files is simply unacceptable in
+
+103
+00:04:36,133 --> 00:04:38,198
+企业可能需要这些文件
+corporate settings. The corporation might need
+
+104
+00:04:38,198 --> 00:04:41,635
+那么问题是该怎么办
+access to those files. So, the question is what to do.
+
+105
+00:04:41,635 --> 00:04:43,667
+答案是引入这个实体
+And the answer is to introduce this entity called
+
+106
+00:04:43,667 --> 00:04:46,296
+叫做密钥契约服务。这个系统工作的方式
+a key escrow service. The way the system then
+
+107
+00:04:46,296 --> 00:04:48,322
+如下：
+would work is as follows:
+
+108
+00:04:48,322 --> 00:04:51,248
+Bob在硬盘上的系统写他的文件
+Basically, when Bob writes his file to disk, his
+
+109
+00:04:51,248 --> 00:04:54,406
+他把文件写到这个共享存储媒介上
+system, as it's writing the file to this shared
+
+110
+00:04:54,406 --> 00:04:56,800
+与往常一样，它当然会
+storage medium, what it would do of course, as before,
+
+111
+00:04:56,800 --> 00:05:01,186
+使用文件加密密钥K_f来加密文件
+it would encrypt the file using the file encryption key Kf.
+
+112
+00:05:01,186 --> 00:05:04,467
+再用Bob的公钥加密K_f
+It would encrypt Kf using Bob's public key, but it would
+
+113
+00:05:04,467 --> 00:05:08,200
+但是，它还会使用一个契约服务来加密K_f
+also encrypt Kf using an escrow service. So here,
+
+114
+00:05:08,200 --> 00:05:11,400
+这里的契约服务完全是离线的
+the escrow service is completely offline. We never
+
+115
+00:05:11,400 --> 00:05:14,329
+我们从不进行会话，除非我们需要服务
+talk to it unless we actually need its services.
+
+116
+00:05:14,329 --> 00:05:17,000
+当Bob在写文件时，他只需要写
+As Bob is writing the file, all he does is he simply writes
+
+117
+00:05:17,000 --> 00:05:20,366
+K_f的加密结果，使用契约方的公钥进行加密
+the encryption of Kf under the escrow authority's
+
+118
+00:05:20,366 --> 00:05:23,477
+生成文件头部。现在
+public key into the file header. Now, later Bob
+
+119
+00:05:23,477 --> 00:05:26,067
+Bob随后消失了，现在公司需要还原Bob的文件
+disappears and now the company needs to recover
+
+120
+00:05:26,067 --> 00:05:28,200
+它会怎么做？在这里
+Bob's file. What does it do? Well, at this point it would
+
+121
+00:05:28,200 --> 00:05:30,536
+它会联系契约服务。契约服务
+contact the escrow service. The escrow service
+
+122
+00:05:30,536 --> 00:05:33,400
+会读这个文件头，使用它的私钥
+would read this part of the header, use its secret
+
+123
+00:05:33,400 --> 00:05:36,333
+来解密文件头，以还原K_f，然后使用K_f
+key to decrypt the header and recover Kf and then use Kf
+
+124
+00:05:36,333 --> 00:05:38,802
+来解密实际的文件
+to decrypt the actual file.
+
+125
+00:05:38,802 --> 00:05:42,007
+好，这里大家注意，契约服务是
+Ok. So, in this way again you notice that the escrow service was
+
+126
+00:05:42,007 --> 00:05:44,607
+完全离线的。与契约范围之间没有任何交互
+completely offline. There was no interaction with the
+
+127
+00:05:44,607 --> 00:05:47,600
+直到我们需要用到契约服务时
+escrow service until the point at which the escrow
+
+128
+00:05:47,600 --> 00:05:50,737
+同时，你还可以看到
+services were actually needed. And again, you can
+
+129
+00:05:50,737 --> 00:05:53,133
+这是一个非常清楚优雅的公钥加密的应用
+see that this is a very clean and elegant application
+
+130
+00:05:53,133 --> 00:05:56,333
+那么，如我在上一讲中所说
+of public key encryption. So, as I said in the
+
+131
+00:05:56,333 --> 00:05:58,867
+我们看了基于陷门函数的
+previous lecture, we saw constructions for public
+
+132
+00:05:58,867 --> 00:06:01,333
+公钥加密机制
+key encryption based on trapdoor functions.
+
+133
+00:06:01,333 --> 00:06:03,667
+特别地，我们看了RSA
+In particular, we look at RSA. We looked at the
+
+134
+00:06:03,667 --> 00:06:05,867
+我们看了通用机制叫做ISO标准
+generic construction we called ISO standard.
+
+135
+00:06:05,867 --> 00:06:09,467
+我们看了像OAEP+等等这样的机制
+We looked at constructions like OAEP+ and so on and so forth.
+
+136
+00:06:09,467 --> 00:06:11,887
+本讲中，我们来看基于Diffie-Hellman协议的
+In this lecture, we are going to look at public key
+
+137
+00:06:11,887 --> 00:06:13,467
+公钥加密机制
+constructions from the Diffie-Hellman protocol.
+
+138
+00:06:13,467 --> 00:06:15,800
+这是另外一族公钥系统
+This is another family of public key systems and
+
+139
+00:06:15,800 --> 00:06:18,508
+我要给大家看它们是怎样工作的
+I am going to show you how they work. These public
+
+140
+00:06:18,508 --> 00:06:21,133
+这些公钥系统叫做ElGamal公钥加密系统
+key systems are generally called ElGamal public key
+
+141
+00:06:21,133 --> 00:06:24,200
+Taher ElGamal实际上是
+encryption schemes. Taher ElGamal was actually Marty
+
+142
+00:06:24,200 --> 00:06:26,635
+Marty Hellman的学生，他提出这个ElGamal加密系统
+Hellman's student. He came up with this ElGamal
+
+143
+00:06:26,635 --> 00:06:30,165
+是作为他的博士毕业论文的一部分
+encryption system as part of his PhD thesis.
+
+144
+00:06:30,165 --> 00:06:32,400
+事实上，由于历史原因
+And, in fact, ElGamal encryption, for historical
+
+145
+00:06:32,400 --> 00:06:35,800
+ElGamal加密被用于一个邮件加密系统叫做GPG
+reasons, is used in an email encryption system called GPG,
+
+146
+00:06:35,800 --> 00:06:39,360
+GNU隐私卫士。通常
+the GNU Privacy Guard. As usual, when we
+
+147
+00:06:39,360 --> 00:06:41,333
+当我们构建公钥加密系统时，我们的目标是
+construct public key encryption systems, our goal is
+
+148
+00:06:41,333 --> 00:06:44,050
+构建选择密文安全的系统
+to build systems that have chosen ciphertext security,
+
+149
+00:06:44,050 --> 00:06:46,667
+使得它们对抗窃听
+so that they are secure both against eavesdropping
+
+150
+00:06:46,667 --> 00:06:50,599
+和篡改攻击是安全的。那么在我给大家看ElGamal系统之前
+and tampering attacks. So, before I show you the ElGamal
+
+151
+00:06:50,599 --> 00:06:53,333
+我们来简单回顾一下Diffie-Hellman协议
+system let's do a very brief review of the Diffie-Hellman
+
+152
+00:06:53,333 --> 00:06:56,133
+那么在我这里的表述里
+protocol. So, in my description here, I am going
+
+153
+00:06:56,133 --> 00:06:58,679
+要比我们上周看到的版本稍微抽象一点
+to abstract a little bit from the version that we saw last
+
+154
+00:06:58,679 --> 00:07:00,467
+事实上，我要使用一个概念
+week. In fact, I just going to use the concept
+
+155
+00:07:00,467 --> 00:07:03,933
+叫做有限循环群。事实上我们有一个任意的有限循环群
+of a finite cyclic group. In fact, we have an arbitrary finite
+
+156
+00:07:03,933 --> 00:07:07,131
+例如，它可以是群Z_p^*
+cyclic group, for example, it could be the group (Zp) star,
+
+157
+00:07:07,131 --> 00:07:10,521
+但它也可以是椭圆曲线的点群
+but it could also be the points of an elliptic curve.
+
+158
+00:07:10,521 --> 00:07:12,533
+如我说过的，使用椭圆曲线上的Diffie-Hellman
+And as I mentioned, there are some benefits to doing
+
+159
+00:07:12,533 --> 00:07:15,467
+有一些好处。不过为求简便
+Diffie-Hellman over an elliptic curve. But, for simplicity,
+
+160
+00:07:15,467 --> 00:07:18,000
+我只用G来表示一个抽象的有限循环群
+I am just going to refer to G as an abstract finite
+
+161
+00:07:18,000 --> 00:07:20,000
+但在大家脑子里
+cyclic group, but in your heads you should be
+
+162
+00:07:20,000 --> 00:07:22,456
+应把G想象成群(Z_p)
+thinking G is the group (Zp) and let's suppose
+(伊卡酱认为这里与现代数学思维正好相反)
+
+163
+00:07:22,456 --> 00:07:25,467
+设这个循环群有阶n，n为某个整数
+that the group has order n for some integer n.
+
+164
+00:07:25,467 --> 00:07:27,667
+现在我们固定选取这个群里的一个生成元g
+Now, we are going to fix a generator g of this group
+
+165
+00:07:27,667 --> 00:07:29,933
+这意味着，如果你看
+and all this means, is basically, if you look at the
+
+166
+00:07:29,933 --> 00:07:32,905
+g的各次幂，你会得到
+successive powers of g, that basically you get
+
+167
+00:07:32,905 --> 00:07:35,200
+群G中的所有元素。大家注意
+all the elements in the group G. You notice,
+
+168
+00:07:35,200 --> 00:07:37,667
+因为群的阶为n，我们知道
+because the group has order n, we know that
+
+169
+00:07:37,667 --> 00:07:41,133
+g^n = 1。所以
+g to the power of n is equal to 1. And, therefore
+
+170
+00:07:41,133 --> 00:07:44,053
+看g的大于n-1次幂没有意义
+there is no reason to go beyond the n-1st power
+
+171
+00:07:44,053 --> 00:07:48,036
+g^n=1所以我们就回卷到头了
+of g. g to the n is equal to 1 so that we just wrap around.
+
+172
+00:07:48,990 --> 00:07:51,600
+好，那么我们有了这个循环群G
+Ok. So, we have this cyclic group G. We have this
+
+173
+00:07:51,600 --> 00:07:54,453
+我们有这个生成元，它的幂给出了G中的所有元素
+generator whose powers gave us all the elements of
+
+174
+00:07:54,453 --> 00:07:57,565
+现在让我提醒大家
+G, and now let me remind you how the Diffie-Hellman
+
+175
+00:07:57,565 --> 00:08:00,133
+Diffie-Hellman协议是如何工作的。Alice选择一个
+protocol works. Basically, what Alice does is she chooses a
+
+176
+00:08:00,133 --> 00:08:03,133
+随机数a。她计算g^a并把它
+random a. She computes g to the a and sends it
+
+177
+00:08:03,133 --> 00:08:06,621
+发送给Bob。Bob选择一个随机数b，我们来看谁还记得
+over to Bob. Bob chooses a random b. Let's see who
+
+178
+00:08:06,621 --> 00:08:10,905
+Bob给Alice发送什么？
+remembers. What does Bob send over to Alice?
+
+179
+00:08:12,936 --> 00:08:15,398
+那么Bob给Alice发送g^b
+So, Bob sends over to Alice g to the b and of
+
+180
+00:08:15,398 --> 00:08:18,370
+当然我应该提醒大家g^a
+course I should remind you that both g to the a and
+
+181
+00:08:18,370 --> 00:08:21,867
+和g^b都是群G里的元素。现在
+g to the b are just elements in this group G. Now,
+
+182
+00:08:21,867 --> 00:08:24,133
+他们可以推导出共享密钥了，如果大家记得
+they can derive the shared secret, If you remember,
+
+183
+00:08:24,133 --> 00:08:27,667
+共享密钥是g^ab，这里的这些等式
+the shared secret is g to the ab, and these equalities
+
+184
+00:08:27,667 --> 00:08:30,467
+证实了双方可以计算出
+here shows that both sides can actually compute
+
+185
+00:08:30,467 --> 00:08:33,133
+共享密钥，有了他们各自的值
+the shared secret given the values at their disposal.
+
+186
+00:08:33,133 --> 00:08:35,800
+那么，比如说Alice有了B，她自己有a
+So, Alice for example, has B and she has a, and
+
+187
+00:08:35,800 --> 00:08:38,667
+那么计算B的a次方，她就会得到共享密钥
+so raising B to the power of a, gives her the shared
+
+188
+00:08:38,667 --> 00:08:41,776
+当然攻击者很可怜
+secret. The attacker, of course, the poor attacker
+
+189
+00:08:41,776 --> 00:08:46,512
+他能看到A和B，他现在的目标当然是
+he gets to see A and B and his goal is now,
+
+190
+00:08:46,512 --> 00:08:49,438
+攻击者还知道生成元g
+of course, he also gets to see the generated g, and
+
+191
+00:08:49,438 --> 00:08:52,333
+他现在的目标是计算g^ab。但是我们说过
+his goal now is to compute g to the ab. But, we said that
+
+192
+00:08:52,333 --> 00:08:55,600
+我们相信这是一个难题，有g，g^a
+this is believed to be a hard problem. Given g, g to the a,
+
+193
+00:08:55,600 --> 00:08:59,067
+以及g^b，在类似于Z_p^*的群里，要求计算g^ab
+and g to the b, in a group like Zp*, computing g to
+
+194
+00:08:59,067 --> 00:09:03,533
+是困难的。那么现在我们看
+the ab is difficult. So, now let's see how to convert to
+
+195
+00:09:03,533 --> 00:09:05,467
+然后将Diffie-Hellman协议转换成一个实际的公钥系统
+the Diffie-Hellman protocol into an actual public key
+
+196
+00:09:05,467 --> 00:09:08,533
+如我所说，Taher ElGamal有一个很聪明的点子
+system. As I said, this was a brilliant idea due to
+
+197
+00:09:08,533 --> 00:09:11,133
+那么与之前一样，我们固定选取我们的循环群G
+Taher ElGamal. So, as before, we are going to fix our
+
+198
+00:09:11,133 --> 00:09:15,305
+和G中的一个生成元
+cyclic group G and a generator g inside of G.
+
+199
+00:09:15,305 --> 00:09:19,400
+现在，我在这里重新写下了Diffie-Hellman协议
+Now, here I wrote the Diffie-Hellman protocol again,
+
+200
+00:09:19,400 --> 00:09:21,800
+不过现在我们假设这些步骤在时间上
+except now we are going to assume that these guys
+
+201
+00:09:21,800 --> 00:09:25,533
+是分开进行的。这两步不一定同时发生
+are separated in time. These two steps do not have
+
+202
+00:09:25,533 --> 00:09:28,133
+他们可以
+to occur simultaneously; they could actually take place
+
+203
+00:09:28,133 --> 00:09:31,800
+发生于不同的时间。Diffie-Hellman协议的第一步是
+at quite different times. The first step of the Diffie-Hellman
+
+204
+00:09:31,800 --> 00:09:34,578
+我们将讨论的密钥生成
+protocol is what we are going to view as key
+
+205
+00:09:34,578 --> 00:09:36,533
+公钥是这里的A
+generation. That is the public key is going to be
+
+206
+00:09:36,533 --> 00:09:39,200
+对应的私钥是a
+this capital A and the secret key is simply going to
+
+207
+00:09:39,200 --> 00:09:42,200
+那么当然，大家注意
+be the little a. So, you notice of course that
+
+208
+00:09:42,200 --> 00:09:45,667
+从公钥提取私钥
+extracting the secret key from the public key,
+
+209
+00:09:45,667 --> 00:09:49,333
+即从A提取a
+namely extracting the little a from capital A is a
+
+210
+00:09:49,333 --> 00:09:52,132
+是个离散对数问题。那么还原私钥
+discrete log problem. So, that recovering a secret
+
+211
+00:09:52,132 --> 00:09:55,787
+实际上是困难的。好，现在我们有了公钥
+key is actually difficult. Ok, now this gives us our public key.
+
+212
+00:09:55,787 --> 00:09:57,805
+那么稍后Bob想给Alice加密一条信息
+So, now at a later time Bob wants to encrypt a
+
+213
+00:09:57,805 --> 00:10:01,083
+使用她的公钥加密
+message to Alice, encrypted using her public key.
+
+214
+00:10:01,083 --> 00:10:04,161
+那么Bob如何加密呢？
+So how does Bob encrypt? Well, what he is going to do is
+
+215
+00:10:04,161 --> 00:10:06,400
+他会计算他对Diffie-Hellman的贡献
+he's going to compute his contribution to the Diffie-Hellman
+
+216
+00:10:06,400 --> 00:10:08,990
+也就是说，他发送g^b
+protocol. Namely, he is going to send over g to the
+
+217
+00:10:08,990 --> 00:10:11,467
+当然他随机选择这里的b
+little b. Of course, he is going to choose this little b
+
+218
+00:10:11,467 --> 00:10:14,005
+现在他要自己计算
+at random and now he is going to compute by
+
+219
+00:10:14,005 --> 00:10:16,133
+这里的共享密钥。那么
+himself the shared secret. So, he is going to
+
+220
+00:10:16,133 --> 00:10:20,276
+Bob自己计算g^ab，根据这个g^ab
+compute by himself g to the ab. From this g to the ab
+
+221
+00:10:20,276 --> 00:10:23,249
+他可以推出一个对称密钥
+he is going to derive a symmetric key for a
+
+222
+00:10:23,249 --> 00:10:25,282
+用于对称加密系统，然后他
+symmetric encryption system and then he is going to
+
+223
+00:10:25,282 --> 00:10:27,844
+使用这个刚刚推出的对称密钥来加密信息m
+encrypt the message m using this symmetric key
+
+224
+00:10:27,844 --> 00:10:30,306
+这是Bob所要发送的
+that he just derived. And that is the pair he is going to
+
+225
+00:10:30,306 --> 00:10:32,200
+他要发送他的Diffie-Hellman贡献
+send. So, he is going to send over his contribution
+
+226
+00:10:32,200 --> 00:10:34,933
+加上信息m的对称加密结果
+to the Diffie-Hellman protocol plus the symmetric
+
+227
+00:10:34,933 --> 00:10:38,067
+信息m是Bob想发送给Alice的信息 
+encryption of the message m that he wants to send
+
+228
+00:10:38,067 --> 00:10:41,733
+好，那么大家可以看到
+over to Alice. Ok, so you can see basically, we are
+
+229
+00:10:41,733 --> 00:10:43,933
+我们做的事情与Diffie-Hellman协议一模一样
+doing the exact same thing as we would do in the Diffie-Hellman
+
+230
+00:10:43,933 --> 00:10:48,046
+除了在我们这里，Bob直接使用
+protocol except now we, Bob directly immediately is using
+
+231
+00:10:48,046 --> 00:10:51,067
+Diffie-Hellman对称密钥去加密
+his Diffie-Hellman secret to encrypt the message  that he
+
+232
+00:10:51,067 --> 00:10:52,600
+他想发送给Alice的信息
+wants to send over to Alice.
+
+233
+00:10:52,600 --> 00:10:54,200
+现在Alice要解密什么？
+Now, what does Alice do to decrypt?
+
+234
+00:10:54,200 --> 00:10:56,733
+她要计算Diffie-Hellman的密钥
+Basically, she is going also to compute the
+
+235
+00:10:56,733 --> 00:10:58,615
+记得，现在
+Diffie-Hellman secret. Remember, that now she just
+
+236
+00:10:58,615 --> 00:11:00,600
+Alice收到了Bob的Diffie-Hellman贡献
+received Bob's contribution to the Diffie-Hellman
+
+237
+00:11:00,600 --> 00:11:03,400
+她有她的私钥a。那么
+protocol and she has her secret key a. So, she can
+
+238
+00:11:03,400 --> 00:11:06,733
+她可以计算Diffie-Hellman密钥了
+compute also the Diffie-Hellman secret, namely
+
+239
+00:11:06,733 --> 00:11:09,400
+即g^ab，根据g^abAlice可以推出
+g to the ab, from which she is going to derive the
+
+240
+00:11:09,400 --> 00:11:12,055
+对称加密密钥k。那么
+symmetric encryption key k. And then, she is going
+
+241
+00:11:12,055 --> 00:11:13,800
+她解密信息以还原明文
+to decrypt the message to recover the actual
+
+242
+00:11:13,800 --> 00:11:17,584
+好，这是我们如何
+plaintext. Ok, so that is the intuition for how we
+
+243
+00:11:17,584 --> 00:11:20,461
+把Diffie-Hellman协议转成公钥系统的直观想法
+convert the Diffie-Hellman protocol into a public key
+
+244
+00:11:20,461 --> 00:11:22,318
+顺便一说，在它提出时
+system. By the way, this was kind of an interesting
+
+245
+00:11:22,318 --> 00:11:25,400
+有一个有趣的发展
+development at the time that it came out, partially
+
+246
+00:11:25,400 --> 00:11:28,000
+部分是因为，大家注意这是一个随机加密算法
+because, you notice this is a randomized encryption scheme.
+
+247
+00:11:28,000 --> 00:11:31,188
+那么每次Bob加密一条信息
+So, every time Bob encrypts a message, it is
+
+248
+00:11:31,188 --> 00:11:34,133
+他需要选择一个新的随机b
+required that he choose a new random b and
+
+249
+00:11:34,133 --> 00:11:38,015
+然后使用这个新随机数b加密信息
+encrypt the message using this new random b.
+
+250
+00:11:38,015 --> 00:11:40,364
+那么我们来看ElGamal系统的更多细节
+So, let's see the ElGamal system, actually in more
+
+251
+00:11:40,364 --> 00:11:42,708
+现在我们把它视为
+detail. So, now actually let's view it as an actual
+
+252
+00:11:42,708 --> 00:11:45,800
+一个公钥加密系统，即算法三元组Gen
+public key encryption system. Namely, algorithm Gen,
+
+253
+00:11:45,800 --> 00:11:48,333
+E和D
+algorithm E and algorithm D.
+
+254
+00:11:48,333 --> 00:11:50,533
+那么通常，我们固定我们的n阶有限循环群
+So, as usual, we are going to fix our finite cyclic
+
+255
+00:11:50,533 --> 00:11:53,133
+我们需要的另一工具是
+group of order n. Another ingredient that we are going
+
+256
+00:11:53,133 --> 00:11:55,600
+一个对称加密系统。那么
+to need is a symmetric encryption system. So, I am
+
+257
+00:11:55,600 --> 00:11:58,402
+我把它记为E_s和D_s
+going to refer to it as E sub s, and D sub s. These are the
+
+258
+00:11:58,402 --> 00:12:00,651
+它们是对称加密系统的加密和解密算法
+encryption and decryption algorithms of a symmetric
+
+259
+00:12:00,651 --> 00:12:02,767
+这个对称加密系统提供了
+encryption system that happens to provide
+
+260
+00:12:02,767 --> 00:12:05,077
+认证加密。这个系统的密钥空间
+authenticated encryption. And, the key space for
+
+261
+00:12:05,077 --> 00:12:08,667
+记为K。那么我们还需要
+this system is capital K. And, then we are also going
+
+262
+00:12:08,667 --> 00:12:11,859
+一个哈希函数，它把群里的很多元素配对
+to need a hash function that maps pairs of elements
+
+263
+00:12:11,859 --> 00:12:14,533
+即把G^2中的许多元素
+in the group, namely elements in G squared into
+
+264
+00:12:14,533 --> 00:12:17,200
+映射到密钥空间。现在，公钥加密系统
+the key space. Now, here is how the public key
+
+265
+00:12:17,200 --> 00:12:19,467
+如下工作：那么我必须描述三个算法
+encryption system works. So, I have to describe
+
+266
+00:12:19,467 --> 00:12:22,133
+生成公钥和私钥的算法
+three algorithms. Algorithm that generates the
+
+267
+00:12:22,133 --> 00:12:24,200
+然后是加密和解密的算法
+public key and the secret key, and then the  encryption
+
+268
+00:12:24,200 --> 00:12:26,600
+那么，密钥生成算法
+and decryption algorithms. So, the key generation
+
+269
+00:12:26,600 --> 00:12:28,733
+如下工作：
+algorithm works as follows: All we do is basically,
+
+270
+00:12:28,733 --> 00:12:31,600
+我们构建Alice的Diffie-Hellman协议的贡献
+build up Alice's contribution to the Diffie-Hellman
+
+271
+00:12:31,600 --> 00:12:34,133
+我们选择一个G中的
+protocol. What we are going to do is going to choose a
+
+272
+00:12:34,133 --> 00:12:37,662
+随机的生成元g，然后我们
+random generator g in G and then we are going to
+
+273
+00:12:37,662 --> 00:12:39,800
+现在一个随机指数a。私钥将是a
+choose a random exponent a. The secret key is
+
+274
+00:12:39,800 --> 00:12:42,267
+然后公钥将是
+going to be a and then the public key is going to be
+
+275
+00:12:42,267 --> 00:12:45,867
+生成元g和Alice的Diffie-Hellman协议的贡献
+the generator g and Alice's contribution to the
+
+276
+00:12:45,867 --> 00:12:48,262
+顺便说下其原因是
+Diffie-Hellman protocol. The reason, by the way,
+
+277
+00:12:48,262 --> 00:12:50,090
+我们并不使用固定的生成元，因为
+we don't use a fix generator, is because it
+
+278
+00:12:50,090 --> 00:12:52,662
+它允许我们使用一个更弱的假设
+allows us to somewhat use a weaker assumption,
+
+279
+00:12:52,662 --> 00:12:54,933
+提升安全性。那么最好是
+improving security. And, so it is actually better to
+
+280
+00:12:54,933 --> 00:12:57,845
+每次选取一个随机生成元
+choose a random generator every time. It is easy
+
+281
+00:12:57,845 --> 00:13:00,000
+选择一个随机生成元足够容易了
+enough to choose a random generator. All we do, is we
+
+282
+00:13:00,000 --> 00:13:02,533
+我们取开始时选取的生成元
+take the generator that we started with and then we
+
+283
+00:13:02,533 --> 00:13:05,667
+然后计算它的某个幂，其幂次与n互质
+raise it to some power that is relatively prime to n.
+
+284
+00:13:05,667 --> 00:13:07,600
+这会给我们另一个生成元
+That will give us another generator. A random
+
+285
+00:13:07,600 --> 00:13:10,400
+群G的一个随机生成元。好，那么大家可以看到
+generator of the group capital G. Ok. So, you can
+
+286
+00:13:10,400 --> 00:13:12,799
+公钥就是Alice的
+see here that again the public key is simply Alice's
+
+287
+00:13:12,799 --> 00:13:15,000
+Diffie-Hellman协议贡献
+contribution to the Diffie-Hellman protocol. And, the
+
+288
+00:13:15,000 --> 00:13:18,667
+私钥是她选择的随机数a。现在
+secret key is the random a that she chose. Now, how
+
+289
+00:13:18,667 --> 00:13:21,400
+我们如何加密和解密呢？
+do we encrypt and decrypt? Well, when Bob wants
+
+290
+00:13:21,400 --> 00:13:23,067
+当Bob想加密信息时，他要使用公钥
+to encrypt the message, he is going to use the
+
+291
+00:13:23,067 --> 00:13:25,467
+记得，它由g和h组成
+public key. Remember, it consists of g and h.
+
+292
+00:13:25,467 --> 00:13:28,533
+他想加密信息m
+Here, he wants to encrypt a message m.
+
+293
+00:13:28,533 --> 00:13:30,533
+那么Bob会
+So, here is what he is going to do. So, he is going
+
+294
+00:13:30,533 --> 00:13:32,768
+选择他的Diffie-Hellman协议贡献
+to choose his contribution to the Diffie-Hellman protocol.
+
+295
+00:13:32,768 --> 00:13:35,200
+通常在Diffie-Hellman中，他会选择私钥b
+So, this is the secret b that he would normally
+
+296
+00:13:35,200 --> 00:13:37,267
+现在Bob要
+choose in Diffie-Hellman. And, now he is going to
+
+297
+00:13:37,267 --> 00:13:40,667
+计算g^b，即他的信息
+compute g to the b, which is actually his message,
+
+298
+00:13:40,667 --> 00:13:43,600
+在Diffie-Hellman协议中要发送给Alice的信息
+that gets send to Alice in the Diffie-Hellman protocol.
+
+299
+00:13:43,600 --> 00:13:46,050
+他要计算Diffie-Hellman密钥
+He is going to compute the Diffie-Hellman secret,
+
+300
+00:13:46,050 --> 00:13:49,000
+即h^b，如果大家还记得，h=g^a
+that's h to the b. If you remember, h was g to the a,
+
+301
+00:13:49,000 --> 00:13:52,000
+因此这里的值就是g^ab
+therefore, this value here is really g to the ab.
+
+302
+00:13:52,000 --> 00:13:54,067
+这就是Diffie-Hellman密钥。这个g^ab
+That's the Diffie-Hellman secret. That is the one thing that
+
+303
+00:13:54,067 --> 00:13:56,600
+是攻击者所不知道的。接下来
+the attacker doesn't actually know. Next, he is going
+
+304
+00:13:56,600 --> 00:13:59,067
+他要计算一个对称密钥
+to compute a symmetric key by basically hashing
+
+305
+00:13:59,067 --> 00:14:02,333
+通过求二元组(u,v)的哈希值。那么当然
+this pair u comma v. So, u, of course, is something
+
+306
+00:14:02,333 --> 00:14:04,102
+u是攻击者将会知道的东西，因为
+that the attacker is going to know because that is
+
+307
+00:14:04,102 --> 00:14:06,733
+u将作为密文的一部分被发送
+going to be sent as part of the ciphertext. But v, the
+
+308
+00:14:06,733 --> 00:14:09,667
+但是攻击者不会知道v。为了证明其安全性
+attacker isn't going to know. Again, for the proof of
+
+309
+00:14:09,667 --> 00:14:13,267
+哈希u和v会有帮助
+security, actually it helps to hash both u and v. So, we
+
+310
+00:14:13,267 --> 00:14:15,667
+那么我们计算两者的哈希，虽然严格说来
+hash both of them together. Although, strictly speaking
+
+311
+00:14:15,667 --> 00:14:18,600
+我们只需要哈希v，因为v是唯一的
+we just needed to hash v, because v is the only value
+
+312
+00:14:18,600 --> 00:14:20,200
+攻击者不知道的内容
+that the attacker doesn't know. The attacker
+
+313
+00:14:20,200 --> 00:14:22,737
+攻击者已经知道了u，因为u是在网络上
+already knows u, because that's going to be part of the data
+
+314
+00:14:22,737 --> 00:14:25,000
+发送的数据的一部分。那么Bob推导出
+that's sent on the network. So, anyhow, so Bob derives
+
+315
+00:14:25,000 --> 00:14:28,933
+这个对称密钥k，通过计算u和v的哈希。然后
+this symmetric key k, by hashing u and v. Then, he
+
+316
+00:14:28,933 --> 00:14:30,867
+Bob使用对称密钥k加密信息
+goes ahead and encrypts the message using the
+
+317
+00:14:30,867 --> 00:14:33,933
+最后，Bob输出
+symmetric key k and finally he outputs his
+
+318
+00:14:33,933 --> 00:14:35,733
+他的Diffie-Hellman协议贡献
+contribution to the Diffie-Hellman protocol.
+
+319
+00:14:35,733 --> 00:14:38,867
+值u，然后是对称加密的密文
+The value u and then the symmetric ciphertext that
+
+320
+00:14:38,867 --> 00:14:41,223
+是直接加密信息m后的密文
+directly encrypts the message m.
+
+321
+00:14:41,223 --> 00:14:43,841
+完事。那么密文由两部分组成
+That's it. So, the ciphertext consists of these two
+
+322
+00:14:43,841 --> 00:14:45,764
+这是在网络上发送的内容
+parts and that is the thing that gets sent over the
+
+323
+00:14:45,764 --> 00:14:48,098
+我们看Alice是如何解密的
+network. Let's see, how does Alice decrypt now.
+
+324
+00:14:48,098 --> 00:14:50,800
+那么她要使用她的私钥来解密
+So, she is going to use her secret key a to decrypt
+
+325
+00:14:50,800 --> 00:14:53,800
+这里她接收了Bob的Diffie-Hellman协议的贡献
+and she receives here, Bob's contribution to the
+
+326
+00:14:53,800 --> 00:14:55,533
+还有对称加密后的
+Diffie-Hellman protocol plus the symmetric
+
+327
+00:14:55,533 --> 00:14:59,000
+Bob发送的信息的密文
+encryption of the message that Bob sent.
+
+328
+00:14:59,000 --> 00:15:01,800
+她会自己计算Diffie-Hellman密钥
+What she will do is she'll compute herself the Diffie-Hellman
+
+329
+00:15:01,800 --> 00:15:05,267
+如果大家记得，u^a就是(g^b)^a
+secret. If you remember, u to the a is simply g to the b
+
+330
+00:15:05,267 --> 00:15:07,933
+即g^ab。那么这里
+to the a. Which is g to the ab. So, here Alice
+
+331
+00:15:07,933 --> 00:15:11,467
+Alice计算了Diffie-Hellman密钥，现在我问大家
+computed the Diffie-Hellman secret. And, now let me
+
+332
+00:15:11,467 --> 00:15:14,467
+她怎么推导出对称密钥k
+ask you, how does she derive the symmetric key k
+
+333
+00:15:14,467 --> 00:15:16,867
+根据Diffie-Hellman密钥g^ab
+given the Diffie-Hellman secret, g to the ab and the
+
+334
+00:15:16,867 --> 00:15:19,103
+以及她收到的密文呢？
+ciphertext that she was given?
+
+335
+00:15:22,088 --> 00:15:23,933
+那么现在Alice
+Well, what she will do, is simply again, now she has
+
+336
+00:15:23,933 --> 00:15:27,267
+从密文里获得了u，也有了v
+u from the ciphertext and she has v, because she just
+
+337
+00:15:27,267 --> 00:15:29,667
+因为她自己能算出来。那么现在Alice可以重新推出
+computed it herself. So, now she can rederive the
+
+338
+00:15:29,667 --> 00:15:31,800
+对称加密密钥，通过计算(u,v)的哈希
+symmetric encryption key by hashing u and v
+
+339
+00:15:31,800 --> 00:15:34,333
+以获得对称加密密钥
+together to get the symmetric encryption key and
+
+340
+00:15:34,333 --> 00:15:36,667
+然后她解密密文
+then she just decrypts the ciphertext to get the
+
+341
+00:15:36,667 --> 00:15:39,600
+以获得实际的明文。好，完事了，这就是整个
+actual plaintext. OK, so that's it. That is the whole
+
+342
+00:15:39,600 --> 00:15:42,333
+加密和解密算法。用图表示的话
+encryption and decryption algorithm. In a picture,
+
+343
+00:15:42,333 --> 00:15:45,493
+密文看起来
+the way the ciphertext would look, is also
+
+344
+00:15:45,493 --> 00:15:47,667
+与上一讲里我们看到的类似
+as kind of what we saw in the last lecture. Basically,
+
+345
+00:15:47,667 --> 00:15:50,323
+包含u的会是个较短的报文头
+there would be a short header that contains u.
+
+346
+00:15:50,323 --> 00:15:53,467
+大家回忆一下，它就是g^b，然后剩下的密文
+Which as you recall, is g to the b. And, then the rest of the
+
+347
+00:15:53,467 --> 00:15:56,800
+将是待发送信息的加密结果
+ciphertext would be the encryption of the message
+
+348
+00:15:56,800 --> 00:16:01,441
+使用对称密钥k加密
+that is being sent, under the symmetric key k.
+
+349
+00:16:01,441 --> 00:16:04,000
+然后为了解密，Alice会使用这个报文头
+And, then to decrypt, Alice would use this header
+
+350
+00:16:04,000 --> 00:16:06,533
+来推导Diffie-Hellman密钥
+to derive the Diffie-Hellman secret from which she
+
+351
+00:16:06,533 --> 00:16:09,735
+继而推出密钥k，然后去解密报文内容
+will derive k and then decrypts the body, to get the
+
+352
+00:16:09,735 --> 00:16:12,336
+以获得最初的明文。顺便说下，我应该提到
+original plaintext. By the way, I should note that
+
+353
+00:16:12,336 --> 00:16:14,667
+我这里描述这个系统的方式，并非
+the way I describe this system here, is actually not
+
+354
+00:16:14,667 --> 00:16:17,544
+ElGamal最初给出的描述
+how ElGamal described it originally, this is
+
+355
+00:16:17,544 --> 00:16:19,775
+这是某种现代的观点来看ElGamal加密
+in some sense a modern view about the ElGamal
+
+356
+00:16:19,775 --> 00:16:21,809
+但它与ElGamal的看法基本上是等价的
+encryption, but it is pretty much equivalent to how
+
+357
+00:16:21,809 --> 00:16:25,600
+那么现在我们看
+ElGamal viewed it. So, now let's look at the
+
+358
+00:16:25,600 --> 00:16:27,379
+ElGamal的性能。那么这里我写了
+performance of ElGamal. So, here what I wrote
+
+359
+00:16:27,379 --> 00:16:29,800
+ElGamal加密中要花大量时间的步骤
+is the, kind of the time intensive steps of ElGamal
+
+360
+00:16:29,800 --> 00:16:32,400
+即在加密中
+encryption. Namely, during encryption, there are
+
+361
+00:16:32,400 --> 00:16:35,133
+有两步群G的指数计算
+these two exponentiations in the group G.
+
+362
+00:16:35,133 --> 00:16:37,067
+指数是一个立方时间算法
+Exponentiation, remember is a cubic time algorithm
+
+363
+00:16:37,067 --> 00:16:39,867
+使用重复平方算法
+using the repeated squaring algorithm. And, as a
+
+364
+00:16:39,867 --> 00:16:43,467
+因此它是很花时间的
+result, it is fairly time intensive. When I say, time
+
+365
+00:16:43,467 --> 00:16:45,819
+我说很花时间的意思是，在一个现代处理器上
+intensive, I mean, that on a modern processor it would
+
+366
+00:16:45,819 --> 00:16:47,200
+它需要花掉几毫秒来计算指数
+take a few milliseconds to compute these
+
+367
+00:16:47,200 --> 00:16:49,667
+而在解密时
+exponentiations and during decryption, basically,
+
+368
+00:16:49,667 --> 00:16:52,353
+解密者要计算一个指数
+the decryptor computes one exponentiation,
+
+369
+00:16:52,353 --> 00:16:54,272
+即u^a，这是解密的性能瓶颈
+namely, u to the a. This is the bottleneck during
+
+370
+00:16:54,272 --> 00:16:57,667
+好，那么大家会认为
+decryption. Ok, so you would think that encryption
+
+371
+00:16:57,667 --> 00:17:00,067
+加密的耗时是解密的两倍
+actually is, takes twice as long as decryption, because
+
+372
+00:17:00,067 --> 00:17:02,400
+因为加密需要两个指数计算
+encryption requires two exponentiations, while
+
+373
+00:17:02,400 --> 00:17:05,333
+而解密只需要一个。实际上
+decryption requires only one. It turns out, that
+
+374
+00:17:05,333 --> 00:17:08,133
+这样说不完全准确，因为大家注意
+is not entirely accurate because, you notice that the exponentiation
+
+375
+00:17:08,133 --> 00:17:11,533
+解密的指数计算里，底数可变
+during decryption is done to a variable basis.
+
+376
+00:17:11,533 --> 00:17:14,667
+即每次的u都不一样
+Namely, u changes every time. Whereas during
+
+377
+00:17:14,667 --> 00:17:18,267
+而在加密时，底数是固定的：g和h
+encryption, the basis is fixed: g and h are derived
+
+378
+00:17:18,267 --> 00:17:21,067
+是由公钥推出的，是永远固定的
+from the public key and are fixed forever.
+
+379
+00:17:21,067 --> 00:17:23,000
+那么事实上如果你想计算
+So, in fact, in turns out that if you want to do
+
+380
+00:17:23,000 --> 00:17:25,667
+固定底数的指数，你可以做许多
+exponentiation to a fixed basis, you can do a lot of
+
+381
+00:17:25,667 --> 00:17:28,600
+预备计算，特别地，你可以离线地
+precomputation. In particular, you can do all the
+
+382
+00:17:28,600 --> 00:17:32,067
+把重复平方算法中的平方步骤的结果先算出来
+squaring steps in the repeated squaring algorithm
+
+383
+00:17:32,067 --> 00:17:34,534
+那么这里你可以
+offline. So, here what you would do, you would
+
+384
+00:17:34,534 --> 00:17:36,733
+先算出所有g的平方指数
+compute all powers of 2 of g. So, you would
+
+385
+00:17:36,733 --> 00:17:39,267
+可以计算g, g^2, g^4
+compute g, g squared, g to the fourth, g to the
+
+386
+00:17:39,267 --> 00:17:41,872
+g^8, g^16, g^32，等等。。
+eighth, go to the sixteenth, g to the thirty two, and so
+
+387
+00:17:41,872 --> 00:17:44,565
+这些都是重复平方算法中
+on and so forth. These are all the squaring steps of
+
+388
+00:17:44,565 --> 00:17:47,333
+所有平方步骤的结果，它们的计算可以离线完成
+the repeated squaring algorithm you would do offline.
+
+389
+00:17:47,333 --> 00:17:49,482
+对h也可做同样的事情。那么
+The same thing for h. And, then when it comes time to
+
+390
+00:17:49,482 --> 00:17:52,600
+在计算实际指数的时候，你只需要
+actually do the real exponentiation all you need to do is just do the
+
+391
+00:17:52,600 --> 00:17:56,733
+计算余下的乘法了，把这些平方指数
+multiplications, to accumulate these powers of 2 into the
+
+392
+00:17:56,733 --> 00:17:58,533
+根据指数b，来试图去计算
+exponent b, that you're trying to compute.
+
+393
+00:17:58,533 --> 00:18:00,267
+那么如果大家想一想，这确实加速了
+So, if you think about it, this can actually speed up
+
+394
+00:18:00,267 --> 00:18:03,133
+指数计算，速度是之前的3倍。事实上
+exponentiation by a factor of 3. In fact, it would
+
+395
+00:18:03,133 --> 00:18:05,533
+它会加速更多，如果允许存储
+speed up it even more if you allow me to store even
+
+396
+00:18:05,533 --> 00:18:09,133
+更大的表。这叫做窗口化的指数计算
+larger tables. This is called a windowed exponentiation.
+
+397
+00:18:09,133 --> 00:18:12,133
+不过，如果允许加密者
+But, regardless, if you allow the encryptor to
+
+398
+00:18:12,133 --> 00:18:14,937
+存储更大的由公钥推出的表
+store large tables that are derived from the public
+
+399
+00:18:14,937 --> 00:18:17,400
+那么事实上加密就不会
+key, then in fact encryption is not going to be
+
+400
+00:18:17,400 --> 00:18:19,267
+比解密慢了。事实上，加密快于解密
+slower than decryption. In fact, encryption will be
+
+401
+00:18:19,267 --> 00:18:22,867
+但是这要求
+faster than decryption. But, again, this requires that
+
+402
+00:18:22,867 --> 00:18:25,467
+加密者要预先计算这些大表
+the encryptor to precompute these large tables
+
+403
+00:18:25,467 --> 00:18:28,126
+并存储它们。那么如果所有的加密者都这么做
+and store them around. So, if all the encryptor is
+
+404
+00:18:28,126 --> 00:18:30,600
+只是加密单个接收方
+doing, is just constantly encrypting to a single
+
+405
+00:18:30,600 --> 00:18:34,400
+这可以被很快地完成
+recipient, that can be done actually fairly fast using these
+
+406
+00:18:34,400 --> 00:18:37,067
+使用这些预计算的表。如果加密者
+precomputed tables. If the encryptor, for every
+
+407
+00:18:37,067 --> 00:18:39,800
+对每个信息都要加密给不同的接收方
+message is encrypting to a different recipient, for
+
+408
+00:18:39,800 --> 00:18:41,933
+例如，如果每次发送电子邮件
+example, if every time you send an email, you send
+
+409
+00:18:41,933 --> 00:18:44,612
+你要把邮件发送给不同的接收方，那么事实上
+an email to a different recipient, then, in fact, the
+
+410
+00:18:44,612 --> 00:18:47,671
+解密要比解密慢一倍
+encryption will be twice as slow as decryption.
+
+411
+00:18:48,533 --> 00:18:51,200
+那么这是一个值得记住的好技巧。事实上
+So, this is a good trick to keep in mind. In fact, most
+
+412
+00:18:51,200 --> 00:18:54,467
+大多数的密码学库不是这么做的。那么如果大家看到
+cryptolibraries don't do this. So, if you see that you
+
+413
+00:18:54,467 --> 00:18:57,000
+你总是用同一个公钥加密
+are always encrypting to the same public key and
+
+414
+00:18:57,000 --> 00:18:59,333
+出于某些原因，你的加密过程需要很多时间
+for some reason your encryption process takes a
+
+415
+00:18:59,333 --> 00:19:01,400
+对你来说是个瓶颈，请记得
+lot of time, it's a bottleneck for you, keep in mind
+
+416
+00:19:01,400 --> 00:19:04,021
+你是可以加速的
+that you can actually really speed things up
+
+417
+00:19:04,021 --> 00:19:05,333
+使用预先计算
+using precomputation.
+
+418
+00:19:05,333 --> 00:19:07,200
+当然，如果加密对大家来说是个瓶颈
+Of couse, if encryption is a bottleneck for you, you
+
+419
+00:19:07,200 --> 00:19:10,133
+大家也可以使用RSA，RSA的加密
+might as well be using RSA, where an RSA encryption
+
+420
+00:19:10,133 --> 00:19:14,067
+还是非常快的。好，我们对ElGamal加密的
+is really fast. Ok, so that is the end of our
+
+421
+00:19:14,067 --> 00:19:16,133
+讨论先到这里。现在，当然
+description of ElGamal encryption. Now, the next
+
+422
+00:19:16,133 --> 00:19:18,800
+接下来的问题是，为什么这个系统是安全的？
+question of course, is why is the system secure,
+
+423
+00:19:18,800 --> 00:19:21,467
+特别地，我们能否证明它是选择密文安全的？
+in particular, can we prove that it's chosen
+
+424
+00:19:21,467 --> 00:19:24,133
+更重要地，基于什么样的假设
+ciphertext secure and more importantly, under what
+
+425
+00:19:24,133 --> 00:19:26,267
+我们可以证明这个系统是选择密文安全的？
+assumptions can we prove that the system is
+
+426
+00:19:26,267 --> 00:19:27,600
+那么我们
+chosen ciphertext secure? So, we are going to
+
+427
+00:19:27,600 --> 00:19:29,310
+下节讨论之
+discuss that in the next segment.

@@ -1,0 +1,1623 @@
+1
+00:00:00,000 --> 00:00:03,837
+本节中我们要构建认证加密系统
+In this segment, we're gonna construct
+authenticated encryption systems. Since we
+
+2
+00:00:03,837 --> 00:00:08,250
+由于我们已经有了CPA安全加密，我们有安全MAC
+already have CPA secured encryption, and
+we have secure MACs, the natural question
+
+3
+00:00:08,250 --> 00:00:12,824
+自然就有问题，我们能否把两者相结合，来获得认证加密？
+is whether we can combine the two somehow,
+in order to get authenticated encryption.
+
+4
+00:00:12,824 --> 00:00:15,721
+那正是我们本节要做的。认证加密
+And if, that's exactly what we're gonna do
+in this segment. Authenticated encryption
+
+5
+00:00:15,721 --> 00:00:20,447
+于2000年被提出，在两篇独立的论文里
+was introduced in the year 2000, in two
+independent papers that I point to at the
+
+6
+00:00:20,447 --> 00:00:25,915
+本章最后我会讲到。但在这之前，许多密码学库
+end of this module. But before then, many
+crytpolibraries provided an API that
+
+7
+00:00:25,915 --> 00:00:31,215
+提供了支持CPA安全加密的API，以及MAC
+separately supported CPA secure
+encryption, and MAC-ing. So there was one
+
+8
+00:00:31,215 --> 00:00:36,175
+有个函数用来实现CPA安全加密。例如，带随机IV的CBC
+function for implementing CPA secure
+encryption. For example, CBC with a random
+
+9
+00:00:36,175 --> 00:00:41,136
+另一个函数用来实现MAC。然后每个开发者
+IV. And another function for implementing
+a MAC. And then every developer that
+
+10
+00:00:41,136 --> 00:00:45,646
+都想分别实现CPA安全的加密机制
+wanted to implement encryption, had to,
+himself, call separately the CPA secure
+
+11
+00:00:45,646 --> 00:00:50,552
+和MAC机制。特别是，每个开发者
+encryption scheme and the MAC scheme. In
+particular, every developer had to invent
+
+12
+00:00:50,552 --> 00:00:55,697
+必须自己发明组合加密和MAC的方法
+his own way of combining encryption and
+MAC-ing to provide some sort of
+
+13
+00:00:55,697 --> 00:00:59,376
+来提供某种认证加密。但由于组合加密和MAC的目的
+authenticated encryption. But since the
+goals of combining encryption and MAC-ing
+
+14
+00:00:59,376 --> 00:01:03,690
+当时理解得不好，因为认证加密还没被定义
+wasn't well understood since authenticated
+encryption hasn't yet been defined, it
+
+15
+00:01:03,690 --> 00:01:08,497
+还不清楚哪种加密与MAC的组合是正确的
+wasn't really clear which combinations of
+encryption and MAC-ing are correct and
+
+16
+00:01:08,497 --> 00:01:13,243
+哪些又不是。所以，我们刚才说的每个项目都必须
+以它们自己的方式实现这个组合
+which aren't. And so, every project as I
+said had to invent its own combination.
+
+17
+00:01:13,243 --> 00:01:17,202
+事实上，没有一个组合是正确的。我可以告诉大家
+And in fact, not all combinations were
+correct. And I can tell you that the most
+
+18
+00:01:17,202 --> 00:01:22,556
+在软件项目中最常见的错误是不正确地
+common mistake in software projects were
+basically incorrectly combining the
+
+19
+00:01:22,556 --> 00:01:27,025
+组合加密和完整性机制。希望在本章结束后
+encryption and integrity mechanisms. So
+hopefully, by the end of this module, you
+
+20
+00:01:27,025 --> 00:01:31,260
+大家会知道如何正确组合它们，不会自己再犯错误
+will know how to combine them correctly,
+and you won't be making these mistakes
+
+21
+00:01:31,260 --> 00:01:35,174
+我们看一些CPA安全加密和MAC的组合
+yourself. So let's look at some
+combinations of CPA secure encryption and
+
+22
+00:01:35,174 --> 00:01:39,303
+由不同的项目提出的。这里有三个例子
+MAC, that were introduced by different
+projects. So here are three examples. So,
+
+23
+00:01:39,303 --> 00:01:43,816
+首先，在所有三个例子里，有一个单独的密钥用来加密
+first of all, in all three examples,
+there's a separate key for encryption, and
+
+24
+00:01:43,816 --> 00:01:47,774
+一个单独的密钥用来MAC。这两个密钥相互独立
+a separate key for MACing. These two
+keys are independent of one another, and
+
+25
+00:01:47,774 --> 00:01:52,224
+都是在会话建立阶段生成的。我们将在本课程稍后看到
+both are generated at session setup time.
+And we're gonna see how to generate these
+
+26
+00:01:52,224 --> 00:01:57,071
+如何生成这两个密钥。第一个例子在SSL协议里
+two keys later on in the course. So the
+first example is the SSL protocol. So the
+
+27
+00:01:57,071 --> 00:02:02,681
+SSL组合加密和MAC，希望能获得认证加密
+way SSL combines encryption and MAC in the
+hope of achieving authenticated encryption
+
+28
+00:02:02,681 --> 00:02:07,656
+组合方法如下：取明文m，然后计算明文m的MAC
+is the following. Basically you take the
+plain text, m, and then you compute a MAC
+
+29
+00:02:07,656 --> 00:02:13,415
+使用MAC密钥kI，计算明文m的标签
+on the plain text, m. So you use your MAC
+key, kI, to compute tag for this message
+
+30
+00:02:13,415 --> 00:02:17,787
+然后你可以把标签附在明文后面
+m. And then you can concatenate the tag to
+the message and then you encrypt the
+
+31
+00:02:17,787 --> 00:02:22,580
+然后加密这个明文和标签的联结，得到最终的密文
+concatenation of the message and the tag
+and what comes out is the actual final cipher text.
+
+32
+00:02:22,580 --> 00:02:26,710
+这是一号方案。第二个方案在IPsec中
+So that's option number one. The
+second option is what IPsec does. So
+
+33
+00:02:26,710 --> 00:02:31,160
+取明文，首先加密这个明文
+here, you take the message. The first
+thing you do is you encrypt the message.
+
+34
+00:02:31,160 --> 00:02:35,692
+然后计算得到的密文的标签
+And then, you compute a tag on the
+resulting cipher text. So you notice the
+
+35
+00:02:35,692 --> 00:02:40,238
+大家注意到这个标签是基于得到的密文计算的
+tag itself is computed on the resulting
+cipher text. A third option is what the
+
+36
+00:02:40,238 --> 00:02:45,429
+第三个方案是来自SSH协议的。这里，SSH取明文
+SSH protocol does. So here, the SSH takes
+the message, and encrypts it using a CPA
+
+37
+00:02:45,429 --> 00:02:50,944
+使用CPA安全的加密机制加密明文。然后，
+把明文标签附在后面
+secure encryption scheme. And then, to it,
+it concatenates a tag of the message. The
+
+38
+00:02:50,944 --> 00:02:55,567
+IPsec与SSH不同之处在于，IPsec中
+difference between IPsec and SSH, is that
+in IPsec, the tag is computed over the
+
+39
+00:02:55,567 --> 00:02:59,988
+标签是根据密文计算的，
+在SSH中，标签是根据明文计算的
+cipher text, whereas, in SSH, the tag is
+computed over the message. And so these
+
+40
+00:02:59,988 --> 00:03:04,536
+这就是三个完全不同的组合加密和MAC的方法
+are three completely different ways of
+combining encryption and MAC. And the
+
+41
+00:03:04,536 --> 00:03:09,090
+问题是，哪个是安全的？大家想想
+question is, which one of these is secure?
+So, I will let you think about this for a
+
+42
+00:03:09,090 --> 00:03:12,105
+然后我们继续分析
+second, and then when we continue we'll do
+the analysis together.
+
+43
+00:03:13,197 --> 00:03:17,164
+我们从SSH的方法开始。在SSH的方法中，大家注意
+Okay. So let's start with the SSH method. So 
+in the SSH method you notice that the tag
+
+44
+00:03:17,164 --> 00:03:21,629
+标签是由明文计算的，然后把标签以明文的形式附在密文的后面
+is computed on the message and then 
+concatenated in the clear to the cipher text.
+
+45
+00:03:21,629 --> 00:03:26,407
+这就有很大的问题，因为MAC本身不是为私密性设计的
+Now this is actually quite a problem 
+because MACs themselves are not designed
+
+46
+00:03:26,407 --> 00:03:30,784
+MAC仅为完整性设计。事实上
+to provide confidentiality. MACs are only 
+designed for integrity. And in fact, there's
+
+47
+00:03:30,784 --> 00:03:36,008
+仅以输出明文中的几位作为MAC的话，也没有错
+nothing wrong with a MAC that as part of
+the tag outputs a few bits of the plain
+
+48
+00:03:36,008 --> 00:03:41,458
+输出明文M中的几位，也是很好的标签
+text. Outputs a few bits of the message M.
+That would be a perfectly fine tag. And yet if
+
+49
+00:03:41,458 --> 00:03:46,667
+如果我们这样做，会完全破坏CPA安全性
+we did that, that would completely break
+CPA security here, because some bits of
+
+50
+00:03:46,667 --> 00:03:51,815
+因为明文的若干位在密文里被泄漏了。
+所以对于这个SSH的方法
+the message are leaked in the cipher text.
+And so the SSH approach, even though the
+
+51
+00:03:51,815 --> 00:03:56,595
+尽管对于SSH这个协议本身来说没有问题
+specifics of SSH are fine and the
+protocol itself is not compromised by
+
+52
+00:03:56,595 --> 00:04:00,818
+也没有因为这个组合而被破解，一般来说
+还是不建议使用这种方法
+this specific combination, generally it's
+advisable not to use this approach. Simply
+
+53
+00:04:00,818 --> 00:04:05,928
+因为MAC签名算法的输出会泄漏明文中的一些位
+because the output of the MAC signing algorithm might leak bits of the message. So
+
+54
+00:04:05,928 --> 00:04:11,481
+现在我们看SSL和IPsec。事实上，IPsec的方法
+now let's look at SSL and IPsec. As it
+turns out, the recommended method actually
+
+55
+00:04:11,481 --> 00:04:16,556
+更为推荐。因为无论你使用什么CPA安全系统
+is the IPsec method. Because it turns out
+no matter what CPA secure system and MAC
+
+56
+00:04:16,556 --> 00:04:21,134
+和MAC密钥，组合总能提供认证加密
+key you use the combination is always
+gonna provide authenticated encryption.
+
+57
+00:04:21,134 --> 00:04:26,070
+让我非常简单地解释一下为什么
+Now let me very, very briefly explain why.
+Basically what happens is once we encrypt
+
+58
+00:04:26,070 --> 00:04:31,005
+一旦我们加密了明文，明文的内容就被隐藏在密文里了
+the message well the message contents now
+is hidden inside the cipher text and now
+
+59
+00:04:31,005 --> 00:04:35,761
+现在当我们计算密文的标签时，我们用这个标签
+when we compute a tag of the cipher text
+basically we're locking, this tag locks
+
+60
+00:04:35,761 --> 00:04:40,815
+给密文上了锁，确保没人可以产生一个不同的密文
+the cipher text and makes sure no one can
+produce a different cipher text that would
+
+61
+00:04:40,815 --> 00:04:45,314
+却能看起来是有效的。因此这个方法确保任何对密文的修改
+look valid. And as a result this approach
+ensures that any modifications to the
+
+62
+00:04:45,314 --> 00:04:49,555
+都会被解密者检测出来，因为MAC无法验证
+cipher text will be detected by the
+decrypter simply because the MAC isn't
+
+63
+00:04:49,555 --> 00:04:54,026
+实际上，SSL方法中，有一些病态的例子
+gonna verify. As it turns out, for the SSL
+approach, there actually are kind of
+
+64
+00:04:54,026 --> 00:04:59,348
+你把CPA安全的加密系统和一个安全的MAC组合起来
+pathological examples, where you combine
+CPA secure encryption system with a secure
+
+65
+00:04:59,348 --> 00:05:03,542
+结果却对一个选择密文攻击是脆弱的
+MAC. And the result is vulnerable to a
+chosen cipher text attack, so that it does
+
+66
+00:05:03,542 --> 00:05:07,978
+所以SSL的方法实际上不提供认证加密
+not actually provide authenticated
+encryption. And basically, the reason that
+
+67
+00:05:07,978 --> 00:05:12,824
+这个会发生的原因是，加密机制和MAC算法之间
+could happen, is that there's some sort of
+a bad interaction between the encryption
+
+68
+00:05:12,824 --> 00:05:17,319
+有一些不好的互动。事实上，会有一个选择密文攻击
+scheme and the MAC algorithm. Such that,
+in fact, there will be a chosen cipher
+
+69
+00:05:17,319 --> 00:05:21,752
+如果你设计了一个新的项目
+text attack. So if you're designing a new
+project the recommendation now is to
+
+70
+00:05:21,752 --> 00:05:26,162
+现在总是推荐先加密，然后计算MAC，因为
+无论你组合了什么样的CPA安全加密和MAC算法
+always use encrypt then MAC because that
+is secure no matter which CPA secure
+
+71
+00:05:26,162 --> 00:05:30,607
+得到的组合总是安全的。现在看个术语
+encryption and secure MAC algorithm you're
+combining. Now, just to set the
+
+72
+00:05:30,607 --> 00:05:37,995
+这个SSL方法有时叫做"先MAC后加密"
+terminology, the SSL method is sometimes
+called MAC-then-encrypt. And the
+
+73
+00:05:37,995 --> 00:05:45,039
+IPsec的方法叫做"先加密后MAC"。
+尽管我们不应使用SSH的方法
+IPsec method is called encrypt-then-MAC.
+The SSH method even though you're
+
+74
+00:05:45,039 --> 00:05:51,898
+但这种方法也有名字"加密且MAC"。好
+我经常使用"先加密后MAC"
+not supposed to use it, is called encrypt-and-MAC. Okay, so I'll often refer to
+
+75
+00:05:51,898 --> 00:05:57,002
+和"先MAC后加密"来区分SSL和IPsec
+encrypt-then-MAC, and MAC-then-encrypt to
+differentiate SSL and IPsec. Okay, so
+
+76
+00:05:57,002 --> 00:06:02,112
+重复一下我刚才所讲的。IPsec方法"先加密后MAC"
+just to repeat what I've just said. The IPsec
+method encrypt-then-MAC always
+
+77
+00:06:02,112 --> 00:06:07,160
+总是提供认证加密。如果你从一个CPA安全的密码和一个安全MAC出发
+provides authenticated encryption. If you start 
+from a CPA secure cipher and a secure MAC
+
+78
+00:06:07,160 --> 00:06:11,110
+你总会获得认证加密的。如我所说，事实上
+you will always get authenticated
+encryption. As I said, MAC-then-encrypt in
+
+79
+00:06:11,110 --> 00:06:15,737
+"先MAC或加密"有一些病态的情况，结果对CCA攻击是脆弱的
+fact, there are pathological cases where
+the result is vulnerable to CCA attacks and
+
+80
+00:06:15,737 --> 00:06:20,308
+因此"先MAC或加密"不提供认证加密
+therefore does not provide authenticated
+encryption. However, the story's a little
+
+81
+00:06:20,308 --> 00:06:24,653
+但是，实际上比这要有趣
+bit more interesting than that, in that,
+it turns out, if you're actually using
+
+82
+00:06:24,653 --> 00:06:29,224
+如果你使用随机计数器模式或随机CBC
+randomized counter mode or randomized CBC,
+then it turns out, for those particular
+
+83
+00:06:29,224 --> 00:06:33,625
+那么对那些CPA安全的加密机制，"先MAC后加密"
+CPA secure encryption schemes, MAC-then-encrypt
+actually does provide authenticated
+
+84
+00:06:33,625 --> 00:06:38,028
+确实提供了认证加密，因此是安全的。事实上
+encryption and therefore it is secure. In
+fact, there's even a more interesting
+
+85
+00:06:38,028 --> 00:06:42,334
+更有趣的是如果你使用了随机计数器模式
+twist here in that if you're using
+randomized counter mode. Then, it's enough
+
+86
+00:06:42,334 --> 00:06:46,804
+那么你的MAC算法只要是一次性安全的就够了
+that your MAC algorithm just be one time
+secure. It doesn't have to be a fully
+
+87
+00:06:46,804 --> 00:06:51,561
+不需要是完全安全的MAC。只需要当密钥只用于
+加密单个信息时是安全的即可
+secure MAC. It just has to be secure when
+a key is used to encrypt a single message,
+
+88
+00:06:51,561 --> 00:06:56,088
+我们讨论信息完整性时，看到过有一些快得多的MAC算法
+okay? And when we talked about message
+integrity, we saw that there are actually
+
+89
+00:06:56,088 --> 00:07:00,575
+它们是一次性安全的，而非完全安全的MAC
+much faster MACs that are one time secure
+than MACs that are fully secure. As a
+
+90
+00:07:00,575 --> 00:07:04,454
+因此如果你使用随机计数器模式，"先MAC后加密"
+result, if you're using randomized counter
+mode MAC-then-encrypt could actually
+
+91
+00:07:04,454 --> 00:07:08,187
+实际上可以构造一个更为有效率的加密机制
+result in a more efficient encryption
+mechanism. However, I'm going to repeat
+
+92
+00:07:08,187 --> 00:07:12,213
+但我还要重复一遍。推荐使用"先加密后MAC"
+this again. The recommendation is to use
+encrypt-then-MAC and we're going to see a
+
+93
+00:07:12,213 --> 00:07:16,093
+我们将看到许多针对未使用"先加密后MAC"的系统的攻击
+number of attacks on systems that didn't
+use encrypt-then-MAC. And so just to make
+
+94
+00:07:16,093 --> 00:07:20,120
+为了确保安全，同时不必思考太多
+sure things are secure without you having
+to think too hard about this. Again, I am
+
+95
+00:07:20,120 --> 00:07:24,118
+我推荐大家始终使用"先加密后MAC"
+going to recommend that you always use
+encrypt-then-MAC. Now, once the concept of
+
+96
+00:07:24,118 --> 00:07:27,759
+现在，一旦认证加密的观念变得更为流行
+authenticated encryption became more
+popular, a number of standardized
+
+97
+00:07:27,759 --> 00:07:31,609
+很多组合加密和MAC的标准方法便涌现出来
+approaches for combining encryption and
+MAC turned up. And those were even
+
+98
+00:07:31,609 --> 00:07:35,978
+还有些是国家标准局(NIST)的标准方法。我将讨论其中三个标准
+standardized by the National Institute of
+Standards. So I'm just gonna mention three
+
+99
+00:07:35,978 --> 00:07:41,031
+其中两个是由NIST标准化的
+of these standards. Two of these were
+standardized by NIST. And these are
+
+100
+00:07:41,031 --> 00:07:46,138
+分别叫做Galois计数器模式(<b>GCM</b>)和CBC计数器模式(<b>CCM</b>)。
+我来解释一下它们的工作过程
+called Galois counter mode and CBC counter
+mode. And so let me explain what they do.
+
+101
+00:07:46,138 --> 00:07:51,245
+Galois计数器模式使用了计数器模式加密
+Galois counter mode basically uses counter
+mode encryption, so a randomized counter
+
+102
+00:07:51,245 --> 00:07:56,164
+即使用Carter-Wegman MAC的随机计数器模式，
+一个非常快速的Carter-Wegman MAC
+mode with a Carter-Wegman MAC, so a very
+fast Carter-Wegman MAC. And the way the
+
+103
+00:07:56,164 --> 00:08:01,146
+GCM的Carter-Wegman MAC如下工作：
+它是待求MAC的信息的一个哈希函数
+Carter-Wegman MAC works in GCM is it's
+basically a hash function of the message
+
+104
+00:08:01,146 --> 00:08:06,311
+然后用一个PRF加密哈希的结果
+that's being MACed. And then the result is
+encrypted using a PRF. Now this hash
+
+105
+00:08:06,311 --> 00:08:11,562
+现在GCM里的这个哈希函数已经很快了
+function in GCM is already quite fast to
+the point where the bulk of the running
+
+106
+00:08:11,562 --> 00:08:15,845
+GCM的运行时间受制于计数器模式
+time of GCM is dominated by the counter
+mode encryption and it's even made more so
+
+107
+00:08:15,845 --> 00:08:22,371
+为了更快，Intel引入了一个特殊指令PCLMULQDQ
+in that Intel introduces a special
+instruction PCLMULQDQ specifically
+
+108
+00:08:22,371 --> 00:08:27,432
+特别为此设计，目标是让GCM的这个哈希函数跑得尽可能的快
+designed for the purpose of making the
+hash function in GCM run as fast as possible.
+
+109
+00:08:27,432 --> 00:08:32,950
+现在CCM计数器模式是另一个NIST标准。它使用CBC MAC
+Now CCM counter mode is another
+NIST standard. It uses a CBC MAC and
+
+110
+00:08:32,950 --> 00:08:37,276
+然后用计数器模式加密。这个机制使用MAC
+then counter mode encryption. So this
+mechanism, you know, this uses MAC, then
+
+111
+00:08:37,276 --> 00:08:40,906
+然后加密，就像SSL那样。这并不是推荐的方法
+encrypt, like SSL does. So this is
+actually not the recommended way of doing
+
+112
+00:08:40,906 --> 00:08:44,023
+但因为使用的是计数器模式，这实际上
+things, but because counter mode
+encryption is used. This is actually a
+
+113
+00:08:44,023 --> 00:08:47,945
+是一个很好的加密机制。关于CCM我要指出一点
+perfectly fine encryption mechanism. One
+thing that I'd like to point out about
+
+114
+00:08:47,945 --> 00:08:53,799
+一切都是基于AES的。大家注意，它的CBC-MAC使用了AES
+CCM, is that everything is based on AES.
+You notice, it's using AES for the CBC
+
+115
+00:08:53,799 --> 00:08:58,778
+它的计数器模式也是使用的AES。因此
+MAC, and it's using AES for the counter
+mode encryption. And as a result, CCM can
+
+116
+00:08:58,778 --> 00:09:03,084
+CCM可以用相对少的代码实现，
+因为需要的仅为AES引擎
+be implemented with relatively little
+code. Cause all you need is an AES engine
+
+117
+00:09:03,084 --> 00:09:08,343
+其他都不需要。因为这点，CCM被WiFi所采用
+and nothing else. And because of this, CCM
+actually was adopted by the Wi-Fi
+
+118
+00:09:08,343 --> 00:09:13,963
+事实上，你很有可能每天都在使用CCM
+alliance, and in fact, you're probably
+using CCM on a daily basis if you're using
+
+119
+00:09:13,963 --> 00:09:19,093
+如果你使用加密的WiFi 802.11i，那么
+你就在使用CCM来加密
+encrypted Wi-Fi 802.11i then you're
+basically using CCM to encrypt traffic
+
+120
+00:09:19,093 --> 00:09:23,450
+你的笔记本和接入点之间的通信。
+还有一个模式叫做EAX
+between your laptop and the access point.
+There's another mode called a EAX that
+
+121
+00:09:23,450 --> 00:09:28,922
+使用的计数器模式加密，然后是CMAC。
+大家注意，这次是先加密后MAC
+uses counter mode encryption, and then
+CMAC. So, again you notice encrypt-then-MAC
+
+122
+00:09:28,922 --> 00:09:31,906
+这是另一个很好的模式。我们待会来对这些模式做个比较
+and that's another fine mode to
+use. We'll do a comparison of all these
+
+123
+00:09:31,906 --> 00:09:36,806
+现在我想提一下，首先
+modes in just a minute. Now I wanted to
+mention that first of all, all these modes are
+
+124
+00:09:36,806 --> 00:09:41,190
+所有的这些模式都是基于新鲜值的。换句话说
+它们不使用任何随机性，但它们取新鲜值为输入
+nonce-based. In other words, they don't
+use any randomness but they do take as
+
+125
+00:09:41,190 --> 00:09:46,360
+而且每个密钥的新鲜值是唯一的，换句话说
+input a nonce and the nonce has to be
+unique per key. In other words, as you
+
+126
+00:09:46,360 --> 00:09:50,600
+大家记得，有序对(密钥，新鲜值)永远不应该重复使用
+remember, the pair (key, nonce)
+should never ever, ever repeat. But the
+
+127
+00:09:50,600 --> 00:09:53,851
+但新鲜值本身不一定是随机的，所以完全可以使用一个计数器
+nonce itself need not be random, so
+it's perfectly fine to use a counter, for
+
+128
+00:09:53,851 --> 00:09:57,520
+比如新鲜值。另一个重要的地方是
+example, as a nonce. And the other
+important point is that, in fact, all
+
+129
+00:09:57,520 --> 00:10:01,384
+事实上，所有的这些模式被称为
+带相关数据的认证加密(<b>AEAD</b>)
+these modes are what's called
+authenticated encryption with associated
+
+130
+00:10:01,384 --> 00:10:04,936
+这是一个认证加密的扩展
+data. This is an extension of
+authenticated encryption, that comes
+
+131
+00:10:04,936 --> 00:10:10,884
+这在网络协议中经常出现。AEAD的想法是
+up very often in networking protocols. So
+the idea between AEAD is that, in fact,
+
+132
+00:10:10,884 --> 00:10:15,223
+提供给加密模式的信息不被完全加密
+the message that's provided to the encryption
+mode is not intended to be fully
+
+133
+00:10:15,223 --> 00:10:19,924
+只有部分信息是被加密的
+encrypted. Only part of the message is
+intended to be encrypted, but all of the
+
+134
+00:10:19,924 --> 00:10:24,157
+但所有信息是被认证的。这里一个好例子是网络数据包
+message is intended to be authenticated. A
+good example of this is a network packet.
+
+135
+00:10:24,157 --> 00:10:29,408
+考虑一个IP包，有报文头，然后是封装数据
+Think of like a IP packet where there's a
+header and then there's a payload. And
+
+136
+00:10:29,408 --> 00:10:33,157
+一般来说，报文头不会被加密。例如
+typically the header is not gonna be
+encrypted. For example, the header might
+
+137
+00:10:33,157 --> 00:10:36,905
+报文头可能包含数据包的目标地址，那么报文头
+contain the destination of the packet, but
+then the header had better not be
+
+138
+00:10:36,905 --> 00:10:40,950
+最好不要被加密，免得图中的路由器不知道如何路由
+encrypted otherwise routers along the way
+wouldn't know where to route the packet.
+
+139
+00:10:40,950 --> 00:10:45,225
+一般来说，报文头以明文形式发送，但当然
+And so, typically the header is sent in
+the clear, but the payload, of course, is
+
+140
+00:10:45,225 --> 00:10:49,500
+封装数据总是被加密的，不过你还是希望报文头被认证
+always encrypted, but what you'd like to
+do is have the header be authenticated.
+
+141
+00:10:49,500 --> 00:10:55,907
+不用加密，但需认证。那么这就是这些AEAD模式的工作
+Not encrypted but authenticated. So this is
+exactly what these AEAD modes do. They
+
+142
+00:10:55,907 --> 00:11:00,033
+它们会认证报文头，然后加密封装数据
+will authenticate the header and then
+encrypt the payload. But the header and
+
+143
+00:11:00,033 --> 00:11:04,177
+但在认证中，报文头和封装数据是绑定在一起的
+the payload are bound together in the
+authentication so they can't
+
+144
+00:11:04,177 --> 00:11:07,803
+这样它们不能分开。这不难做到
+actually be separated. So this is not
+difficult to do. What happens is in these
+
+145
+00:11:07,803 --> 00:11:14,170
+在这三种模式GCM，CCM和EAX中，MAC应用到整个报文数据上
+three modes GCM, CCM, and EAX, basically
+the MAC is applied to the entire data. But
+(报文=报文头+封装数据)
+
+146
+00:11:14,170 --> 00:11:18,852
+不过加密只被应用到部分需要加密的数据上
+the encryption is only applied to the part
+of the data that needs to be encrypted.
+
+147
+00:11:18,852 --> 00:11:22,983
+所以我想为大家展示一个带相关数据的认证加密的API
+So I wanted to show you what an API
+to these authenticated encryption with
+
+148
+00:11:22,983 --> 00:11:28,716
+长什么样。它在OpenSSL里长这样
+associated data encryption schemes look
+like. So here's what it looks like in OpenSSL.
+
+149
+00:11:28,716 --> 00:11:33,609
+例如，这是一个GCM的API。你可以调用init函数
+For example, this is, an API
+for GCM. So what you do is you call the
+
+150
+00:11:33,609 --> 00:11:37,404
+来初始化这个加密模式，然后注意给它一个密钥
+init function to initialize the encryption
+mode, and you notice you give it a key and
+
+151
+00:11:37,404 --> 00:11:40,609
+和新鲜值。这个新鲜值也不必是随机的
+the nonce. The nonce again,
+doesn't have to be random, but it has to
+
+152
+00:11:40,609 --> 00:11:44,402
+但它必须是唯一的。初始化后，调用这个加密函数
+be unique. And after initialization, you
+would call this encrypt function, where
+
+153
+00:11:44,402 --> 00:11:48,169
+给它需要认证、但不需要加密的相关数据
+you see that you give it the associated
+data that's gonna be authenticated, but
+
+154
+00:11:48,169 --> 00:11:51,794
+然后给它需要认证和加密的数据
+not encrypted. You give it the data, and
+it's gonna be both authenticated and
+
+155
+00:11:51,794 --> 00:11:55,752
+函数就会返回整个数据加密后的密文
+encrypted. And it gives you back the full
+cipher text, which is an encryption of the
+
+156
+00:11:55,752 --> 00:11:59,582
+不过当然，不包括AEAD，因为AEAD需要以明文形式发送
+data, but of course does not include the
+AEAD, because the AEAD is gonna be sent in
+
+157
+00:11:59,582 --> 00:12:04,535
+那么现在我们理解了这个"先加密后MAC"的机制
+the clear. So now that we understand
+this mode of encrypt-then-MAC, we can go
+
+158
+00:12:04,535 --> 00:12:09,951
+我们可以回到MAC安全性的定义，我可以为大家解释
+back to the definition of MAC security and
+I can explain to you something that might
+
+159
+00:12:09,951 --> 00:12:13,970
+定义里一些看起来略难懂的地方。如果大家还记得
+have been a little obscure when we looked
+at that definition. So if you remember,
+
+160
+00:12:13,970 --> 00:12:18,570
+安全MAC的定义的要求之一是
+one of the requirements that followed from
+our definition of secure MACs meant that
+
+161
+00:12:18,570 --> 00:12:25,689
+给定信息M的信息、MAC对，攻击者不能产生
+given a message-MAC pair on a message M,
+the attacker cannot produce another tag on
+
+162
+00:12:25,689 --> 00:12:30,386
+同样的信息M的另一个标签。换句话说，
+即使攻击者已经有了信息M的一个标签
+the same message M. In other words, even
+though the attacker already has a tag for
+
+163
+00:12:30,386 --> 00:12:34,771
+他也不应该能够产生同样信息M的一个新的标签
+the message M, he shouldn't be able to
+produce a new tag for the same message M.
+
+164
+00:12:34,771 --> 00:12:39,382
+还不太清楚为什么这点很要紧？谁在乎这点呢？
+And it's really not clear, why does that
+matter? Who cares, if the adversary already
+
+165
+00:12:39,382 --> 00:12:44,038
+如果攻击者已经有了信息M的一个标签，谁在乎
+他是否能产生另一个标签？
+has a tag on the message M, who cares if
+he can produce another tag? Well, it turns
+
+166
+00:12:44,038 --> 00:12:48,828
+实际上如果MAC没有这一性质，换句话说
+out if the MAC didn't have this property. 
+In other words, given a message-MAC pair
+
+167
+00:12:48,828 --> 00:12:53,618
+给定一对信息和MAC，你能产生同样信息的另一个MAC
+you can produce another MAC on
+the same message, then that MAC would
+
+168
+00:12:53,618 --> 00:12:58,694
+那么这个MAC就会造成一个不安全的"先加密后MAC"
+的模式。如果我们想让我们的"先加密后MAC"
+result in an insecure encrypt-then-MAC mode.
+And so if we want our encrypt-then-MAC to
+
+169
+00:12:58,694 --> 00:13:03,961
+具有密文完整性，很重要的一点是，我们的MAC安全性
+have cipher text integrity, it's crucial
+that our MAC security would imply this strong
+
+170
+00:13:03,961 --> 00:13:08,910
+蕴涵着这个安全观点，当然是因为我们定义得正确
+notion of security, which, of course, it
+does because we defined it correctly.
+
+171
+00:13:08,910 --> 00:13:13,613
+那么我们看会出错的，事实上容易产生这种伪造
+So let's see what would go wrong, if, in
+fact, it was easy to produce this type of
+
+172
+00:13:13,613 --> 00:13:18,081
+我会告诉大家一种在"先加密后MAC"系统上的
+forgery. So what I'll do is I'll show you
+a chosen cipher text attack on the
+
+173
+00:13:18,081 --> 00:13:22,784
+选择密文攻击。由于这个系统有一种选择密文攻击
+resulting encrypt-then-MAC system. And
+since the system has a chosen cipher text
+
+174
+00:13:22,784 --> 00:13:27,193
+这就意味着它不提供认证加密
+attack on it, it necessarily means that it
+doesn't provide authenticated
+
+175
+00:13:27,193 --> 00:13:31,458
+我们来看看。一开始，攻击者发送两个信息
+encryption. So let's see. So the
+adversary's gonnna start by sending two
+
+176
+00:13:31,458 --> 00:13:35,861
+M0和M1。通常他会收到
+messages, M0 and M1. And he's gonna
+receive, as usual, the encryption of one
+
+177
+00:13:35,861 --> 00:13:39,522
+M0或M1的加密结果。由于我们使用"先加密后MAC"
+of them, either the encryption of M0 or
+the encryption of M1. And since we're
+
+178
+00:13:39,522 --> 00:13:44,907
+攻击者收到的密文我们记为C0
+using encrypt-then-MAC, the adversary
+receives the cipher text we'll call it C0
+
+179
+00:13:44,907 --> 00:13:49,883
+C0上有一MAC。我们说过，给定信息的MAC
+and a MAC on the cipher text C0.
+Well now we said that given the MAC on
+
+180
+00:13:49,883 --> 00:13:53,827
+攻击者可以产生同样信息的另一个MAC
+a message the adversary can produce
+another MAC on the same message. So what
+
+181
+00:13:53,827 --> 00:13:57,994
+这样他将产生信息C0的另一个MAC
+he's gonna do is he's gonna produce
+another MAC on the message C0. Now he has
+
+182
+00:13:57,994 --> 00:14:03,532
+现在他有了一个新的密文(C0,T')，是一个完全有效的密文
+a new cipher text (C0,T'), which is a
+perfectly valid cipher text. T' is a
+
+183
+00:14:03,532 --> 00:14:09,558
+T'是C0的一个有效MAC。所以，攻击者可以提交
+valid MAC of C0. Therefore, the adversary
+now can submit a chosen cipher text query
+
+184
+00:14:09,558 --> 00:14:14,492
+C'的一个选择密文的询问，这是一个有效的选择密文的询问
+on C' and this is a valid chosen
+cipher text query because it's different
+
+185
+00:14:14,492 --> 00:14:19,288
+因为它和C不同，它是一个新的密文。可怜的挑战者
+from C. It's a new cipher text. The poor
+challenger now is forced to decrypt this
+
+186
+00:14:19,288 --> 00:14:23,278
+被迫去解密这个密文C'，然后发送C'的解密
+cipher text C' so he's going to send
+back the decryption of C'. It's a
+
+187
+00:14:23,278 --> 00:14:29,093
+它是一个有效的密文，所以C'的解密是信息Mb
+valid cipher text therefore the decryption
+of C prime is the message Mb but now the
+
+188
+00:14:29,093 --> 00:14:32,318
+但现在攻击者就学得了b的值，因为他可以测试
+attacker just learned the value of B
+because he can test whether Mb is equal to
+
+189
+00:14:32,318 --> 00:14:37,371
+Mb等于M0还是M1。因此他能输出b
+M0 or MB is equal to M1. As a result he
+can just output B and he gets advantage
+
+190
+00:14:37,371 --> 00:14:43,468
+以优势1赢得这个机制。如果我们的MAC安全性
+one in defeating the scheme. And so
+again if our MAC security did not imply
+
+191
+00:14:43,468 --> 00:14:48,471
+不蕴涵着这里的性质，那么在这个"先加密后MAC"系统上
+有一个选择密文攻击
+this property here. Then, there would be a
+chosen cipher text attack on encrypt-then-MAC.
+
+192
+00:14:48,471 --> 00:14:53,181
+因此，它将是不安全的。所以我们正确定义了MAC的安全性
+And therefore, it would not be secure. So the
+fact that we define MAC security correctly
+
+193
+00:14:53,181 --> 00:14:57,241
+意味着"先加密后MAC"的确提供了认证加密
+means that encrypt-then-MAC really does
+provide authenticated encryption. And
+
+194
+00:14:57,241 --> 00:15:01,728
+我们讨论过的所有MAC都满足这一很强的
+throughout all the MACs that we discussed
+actually do satisfy this strong notion of
+
+195
+00:15:01,728 --> 00:15:06,146
+不可伪造性的观点。有趣的是，故事还没有结束
+unforgeability. So, interestingly, this is
+not the end of the story. So, as we said
+
+196
+00:15:06,146 --> 00:15:10,385
+我们在引入认证加密的概念之前曾说过，
+before the concept of authenticated
+encryption was introduced everyone was
+
+197
+00:15:10,385 --> 00:15:15,295
+人们以不同的方式组合MAC和加密，以期获得认证加密
+just combining MACs and encryption in
+various ways in the hope of achieving
+
+198
+00:15:15,295 --> 00:15:19,201
+在认证加密的观点被严格地形式化后
+some authenticated encryption. After
+the notion of authenticated encryption
+
+199
+00:15:19,201 --> 00:15:23,553
+人们开始搔脑袋，说
+became formalized and rigorous, people
+kind of started scratching their heads and said,
+
+200
+00:15:23,553 --> 00:15:28,130
+等等，比起组合MAC和加密机制，也许我们可以
+hey, wait a minute. Maybe we can achieve
+authenticated encryption more efficiently
+
+201
+00:15:28,130 --> 00:15:32,722
+更加有效地获得认证加密。事实上
+than by combining a MAC and an encryption
+scheme. In fact, if you think about how
+
+202
+00:15:32,722 --> 00:15:37,366
+如果考虑MAC和加密的组合是如何工作的，
+比如说组合计数器模式和CMAC
+this combination of MAC and encryption
+works, let's say we combine counter mode
+
+203
+00:15:37,366 --> 00:15:42,134
+那么对每个明文分组，首先必须使用
+with CMAC, then for every block of
+plaintext, you first of all have to use
+
+204
+00:15:42,134 --> 00:15:46,419
+你的分组密码以计数器模式，然后必须再次使用分组密码
+your block cipher for counter mode, and
+then you have to use to your block cipher
+
+205
+00:15:46,419 --> 00:15:51,357
+运行CBC-MAC。这意味着如果你把CPA安全的加密
+again, for the CBC-MAC. This means that if
+you're combining CPA secure encryption with a
+
+206
+00:15:51,357 --> 00:15:55,943
+和一个MAC组合起来，对每个明文分组，
+你必须计算你的分组密码两次
+MAC, for every block of plaintext, you
+have to evaluate your block cipher twice,
+
+207
+00:15:55,943 --> 00:16:00,535
+一次计算MAC，一次计算加密机制
+once for the MAC and once for the
+encryption scheme. So the natural question
+
+208
+00:16:00,535 --> 00:16:05,396
+自然问题就来了，我们能否由一个PRP
+直接构建一个认证加密机制
+was, can we construct an authenticated
+encryption scheme directly from a PRP,
+
+209
+00:16:05,396 --> 00:16:10,345
+这样一来我们可以对每个分组，只计算PRP一次
+such that we would have to only evaluate
+the PRP once per block? And it turns out
+
+210
+00:16:10,345 --> 00:16:14,117
+实际上答案是肯定的，有这个漂亮的构造叫做OCB
+the answer is yes, and there's this
+beautiful construction called OCB, that
+
+211
+00:16:14,117 --> 00:16:18,343
+它能做你想要的一切，而且比从加密和MAC分别构造的机制
+pretty much does everything you want, and
+is much faster than constructions that are
+
+212
+00:16:18,343 --> 00:16:22,467
+快很多。那么我写下了OCB的机制
+separately built from an encryption and a
+MAC. So I wrote down, kind of a schematic
+
+213
+00:16:22,467 --> 00:16:26,290
+我不想解释太多细节。我从高层次来解释一下
+of OCB. I don't want to explain it in
+detail. I'll just kind of explain it at a
+
+214
+00:16:26,290 --> 00:16:30,025
+这里有我们的输入明文，在这上面
+high level. So here we have our input
+plain text, here at the top. And you
+
+215
+00:16:30,025 --> 00:16:34,540
+大家注意，首先，OCB是可并行的，完全可并行的
+notice that, first of all, OCB is
+parallelizable, completely parallelizable.
+
+216
+00:16:34,540 --> 00:16:39,700
+所以每个分组可以被单独加密
+So every block can be encrypted separately of
+every other block. The other thing to
+
+217
+00:16:39,700 --> 00:16:44,338
+另一件事是，如我所保证的，对每个明文分组
+你只需计算一次分组密码
+notice is that as I promised, you only
+evaluate your block cipher once per plain
+
+218
+00:16:44,338 --> 00:16:49,318
+然后在最后再计算一次分组密码，以构建
+text block. And then you evaluate it one
+more time at the end to build your
+
+219
+00:16:49,318 --> 00:16:53,887
+认证标签，那么除去分组密码部分，OCB的开销是最小的
+authentication tag and then the overhead
+of OCB beyond just a block cipher is
+
+220
+00:16:53,887 --> 00:16:58,749
+你只需计算一个非常简单的函数P
+minimal. All you have to do is evaluate a
+certain very simple function P. The
+
+221
+00:16:58,749 --> 00:17:02,844
+新鲜值交给了P，密钥也给了P
+nonce goes into the P you notice, the
+key goes into this P and then there is a
+
+222
+00:17:02,844 --> 00:17:08,238
+然后还有一个分组计数器交给了P。所以
+你只需计算这个函数P
+block counter that goes into this P. So
+you just evaluate this function P, twice
+
+223
+00:17:08,238 --> 00:17:12,748
+每个分组算两次，然后与之前的结果异或
+for every block and you XOR the result
+before and after encryption using the
+
+224
+00:17:12,748 --> 00:17:17,553
+使用分组密码加密之后，就结束了。你获得了
+block cipher and that's it. That's all you
+have to do and then you get a very fast
+
+225
+00:17:17,553 --> 00:17:22,241
+一个快速有效的，由分组密码构建的认证加密机制
+and efficient authenticated encryption
+scheme built from a block cipher. So OCB
+
+226
+00:17:22,241 --> 00:17:26,065
+所以OCB有一个附带的很好的安全性定理
+actually has a nice security theorem
+associated with it and I am going to point
+
+227
+00:17:26,065 --> 00:17:29,567
+在本章末，我要指出一篇关于OCB的论文
+to a paper on OCB when we get to end of
+this module where I list some further
+
+228
+00:17:29,567 --> 00:17:34,457
+届时我会列出一些大家可进一步阅读的论文。
+大家可能想知道
+reading papers that you can take a look
+at. So you might be wondering if OCB is so
+
+229
+00:17:34,457 --> 00:17:40,168
+如果OCB比目前看到过的其他机制都好，包括CCM, GCM
+much better than everything you've seen so
+far, all these three standards CCM, GCM and
+
+230
+00:17:40,168 --> 00:17:46,037
+以及EAX，为什么OCB没怎么被使用？为什么OCB不是标准？
+EAX why isn't OCB being used or why isn't
+OCB the standard? And the answer is a
+
+231
+00:17:46,037 --> 00:17:50,729
+这是个令人悲伤的答案。OCB没被应用的主要原因
+little sad. The primary answer that
+OCB is not being used is actually because
+
+232
+00:17:50,729 --> 00:17:54,567
+是因为各种各样的专利。我这里就不提了。
+of various patents. And I'll just leave it
+at that. So to conclude this section I
+
+233
+00:17:54,567 --> 00:17:58,216
+总结一下本节，我想给大家一些性能参数
+wanted to show you some performance
+numbers. So here on the right I listed
+
+234
+00:17:58,216 --> 00:18:02,368
+右边我列了这些大家不该用的模式的性能参数
+performance numbers for modes that you
+shouldn't be using. So this is for
+
+235
+00:18:02,368 --> 00:18:07,879
+这是随机计数器模式，这是随机CBC
+randomized counter mode, and this is for
+randomized CBC. And you can see also the
+
+236
+00:18:07,879 --> 00:18:12,460
+大家还可以看到CBC-MAC的性能和CBC加密的性能基本一样
+performance of CBC MAC is basically the
+same as the performance of CBC encryption.
+
+237
+00:18:12,460 --> 00:18:16,221
+现在这里是认证加密模式
+Okay. Now here are the authenticated
+encryption modes, so these are the ones
+
+238
+00:18:16,221 --> 00:18:20,083
+所以这些是大家应当使用的模式了，
+右边的大家不要用
+that you're supposed to using, these
+you're not supposed to be using on their
+
+239
+00:18:20,083 --> 00:18:23,795
+这两个，大家永远不应该使用这两个
+own, right. These two, you should never
+ever use these two because they only
+
+240
+00:18:23,795 --> 00:18:27,858
+因为它们只提供CPA安全，它们不提供
+对抗主动攻击的安全性
+provide CPA security, they don't
+actually provide security against active
+
+241
+00:18:27,858 --> 00:18:31,669
+大家只应该使用认证加密来进行加密
+attacks. You're only supposed to use
+authenticated encryption for encryption.
+
+242
+00:18:31,669 --> 00:18:35,509
+所以我列了这三个标准的性能参数
+And so I listed performance numbers
+for the three standards. And let me remind
+
+243
+00:18:35,509 --> 00:18:40,109
+让我提醒大家，GCM使用了非常快速的哈希函数。
+然后它在加密中使用了计数器模式
+you that GCM basically uses a very fast
+hash. And then it uses counter mode for
+
+244
+00:18:40,109 --> 00:18:43,770
+你可以看到，计数器模式的GCM的开销
+actual encryption. And you can see that
+the overhead of GCM over counter mode is
+
+245
+00:18:43,770 --> 00:18:49,554
+相对是很小的。CCM和EAX都使用了一个
+基于分组密码的加密
+relatively small. CCM and EAX both use a
+block cipher based encryption and a
+
+246
+00:18:49,554 --> 00:18:54,627
+和一个基于分组密码的MAC。因此它们的运行时间
+大约是计数器模式的两倍
+block cipher based MAC. And as a result
+they're about twice as slow as counter
+
+247
+00:18:54,627 --> 00:18:59,196
+大家看到，OCB是这些当中最快的
+modes. You see that OCB is actually the
+fastest of these, primarily because it
+
+248
+00:18:59,196 --> 00:19:03,820
+主要因为它对每个明文分组只使用一次分组密码
+only use the block cipher once per message
+block. So based on these performance
+
+249
+00:19:03,820 --> 00:19:08,328
+根据这些性能参数，大家会认为GCM正是
+应该一直使用的正确模式
+numbers, you would think that GCM is
+exactly the right mode to always use. But
+
+250
+00:19:08,328 --> 00:19:12,659
+但实际上，如果你在空间有限的硬件设备上，GCM并不理想
+it turns out if you're on the space
+constrained hardware, GCM is not ideal.
+
+251
+00:19:12,659 --> 00:19:16,709
+主要是因为它的实现需要比其他两个模式更多的代码
+Primarily because its implementation
+requires larger code than the other two
+
+252
+00:19:16,709 --> 00:19:21,323
+但是，如我所说，Intel特地加了指令
+modes. However, as I said, Intel
+specifically added instructions to speed
+
+253
+00:19:21,323 --> 00:19:26,064
+来加速GCM模式。因此在Intel体系结构上实现GCM
+up GCM mode. And as a result, implementing
+GCM on an Intel architecture takes
+
+254
+00:19:26,064 --> 00:19:30,315
+只需要很少的代码。但在其他硬件平台上，
+比如说智能卡或其他受限的硬件环境
+very little code. But on other hardware
+platforms, say in smart cards or other
+
+255
+00:19:30,315 --> 00:19:34,745
+实现GCM的代码大小会比其他两个模式
+constrained environments, the code size
+for implementing GCM would be considerably
+
+256
+00:19:34,745 --> 00:19:39,387
+大得多。但如果代码大小不受限制的话
+larger than for the other two modes. But
+if code size is not a constraint then GCM
+
+257
+00:19:39,387 --> 00:19:43,928
+那么GCM是正确的选择。总结一下本节，我想再说一次
+is the right mode to use. So to summarize
+this segment I want to say it one more
+
+258
+00:19:43,928 --> 00:19:48,267
+当你想加密信息时，你必须使用认证加密模式
+time that when you want to encrypt
+messages you have to use an authenticated
+
+259
+00:19:48,267 --> 00:19:52,716
+推荐的方法是使用这些标准中的一个
+encryption mode and the recommended way to
+do it is to use one of the standards,
+
+260
+00:19:52,716 --> 00:19:57,037
+这三个标准中的一个，以提供认证加密
+namely one of these three modes for
+providing authenticated encryption.
+
+261
+00:19:57,037 --> 00:19:59,846
+不要自己实现加密机制。换句话说
+Don't implement the encryption scheme yourself.
+In other words don't implement
+
+262
+00:19:59,846 --> 00:20:05,842
+不要自己先加密后MAC，就使用三个标准中的一个
+encrypt-then-MAC yourself. Just use one of these
+three standards. Many crypto libraries
+
+263
+00:20:05,842 --> 00:20:10,513
+现在许多密码学库提供了这三种模式的标准API
+now provide standard API's for these three
+modes and these are the one's you should
+
+264
+00:20:10,513 --> 00:20:14,347
+你应该使用这些，而不是别的。下一节，我们要看
+be using and nothing else. In the next
+segment we're going to see what else can
+
+265
+00:20:14,347 --> 00:20:17,500
+当你试图自己实现认证加密时，还会发生什么错误
+go wrong when you try to implement
+authenticated encryption by yourself.

@@ -1,0 +1,1895 @@
+1
+00:00:00,000 --> 00:00:04,669
+本节我们看如何使用分组密码加密多个明文信息
+In this segment we will look at how to use
+block ciphers to encrypt multiple messages
+
+2
+00:00:04,669 --> 00:00:08,959
+使用同样的密钥。这个在实际中有用
+比如在文件系统中
+using the same key. This comes up in
+practice for example in file systems where
+
+3
+00:00:08,959 --> 00:00:13,412
+使用相同的密钥加密多个文件
+在网络协议中
+the same key's used to encrypt multiple
+files. It comes up in networking protocols
+
+4
+00:00:13,412 --> 00:00:17,647
+使用同样的密钥加密多个数据包
+where the same key is used to encrypt
+multiple packets. So let's see how to do
+
+5
+00:00:17,647 --> 00:00:21,883
+我们看怎么办。首先我们需要定义
+it. The first thing we need to do is to
+define what is mean for a cipher to be
+
+6
+00:00:21,883 --> 00:00:26,185
+密码是安全的意义，当同样的密钥被用于
+加密多个信息时
+secure when the same key is used to
+encrypt multiple messages. When we use the
+
+7
+00:00:26,185 --> 00:00:31,041
+当我们多次使用密钥，那么结果是
+攻击者获得很多用同一个密钥加密的密文
+key more than once the result of that is
+that the adversary gets to see many cyber
+
+8
+00:00:31,041 --> 00:00:35,627
+因此，当我们定义安全的时候
+text encrypted using the same key. As a
+result, when we define security, we're
+
+9
+00:00:35,627 --> 00:00:40,512
+我们允许攻击者实施选择明文攻击
+gonna allow the adversary to mount what's
+called a chosen plain text attack. In
+
+10
+00:00:40,512 --> 00:00:45,522
+换句话说，攻击者可以获得他选择的任一明文的加密
+other words, the adversary can obtain the
+encryption of arbitrary messages of his
+
+11
+00:00:45,522 --> 00:00:49,710
+例如，如果攻击者正和Alice交互
+choice. So, for example, if the
+adversary's interacting with Alice. The
+
+12
+00:00:49,710 --> 00:00:53,924
+攻击者可以让Alice加密任何他选择的明文
+adversary can ask Alice to encrypt
+arbitrary messages of the adversary's
+
+13
+00:00:53,924 --> 00:00:58,138
+Alice会加密那些信息
+choosing. And Alice will go ahead and
+encrypt those messages and give the
+
+14
+00:00:58,138 --> 00:01:02,929
+然后给攻击者相应的密文。大家可能会怀疑
+Alice会做这些
+adversary the resulting cipher texts. You
+might wonder why would Alice ever do this.
+
+15
+00:01:02,929 --> 00:01:07,431
+这点在现实中是怎么发生的呢？
+How could this possibly happen in real
+life? But it turns out this is actually
+
+16
+00:01:07,431 --> 00:01:11,760
+但事实上这点在实际中很常见。事实上
+在现实里，这个模型还算保守的
+very common in real life. And in fact,
+this modeling is quite a conservative
+
+17
+00:01:11,760 --> 00:01:16,320
+比如说，攻击者可能发给Alice一份电子邮件
+modeling of real life. For example, the
+adversary might send Alice an email. When
+
+18
+00:01:16,320 --> 00:01:21,168
+当Alice收到这份电子邮件时，邮件被写进加密的硬盘里
+Alice receives the email, the writes it to
+her encrypted disk, thereby encrypting the
+
+19
+00:01:21,168 --> 00:01:26,140
+使用她的密钥加密攻击者的电子邮件
+如果后来攻击者偷到了这个硬盘
+adversary's email using her secret key. If
+later the adversary steals this disc, then
+
+20
+00:01:26,140 --> 00:01:31,280
+那么他就可以获得这份发给Alice的
+电子邮件的加密，使用Alice的密钥
+he obtains the encryption of an email that
+he sent Alice under Alice's secret key. So
+
+21
+00:01:31,280 --> 00:01:36,298
+这就是一个选择明文攻击的例子
+攻击者提供给Alice明文
+that's an example of a chosen plain text
+attack, where the adversary provided Alice
+
+22
+00:01:36,298 --> 00:01:41,075
+Alice用自己的密钥加密这个明文
+with a message and she encrypted that
+message using her own key. And then later
+
+23
+00:01:41,075 --> 00:01:45,429
+之后攻击者能够获得相应的密文
+the attacker was able to obtain the
+resulting cipher text. So that's the
+
+24
+00:01:45,429 --> 00:01:49,661
+这是攻击者的能力。他的目标是
+adversary's power. And then the
+adversary's goal is basically to break
+
+25
+00:01:49,661 --> 00:01:54,368
+破解语义安全。那么我们要更清楚地定义这点
+semantic security. So let's define this
+more precisely. As usual, we're gonna
+
+26
+00:01:54,368 --> 00:01:59,447
+通常，我们在选择明文攻击下定义语义安全
+要使用两个实验
+define semantic security under a chosen
+plain text attack using two experiments,
+
+27
+00:01:59,447 --> 00:02:04,717
+实验0和实验1，是关于挑战者和攻击者之间的
+一个游戏模型
+experiment zero and experiment one, that
+are modeled as a game between a challenger
+
+28
+00:02:04,717 --> 00:02:09,669
+当游戏开始时，挑战者选择一个随机密钥K
+and an adversary. When the game begins,
+the challenger is gonna choose a random
+
+29
+00:02:09,669 --> 00:02:14,006
+现在攻击者询问挑战者
+key K. And now the adversary basically
+gets to query the challenger. So the
+
+30
+00:02:14,006 --> 00:02:18,198
+攻击者提交一个语义安全询问
+adversary now begins by submitting a
+semantic security query, namely, he
+
+31
+00:02:18,198 --> 00:02:22,804
+他提交两个明文M0和M1
+我多加了个下标，但我先忽略它们一会
+submits two messages, M zero and M one. I
+added another index, but let me ignore
+
+32
+00:02:22,804 --> 00:02:27,351
+那么攻击者提交了两个明文M0和M1
+that extra index for a while. So the
+adversary submits two messages, M zero and
+
+33
+00:02:27,351 --> 00:02:31,780
+它们的长度是一样的。然后攻击者收到
+M one, that happen to be of the same
+length. And then the adversary receives
+
+34
+00:02:31,780 --> 00:02:36,031
+提交的明文的加密，M0或M1的
+the encryption of one of those messages,
+either of M zero or of M one. In
+
+35
+00:02:36,031 --> 00:02:40,224
+在实验0中，他收到M0的加密结果
+experiment zero, he receives the
+encryption of M zero. In experiment one,
+
+36
+00:02:40,224 --> 00:02:44,952
+在实验1中，他收到M1的加密结果
+目前这和一个标准的语义安全游戏
+he receives the encryption of M one. So,
+so far this would look familiar this looks
+
+37
+00:02:44,952 --> 00:02:49,477
+一模一样。但是对选择明文攻击
+exactly like a standard semantic security
+game. However, plain text attack
+
+38
+00:02:49,477 --> 00:02:54,007
+攻击者可以重复这个询问
+the adversary can now repeat this query
+again. So now you can issue a query with
+
+39
+00:02:54,007 --> 00:02:58,485
+现在你发起了其他两个明文的询问，长度相同
+two other plain texts, again of the same
+length, and again you would receive the
+
+40
+00:02:58,485 --> 00:03:03,189
+你还会收到其中之一的加密。在实验0中
+你会收到M0的加密
+encryption of one of them. In experiment
+zero you would receive the encryption of M
+
+41
+00:03:03,189 --> 00:03:07,837
+在实验1中，你会收到M1的加密
+zero. In experiment one you would receive
+the encryption of M one. And the attacker
+
+42
+00:03:07,837 --> 00:03:12,542
+攻击者还可以继续这样的询问
+事实上，我们说他可以进行最多Q次
+can continue issuing queries like this. In
+fact we'll say that he can issue up to Q
+
+43
+00:03:12,542 --> 00:03:17,020
+这样的询问。然后记住，每次他都询问一对明文
+queries of this type. And then, remember,
+every time he issues a pair of messages.
+
+44
+00:03:17,020 --> 00:03:21,416
+这对明文长度相同，他会获得
+That happen to be of the same length and
+every time he either gets the encryption
+
+45
+00:03:21,416 --> 00:03:25,867
+左边或右边的加密结果
+在实验0里，他总是获得
+of the left side or the right side. Again
+in experiment zero he will always get the
+
+46
+00:03:25,867 --> 00:03:29,727
+左边明文的加密。在实验1里，
+他总是获得右边明文的加密
+encryption of the left message; in
+experiment one he will always get the
+
+47
+00:03:29,727 --> 00:03:33,970
+攻击者的目标是算出
+encryption of the right message. And, then
+adversary's goal is, basically, to figure
+
+48
+00:03:33,970 --> 00:03:38,289
+他是在实验0中，还是实验1中
+out whether he's in experimental zero or
+in experiment one. In other words, whether
+
+49
+00:03:38,289 --> 00:03:42,713
+换句话说，他一直在接收左边信息的加密
+还是右边信息的加密
+he was constantly receiving the encryption
+of the left message or the encryption of
+
+50
+00:03:42,713 --> 00:03:47,032
+那么，某种意义上，这是一个标准的
+语义安全游戏
+the right message. So, in some sense, this
+is a standard semantic security game just
+
+51
+00:03:47,032 --> 00:03:51,193
+只不过重复多次询问，每次询问后
+攻击者可以进行调整
+iterated over many queries that the
+attacker can issue to adaptively one after
+
+52
+00:03:51,193 --> 00:03:56,014
+现在选择明文攻击的本质就在于
+the other. Now the chosen plain text
+attack is captured by the fact that if the
+
+53
+00:03:56,014 --> 00:04:00,646
+如果攻击者想知道特定明文信息m的加密
+attacker wants the encryption of a
+particular message m. What he could do is,
+
+54
+00:04:00,646 --> 00:04:05,234
+比如使用询问J，查明文J的加密结果
+在询问J中，他把信息0和信息1
+for example, use query J for some J, where
+in this query J he'll set both the zero
+
+55
+00:04:05,234 --> 00:04:09,593
+都设为一样的信息M。换句话说
+message and the one message to be the
+exactly same message M. In other words,
+
+56
+00:04:09,593 --> 00:04:14,008
+左边和右边的信息是一样的
+both the left message and the right
+message are the same, and both are set to
+
+57
+00:04:14,008 --> 00:04:18,653
+两遍信息都是M。这时由于两个信息一样
+the message M. In this case, what he will
+receive, since both messages are the same,
+
+58
+00:04:18,653 --> 00:04:23,126
+攻击者会收到他感兴趣的信息M的加密结果
+he knows that he's gonna receive the
+encryption of this message M that he was
+
+59
+00:04:23,126 --> 00:04:27,600
+这正是选择明文攻击的意思
+interested in. So this is exactly what we
+meant by a chosen plaintext attack.
+
+60
+00:04:27,600 --> 00:04:32,598
+攻击者可以提交信息m，收到m的加密
+Where the adversary can submit a message m
+and receive the encryption of that
+
+61
+00:04:32,598 --> 00:04:37,429
+m是他自己选的。那么他的一些询问
+particular message m of his choice. So
+some of his queries might be of this chose
+
+62
+00:04:37,429 --> 00:04:42,157
+可以是选择明文攻击的方式
+即左右信息是一样的
+plain text flavor where the message on the
+left is equal to the message on the right,
+
+63
+00:04:42,157 --> 00:04:46,775
+但另一些询问可以是标准的语义安全的
+but some of the queries might be standard
+semantic security queries where the two
+
+64
+00:04:46,775 --> 00:04:51,281
+即两个信息是不同的，这可以给攻击者
+一些信息，关于是实验0还是实验1的
+messages are distinct and that actually
+gives him information on whether he's in
+
+65
+00:04:51,281 --> 00:04:55,453
+现在大家应该对这类定义习惯了
+experiment zero or in experiment one. Now
+by now you should be used to this
+
+66
+00:04:55,453 --> 00:05:00,182
+当我们说系统是在选择明文攻击下语义安全的
+definition where we say that the system is
+semantically secure under a chosen plain
+
+67
+00:05:00,182 --> 00:05:04,141
+如果所有有效的攻击者
+text attack. If, for all efficient
+adversaries, they cannot distinguish
+
+68
+00:05:04,141 --> 00:05:08,703
+都无法区分实验0和实验1，换句话说
+experiment zero from experiment one. In
+other words, the probability that, at the
+
+69
+00:05:08,703 --> 00:05:13,091
+输出b'的概率，即实验b的输出概率
+end, the output, B Prime, which we're
+gonna denote by the output of experiment
+
+70
+00:05:13,091 --> 00:05:17,769
+这个输出无论在实验0还是实验1里都是一样的
+B. This output will be the same whether
+in experiment zero or experiment
+
+71
+00:05:17,769 --> 00:05:22,310
+那么攻击者无法区分他总是收到
+one. So the attacker couldn't distinguish
+between always receiving encryptions of
+
+72
+00:05:22,310 --> 00:05:26,900
+左边信息的加密，或是右边信息的加密
+the left messages, versus always receiving
+encryptions of the right messages. So in
+
+73
+00:05:26,900 --> 00:05:31,267
+大家考虑一个可以实施选择明文攻击的攻击者
+your mind, I'd like you to be thinking of
+an adversary that is able to mount a
+
+74
+00:05:31,267 --> 00:05:35,745
+可以获得他选择的任意信息的加密
+chosen plaintext attack, namely, be given
+the encryption of arbitrary messages of
+
+75
+00:05:35,745 --> 00:05:40,168
+他的目标是为其他密文破解语义安全
+his choice, and his goal is to break
+semantic security for some other challenge
+
+76
+00:05:40,168 --> 00:05:44,330
+我说过在这个真实的游戏模型里
+cipher texts. And as I said in this
+game model of the real world the
+
+77
+00:05:44,330 --> 00:05:48,721
+攻击者可以欺骗Alice，为他所选择的明文加密
+attacker is able to fool Alice into
+encrypting for him messages of his choice
+
+78
+00:05:48,721 --> 00:05:53,287
+然后攻击者的目标是破解某些挑战的密文
+and then the attacker's goal is to somehow
+break some challenge cypher text. So I
+
+79
+00:05:53,287 --> 00:05:58,173
+那么我说目前我们看到过的所有密码
+claim that all the ciphers that we've seen
+up until now, namely deterministic counter
+
+80
+00:05:58,173 --> 00:06:02,541
+确定的计数器模式或是一次性密码本
+在选择明文攻击下是不安全的
+mode or the one time pad, are insecure
+under a chosen plain text attack. More
+
+81
+00:06:02,541 --> 00:06:07,312
+一般地，假设我们有一个加密机制
+generally, suppose we have an encryption
+scheme that always outputs the same cipher
+
+82
+00:06:07,312 --> 00:06:11,968
+总是对信息M输出同样的密文。换句话说
+如果我让这个加密机制加密信息M
+text for a particular message M. In other
+words, if I ask the encryption scheme to
+
+83
+00:06:11,968 --> 00:06:16,188
+那么我让这个加密机制再次加密信息M
+encrypt the message M once. And then I ask
+the encryption scheme to encrypt the
+
+84
+00:06:16,188 --> 00:06:21,183
+两次加密机制都输出一样的密文
+message M again. If in both cases the
+encryption scheme outputs the same cypher
+
+85
+00:06:21,183 --> 00:06:26,550
+这样系统在选择明文攻击下不可能是安全的
+text, then that system cannot possibly be
+secure under a chosen plain text attack.
+
+86
+00:06:26,550 --> 00:06:31,281
+确定的计数器模式和一次性密码本都是如此
+And both deterministic counter mode and
+the one time pad were of that flavor. They
+
+87
+00:06:31,281 --> 00:06:35,923
+它们总是对相同的输入信息，输出相同的密文
+always output the same cipher text, given
+the same message. And so let's see why
+
+88
+00:06:35,923 --> 00:06:41,143
+我没看为什么它们对选择明文攻击不安全
+这种攻击是简单的
+that cannot be chosen plain text secure.
+And the attack is fairly simple, what the
+
+89
+00:06:41,143 --> 00:06:46,300
+攻击者两次输出同样的明文
+attacker is gonna do, is he's gonna output
+the same message twice. This just says.
+
+90
+00:06:46,300 --> 00:06:51,233
+他非常想知道M0的加密
+这里攻击者得到了C0
+That he really wants the encryption of M0.
+So here the attacker is given C0 which is
+
+91
+00:06:51,233 --> 00:06:55,872
+也就是M0的密文。那么这是他的选择明文攻击
+the encryption of M0. So this was his
+chosen plain text query where he actually
+
+92
+00:06:55,872 --> 00:07:00,805
+他收到了他选择的M0的加密
+received the encryption of the message M0
+of his choice. And now he's going to break
+
+93
+00:07:00,805 --> 00:07:05,445
+现在他要破解语义安全。他输出两个明文M0和M1
+semantic security. So what he does is he
+outputs two messages, M0 and M1 of the
+
+94
+00:07:05,445 --> 00:07:10,084
+两个明文长度相同。攻击者还有明文Mb的加密
+same length, and he's going to be given
+the encryption of MB. But low and behold,
+
+95
+00:07:10,084 --> 00:07:15,850
+我们说这个加密系统在加密M0时
+we said that the encryption system always
+outputs the same cipher text when its
+
+96
+00:07:15,850 --> 00:07:21,539
+总是输出同样的密文。因此，如果b等于0
+encrypting the message, M0. Therefore, if
+B is equal to zero, we know that C, this
+
+97
+00:07:21,539 --> 00:07:27,310
+那么挑战者的密文C就等于C0
+因为它是M0的加密结果
+challenged cipher text, is simply euqal to CO,
+because it's the encryption of M0.
+
+98
+00:07:27,310 --> 00:07:32,409
+但是如果b=1，那么挑战者的密文
+However, if B is=to one. Then we know that
+this challenge cypher text is the
+
+99
+00:07:32,409 --> 00:07:38,048
+就是M1的加密结果，即不是C0
+encryption of M1 which is something other
+than C zero. So all the attacker does is he
+
+100
+00:07:38,048 --> 00:07:43,441
+所以攻击者只需检查C是否等于C0
+或者说，他是否输出1
+just checks his C is = to C0 the output's
+zero in other words he outputs one. So, in
+
+101
+00:07:43,441 --> 00:07:47,722
+这时，攻击者完全能够猜出位b
+this case, the attacker is able to
+perfectly guess this bit B, so he knows
+
+102
+00:07:47,722 --> 00:07:52,412
+攻击者能确切地知道结果，给定M0的加密
+或者给定M1的加密
+exactly what was given the encryption
+of M0, or the encryption of M1. And as a
+
+103
+00:07:52,412 --> 00:07:57,103
+因此，攻击者获胜的优势是1，意味着
+result, his advantage in winning this game
+is one. Meaning that the system cannot
+
+104
+00:07:57,103 --> 00:08:01,491
+这个系统对CPA不可能是安全的
+1不是一个可忽略的数
+possibly be CPA secure. One is not a
+negligible number. So this shows that the
+
+105
+00:08:01,491 --> 00:08:05,582
+那么这就证明了确定的加密机制不可能是CPA安全的
+deterministic encryption schemes cannot
+possibly be CPA-secure, but you might
+
+106
+00:08:05,582 --> 00:08:09,345
+但是大家可能会怀疑，这在现实中有何意义呢？
+wonder well, what does this mean in
+practice? Well in practice this means
+
+107
+00:08:09,345 --> 00:08:13,111
+在现实中这意味着每一个信息总是被
+加密成相同的密文
+again that every message is always
+encrypted to the same cipher text. What
+
+108
+00:08:13,111 --> 00:08:17,234
+这意味着如果你加密硬盘上的文件
+this means is if you're encrypting files
+on disk, and you happen to be encrypting
+
+109
+00:08:17,234 --> 00:08:21,407
+如果加密的两个文件正好一样，则它们的密文
+two files that happen to be the same, they
+will result in the same cipher text and
+
+110
+00:08:21,407 --> 00:08:25,327
+是一样的，然后攻击者看硬盘的时候
+then the attacker by looking at the
+encrypted disk, will learn that these two
+
+111
+00:08:25,327 --> 00:08:29,297
+就会知道这两个文件实际上包含了相同的信息
+尽管攻击者可能不知道具体内容
+files actually contain the same content.
+The attacker might not learn what the
+
+112
+00:08:29,297 --> 00:08:33,419
+但他会学到一点，这两文件是同一内容的加密
+content is, but he will learn that these
+two encrypted files are an encryption of
+
+113
+00:08:33,419 --> 00:08:37,524
+而这一点他本不应该知道的。类似地
+the same content and he shouldn't be able
+to learn that. Similarly, if you send two
+
+114
+00:08:37,524 --> 00:08:41,287
+如果你发送两个加密的网络数据包
+它们正好是一样的
+encrypted packets on the network that
+happen to be the same, the attacker will
+
+115
+00:08:41,287 --> 00:08:45,146
+攻击者不会知道数据包内容是什么
+但他会知道这两个包是同样的内容
+not learn the content of those packets,
+but he will learn that those two packets
+
+116
+00:08:45,146 --> 00:08:49,301
+想一个关于加密语音通话的例子
+actually contain the same information.
+Think for example of an encrypted voice
+
+117
+00:08:49,301 --> 00:08:53,769
+每次当线上没有声音的时候
+conversation. Every time there's quiet on
+the line, the system will be sending
+
+118
+00:08:53,769 --> 00:08:58,072
+系统会发送全是0的加密。但是由于0的加密
+encryptions of zero. But since encryption
+of zero are always mapped to the same
+
+119
+00:08:58,072 --> 00:09:02,334
+总是被映射成相同的密文，攻击者监听网络
+cypher text. An attacker looking at the
+network will be able to identify exactly
+
+120
+00:09:02,334 --> 00:09:06,489
+就可以分辨出通话中哪些时候是安静的
+the points in the conversation where
+there's quiet because he will always see
+
+121
+00:09:06,489 --> 00:09:11,113
+因为他每次总是看到一样的密文
+那么这些例子说明
+those exact same cypher text every time.
+So these are examples where deterministic
+
+122
+00:09:11,113 --> 00:09:15,492
+确定的加密不可能是安全的。形式化地说
+encryption cannot possibly be secure. And
+as I say formerly we say that the
+
+123
+00:09:15,492 --> 00:09:19,800
+确定的加密对于选择明文攻击
+不可能是语义安全的
+deterministic encryption can not be
+semantically secure under a chosen plain
+
+124
+00:09:19,800 --> 00:09:24,743
+这里的教训是，如果要用密钥
+text attack. So what do we do, well the
+lesson here is if the secret keys gonna be
+
+125
+00:09:24,743 --> 00:09:29,674
+加密多个明文信息，最好是
+used to encrypt multiple messages, it had
+better be the case that given the same
+
+126
+00:09:29,674 --> 00:09:33,572
+给两次同样的明文去加密，
+加密算法可以产生不同的密文
+plain text to encrypt twice. The
+encryption algorithm must produce
+
+127
+00:09:33,572 --> 00:09:38,147
+有两种方法可以做到
+different cipher texts. And so there are
+two ways to do that. The first method is
+
+128
+00:09:38,147 --> 00:09:42,836
+第一种叫做随机加密，这种加密算法
+what's called randomized encryption. Here,
+the encryption algorithm itself is going
+
+129
+00:09:42,836 --> 00:09:47,296
+在加密过程中选择一些随机的字符串
+to choose some random string during the
+encryption process and it is going to
+
+130
+00:09:47,296 --> 00:09:51,642
+他将使用这个随机字符串来加密信息M
+encrypt the message M using that random
+string. So what this means is that a
+
+131
+00:09:51,642 --> 00:09:56,389
+这意味着特定的信息，比如M0
+不会被映射到一个密文
+particular message, M0 for example, isn't
+just going to be mapped to one cipher text
+
+132
+00:09:56,389 --> 00:10:00,894
+而是被映射到一组密文
+but it's going to be mapped to a whole
+ball of cipher texts. Whereon every
+
+133
+00:10:00,894 --> 00:10:06,692
+每次加密，我们输出这个球里的一个点
+那么我们每次加密时
+encryption, basically, we output one point
+in this ball. So every time we encrypt, the
+
+134
+00:10:06,692 --> 00:10:11,292
+加密算法选择一个随机字符串
+encryption algorithm chooses a random
+string, and that random string leads to
+
+135
+00:10:11,292 --> 00:10:15,832
+这个随机字符串射到球里的一点
+当然，解密算法总是将球里的任一点
+one point in this ball. Of course, the
+decryption algorithm, when it takes any
+
+136
+00:10:15,832 --> 00:10:20,610
+映射到M0。类似地，明文M1
+point in this ball, will always map the
+result to M zero. Similarly cipher text M
+(口误：cipher->plain)
+
+137
+00:10:20,610 --> 00:10:25,449
+会被映射到一个球，每次我们加密M1
+one will be mapped to a ball, and every
+time we encrypt M one, we basically output
+
+138
+00:10:25,449 --> 00:10:29,690
+我们输出球里的一个点。这些球是不相交的
+one point in this ball. And these balls
+have to be disjoint, so that the
+
+139
+00:10:29,690 --> 00:10:34,469
+解密算法获得球里的一点，对应于M1
+encryption algorithm, when it obtains a
+point in the ball corresponding to M one,
+(解密说成加密了)
+
+140
+00:10:34,469 --> 00:10:38,964
+总是输出明文信息M1。这样，由于加密算法
+will always output the message M one. In
+this way, since the encryption algorithm
+
+141
+00:10:38,964 --> 00:10:43,266
+使用了随机性，如果我们加密同样的明文两次
+以很高的概率
+uses randomness, if we encrypt the same
+message twice, with high probability we'll
+
+142
+00:10:43,266 --> 00:10:47,144
+我会得到不同的密文。很不幸，这意味着
+get different cipher texts. Unfortunately
+this means that the cipher text
+
+143
+00:10:47,144 --> 00:10:51,393
+密文一定比明文长，因为
+necessarily has to be longer than the
+plain text because somehow the randomness
+
+144
+00:10:51,393 --> 00:10:55,855
+生成密文时使用的随机性，现在被
+编码进密文里了
+that was used to generate the cipher text
+is now encoded somehow in the cipher text.
+
+145
+00:10:55,855 --> 00:11:00,158
+所以密文需要更多的空间
+不严格地讲，密文大小
+So the cipher text takes more space. And
+roughly speaking, the cipher text size is
+
+146
+00:11:00,158 --> 00:11:04,620
+要比明文大得多，多出了用于解密的
+going to be larger than the plain text. By
+basically the number of random bits that
+
+147
+00:11:04,620 --> 00:11:08,748
+随机位。所有如果明文很长
+were used during encryption. So if the
+plain texts are very big, if the plain
+
+148
+00:11:08,748 --> 00:11:13,203
+如果明文有几个G，那么随机位可能有
+texts are gigabytes long, the number of
+random bits is going to be on the order of
+
+149
+00:11:13,203 --> 00:11:17,494
+128个。也许这个多余空间无关紧要
+128. So maybe this extra space doesn't
+really matter. But if the plain texts are
+
+150
+00:11:17,494 --> 00:11:21,786
+但如果明文很短，也许它们本身就是128位
+为每个密文添加128位
+very short, maybe they themselves are 128
+bits, then adding an extra 128 bits to
+
+151
+00:11:21,786 --> 00:11:26,240
+就会使整个密文大小翻倍
+every cipher text is going to double the
+total cipher text size. And that could be
+
+152
+00:11:26,240 --> 00:11:31,117
+那样开销就太大了。所以我说随机加密很好
+quite expensive. So as I say randomized
+encryption is a fine solution but in some
+
+153
+00:11:31,117 --> 00:11:35,862
+但是在某些场合它引入了很大的开销
+所以我们看另一个简单的例子
+cases it actually introduces quite a bit
+of costs. So let's look at a simple example.
+
+154
+00:11:35,862 --> 00:11:41,107
+那么想象一下，我们有一个伪随机函数
+So imagine we have a pseudorandom
+function that takes inputs in a certain
+
+155
+00:11:41,107 --> 00:11:46,223
+其输入来自一个特定空间r，也叫做
+新鲜值空间。而输出则来自明文空间
+space r which is gonna be called a nonce
+space. And outputs, outputs in the message
+
+156
+00:11:46,223 --> 00:11:50,636
+现在，我们定义下面的随机加密机制
+space. And, now, let's define the
+following randomize encryption scheme
+
+157
+00:11:50,636 --> 00:11:55,880
+我们想加密明文m，使用某种加密机制
+where we want to encrypt the message m
+with the encryption of whatever it's gonna
+
+158
+00:11:55,880 --> 00:12:01,149
+首先生成一个新鲜值空间R中一个随机值r
+do is first it's gonna generate a random r
+in this nonce space R. And then it's going
+
+159
+00:12:01,149 --> 00:12:06,232
+打开一个由两部分组成的密文
+第一部分是r值
+to open a cypher text that consist of two
+components, the first component is going
+
+160
+00:12:06,232 --> 00:12:10,943
+第二部分是伪随机函数在r的值
+to be this value R and the second
+component is going to be an evaluation of
+
+161
+00:12:10,943 --> 00:12:16,180
+与明文M的异或值
+the pseudo-random function at the point R
+XOR with the message M. And my question to
+
+162
+00:12:16,180 --> 00:12:21,397
+我的问题是，这个加密系统在选择明文攻击下
+是安全的吗？
+you is, is this encryption system
+semantically secure under a chosen plain
+
+163
+00:12:21,397 --> 00:12:26,290
+那么正确答案是肯定的。仅当新鲜值空间R
+text attack? So the correct answer is yes.
+But only if the nonce space R is large
+
+164
+00:12:26,290 --> 00:12:31,249
+足够大时，r才会以很高的概率不重复
+enough so that little R never repeats with
+very, very high probability. And let's
+
+165
+00:12:31,249 --> 00:12:36,332
+我们来看为什么是这样。首先
+因为函数F是一个安全的伪随机函数
+quickly argue why that's true. So first of
+all, because F is a secure pseudo-random
+
+166
+00:12:36,332 --> 00:12:41,352
+我们还可以用一个真随机函数替换之
+function, we might as well replace it with
+a truly random function. In other words,
+
+167
+00:12:41,352 --> 00:12:46,373
+换句话说，这和我们使用真随机函数f
+加密明文M是不可区分的
+this is indistinguishable from the case
+where we encrypt the message M, using the
+
+168
+00:12:46,373 --> 00:12:51,252
+计算在点r的值，然后与M异或
+truly random function little F, evaluated
+to point R, and then XOR with M.
+
+169
+00:12:51,252 --> 00:12:57,320
+但由于这个r不会重复。每个密文
+使用不同的r
+But since this little r never repeats. Every
+cypher text uses a different little r. What
+
+170
+00:12:57,320 --> 00:13:03,095
+这意味着值F(r)每次都是随机均匀分布的
+this means is that the values of F(r)
+are random uniform independent strings
+
+171
+00:13:03,095 --> 00:13:08,818
+相互独立的字符串。所有每次我们加密
+一个明文，我们使用的都是一个新的
+every time. So every time we encrypt a
+message, we encrypt it essentially using a
+
+172
+00:13:08,818 --> 00:13:14,369
+均匀分布的随机的一次性密码本
+由于异或一个均匀分布的字符串
+new uniform random one time pad. And since
+XORing a uniform string with any string
+
+173
+00:13:14,369 --> 00:13:19,666
+可以让任何字符串都变成新的均匀分布的字符串
+生成的密文就是两个
+simply generates a new uniform string, the
+resulting cipher text is distributed as
+
+174
+00:13:19,666 --> 00:13:24,767
+随机字符串的分布。我分别称它们为r和r'
+simply two random uniform strings. I'll
+call them r and r prime. And so both in
+
+175
+00:13:24,767 --> 00:13:30,325
+在实验0和实验1中，所有攻击者可以看到
+experiment zero and in experiment one, all
+the attacker gets to see are truly uniform
+
+176
+00:13:30,325 --> 00:13:35,622
+真随机字符串r和r'；由于在两个实验中
+random strings r, r', and since in both
+experiments the attacker is seeing the same
+
+177
+00:13:35,622 --> 00:13:40,666
+攻击者看到的字符串同分布，他无法区分它们
+distribution, he cannot distinguish the
+two distributions. And so since security
+
+178
+00:13:40,666 --> 00:13:45,695
+由于当我们使用真随机函数时，
+安全性完全成立，
+holds completely when we're using a truly
+random function. It's also gonna hold when
+
+179
+00:13:45,695 --> 00:13:50,559
+当我们使用伪随机函数时，也是有安全性的
+好，这是一个很好的例子
+we're using a pseudorandom function. Okay,
+so this is a nice example of how we use
+
+180
+00:13:50,559 --> 00:13:55,435
+使用伪随机函数与真随机函数表现很像
+the fact that the pseudo random function
+behaves like a random function to argue
+
+181
+00:13:55,435 --> 00:13:59,829
+这一事实来证明这个加密机制的安全性
+security of this particular encryption
+scheme. Okay, so now we have a nice
+
+182
+00:13:59,829 --> 00:14:04,465
+现在我们有了一个随机算法的好例子
+另一个构造对选择明文攻击安全的加密机制
+example of randomized encryption. The
+other approach to building chosen plain
+
+183
+00:14:04,465 --> 00:14:09,344
+的方法是叫做基于新鲜值的加密
+text secure encryption schemes is what's
+called a nonce based encryption. Now, in
+
+184
+00:14:09,344 --> 00:14:14,012
+现在，基于新鲜值的加密系统里
+加密算法取三个输入
+a nonce based encryption system, the
+encryption algorithm actually takes three
+
+185
+00:14:14,012 --> 00:14:19,044
+而不是两个输入。通常它取密钥和明文信息
+inputs rather than two. As usual it takes
+the key and the message. But it also takes
+
+186
+00:14:19,044 --> 00:14:23,773
+但它还另外一个输入叫做新鲜值
+类似地，解密算法
+an additional input called a nonce. And
+similarly, the decryption algorithm also
+
+187
+00:14:23,773 --> 00:14:28,683
+也取新鲜值为输入，然后输出明文的加密
+takes the nonce as input, and then produces
+the resulting decrypted plain text. And
+
+188
+00:14:28,683 --> 00:14:33,529
+这个新鲜值n是什么？这个新鲜值是公开的
+what is this nonce value n? This nonce is
+a public value. It does not need to be
+
+189
+00:14:33,529 --> 00:14:38,402
+它没有必要向攻击者隐瞒
+但唯一的要求是
+hidden from the adversary but the only
+requirement is that the pair (k,n)
+
+190
+00:14:38,402 --> 00:14:43,213
+(k,n)只能用来加密一个明文
+换句话说，这一对(k,n)
+is only used to encrypt a single
+message. In other words, this pair (k,n)
+
+191
+00:14:43,213 --> 00:14:48,148
+加密不同明文时必须更换
+有两种方法可以改变
+must change from message to message. And
+there are two ways to change it. One way
+
+192
+00:14:48,148 --> 00:14:53,144
+一种是为每个明文选择新的随机密钥
+to change it is by choosing a new random
+key for every message. And the other way
+
+193
+00:14:53,144 --> 00:14:58,276
+另一种是保持密钥不变，然后选择新的新鲜值
+is to keep using the same key all the time
+but then we must choose a new nonce for
+
+194
+00:14:58,276 --> 00:15:02,721
+我说过，我想强调这点，新鲜值
+every message. And, and as I said, I wanna
+emphasize again, this nonce need not
+
+195
+00:15:02,721 --> 00:15:06,823
+不是私密的，它也不需要是随机的
+唯一的要求是新鲜值是唯一的
+be secret, and it need not be random. The
+only requirement is the nonce is unique.
+
+196
+00:15:06,823 --> 00:15:11,029
+事实上，我们要用新鲜值这个术语
+贯穿整个课程
+And in fact, we're gonna use this
+term throughout the course. A nonce
+
+197
+00:15:11,029 --> 00:15:15,247
+一个新鲜值意味着不能重复
+它不必是随机的
+for us, means a unique value that doesn't
+repeat. It does not have to be random. So
+
+198
+00:15:15,247 --> 00:15:19,891
+那么我们看选择新鲜值的几个例子
+最简单的选择是
+let's look at some examples of choosing an
+nonce, well the simplest option is
+
+199
+00:15:19,891 --> 00:15:24,255
+就把计数器当成是新鲜值
+simply to make the nonce be a
+counter. So for example the networking
+
+200
+00:15:24,255 --> 00:15:28,898
+例如在网络协议中，你可以把新鲜值想象成
+数据包的计数器
+protocol you can imagine the nonce
+being a packet counter that's incremented
+
+201
+00:15:28,898 --> 00:15:33,598
+发送方每发出一个包，或接收方每接到一个包
+计数器加一
+every time a packet is sent by a sender or
+received by the receiver. This means that
+
+202
+00:15:33,598 --> 00:15:37,962
+这意味着加密者必须在信息间保留状态记录
+the encrypter has to keep state from
+message to message mainly that he has to
+
+203
+00:15:37,962 --> 00:15:42,270
+他必须保留这个计数器，每条信息传送时
+计数器加一
+keep this counter around and increment it
+after every message is transmitted.
+
+204
+00:15:42,270 --> 00:15:47,487
+有趣的是，如果解密者具有同样的状态
+Interestingly, if the decrypter actually
+has the same state then there is no need
+
+205
+00:15:47,487 --> 00:15:52,705
+是不需要在密文里包括新鲜值的
+因为新鲜值是隐藏的
+to include the nonce in the cipher text
+since the nonce is implicit. Let's look
+
+206
+00:15:52,705 --> 00:15:57,987
+我们看一个例子。HTTPS协议运行在一个可靠的传输机制上
+at an example. The https protocol is run
+over a reliable transport mechanism which
+
+207
+00:15:57,987 --> 00:16:03,075
+意思是发送方发送的数据包，
+接收方是按发送顺序接收的
+means that packets sent by the sender are
+assumed to be received in order at a
+
+208
+00:16:03,075 --> 00:16:07,645
+所以如果发送者发送了数据包5，然后
+发送了数据包6
+recipient. So if the sender sends packet #5
+and then packet #6, the recipient
+
+209
+00:16:07,645 --> 00:16:12,068
+接收方会接收到数据包5，然后是
+数据包6，以这个顺序
+will receive packet #5 and then
+packet #6 in that order. This
+
+210
+00:16:12,068 --> 00:16:16,215
+这意味着如果发送方维护了一个数据包计数器
+means that if the sender maintains a
+packet counter, the recipient can also
+
+211
+00:16:16,215 --> 00:16:20,860
+接收方也可以维护一个计数器
+两个计数器是同步增长的
+maintain a packet counter and two counters
+basically increment in sync. In this case
+
+212
+00:16:20,860 --> 00:16:24,896
+这种情况下就不需要把新鲜值包含在数据包里
+there is no reason to include the
+nonce in the packets because the
+
+213
+00:16:24,896 --> 00:16:29,476
+因为新鲜值对于双方来说都是隐藏的
+但是，在其他协议中
+nonce is implicit between the two
+sides. However, in other protocols, for
+
+214
+00:16:29,476 --> 00:16:34,600
+例如IPsec，一个用来加密IP层的协议
+example, in IPsec, IPsec is a protocol
+designed to encrypt the IP layer. The IP
+
+215
+00:16:34,600 --> 00:16:39,330
+IP层是不能保证数据包按序送达的
+所以发送方发送包5
+layer does not guarantee in order
+delivery. And so the sender might send
+
+216
+00:16:39,330 --> 00:16:44,520
+再发送包6，但有可能以相反的顺序
+packet #5 and then packet #6, but
+those will be received in reverse order at
+
+217
+00:16:44,520 --> 00:16:49,164
+被接收方接收。这种情况下也是可以用
+数据包计数器作为新鲜值的
+the recipient. In this case it's still
+fine to use a packet counter as a nonce
+
+218
+00:16:49,164 --> 00:16:53,748
+现在新鲜值必须被包含在数据包里了
+but now the nonce has to be included in
+the packet so that the recipient knows
+
+219
+00:16:53,748 --> 00:16:58,102
+这样接收方才知道该使用那一个新鲜值
+来解密收到的数据包。如我所说
+which nonce to use to decrypt the
+received packet. So as I say, nonce based
+
+220
+00:16:58,102 --> 00:17:02,686
+基于新鲜值的加密是一个非常有效的方法
+来实现对CPA的安全。特别地
+encryption is a very efficient way to
+achieve CPA security. In particular if the
+
+221
+00:17:02,686 --> 00:17:07,098
+如果新鲜值是隐藏，它甚至不会增加密文长度
+nonce is implicit, it doesn't even
+increase the cipher text length. Of course
+
+222
+00:17:07,098 --> 00:17:11,796
+当然另一个生成唯一新鲜值的方法是
+随机选取新鲜值
+another method to generate a unique nonce
+is simply to pick the nonce at random
+
+223
+00:17:11,796 --> 00:17:16,495
+前提是新鲜值空间足够大
+这样就能以很高的概率
+assuming the nonce space is sufficiently
+large so that with high probability the
+
+224
+00:17:16,495 --> 00:17:21,579
+使得新鲜值在密钥使用期间内不会重复
+现在在这种情况下
+nonce will never repeat for the life of
+the key. Now in this case, nonce
+
+225
+00:17:21,579 --> 00:17:26,098
+基于新鲜值的加密就变成了随机加密
+based encryption simply reduces to
+randomized encryption. However, the
+
+226
+00:17:26,098 --> 00:17:31,600
+不过这里的好处是，发送方在发送不同信息时
+不需要维护状态
+benefit here is that the sender does not
+need to maintain any state from message to
+
+227
+00:17:31,600 --> 00:17:36,382
+所以这很有用，比如，如果加密正好发生在
+message. So this is very useful, for
+example if encryption happens to take
+
+228
+00:17:36,382 --> 00:17:41,425
+多台设备上，例如，我可以有一台笔记本
+place on multiple devices. For example, I
+might have both a laptop and a smart
+
+229
+00:17:41,425 --> 00:17:46,096
+和一个智能手机。它们可能使用同样的密钥
+但这种情况下，如果我需要维护状态
+phone. They might both use the same key.
+But in this case if I require state for
+
+230
+00:17:46,097 --> 00:17:49,961
+为了加密的话，那么我的笔记本和智能手机
+就必须协调好
+encryption, then my laptop and the
+smartphone would have to coordinate to
+
+231
+00:17:49,961 --> 00:17:54,302
+以确保它们不会重复使用相同的新鲜值
+如果双方都随机选取新鲜值
+make sure that they never reuse the same
+nonces. Whereas if both of them simply take
+
+232
+00:17:54,302 --> 00:17:58,114
+他们不必协调的，因为
+nonces at random, they don't need to
+coordinate because it was very high
+
+233
+00:17:58,114 --> 00:18:02,243
+他们不会选中同一个新鲜值的概率非常高
+probability they'll simply never choose
+the same nonce. Again assuming the nonce
+
+234
+00:18:02,243 --> 00:18:06,478
+前提依然是新鲜值空间足够大
+那么有些情况下无状态的加密是很重要的
+space is big enough. So there are some
+cases where stateless encryption is quite
+
+235
+00:18:06,478 --> 00:18:10,562
+特别是当同样的密钥被不同的机器用来加密时
+important, in particular where the same
+key is used by multiple machines. So I
+
+236
+00:18:10,562 --> 00:18:14,492
+我想更精确地找到对于基于新鲜值的加密
+wanted to find, more precisely, what
+security means for nonce based
+
+237
+00:18:14,492 --> 00:18:18,694
+安全意味着什么。特别地，我想强调，
+系统必须保持安全
+encryption. And in particular, I want to
+emphasize that the system must remain
+
+238
+00:18:18,694 --> 00:18:23,122
+当新鲜值是由攻击者选择的时候
+这一点很重要的原因
+secure when the nonce are chosen by
+the adversary. The reason it's important
+
+239
+00:18:23,122 --> 00:18:27,027
+是攻击者可以选择它想攻击的密文
+to allow the adversary to choose the
+nonces is because the adversary can
+
+240
+00:18:27,027 --> 00:18:31,090
+设想一下，新鲜值正好是一计数器
+choose which cipher text it wants to
+attack. So imagine the nonce happens to
+
+241
+00:18:31,090 --> 00:18:35,364
+计数器的值正好是15
+be a counter and it so happens that when
+the couter hits the value fifteen, maybe
+
+242
+00:18:35,364 --> 00:18:39,428
+也许在这一点，攻击者容易破解语义安全
+at that point it's easy for the adversary
+to break semantic security. So the
+
+243
+00:18:39,428 --> 00:18:43,702
+那么攻击者会等到第15个包发出时
+才会试图破坏语义安全
+adversary will wait until the fifteenth
+packet is sent and only then he will ask
+
+244
+00:18:43,702 --> 00:18:48,076
+所以当我们讨论基于新鲜值的加密时
+to break semantic security. So when we
+talk about nonce based encryption, we
+
+245
+00:18:48,076 --> 00:18:52,806
+我们一般允许攻击者选择新鲜值
+而且系统应当保持安全
+generally allow the adversary to choose
+the nonce and the system should remain
+
+246
+00:18:52,806 --> 00:18:57,772
+即使是在这些条件下。那么我们定义
+在这种情况下的CPA游戏
+secure even under those settings. So let's
+define the CPA game in this case and it's
+
+247
+00:18:57,772 --> 00:19:02,442
+实际上它和之前的游戏很像
+攻击者提交一对明文信息MI
+actually very similar to the game before.
+Basically the attacker gets to submit
+
+248
+00:19:02,442 --> 00:19:06,935
+MI由MI0和MI1组成。明显它们的长度是一样的
+pairs of messages MI, MI0, and MI1.
+Obviously they both have to be of the same
+
+249
+00:19:06,935 --> 00:19:11,576
+攻击者提供新鲜值。作为回应
+length. And he gets to supply the nonce.
+And in response, the adversary is given
+
+250
+00:19:11,576 --> 00:19:16,304
+攻击者得到MI0或MI1的加密结果
+不过是使用攻击者选择的新鲜值
+the encryption of either MI0, or MI1. But
+using the nonce that the adversary
+
+251
+00:19:16,304 --> 00:19:20,740
+当然，和往常一样，攻击者的目标是
+chose. And of course, as usual, the
+adversary's goal is to tell whether he was
+
+252
+00:19:20,740 --> 00:19:25,096
+区分他得到的是左边明文的加密
+还是右边明文的加密
+given the encryption of the left plain
+text or the right plain text. And as
+
+253
+00:19:25,096 --> 00:19:29,464
+之前，攻击者反复进行询问，
+他想问多少次都可以
+before the adversary gets to iterate these
+queries and he can issue as, as many
+
+254
+00:19:29,464 --> 00:19:33,610
+我们通常记攻击者询问的次数为Q
+queries as he wants, we usually let q
+denote the number of queries that the
+
+255
+00:19:33,610 --> 00:19:37,956
+当然，现在唯一的重要限制是
+adversary issues. Now the only restriction
+of course, which is crucial, is that
+
+256
+00:19:37,956 --> 00:19:42,329
+尽管攻击者可以选择新鲜值
+他每次只能选择不同的新鲜值
+although the adversary gets to choose the
+nonces, he's restricted to choosing
+
+257
+00:19:42,329 --> 00:19:46,758
+我们这样要求攻击者的原因是
+distinct nonces. The reason we force him
+to choose distinct nonces is because
+
+258
+00:19:46,758 --> 00:19:50,959
+这是实际中的要求。即使攻击者欺骗Alice
+that's the requirement in practice. Even
+if the adversary fools Alice into
+
+259
+00:19:50,959 --> 00:19:55,161
+为他加密多个信息，Alice也不会使用同样的新鲜值的
+encrypting multiple messages for him,
+Alice will never use the same nonce
+
+260
+00:19:55,161 --> 00:19:59,477
+因此，攻击者不会看到用同样新鲜值加密的明文
+again. As a result, the adversary will
+never see messages encrypted using the
+
+261
+00:19:59,477 --> 00:20:03,678
+所以在这个游戏中，我们要求所有新鲜值不同
+same nonce and therefore, even in the
+game, we require that all nonce be
+
+262
+00:20:03,678 --> 00:20:08,305
+然后，通常我们说系统是基于新鲜值加密的
+distinct. And then as usual we say that
+the system is a nonce based encryption
+
+263
+00:20:08,305 --> 00:20:13,412
+是对选择明文攻击语义安全的
+system that's, semantically secure under a
+chosen plain text attack if the adversary
+
+264
+00:20:13,421 --> 00:20:17,890
+如果攻击者无法区分实验0
+即获得左边明文加密
+cannot distinguish experiment zero where
+he's given encryptions of the left
+
+265
+00:20:17,890 --> 00:20:22,593
+和实验1，即获得右边明文加密
+messages from experiment one where he's
+given encryptions of the right messages.
+
+266
+00:20:22,593 --> 00:20:27,121
+我们看一个例子，是基于新鲜值的加密系统
+So let's look at an example of a nonce
+based encryption system. As before, we
+
+267
+00:20:27,121 --> 00:20:32,119
+之前，我们有一个安全的PRF，取新鲜值空间R里的元素
+为输入，输出明文空间M里的字符串
+have a secure PRF that takes inputs in the
+nonce space R and outputs strings in the
+
+268
+00:20:32,119 --> 00:20:36,823
+现在，当选择一个新密钥时，我们重置计数器R为0
+message space M. Now when a new key is
+chosen, we're going to reset our counter R
+
+269
+00:20:36,823 --> 00:20:41,006
+现在我们加密特定的明文M
+to be zero. And now we encrypt the
+particular message M, what we will do is
+
+270
+00:20:41,006 --> 00:20:45,103
+我们将计数器R加一，然后使用伪随机函数加密M
+we will increment our counter R, and then
+encrypt the message M using the
+
+271
+00:20:45,103 --> 00:20:49,481
+并应用这个R值。之前，密文包含两个部分
+pseudorandom function applied to this
+value R. And as before, the cipher text is
+
+272
+00:20:49,481 --> 00:20:53,859
+我们当前计数器的值
+going to contain two components, our
+current value of the counter and then the
+
+273
+00:20:53,859 --> 00:20:58,518
+然后明文M的一次性密码本加密结果
+我的问题是
+one time pad encryption of the message M.
+And so my question to you is whether this
+
+274
+00:20:58,518 --> 00:21:03,312
+这是一个安全的基于新鲜值的加密系统吗？
+跟之前一样，答案是肯定的
+is a secure, nonce based encryption system.
+So the answer as before is yes, but only
+
+275
+00:21:03,312 --> 00:21:08,485
+但是仅当新鲜值空间足够大
+这样我们增加计数器R
+if the nonce space is large enough. So as
+we increment the counter R, it will never
+
+276
+00:21:08,485 --> 00:21:13,284
+R也不会回卷到0，这样新鲜值总是唯一的
+cycle back to zero so that the nonce
+will always, always be unique. We argue
+
+277
+00:21:13,284 --> 00:21:18,020
+用之前一样的方法，我们能证明其安全性
+因为PRF是安全的，我们知道
+security the same way as before. Because
+the PRF is secure, we know that this
+
+278
+00:21:18,020 --> 00:21:22,819
+这个加密系统和使用真随机函数不可区分
+encryption system is indistinguishable
+from using a truly random function. In
+
+279
+00:21:22,819 --> 00:21:27,493
+换句话说，如果我们对计数器
+应用一个真随机函数
+other words, if we apply a truly random
+function to the counter and XOR the
+
+280
+00:21:27,493 --> 00:21:32,602
+然后把结果和明文M异或。但现在
+由于新鲜值R从不重复
+results with, the plain text M. But now
+since the nonce R never repeats, every
+
+281
+00:21:32,602 --> 00:21:37,447
+每次我们计算F(R)，我们都能得到
+一个真随机的均匀分布且相互独立的
+time we compute this F of R, we get a
+truly random uniform and independent
+
+282
+00:21:37,447 --> 00:21:42,843
+字符串，这样我们实际上是使用一次性密码本
+在加密每一个明文信息
+string so that we're actually encrypting
+every message using the one time pad. And
+
+283
+00:21:42,843 --> 00:21:48,306
+于是，在两个实验中，所有的攻击者
+as a result, all the adversary gets to see
+in both experiments are basically just a
+
+284
+00:21:48,306 --> 00:21:52,751
+只能获得一对随机字符串。所以实验0和实验1里
+pair of random strings. So both the
+experiment zero and experiment one the
+
+285
+00:21:52,751 --> 00:21:57,408
+攻击者看到的是严格相同的分布
+adversary get's to see exactly the same
+distribution, namely, the responses to all
+
+286
+00:21:57,408 --> 00:22:02,064
+对所有选择明文攻击的询问的回应
+仅仅是均匀分布的一对字符串
+this chosen plain text queries are just
+pairs of strings that are just uniformly
+
+287
+00:22:02,064 --> 00:22:06,950
+这点在实验0和实验1中都是一样的
+distributed and this is basically the same
+in experiment zero and experiment one and,
+
+288
+00:22:06,950 --> 00:22:11,664
+所以攻击者无法区分这两个实验
+therefore, the attacker cannot distinguish
+the two experiments. And since he cannot
+
+289
+00:22:11,664 --> 00:22:16,206
+由于使用真随机函数时，攻击者
+不能取得这个语义安全游戏的胜利
+win the semantic security game with a
+truly random function he, also, cannot win
+
+290
+00:22:16,206 --> 00:22:20,517
+他也不能取得使用PRF时，这个游戏的胜利
+the semantics security game with the
+secure PRF, and, therefore, the scheme is
+
+291
+00:22:20,517 --> 00:22:25,222
+所以这个机制是安全的。现在我们理解了
+对称加密系统安全的意义
+secure. So now we understand what it means
+for a symmetric system to be secure when
+
+292
+00:22:25,222 --> 00:22:30,091
+当密钥用于加密多个信息，且要求
+the keys used to encrypt multiple messages
+the requirement is that it be secure under
+
+293
+00:22:30,091 --> 00:22:34,777
+对选择明文攻击是安全的。我们说了
+唯一的在选择明文攻击是安全的方法
+a chosen plan of attack. And we said that
+basically, the only way to be secure under
+
+294
+00:22:34,777 --> 00:22:39,289
+是使用随机加密
+a chosen plain text attack is either to
+use randomized encryption, or to use, use
+
+295
+00:22:39,289 --> 00:22:43,462
+或使用基于新鲜值的加密，这里
+新鲜值不会重复才行
+nonce spaced encryption where the
+nonce never repeats. And then in the
+
+296
+00:22:43,462 --> 00:22:48,143
+下面两节，我们构建两个经典的加密系统
+next two segments, we're gonna build two
+classic encryption systems that are secure
+
+297
+00:22:48,143 --> 00:22:50,174
+它们在密钥多次使用时是安全的
+when the key is used multiple times.

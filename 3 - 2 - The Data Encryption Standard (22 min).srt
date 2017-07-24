@@ -1,0 +1,1713 @@
+1
+00:00:00,000 --> 00:00:03,662
+现在我们理解了什么是分组密码
+So now that we understand what block
+ciphers are, let's look at a classic
+
+2
+00:00:03,662 --> 00:00:07,655
+我们看一个经典的例子叫数据加密标准
+DES。简单提醒一下大家
+example called the Data Encryption
+Standard. So, just a quick reminder. Block
+
+3
+00:00:07,655 --> 00:00:12,379
+分组密码将N位输入映射到N位输出
+ciphers basically map N bits of input to N
+bits of output. And we talked about two
+
+4
+00:00:12,379 --> 00:00:17,045
+我们讨论了两个经典的例子，3DES和AES。
+本节我们讲DES
+canonical examples, triple DES and AES. In
+this segment, we're gonna talk about DES,
+
+5
+00:00:17,045 --> 00:00:21,480
+然后在下一节讨论3DES
+and we'll talk about triple DES, actually,
+in the next segment. And then I also
+
+6
+00:00:21,480 --> 00:00:26,031
+我之前提过，分组密码由迭代构造。特别地
+mentioned before that block ciphers are
+often built by iteration. In particular,
+
+7
+00:00:26,031 --> 00:00:30,985
+我们看的分组密码里的迭代
+we're gonna look at block ciphers that are
+built by a form of iteration where a key K
+
+8
+00:00:30,985 --> 00:00:35,863
+开始时密钥K被扩张成一组回合密钥，
+然后回合函数应用到输入信息上
+is first expanded into a bunch of round
+keys. And then a round function is applied
+
+9
+00:00:35,863 --> 00:00:40,660
+一次又一次，所有轮次
+to the input message, again and again and
+again. And essentially, after all these
+
+10
+00:00:40,660 --> 00:00:45,156
+都完事后，我们获得最终的密文，对吧？
+round functions are applied, we obtain the
+resulting cipher text, okay? And again,
+
+11
+00:00:45,156 --> 00:00:49,253
+我们要看看数据加密标准DES如何工作
+what we're gonna look at, how DES, the
+data encryption standard, uses this
+
+12
+00:00:49,253 --> 00:00:53,577
+使用这个格式。我想更清楚点
+事实上，指定一个这种类型的分组密码
+format. I just wanna be clear that, in
+fact, to specify a block cipher of this
+
+13
+00:00:53,577 --> 00:00:57,788
+需要指定密钥扩张的机制
+type, one needs to specify the key
+expansion mechanism, and one needs to
+
+14
+00:00:57,788 --> 00:01:02,113
+需要指定回合函数。本节我关注回合函数
+specify the round function. In the segment
+here, I'm gonna focus on the round
+
+15
+00:01:02,113 --> 00:01:06,551
+我不会讨论太多密钥扩张的细节
+function, and I'm not gonna talk much
+about key expansion. But I just wanted to
+
+16
+00:01:06,551 --> 00:01:10,990
+但我想提一下，事实上，密钥扩张也是描述
+分组密码的重要部分
+mention that, in fact, key expansion is
+also a big part of describing how block
+
+17
+00:01:10,990 --> 00:01:15,892
+好，那么我们来看看DES的历史
+cipher works. Okay, so let's talk about
+the history of DES. Essentially, in the
+
+18
+00:01:15,892 --> 00:01:20,715
+1970年代初，IBM发现他们的消费者要求
+early 1970s, IBM realized that their
+customers are demanding some form of
+
+19
+00:01:20,715 --> 00:01:25,869
+某种形式的加密。于是它们成立了一个
+密码小组，组长是Horst Feistel
+encryption. And so they formed a crypto
+group, and the head of that group, was
+
+20
+00:01:25,869 --> 00:01:30,492
+在70年代初，他设计了Lucifer密码
+Horst Feistel, who, in the early 70s,
+designed a cipher called Lucifer. Now,
+
+21
+00:01:30,492 --> 00:01:35,560
+有趣的是，事实上Lucifer有很多变种
+it's interesting. In fact Lucifer had a
+number of variations but one of the later
+
+22
+00:01:35,560 --> 00:01:40,559
+但是其中一种新变种有128位的密钥长度
+variations in fact had a key length that
+was 128 bits and a block length that's
+
+23
+00:01:40,559 --> 00:01:45,682
+分组大小也是128位。好，1973年
+政府发现它买了很多商业的
+also 128 bits. Okay, in 1973 the governor
+realized that it's buying many commercial
+
+24
+00:01:45,682 --> 00:01:50,867
+已下架的计算机，所有它希望这些计算机
+提供商能有个好的算法
+off-the-shelf computers and so it wanted
+its suppliers to actually have a good grip
+
+25
+00:01:50,867 --> 00:01:55,434
+可以在卖给政府的产品中有用
+to algorithm that they could use in
+products sold to the government. So in
+
+26
+00:01:55,434 --> 00:02:00,157
+1973年国家安全局（当时的称谓）
+1973 the National Bureau of Standards as
+it was called at the time put out a
+
+27
+00:02:00,157 --> 00:02:04,503
+放出了一个征求分组密码的项目
+选中的会成为联邦标准
+request for proposals for a block cipher
+that is going to become a federal
+
+28
+00:02:04,503 --> 00:02:09,026
+事实上IBM提交了Lucifer的一个变种
+standard. And in fact IBM submitted a
+variant of Lucifer. That variant actually
+
+29
+00:02:09,026 --> 00:02:13,901
+这个变种经过一些标准化的修改之后
+went through some modification during the
+standardization process and then finally
+
+30
+00:02:13,901 --> 00:02:18,482
+最后于1976年由国家安全局采用为联邦标准
+in 1976, the national bureau standard
+adopted DES as a federal standard. And, in
+
+31
+00:02:18,482 --> 00:02:23,122
+事实上DES很有意思，它的密钥长度比Lucifer要少
+fact, for DES it's interesting that the
+key length was far reduced from Lucifer.
+
+32
+00:02:23,122 --> 00:02:27,602
+仅为56位，分组大小也减少到64位
+It's only 56 bits. And the block length
+was also reduced to 64 bits. And in
+
+33
+00:02:27,602 --> 00:02:31,838
+事实上这些决定，特别是减少密钥长度
+fact, these decisions, especially the
+decision to reduce the key length, is
+
+34
+00:02:31,838 --> 00:02:36,653
+是导致很多人怀疑DES寿命的原因
+going to be a key length yield of DES and
+was a source of many complaints over its
+
+35
+00:02:36,653 --> 00:02:41,062
+特别地，早在1997年，DES就被穷举密钥攻击
+life. In particular, already back in 1997,
+DES was broken by exhaustive search
+
+36
+00:02:41,062 --> 00:02:45,994
+破解了，意思是让计算机遍历所有
+2的56次方个可能的密钥
+meaning that a machine was able to search
+through all two to the 56 possible keys to
+
+37
+00:02:45,994 --> 00:02:50,867
+来找到特定的密钥。事实上我们会
+recover a particular challenge key. And in
+fact we're going to talk about exhaustive
+
+38
+00:02:50,867 --> 00:02:54,683
+详细讨论一下穷举攻击。这个问题很有趣
+search quite a bit. It's quite an
+interesting question, and there are
+
+39
+00:02:54,683 --> 00:02:59,335
+有很多方法可以来抵抗穷举攻击
+various ways to defend against exhaustive
+search. And basically this 1997 experiment
+
+40
+00:02:59,335 --> 00:03:03,655
+1997年的实验预示了DES的末路，
+它意味着DES本身不再安全了
+kinda spelled the doom of DES. It meant
+that DES is itself, is no longer secure.
+
+41
+00:03:03,655 --> 00:03:08,251
+于是国家标准研究所对外发出请求
+And as a result, the National Institute of
+Standards, as it became known, issued a
+
+42
+00:03:08,251 --> 00:03:12,755
+征求下一代分组密码方案
+request for proposals. For our next
+generation's block cipher standard and in
+
+43
+00:03:12,755 --> 00:03:17,427
+在2000年，它在Rijndael的基础上研发标准
+2000 it standardized on a cipher called Rijndael.
+Which became the advanced encryption
+
+44
+00:03:17,427 --> 00:03:21,903
+成为了高级加密标准AES。我们稍后讨论AES
+standard, AES. And we'll talk about AES
+later on. But in this segment, I wanna
+
+45
+00:03:21,903 --> 00:03:26,199
+本节我想描述DES的工作原理
+DES是个(历史上)异常成功的密码
+describe how DES works. Now, DES is a
+cipher, it's an amazingly successful
+
+46
+00:03:26,199 --> 00:03:30,496
+它被用于银行业界。事实上
+cipher. It's been used in the banking
+industry. In fact, there's a classic
+
+47
+00:03:30,496 --> 00:03:34,613
+有一个经典的网络叫做电子打扫房间
+network called the Electronic
+Clearing House, which banks use to clear
+
+48
+00:03:34,613 --> 00:03:39,447
+银行使用这个网络来处理支票
+DES被用来保护这些事务的完整性
+checks with one another. And DES is used
+for integrity in those transactions. It's
+
+49
+00:03:39,447 --> 00:03:43,922
+DES也被商用。事实上它不久前很流行
+also used in commerce. In fact, it was
+very popular up until recently, as the
+
+50
+00:03:43,922 --> 00:03:48,699
+曾是网络的主要加密机制
+当然，现在它已被AES和其他密码替代
+main encryption mechanism for the web. Of
+course, now, that's been replaced with AES
+
+51
+00:03:48,699 --> 00:03:52,977
+总的来说，从应用的角度来看
+DES是个非常成功的密码
+and other ciphers. Overall, it's a
+very successful cipher in terms of
+
+52
+00:03:52,977 --> 00:03:57,425
+DES也有非常丰富的被攻击历史
+deployment. DES also has a very rich
+history of attacks, which we'll talk about
+
+53
+00:03:57,425 --> 00:04:01,931
+我们将在下一节中讨论DES的攻击
+现在，我们讨论DES的构造
+in the next segment. Okay, so now, let's
+talking about the construction of DES. So,
+
+54
+00:04:01,931 --> 00:04:06,608
+DES背后的核心思想叫做Feistel网络
+由Horst Feistel提出
+the core idea behind DES is what's called
+a Feistel network, due to Horst Feistel.
+
+55
+00:04:06,608 --> 00:04:11,087
+这是一个非常聪明的方法，
+来根据任意函数F1到FD构造分组密码
+And basically, it's a very clever idea for
+building the block cipher out of arbitrary
+
+56
+00:04:11,087 --> 00:04:15,485
+好的，那么我们有这些函数F1到FD
+functions, F1 to FD. Okay so imagine we
+have these functions F1 to FD
+
+57
+00:04:15,485 --> 00:04:18,765
+它们从n位字符串映射到n位字符串
+现在这些是任意的函数
+that happens to match n bits to n bits.
+Now these are arbitrary functions,
+
+58
+00:04:18,765 --> 00:04:22,425
+它们不一定是可逆的，而我们要做的
+they don't have to be invertible or
+anything. What we want to do is build an
+
+59
+00:04:22,425 --> 00:04:26,956
+是根据这D个函数构造出一个可逆函数。
+我们实现的方法是
+invertible function out of those D
+functions and the way we'll do it is by
+
+60
+00:04:26,956 --> 00:04:31,484
+构造一个新的函数，我们记为F
+将2n位字符串映射到2n位字符串
+building a new function we'll call capital
+F that maps 2n bits to 2n bits.
+
+61
+00:04:31,484 --> 00:04:35,593
+构造方法写在这里了
+那么这里有我们的输入
+And the construction is described right
+here. So here we have our inputs. You
+
+62
+00:04:35,593 --> 00:04:40,299
+大家注意，有两个n位的分组
+换句话说，输入实际上是2n位
+notice, there are two blocks of n bits.
+In other words, the input is actually
+
+63
+00:04:40,299 --> 00:04:44,792
+R和L分布代表右和左。典型地
+2n bits. The R and L stand for right and
+left. Typically, people describe a
+
+64
+00:04:44,792 --> 00:04:49,205
+我们从高层到底层来表述Feistel网络。
+这里n位字符串分左右
+Feistel network from top to bottom. In
+which case, these n bits really would be
+
+65
+00:04:49,205 --> 00:04:52,214
+但这里我横向描述会更方便些
+right and left. But here it is more
+convenient for me to describe it
+
+66
+00:04:52,214 --> 00:04:56,300
+如果我们跟着右边R走
+horizontally. So if we follow the R
+inputs. You realize it basically gets
+
+67
+00:04:56,300 --> 00:05:01,555
+发现它被左边输出原样复制了一份
+没有发生任何改变，对吧？
+copied into the L output, without any
+change at all. Okay? However, the L
+
+68
+00:05:01,555 --> 00:05:07,260
+但是输入L有些变化。将输入R
+inputs, is changed somewhat. What happens
+is, basically, the R inputs is fit into
+
+69
+00:05:07,260 --> 00:05:12,888
+应用函数F1，然后结果和L0异或，就成为了新的R1
+the function F1 and the result is then
+XORed with L0 and that becomes the new R1
+(编号表示第几回合的结果)
+
+70
+00:05:12,888 --> 00:05:17,711
+好，那么这个叫做Feistel网络的一个回合
+input. Okay, so this is called one round
+of a Feistel network, and is done using
+
+71
+00:05:17,711 --> 00:05:22,584
+它是使用函数F1的。现在我们再做一遍，使用函数F2来完成
+the function F1. Now we do this again with
+another round of the Feistel network
+
+72
+00:05:22,584 --> 00:05:26,122
+Feistel网络，然后我们一次又一次地做
+with the function F2, and we do it again
+and again and again, 'till we get to the
+
+73
+00:05:26,122 --> 00:05:31,969
+直到最后一轮，用函数FD完成之。
+最终所得的结果
+last round, and we do it again with the
+function FD. And finally, the output is
+
+74
+00:05:31,969 --> 00:05:37,542
+记为Rd和Ld。那么如果你乐意，我们能
+写成符号的形式，就是说
+Rd, Ld. Okay. So, if you like, we can write
+this in symbols. That basically, Li is
+
+75
+00:05:37,542 --> 00:05:43,003
+Li等于R_i-1，然后Ri更复杂
+simply equal to R_i-1. And Ri,
+let's see, that's the more complicated
+
+76
+00:05:43,003 --> 00:05:50,451
+Ri等于。。我们跟着这条线
+Ri等于Fi应用到
+one. Ri is equal, well, let's just follow
+the lines here. Ri is just equal to Fi
+
+77
+00:05:50,451 --> 00:05:58,968
+R_i-1，再异或Li，对吧？
+applied to, R_i-1 XOR Li. Okay?
+So this, and this is basically, i goes
+
+78
+00:05:58,968 --> 00:06:06,618
+这里i从1到d。这个方程定义了一个Feistel网络
+from, 1 to d. So this is the, equation
+that defines a Feistel network, mapping a
+
+79
+00:06:06,618 --> 00:06:09,673
+将一个2n位输入映射到2n位输出
+所以我们这里有
+2n bit input to 2n bit outputs. So
+here we have the, again, I just copied the
+
+80
+00:06:09,673 --> 00:06:14,831
+我刚刚复制了Feistel网络的图
+令人惊讶的论断是，事实上
+picture of the Feistel network. And the
+amazing claim is that, in fact, it doesn't
+
+81
+00:06:14,831 --> 00:06:19,541
+与你给我的函数们F1到Fd无关
+对于这些给我的函数
+matter which functions you give me. For
+any functions, F1 to FD that you give me,
+
+82
+00:06:19,541 --> 00:06:24,602
+构造出的Feistel网络事实上是可逆的
+the resulting Feistel network function is,
+in fact, invertible. And the way we're
+
+83
+00:06:24,602 --> 00:06:27,635
+我们证明的方法是构造出它的一个逆
+going to prove that is basically we're
+going to construct an inverse, because not
+
+84
+00:06:27,635 --> 00:06:31,235
+因为它不仅可逆，而且它的逆可被有效计算。
+那么我们来看看
+only is it invertible, it's efficiently
+invertible. So let's see. So let's look at
+
+85
+00:06:31,235 --> 00:06:36,628
+我们先看一回合Feistel网络：
+这里是输入Ri和Li
+one round of a Feistel network, so
+here, this is the inputs, Ri, Li, and this
+
+86
+00:06:36,628 --> 00:06:41,618
+这是输出R_i+1和L_i+1。现在我问大家
+如何求这个的逆呢？
+is the output R_i+1, L_i+1. And now what I'm
+going to ask you is to invert this.
+
+87
+00:06:41,618 --> 00:06:48,781
+那我们看看。假设我们有的输入是R_i+1和L_i+1
+So let's see. So suppose now the input that
+we're given is R_i+1, L_i+1 and we want to
+
+88
+00:06:48,781 --> 00:06:54,883
+我们想计算Ri和Li。我们想计算这一回合
+从相反的方向来
+compute Ri, Li. So we want to compute the
+round in the reverse direction. So let's
+
+89
+00:06:54,883 --> 00:07:00,024
+我们看看行不行。好，我们先看Ri。
+Ri非常简单
+see if we can do it. Well, let's look at
+Ri. So, Ri is very easy. Basically, Ri is
+
+90
+00:07:00,024 --> 00:07:07,240
+Ri就等于L_i+1。所有L_i+1就成为了R_i
+现在我问大家
+just equal to L_i+1. So L_i+1 just becomes
+R_i. But now, let me ask you, to write the
+
+91
+00:07:07,245 --> 00:07:12,157
+写出L_i的表达式，用R_i+1和L_i+1表示
+expression for L_i in terms of R_i+1, and L_i+1.
+
+92
+00:07:13,049 --> 00:07:17,991
+那么我希望大家都写出来了，
+将L_i+1输入到函数F_i+1
+So I hope everybody sees that, basically, L_i+1
+is fed into the function F_i+1.
+
+93
+00:07:17,991 --> 00:07:24,810
+函数结果跟R_i+1异或，答案就是L_i
+The result is XORed with R_i+1,
+and that gives the L_i input.
+
+94
+00:07:24,810 --> 00:07:28,181
+这就是Feistel网络一轮的逆
+So this the inverse of one round
+of a Feistel network.
+
+95
+00:07:28,181 --> 00:07:32,865
+如果我们画成这幅图，写下逆的构造图
+And if we draw this as a diagram, let's just
+write the picture for the inverse.
+
+96
+00:07:32,865 --> 00:07:38,810
+大家注意输入是R_i+1, L_i+1
+输出是Ri和Li，对吧？
+So here you notice the input is R_i+1, L_i+1
+and the output is Ri, Li. Right?
+
+97
+00:07:38,810 --> 00:07:43,278
+我们在计算每回合的逆
+大家注意到Feistel回合的逆
+So we're computing, we're inverting, the
+rounds. So you notice that the inverse of
+
+98
+00:07:43,278 --> 00:07:47,242
+和正向Feistel网络本身长得很像
+a Feistel round looks pretty much the
+same as the Feistel round in the
+
+99
+00:07:47,242 --> 00:07:50,237
+由于技术原因，字面上看
+forward direction. It's literally, you
+know, just for a technical reason, it's
+
+100
+00:07:50,237 --> 00:07:54,309
+它们互为镜像，构造是相同的
+kinda the mirror image of one another. But
+it's basically, the same construct. And
+
+101
+00:07:54,309 --> 00:07:59,133
+当我们一起用这些回合的逆时
+when we put these inverted rounds back
+together. We essentially get the inverse
+
+102
+00:07:59,133 --> 00:08:03,446
+我们就可以获得整个Feistel网络的逆了。
+那么大家注意到我们从第D个回合开始
+of the entire Feistel network. So you
+notice we start off with the round number D
+
+103
+00:08:03,446 --> 00:08:07,632
+计算第D个回合的逆，然后计算
+第D-1个回合的逆，等等
+with the inverse of round number D,
+then we do the inverse of round number D-1
+
+104
+00:08:07,632 --> 00:08:11,458
+直到我们获得了第一回合的逆
+and so on and so forth until we
+get to the inverse of the first round. And
+
+105
+00:08:11,458 --> 00:08:18,063
+我们得到了最后的输出R0和L0
+这就是输入
+we get our final outputs which is R0, L0,
+like this is the inputs and we manage to
+
+106
+00:08:18,063 --> 00:08:22,694
+这样我们设法用Rd和Ld，计算出R0和L0。有趣的是
+invert basically Rd, Ld and get R0, L0
+and the interesting thing is that
+
+107
+00:08:22,694 --> 00:08:25,882
+这些求逆的计算和加密的计算非常类似
+basically these inversion circuits look
+pretty much the same as the encryption
+
+108
+00:08:25,882 --> 00:08:31,105
+唯一的不同是函数应用的顺序正好相反
+circuits and the only difference is that
+the functions are applied in reverse order.
+
+109
+00:08:31,105 --> 00:08:35,566
+我们从Fd出发，到F1结束。当我们加密时
+Right we started with Fd and ended with
+F1. Whereas when we were encrypting, we
+
+110
+00:08:35,566 --> 00:08:40,539
+从F1出发，到Fd结束。所以，对硬件设计者而言
+started with F1 and ended with Fd. So, for
+hardware designers, this is very
+
+111
+00:08:40,539 --> 00:08:44,808
+这个非常吸引人，因为想节省硬件开销
+attractive, because, basically, if you
+wanna save hardware, you realize that your
+
+112
+00:08:44,808 --> 00:08:48,536
+加密硬件要和解密硬件一样
+encryption hardware is identical to your
+decryption hardware. So you only have to
+
+113
+00:08:48,536 --> 00:08:52,674
+所以大家只需要实现一个算法即可
+同时可以获得两个算法
+implement one algorithm, and you get both
+algorithms the same way. The only
+
+114
+00:08:52,674 --> 00:08:56,899
+唯一的不同在于函数应用的顺序相反
+difference is that the functions are
+applied in reverse order. Okay. So this
+
+115
+00:08:56,899 --> 00:09:01,109
+好的，这个Feistel机制是个构造可逆函数的一般方法
+Feistel mechanism is a general method
+for building invertible functions from
+
+116
+00:09:01,109 --> 00:09:06,224
+根据任意函数F1到Fd。事实上
+它在很多不同的分组密码中都有应用
+arbitrary functions F1 to Fd and in fact,
+it's used in many different block ciphers.
+
+117
+00:09:06,224 --> 00:09:11,040
+不过有趣的是，AES没有使用它
+Although, interestingly, it's not actually
+used in AES. So, there are many other
+
+118
+00:09:11,040 --> 00:09:15,297
+有许多其他分组密码用了Feistel网络
+当然，它们的回合函数
+block ciphers that use a Feistel
+network. Or, of course, they differ from
+
+119
+00:09:15,297 --> 00:09:19,838
+与DES中的F1到Fd不同。但是AES
+使用了一个完全不同的结构类型
+DES in the functions F1 to Fd. But AES
+actually uses a completely different type
+
+120
+00:09:19,838 --> 00:09:24,033
+并非Feistel网络，过几节
+of structure that's actually not a
+Feistel network. We'll see how AES
+
+121
+00:09:24,033 --> 00:09:29,043
+我们会看到AES的工作原理。
+现在我们知道了Feistel网络是什么了
+works in a couple of segments. So now that
+we know what Feistel networks are, let
+
+122
+00:09:29,043 --> 00:09:32,898
+让我提一个关于Feistel网络的重要定理
+me mention an important theorem about the
+theory of Feistel networks that shows
+
+123
+00:09:32,898 --> 00:09:37,794
+用来证实Feistel网络是个好办法
+这个定理由Luby和Rackoff于1985年提出
+why they're a good idea. This theorem is
+due to Luby and Rackoff back in 1985, and it
+
+124
+00:09:37,794 --> 00:09:41,774
+表述如下。假设我有一个安全的伪随机函数
+says the following. Suppose I have a
+function that is a secure pseudorandom
+(参见论文How to construct pseudorandom 
+permutations from pseudorandom functions)
+
+125
+00:09:41,774 --> 00:09:46,804
+那么它与定义在N位字符串上的随机函数不可区分
+function, okay. So it's indistinguishable
+from random and happens to act on N bits.
+
+126
+00:09:46,804 --> 00:09:52,857
+所以它使用密钥K将N位字符串映射到N位字符串
+So it maps N bits to N bits and uses a
+key K. Then, it turns out, that if you use
+
+127
+00:09:52,857 --> 00:09:57,621
+如果在三轮Feistel网络中使用这个函数
+最后得到的是一个安全的伪随机置换
+this function in three rounds of a Feistel
+network. What you end up with is a secure
+
+128
+00:09:57,621 --> 00:10:03,208
+换句话说，最终得到的是一个可逆函数
+pseudo random permutation. In other words,
+what you end up with is an invertible
+
+129
+00:10:03,208 --> 00:10:07,724
+它与真随机函数不可区分
+function that is indistinguishable from a
+truly random invertible function. And I
+
+130
+00:10:07,724 --> 00:10:11,457
+我希望大家还记得安全的分组密码的定义
+hope you remember that the true definition
+of a secure block cipher is that it needs
+
+131
+00:10:11,457 --> 00:10:16,106
+它需要一个安全的伪随机置换。这个定理说
+to be a secure pseudo random permutation.
+So what this theorem says, is that if you
+
+132
+00:10:16,106 --> 00:10:20,303
+如果你从一个安全的伪随机函数出发
+最后可以得到一个安全的分组密码
+start with a secure pseudo random
+function, you end up with a secure block
+
+133
+00:10:20,303 --> 00:10:23,824
+就是这些。让我再解释得更多一点
+cipher. Basically, that's what this is.
+And let me explain in a little bit more
+
+134
+00:10:23,824 --> 00:10:28,939
+到底发生什么了。本质上
+PRF在Feistel网络的每一回合里
+detail what's actually going on here. So,
+essentially, the PRF is used in every
+
+135
+00:10:28,939 --> 00:10:34,808
+都被使用。换句话说
+round of the Feistel network. So, in
+other words, here, what's actually
+
+136
+00:10:34,808 --> 00:10:39,731
+PRF使用密钥K0计算
+computed is the PRF using one secret key,
+K0. Here, what's computed is the PRF
+
+137
+00:10:39,731 --> 00:10:45,959
+当然，使用另一不同密钥对付R1
+using a different secret key, of course
+applied to R1. And here we have yet
+
+138
+00:10:45,959 --> 00:10:51,578
+这里我们还有另一密钥K1，对付R1；K2对付R2。大家注意
+another secret key, K1 applied, K2 applied
+to R2. And you notice, this is why,
+
+139
+00:10:51,578 --> 00:10:55,371
+这就是为什么Feistel机制使用K^3里的密钥
+basically this Feistel construction,
+uses keys in K cubed. In other words, it
+
+140
+00:10:55,371 --> 00:11:01,004
+换句话说，它使用了三个独立的密钥
+密钥独立这点很重要
+uses three independent keys. So it's very
+important that the keys are actually
+
+141
+00:11:01,004 --> 00:11:07,438
+所以我们需要三个独立的密钥
+independent. So really, we need three,
+independent keys. And then we end up with
+
+142
+00:11:07,438 --> 00:11:12,600
+然后我们最后得到了一个安全的伪随机置换
+好，那就是支撑Feistel网络的理论
+a secure pseudorandom permutation. Okay,
+so that's the theory behind Feistel
+
+143
+00:11:12,600 --> 00:11:16,051
+现在我们理解了，可以看看DES的特例了
+networks. And now that we understand that,
+we can actually look at the specifics of DES.
+
+144
+00:11:16,051 --> 00:11:20,256
+DES有16回合的Feistel网络，好的
+So DES is basically a sixteen round
+Feistel network, okay. So there are
+
+145
+00:11:20,256 --> 00:11:26,349
+有函数F1到F16，将32位字符串映射到
+32位字符串，因此
+functions F1 to F16 that map 32 bits to
+32 bits, and as a result, the DES itself
+
+146
+00:11:26,349 --> 00:11:33,054
+DES本身是作用于64位分组上的，2x32
+现在DES里的16个回合函数
+acts on 64 bit blocks, 2x32. Now the
+sixteen round functions in DES are
+
+147
+00:11:33,054 --> 00:11:37,673
+都是由一个函数F推导而来的
+只不过回合密钥不同
+actually all derived from a single
+function F. Just used with different keys.
+
+148
+00:11:37,673 --> 00:11:44,765
+事实上，每轮的回合密钥不同。Ki是回合密钥
+So in fact, these are the different round
+keys. So Ki is, a round key. And it's
+
+149
+00:11:44,765 --> 00:11:52,585
+由DES的56位主密钥推导而来
+basically derived from the key K, derived
+from the 56 bit DES key K. Okay and I'll
+
+150
+00:11:52,585 --> 00:11:56,567
+我待会再来描述这个函数F
+describe what this function F is in just a
+minute. But basically that, you see that
+
+151
+00:11:56,567 --> 00:12:01,856
+大家看到有16个不同的回合密钥
+我们得到了16个不同的回合函数
+by using sixteen different round keys, we
+get sixteen different round functions. And
+
+152
+00:12:01,856 --> 00:12:06,460
+这给我们Feistel网络。所以从高层看DES的工作
+that gives us the Feistel network. So just
+on a high level how the DES works
+
+153
+00:12:06,460 --> 00:12:10,829
+你有64位输入。第一件事是
+basically you have a 64 bit input. The
+first thing it does is, this initial
+
+154
+00:12:10,829 --> 00:12:15,175
+初始置换仅是置换这64位字符串
+它把第0位换到第6位
+permutation that just permutes the 64 bits
+around. Namely it maps bit number one to
+
+155
+00:12:15,175 --> 00:12:20,216
+把第2位换到第17位，等等
+bit number six. Bit number two to bit
+number seventeen, and so on. This is not
+
+156
+00:12:20,216 --> 00:12:24,702
+这并不是出于安全考虑，仅仅是标准里的要求
+for security reasons, this is just
+specified in the standard. Then we go into
+
+157
+00:12:24,702 --> 00:12:29,076
+然后进行16轮Feistel网络
+现在大家知道它怎么工作的了
+the sixteen round Feistel network. That
+actually, you now know how it works.
+
+158
+00:12:29,076 --> 00:12:33,810
+使用函数F1到F16，如前所述
+Basically uses the function F1 to F16, as
+specified before. And then, basically we
+
+159
+00:12:33,810 --> 00:12:38,721
+我们还有另一个置换，叫最终置换
+have another permutation, it's called the
+final permutation. That's just the inverse
+
+160
+00:12:38,721 --> 00:12:42,863
+就是初始置换的逆置换，还是置换各位
+of the initial permutation. Again,
+it just permutes bits around, this is not
+
+161
+00:12:42,863 --> 00:12:47,728
+并非出于安全考量。然后我们得到的就是最终输出了
+necessary for security reasons. And then
+we finally get, the final outputs. Okay.
+
+162
+00:12:47,728 --> 00:12:53,400
+好，现在，如前所述，有一步密钥扩张
+我这里不细讲它
+Now, as we said, there's a key expansion
+step, which I'm not gonna describe. But
+
+163
+00:12:53,400 --> 00:12:59,546
+这里56位DES密钥被扩张成了这些回合密钥
+basically, this 56-bit DES key is expanded
+into these rounds keys. Where each round
+
+164
+00:12:59,546 --> 00:13:05,028
+每一轮密钥48位。这样我们有了16个48位回合密钥
+key, is 48 bits. Okay, so we have sixteen
+48 bit round keys, and they're basically
+
+165
+00:13:05,028 --> 00:13:10,243
+分别用在DES的16个回合里
+当你想将这个密码倒过来的时候
+used in the sixteen rounds of DES. And
+then when you want to invert the cipher,
+
+166
+00:13:10,243 --> 00:13:15,458
+你只需要使用这些回合密钥
+all you do is you use these, round keys,
+these sixteen round keys, in reverse
+
+167
+00:13:15,458 --> 00:13:20,490
+以相反的顺序。好的，现在我们理解了DES结构
+唯一剩下的
+order. Okay, so now that we understand the
+DES structure, the only thing that's left
+
+168
+00:13:20,490 --> 00:13:24,809
+就是指定函数F了。让我来解释一下
+to do is specify the function, capital F.
+So let me explain how this function works.
+
+169
+00:13:24,809 --> 00:13:30,238
+它取32位字符串X作为输入
+So basically, it takes, as inputs, its, 32
+bit value, let's call it X. But in
+
+170
+00:13:30,238 --> 00:13:35,112
+实际上这是R0,R1,R2,R3等等
+reality, you remember, this is R0,
+R1, R2, R3, so on and so
+
+171
+00:13:35,112 --> 00:13:40,352
+有32位。然后它还取48位回合密钥为输入
+forth. These are 32 bit values. And then
+it takes, also, a 48 bit round key. So
+
+172
+00:13:40,352 --> 00:13:45,391
+所有我们这里有密钥Ki，48位
+here we have our key Ki, which happens to
+be 48 bits. The first thing it does, is it
+
+173
+00:13:45,391 --> 00:13:50,039
+第一件事，通过一个扩张盒子
+这个扩张盒子取32位输入
+goes through an expansion box. And this
+expansion box basically take thirty two
+
+174
+00:13:50,039 --> 00:13:57,152
+映射到48位字符串。所有的扩张盒子
+bits, and maps them into 48 bits. Now, all
+the expansion box does is just replicates
+
+175
+00:13:57,152 --> 00:14:04,312
+只是复制某些位，移动其他位
+例如，X的第1位
+some bits, and move other bits around. So,
+for example, bit #1 of X is replicated
+
+176
+00:14:04,312 --> 00:14:11,086
+被复制到了输出的位置2；
+X的第2位被放到了输出的第3位
+into positions 2 and 48 in the output.
+Bit #2 of X is positioned in as bit
+
+177
+00:14:11,086 --> 00:14:15,124
+等等。仅仅是复制X的一些位
+#3 of the output. And so on and so
+forth, just by replicating some of the
+
+178
+00:14:15,124 --> 00:14:20,588
+我们将其扩张成了48位。下一件事是
+bits of X, we expand the input into 48
+bits. The next thing we do is we compute
+
+179
+00:14:20,588 --> 00:14:23,940
+我们计算扩张结果和回合密钥的异或
+有时人们说密码学家们
+an XOR with the round key.
+Sometimes people say that cryptographers
+
+180
+00:14:23,940 --> 00:14:30,437
+只会计算异或，这就是个例子
+我们在这个函数里只计算异或
+only compute XORs. This is an example of
+that, where, well, we just do XORs in this
+
+181
+00:14:30,437 --> 00:14:35,817
+然后DES里的魔法部分来了！这48位字符串
+function. And then comes the magic of DES,
+where, actually, these 48 bits are broken
+
+182
+00:14:35,817 --> 00:14:42,756
+被分解成8组，每组6位。6，7，8。。让我画
+into eight groups of six bits. Six, seven,
+eight. And so let me draw, and then what
+
+183
+00:14:42,756 --> 00:14:48,790
+然后。。哦对，这里每一个都是6位
+happens is, so yes. Each one of these,
+each one of these wires is, six bits. And
+
+184
+00:14:48,790 --> 00:14:53,857
+然后它们进入了S盒子
+then they, they go into what, what are
+called S boxes. And I'll explain S boxes
+
+185
+00:14:53,857 --> 00:15:01,524
+我稍后解释S盒子。这些S盒子是DES的智慧所在
+in just a minute. The S boxes are kind of
+the smarts of, DES. And then, the S
+
+186
+00:15:01,524 --> 00:15:07,380
+S盒子是一个映射，6位到4位
+所以S盒子的输出是这些4位字符串
+box is basically a map, six bits to four
+bits. So, the outputs of the S boxes are
+
+187
+00:15:07,380 --> 00:15:12,913
+它们被收集起来，形成了32位，对吧？
+these four bits. They're collected. This
+gives up 32 bits, right? Eight groups of
+
+188
+00:15:12,913 --> 00:15:17,914
+8组4位，给我们32位字符串
+最后应用另一置换
+four bits, gives us 32 bits and then
+finally this is fed into yet another
+
+189
+00:15:17,914 --> 00:15:22,982
+移动各个位，比如
+permutation which just maps the bits
+around. So, for example bit number one
+
+190
+00:15:22,982 --> 00:15:27,045
+第1位移至第9位，第2位移至第15位，等等
+will go to bit number nine, bit number two
+will go to bit number fifteen and so on.
+
+191
+00:15:27,045 --> 00:15:34,353
+它只置换32个位，最终得到函数F的输出32位
+So it just permutes the 32 bits around and
+that's the final 32 bit output of this F function.
+
+192
+00:15:34,353 --> 00:15:39,306
+对吧？通过使用不同的回合密钥
+Okay? So by using different
+round keys, essentially, we get different
+
+193
+00:15:39,306 --> 00:15:44,355
+我们获得了不同的回合函数
+那就是我们如何构造DES的16个回合函数的过程
+round functions, and that's how we form
+the sixteen round functions of DES. Now,
+
+194
+00:15:44,355 --> 00:15:49,093
+现在，唯一剩下没讲的是这些S盒子
+the only thing that, left to specify are
+these S boxes. So the S boxes, literally,
+
+195
+00:15:49,093 --> 00:15:54,982
+这些S盒子是6位映射到4位的函数
+它们使用了一个查找表来实现
+are just functions from six bits to four
+bits. They are just implemented as a look
+
+196
+00:15:54,982 --> 00:15:59,993
+描述一个6位到4位的函数
+up table. Right? So describing a function
+from six bits to four bits basically
+
+197
+00:15:59,993 --> 00:16:05,134
+只要写出所有2的六次方个可能输入
+所对应的输出即可
+amounts to writing the output of the
+function on all two to the six possible inputs.
+
+198
+00:16:05,134 --> 00:16:09,984
+2的六次方是64.所有我们只需一张表，包含64个值
+Two to the six is 64. So we just
+have a table that literally contains 64 values.
+
+199
+00:16:09,984 --> 00:16:14,504
+每个值是4位字符串。那么这是个例子
+Where each value is four bits. So
+here is an example, this happens to be the
+
+200
+00:16:14,504 --> 00:16:18,972
+在第5个S盒子里，这是一张表包含64个值
+fifth S box, and you see that this is a
+table that contains 64 values right?
+
+201
+00:16:18,972 --> 00:16:26,942
+4行16列，共64个值。例如，如果你想查找输出
+It's four by sixteen. So, 64 values. For
+example, if you wanna look at, the output,
+
+202
+00:16:26,942 --> 00:16:35,468
+对应于011011的输出。好，那么你看这两位，01
+that corresponds to 0-1-1-0-1-1. Okay, then
+you look at these two bits. This is 01,
+
+203
+00:16:35,468 --> 00:16:41,689
+然后看这四位1101，然后就能查到对应输出是1001
+and these four bits are 1101, and you see
+that the output is 1001. The four bits
+
+204
+00:16:41,689 --> 00:16:46,977
+四位输出1001。所有S盒子是用这些表实现的
+output 1001. Okay, so the S boxes are just
+implemented as these tables.
+
+205
+00:16:46,977 --> 00:16:51,524
+现在问题是，这些S盒子是如何选取的呢？
+设计者为什么要这样设计它们呢？
+Now the question is, how are these S boxes chosen.
+How are these tables actually chosen by
+
+206
+00:16:51,524 --> 00:16:56,167
+那么为了给大家直观理解
+the designers of this. So to give you some
+intuitions for that, lets start with a
+
+207
+00:16:56,167 --> 00:17:02,395
+我们从一个非常糟糕的S盒子开始
+假设这些S盒子是线性的
+very bad choice for S boxes. So imagine
+the S boxes were linear. What do I mean by
+
+208
+00:17:02,395 --> 00:17:07,266
+什么意思？设想这些S盒子仅仅是将6位输入
+that? I mean that imagine that these six
+bit inputs literally were just
+
+209
+00:17:07,266 --> 00:17:12,678
+以不同的方式进行异或，然后输出4位
+XORed with one another in different
+ways to produce the four bit outputs.
+
+210
+00:17:12,678 --> 00:17:17,893
+好，另一种表示方法是
+我们可以把S盒子写成矩阵向量积的形式
+Okay, another way of writing that is that
+we can write the S box as a matrix vector product.
+
+211
+00:17:17,893 --> 00:17:23,314
+那么这里有矩阵Ai，有6位的向量X
+So here you have the matrix Ai.
+And the vector, the six bit vector X.
+
+212
+00:17:23,314 --> 00:17:27,826
+大家看到，如果我写成矩阵向量积
+And you can see that, if we write this matrix
+vector product, basically, we take the
+
+213
+00:17:27,826 --> 00:17:32,107
+那么我们取这个向量和这个输入向量的内积
+记住，它们都是0,1字符串
+inner product of this vector with the
+input vector. Remember, these are all bits.
+
+214
+00:17:32,107 --> 00:17:36,446
+是6位的向量内积。另一个6位向量
+So the six bits vector inner
+product. Another six bit vector, and we do
+
+215
+00:17:36,446 --> 00:17:40,670
+我们取模2，大家看到，我们在计算X2异或X3
+that modulo two, you realize, basically,
+what we're computing is X2 XOR X3.
+
+216
+00:17:40,670 --> 00:17:44,668
+对吧？因为只有第2位和第3位才有1
+Right? Because only position two and
+position three have 1's in it.
+
+217
+00:17:44,668 --> 00:17:50,034
+类似地，下一个内积会产生X1异或X4异或X5
+And similarly the next, inner product will
+produce X1 XOR X4 XOR X5 and so on and
+
+218
+00:17:50,034 --> 00:17:55,096
+等等。好的，所有大家可以看到
+如果S盒子是用这种方式实现的
+so forth. Okay. So you can literally see
+that if the S boxes are implemented this
+
+219
+00:17:55,096 --> 00:18:00,177
+所做的仅仅是将矩阵A应用到向量X上
+way. Then, all they do, is just apply the
+matrix A to the input vector X. Which is
+
+220
+00:18:00,177 --> 00:18:05,456
+所以我们说，这时S盒子是完全线性的
+why we say, that in this case the S boxes
+are completely linear. Now, I claimed that
+
+221
+00:18:05,456 --> 00:18:10,670
+我说，如果S盒子是线性的，DES将一点都不安全的
+in fact that if the S boxes were linear, then DES
+would be totally insecure. The reason is,
+
+222
+00:18:10,670 --> 00:18:15,691
+原因是，如果S盒子是线性的，那么DES所做的
+if the S boxes are linear, then all that
+DES does is just compute XOR of various
+
+223
+00:18:15,691 --> 00:18:20,127
+无非是计算异或、置换各位而已
+只有异或和位的置换
+things and permute and shuffle bits
+around. So it's just XORs and bit
+
+224
+00:18:20,127 --> 00:18:24,514
+因此所有DES都只是一个线性函数
+permutations, which means that as a
+result, all of DES is just a linear
+
+225
+00:18:24,514 --> 00:18:30,505
+换句话说，存在一个矩阵B，以这些为维数
+function. In other words, there will be a
+Matrix B. Of these dimensions. Basically,
+
+226
+00:18:30,505 --> 00:18:35,584
+如果矩阵B有宽度832
+it's a matrix B that has width 832.
+Basically what I will do is I will write
+(832=64+48*16)
+
+227
+00:18:35,584 --> 00:18:41,065
+我只需要写下64位明文分组和16个回合密钥
+形成一个很长的向量
+the 64 bit message plus the sixteen round
+keys as one long vector. Alright, so the
+
+228
+00:18:41,065 --> 00:18:46,411
+明文64位，有16个回合密钥，每个48位
+message is 64 bits and there are sixteen
+round keys. Each one is 48 and that, if
+
+229
+00:18:46,411 --> 00:18:51,825
+加起来就是832，对吧？我写下这些值、密钥
+you do the math, it's basically 832. Okay?
+So I write these values, the keys and the
+
+230
+00:18:51,825 --> 00:18:57,439
+和明文分组，形成一个长向量，然后有这个矩阵
+message, as one long vector and then there
+will be this matrix that essentially when
+
+231
+00:18:57,439 --> 00:19:02,143
+当你计算这些矩阵向量积时
+你可以得到密文的各个位的值
+you compute these matrix vector products.
+Essentially you get the different bits of
+
+232
+00:19:02,143 --> 00:19:06,941
+所以矩阵有64行，因为密文分组有64位
+the ciphertext. So there's 64 of these
+rows and as a result, you get 64 bits of
+
+233
+00:19:06,941 --> 00:19:10,954
+好，这就是线性DES的意思
+ciphertext. Okay, so this is what it
+means for DES to be linear. So if you
+
+234
+00:19:10,954 --> 00:19:14,693
+大家稍微想一想，就会发现S盒子是DES中
+think a little bit about this, you realize
+that the S boxes are the only nonlinear
+
+235
+00:19:14,693 --> 00:19:19,116
+唯一非线性的结构。如果S盒子是线性的
+那么整个DES算法就是线性的
+part of DES. So if the S boxes were
+linear, then the entire circuit is linear
+
+236
+00:19:19,116 --> 00:19:23,358
+所以就可以使用矩阵来表示了
+如果是线性的这种情况的话
+and therefore can be expressed as this
+matrix. Now if that's the case then DES
+
+237
+00:19:23,358 --> 00:19:28,066
+DES就是一个糟糕的伪随机置换了
+would be terrible as a secure pseudorandom
+permutation. And let me give you a very
+
+238
+00:19:28,066 --> 00:19:33,596
+我给大家一个非常简单的例子
+如果你计算3个DES的输出的异或
+simple example. Basically if you did the
+XOR of three outputs of DES, well
+
+239
+00:19:33,596 --> 00:19:38,984
+想想这意味着什么？看定义了DES的矩阵B
+let's think what that means. Basically we
+would be looking at B times, the matrix B
+
+240
+00:19:38,984 --> 00:19:43,649
+B乘以一个向量，再异或B乘以另一个向量
+that defines DES, times, one vector
+XOR B times another vector,
+
+241
+00:19:43,649 --> 00:19:48,540
+异或B乘以第三个向量。我们可以提取矩阵B
+XOR B times a third vector. We
+could take the B out of the parentheses so
+
+242
+00:19:48,540 --> 00:19:54,338
+就变成了B乘以这个向量
+当然了，K异或K异或K
+we'd be basically doing B times this
+vector over here. But of course K XOR K XOR K,
+
+243
+00:19:54,338 --> 00:19:59,664
+还是K。所有想想这意味着什么？
+this is just K. And so if you
+think about what that means, basically we
+
+244
+00:19:59,664 --> 00:20:06,503
+我们获得了取密钥为K，DES在点
+M1异或M2异或M3处的加密结果
+just got back DES of K at the point
+M1 XOR M2 XOR M3. But this means that now DES
+
+245
+00:20:06,503 --> 00:20:10,896
+这意味着现在DES有这么糟糕的关系
+这是可以被测试的，对吧？
+has this horrible relation. That can be
+tested. Right? So, basically, if you
+
+246
+00:20:10,896 --> 00:20:15,682
+那么，如果你将这三个明文M1, M2, M3
+的输出结果异或
+XOR the output of three values,
+M1, M2, M3, you'll get the value of
+
+247
+00:20:15,682 --> 00:20:20,317
+就可以得到在点M1异或M2异或M3处的
+DES加密结果。这不是一个随机函数
+DES, at the point M1 XOR M2 XOR M3. Now this
+is not a relation that is going to hold
+
+248
+00:20:20,317 --> 00:20:25,362
+应该有的关系。一个随机函数无法满足这个等式
+for a random function. A random function
+is not going to satisfy this equality.
+(或者说，以极小概率成立)
+
+249
+00:20:25,362 --> 00:20:29,707
+那么大家有了一个非常简单的测试
+可以告诉我们DES不是随机函数
+And so you get a very easy test to tell you
+that DES is not a random function.
+
+250
+00:20:29,707 --> 00:20:34,099
+事实上，也许可以留给大家作为练习。不难看出
+In fact, maybe you can take that as a small
+exercise. It's not even difficult to see,
+
+251
+00:20:34,099 --> 00:20:39,195
+给定足够的输入、输出对，是可以
+还原出整个密钥的
+that given enough input output pairs, you
+can literally recover the entire secret key.
+
+252
+00:20:39,195 --> 00:20:44,988
+是的，你需要832个输入、输出对
+就可以还原出整个密钥
+Yeah. You just need 832 input output
+pairs, and you'll be able recover the
+
+253
+00:20:44,988 --> 00:20:50,290
+如果S盒子是线性的，DES将一点都不安全
+entire secret key. And so if the S boxes
+were linear, DES would be completely
+
+254
+00:20:50,290 --> 00:20:55,652
+实际上，即使S盒子和线性相近
+insecure. It turns out, actually, even if
+the S boxes were close to being linear. In
+
+255
+00:20:55,652 --> 00:21:01,119
+换句话说，大多数时候S盒子的表现是线性的
+比如64次中有60次是线性的
+other words, the S boxes were linear most
+of the time. So maybe for 60 out of the 64
+
+256
+00:21:01,119 --> 00:21:06,322
+这实际上也足够破解DES了
+inputs, the S boxes were linear. It turns
+out that would also be enough to break
+
+257
+00:21:06,322 --> 00:21:11,092
+我们稍后就会看到为什么
+特别的，如果你随机地选择S盒子里的值
+DES, and we're gonna see why later on. In
+particular, if you choose the S boxes at
+
+258
+00:21:11,092 --> 00:21:15,376
+实际上结果还是有些接近于线性函数
+random, it turns out they'll tend to be
+somewhat close to linear functions. As a
+
+259
+00:21:15,376 --> 00:21:19,606
+我们还是可以破解DES，还原密钥
+result, you'll be able to totally break
+DES. You'll just be able to recover the
+
+260
+00:21:19,606 --> 00:21:23,619
+用非常少的时间。因此，DES的设计者们
+key, in basically, very little time. And
+so, the designers of DES actually
+
+261
+00:21:23,619 --> 00:21:27,687
+给出了一些他们选择S盒子时的规则
+specified a number of rules they use for
+choosing the S boxes. And it's not
+
+262
+00:21:27,687 --> 00:21:31,711
+不奇怪，第一条就是这些函数要与
+线性函数差很远才行
+surprising, the first rule is that these
+functions are far away from being linear.
+
+263
+00:21:31,711 --> 00:21:36,208
+好，换句话说，没有线性函数以较大比例
+Okay. So, in other words, there is no
+function that agrees with a large fraction
+
+264
+00:21:36,208 --> 00:21:39,840
+能和S盒子的输出吻合。还有这些其他规则
+of the outputs of the S box. And then
+there are all these other rules, for
+
+265
+00:21:39,840 --> 00:21:44,146
+例如，都是4个到1个的映射，对吧？
+example, there are exactly four to one
+maps, right? So, every output has exactly
+
+266
+00:21:44,146 --> 00:21:48,433
+每个输出都有4个原像，等等。所以
+我们理解了为什么要这样选择S盒子
+four pre-images and so on and so forth. So
+we understand now why they chose the S
+
+267
+00:21:48,433 --> 00:21:52,773
+事实上，这些S盒子可以抵抗特定的攻击
+boxes they way they did and in fact its
+all done to defeat certain attacks on DES.
+
+268
+00:21:52,773 --> 00:21:56,742
+好，这就是DES的描述
+Okay. So that's the end of the
+description of DES, and in the next few
+
+269
+00:21:56,742 --> 00:21:59,706
+下面几节我们看DES的安全性
+segments we are going to look at the
+security of DES.

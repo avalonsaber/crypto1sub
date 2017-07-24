@@ -1,0 +1,1176 @@
+1
+00:00:00,000 --> 00:00:03,467
+本节我们看另一种加密
+In this segment we are gonna look at
+another form of encryption called
+
+2
+00:00:03,467 --> 00:00:07,520
+叫做微调加密。我将使用硬盘加密作为应用
+tweakable encryption. I'm gonna motivate
+tweakable encryption using disk encryption
+
+3
+00:00:07,520 --> 00:00:11,379
+来引入微调加密，我们还会看到硬盘加密
+as an application and we'll see disk
+encryption as yet another application for
+
+4
+00:00:11,379 --> 00:00:15,255
+作为另一个确定加密的应用。那么硬盘加密问题
+deterministic encryption. So the disk
+encryption problem is that we wanna
+
+5
+00:00:15,255 --> 00:00:19,790
+是指我们想加密硬盘上的扇区。比如说，
+每个扇区是4KB长度，问题是
+encrypt sectors on disk. Say each sector
+is four kilobytes long and the problem is
+
+6
+00:00:19,790 --> 00:00:24,492
+没有空间来扩展。换句话说，如果扇区大小是4KB
+that there is no space to expand. In other
+words if the sector size is four kilobytes
+
+7
+00:00:24,492 --> 00:00:28,585
+那么密文大小也必须是严格的4KB
+the cipher text size also has to be
+exactly four kilobyte because there is
+
+8
+00:00:28,585 --> 00:00:32,402
+因为没有地方写多出来的位，如果密文比明文长的话
+nowhere to write the extra bits if the
+cipher text was bigger than the plaintext.
+
+9
+00:00:32,402 --> 00:00:37,564
+那么我们的目标是，构建一个不扩展的加密
+And so our goal is basically to build a
+non expanding encryption where the cipher
+
+10
+00:00:37,564 --> 00:00:41,905
+其密文长度严格等于明文长度
+text size is identical exactly equal to
+the plaintext size. So what does it mean
+
+11
+00:00:41,905 --> 00:00:45,820
+加密不能扩展是什么意思？
+that encryption can't expand? Well,
+technically we were saying, basically the
+
+12
+00:00:45,820 --> 00:00:50,099
+就是说，明文空间等于密文空间。那么
+message space is equal to the cipher text
+space. So the message space will be four
+
+13
+00:00:50,099 --> 00:00:54,288
+明文空间是4KB信息，密文空间也是4KB信息
+kilobyte messages and the cipher text
+space would be also four kilobyte
+
+14
+00:00:54,288 --> 00:00:58,084
+在这个情况下，很清楚，我们必须使用确定性的加密
+messages. In this case clearly we have to
+use deterministic encryption because if
+
+15
+00:00:58,084 --> 00:01:02,468
+因为如果加密是随机的，那么将没有空间来存储随机性
+encryption was randomized there will be no
+place to store the randomness. And similarly
+
+16
+00:01:02,468 --> 00:01:05,841
+类似地，我们没有空间来存储完整性，因为我们不能
+扩展密文，也不能加完整性的位
+we have no room for integrity, because we can't
+expand the cipher text and add any
+
+17
+00:01:05,841 --> 00:01:10,714
+所以我们最多可以获得确定性的CPA安全性
+integrity bits. So the most we can achieve
+is deterministic CPA security and that's
+
+18
+00:01:10,714 --> 00:01:14,264
+这是我们的目标。现在实际上可以证明一个简单的引理
+going to be our goal. Now it turns out
+there's a really simple lemma to
+
+19
+00:01:14,264 --> 00:01:19,600
+就是说，如果给我一个确定性的CPA安全的密码
+prove, that basically says if you give me
+a deterministically CPA secure cipher
+
+20
+00:01:19,600 --> 00:01:23,636
+其明文空间等于密文空间，没有扩展
+where the message space is equal to the
+cipher text space, so no expansion, then in
+
+21
+00:01:23,636 --> 00:01:28,043
+事实上这个密码是个PRP。我们这里是说
+fact the cipher is a PRP. So, really all
+we're saying here is if we want no
+
+22
+00:01:28,043 --> 00:01:32,038
+如果我们希望没有一点扩展，我们唯一的加密选择是
+expansion at all, our only option for
+encrypting is what we called construction
+
+23
+00:01:32,038 --> 00:01:37,664
+上节中我们所说的二号机制。我们必须使用PRP加密
+number two in the previous segment. Namely
+we have to encrypt using a PRP. So, let's
+
+24
+00:01:37,664 --> 00:01:41,939
+那么我们来看，我们可以如何使用PRP进行加密。
+我们把我们的硬盘
+look at how we might encrypt using a
+PRP. Well, we take our disk, and we break
+
+25
+00:01:41,939 --> 00:01:47,182
+分解成各个扇区。现在，如果我们使用PRP、
+用同样的密钥来加密每一个扇区
+it into sectors. And now, if we encrypted
+every sector using a PRP under the same
+
+26
+00:01:47,182 --> 00:01:52,098
+我们要看确定性加密的标准问题
+key, we kind of run into our standard
+problem with deterministic encryption.
+
+27
+00:01:52,098 --> 00:01:57,210
+如果扇区1和扇区3正好有同样的明文
+Namely, if sector one and sector three
+happen to have the same plain text, then
+
+28
+00:01:57,210 --> 00:02:01,303
+那么解密后的扇区1等于解密后的扇区3
+the encrypted sector one would be equal to
+the encrypted sector three and the
+
+29
+00:02:01,303 --> 00:02:04,924
+攻击者就知道对应的明文是一样的
+attacker would learn that the
+corresponding plain texts are the same.
+
+30
+00:02:04,924 --> 00:02:09,122
+这是一个真实的问题，例如你的一些扇区是空的
+Now this actually is a real problem for
+example, if your, if some of your sectors
+
+31
+00:02:09,122 --> 00:02:13,267
+它们的数据都被设置为0，那么事实上
+are empty you know they are all set to
+zero then in fact the encrypted sectors
+
+32
+00:02:13,267 --> 00:02:17,518
+加密的扇区将是一样的，因此攻击者就会知道
+would be identical and as a result the
+attacker would know exactly which sectors
+
+33
+00:02:17,518 --> 00:02:21,784
+哪些硬盘上的哪些扇区是空的，哪些不是。
+这就很成问题了
+on your disk are empty and which sectors
+are not. So this is actually quite
+
+34
+00:02:21,784 --> 00:02:26,577
+问题是，我们能做得更好吗？答案是肯定的
+problematic and the question is, can we do
+any better? And so the answer is yes, and
+
+35
+00:02:26,577 --> 00:02:31,720
+我们首先想到的方法是，为什么不对每个扇区，
+使用不同的密钥来加密呢？
+the first idea that comes to mind is well,
+why don't we use a different key for every
+
+36
+00:02:31,720 --> 00:02:35,318
+那么大家可以看到，1号扇区使用1号密钥加密
+sector? So you can see sector number one
+gets encrypted with key one, sector number
+
+37
+00:02:35,318 --> 00:02:40,153
+2号扇区使用2号密钥加密，等等。。
+two gets encrypted with key two and so on
+and so forth. So now even if the content
+
+38
+00:02:40,153 --> 00:02:44,395
+即使1号扇区等于3号扇区，1号扇区的密文
+of sector number one is equal to sector
+number three the cipher text of sector one
+
+39
+00:02:44,395 --> 00:02:48,018
+也会与3号扇区不同，因为它们是用不同的密钥加密的
+and sector three will be different because
+they are encrypted under different keys.
+
+40
+00:02:48,018 --> 00:02:52,118
+这样就防止了我们之前讨论的信息泄漏
+So this actually avoids the leakage that
+we talked about before although I do want
+
+41
+00:02:52,118 --> 00:02:55,971
+虽然我很想指出，这个模式下也会有很多信息泄漏
+to point out that there is still a little
+bit of leakage with this mode. For example
+
+42
+00:02:55,971 --> 00:03:01,295
+例如，如果用户正好改变了1号扇区里的一位
+if the user happened to change one bit in
+sector one and then that sector gets
+
+43
+00:03:01,295 --> 00:03:05,691
+然后这个扇区被加密成了一个不同的密文。
+所以这完全被篡改了
+encrypted into a different cipher text. So
+this will be garbled all completely,
+
+44
+00:03:05,691 --> 00:03:09,323
+因为这是一个伪随机置换，这个扇区将会。。
+because this is a pseudo random
+permutation, the sector will be-- even if
+
+45
+00:03:09,323 --> 00:03:12,642
+即使明文中的一位改变了，这个扇区也会被映射到
+one bit of the plain text changes, the
+sector will be just mapped to a completely
+
+46
+00:03:12,642 --> 00:03:18,654
+一个完全崭新的随机输出。但是，如果撤销了这个改变
+new random output. However, if the user
+then undoes the change, and reverts back
+
+47
+00:03:18,654 --> 00:03:23,275
+还原到原先的扇区，那么加密的扇区也会回到原先的状态
+to the original sector, then the encrypted
+sector will revert back to its original
+
+48
+00:03:23,275 --> 00:03:27,544
+攻击者可以知道，一个改变做出后又撤销了
+state, and the attacker can tell that a
+change was made and then reverted. So,
+
+49
+00:03:27,544 --> 00:03:31,153
+所以还是有一点信息泄漏的，但是这种信息泄漏
+there's still a little bit of 
+information leakage. But that type of
+
+50
+00:03:31,153 --> 00:03:34,659
+如果不牺牲系统性能，我们无能为力
+information leakage, there's really
+nothing we can do without really
+
+51
+00:03:34,659 --> 00:03:38,422
+所以我们忽略这点，姑且认为是可接受的
+sacrificing performance. So, we're just
+going to ignore that and deem that
+
+52
+00:03:38,422 --> 00:03:42,616
+下一个问题是，现在大家发现，我们的硬盘
+acceptable. So the next question is now
+you realize our disks are actually getting
+
+53
+00:03:42,616 --> 00:03:46,856
+容量越来越大，有很多的扇区。这就意味着
+pretty big and there are lots of sectors.
+So this would mean that we are generating
+
+54
+00:03:46,856 --> 00:03:50,295
+我们这里要产生很多的密钥，不过当然，
+我们不需要去存储所有的这些密钥
+lots and lots of keys here, but of course
+we don't have to store all these keys, we
+
+55
+00:03:50,295 --> 00:03:54,437
+我们可以使用一个伪随机函数生成这些密钥
+can simply generate these keys using a
+pseudo random function. So, the way this
+
+56
+00:03:54,437 --> 00:03:58,538
+这个工作的方法是，我们有一个主密钥叫做K
+would work is we would have a master key
+which we would call K. And then the sector
+
+57
+00:03:58,538 --> 00:04:03,253
+然后我记扇区号为T，各个扇区使用主密钥加密
+number which I'm gonna denote by T is
+gonna be encrypted using the master key.
+
+58
+00:04:03,253 --> 00:04:06,838
+解密的结果将是特定的扇区密钥
+And the result of that encryption would be
+the particular sector key, which I'll
+
+59
+00:04:06,838 --> 00:04:11,635
+我把它记为K_T。这步是安全的，因为
+denote by K sub T. Now the reason this is
+secured is again because the PRF is
+
+60
+00:04:11,635 --> 00:04:15,475
+PRF与随机函数不可区分，意味着
+indistinguishable from our random
+function, which means that basically if we
+
+61
+00:04:15,475 --> 00:04:20,389
+如果我们对这些扇区号1,2,3,4...,L
+应用一个随机函数
+apply a random function to these sector
+numbers, one, two, three, four, up to L,
+
+62
+00:04:20,561 --> 00:04:25,253
+它们被映射到密钥空间里完全随机的元素
+they basically get mapped to completely
+random elements in the key space and as a
+
+63
+00:04:25,253 --> 00:04:29,618
+因此我们使用新的随机独立的密钥来加密每个扇区
+result we are encrypting every sector
+using a new random independent key. So
+
+64
+00:04:29,618 --> 00:04:33,718
+这是一个很好的机制，但是对于每个扇区
+this is a fine construction, however
+again, for every sector we would have to
+
+65
+00:04:33,718 --> 00:04:37,906
+我们都必须应用这个PRF。自然就有问题了，
+我们能做得更好些吗？
+apply this PRF. And so the natural
+question is, can we do even better? And it
+
+66
+00:04:37,906 --> 00:04:43,391
+实际上我们可以。这就引入了微调分组密码的概念
+turns out we can. And this introduces this
+concept of a tweakable block cipher where
+
+67
+00:04:43,391 --> 00:04:48,442
+我们只需要一个主密钥
+really what we want is basically to have
+one master key. And we want this one
+
+68
+00:04:48,442 --> 00:04:53,396
+我们需要这个主密钥来推导很多PRP。
+那么我们说过，一种方法是
+master key to derive many, many,
+many PRPs. So we said one way to do that
+
+69
+00:04:53,396 --> 00:04:59,008
+使用PRP数加密密钥K。不过我们将看到
+is simply encrypt the key K using the PRP
+number. But as we'll see, there's a more
+
+70
+00:04:59,008 --> 00:05:03,598
+有一个更有效率的方法。现在这个PRP数就是所谓的微调
+efficient way to do that. Now this PRP
+number is actually what's called a tweak,
+
+71
+00:05:03,598 --> 00:05:08,071
+这就引入了微调的概念，微调分组密码
+and that introduces this concept of
+tweakable, a tweakable block cipher. So in
+
+72
+00:05:08,071 --> 00:05:12,602
+在微调分组密码中，加密和解密算法
+a tweakable block cipher, the encryption
+and decryption algorithm basically, as
+
+73
+00:05:12,602 --> 00:05:17,250
+通常取密钥为输入，取微调为输入
+usual, take a key as input, they take a
+tweak as input. This capital T is what's
+
+74
+00:05:17,250 --> 00:05:21,383
+记微调空间为T。当然它们也取数据为输入
+called the tweak space. And of course they
+take the data as input and they output
+
+75
+00:05:21,383 --> 00:05:26,777
+输出集合X里的数据。有一个性质是，对每个微调空间里的微调
+data in the set X. The property is such that for
+every tweak in a tweak space in a random
+
+76
+00:05:26,777 --> 00:05:31,572
+对每个随机密钥，如果我们固定密钥和微调
+key. Basically if we fix the key and the
+tweak, then we end up with an invertible
+
+77
+00:05:31,572 --> 00:05:36,193
+那么我们会得到一个可逆的函数，集合X上的
+一一映射的函数。因为密钥是随机的
+function, a one to one function on the
+set X. And because the key is random with
+
+78
+00:05:36,193 --> 00:05:40,063
+这个函数事实上与随机函数不可区分
+the, the function is in fact
+indistinguishable from random. In other
+
+79
+00:05:40,063 --> 00:05:44,626
+换句话说，对每个微调的设定，我们都有一个PRP
+words, for every setting of the tweak, we
+basically get a PRP, an independent PRP
+
+80
+00:05:44,626 --> 00:05:48,843
+一个X到X的独立PRP。如我所说，作为这个的应用
+from X to X. And as I said, the
+application for this is now we're going to
+
+81
+00:05:48,843 --> 00:05:53,343
+我们使用扇区号作为微调，这样一来每个扇区
+use the sector number as the tweak, and as
+a result, every sector is going to get its
+
+82
+00:05:53,343 --> 00:05:58,336
+都有它自己的独立的PRP。我们讲快点，更为精确地定义
+own independent PRP. So let me very, very
+quickly just define more precisely what is
+
+83
+00:05:58,336 --> 00:06:03,041
+安全的微调分组密码。如我们所说，有一个微调空间
+a secure tweakable block cipher. So as we
+said there's a tweak space. There's a key,
+
+84
+00:06:03,041 --> 00:06:07,025
+有一个微调空间和一个输入信息空间X。通常，我们定义
+a tweak space and an input space X.
+And as usual, we define our two
+
+85
+00:06:07,025 --> 00:06:12,196
+两个实验。在实验1中，我们选择一个
+experiments. Here in experiment one what's
+gonna happen is we are gonna choose a
+
+86
+00:06:12,196 --> 00:06:17,251
+真随机置换的集合。我们不仅仅只选一个置换
+truly random set of permutations. So not
+just one permutation we're gonna choose as
+
+87
+00:06:17,251 --> 00:06:22,305
+而是与微调数目一样多的置换。那么
+大家注意到，这也为什么我们把这个设定为
+many permutations as there are tweaks. So
+you notice this is why we raise this to the
+
+88
+00:06:22,305 --> 00:06:26,521
+微调空间的大小。如果微调空间的大小是5
+size of the tweak space. If the size of
+the tweak space is five, this says we are
+
+89
+00:06:26,521 --> 00:06:31,877
+那么我们选择5个集合X上的随机置换
+choosing five random permutations on the
+set X. And in the other case, basically,
+
+90
+00:06:31,877 --> 00:06:35,429
+我们将选择一个随机密钥，我们定义我们的置换集合
+we're just gonna, you know, choose a
+random key, and we're gonna define our set
+
+91
+00:06:35,429 --> 00:06:40,665
+根据微调空间里的微调来定义
+of permutations as the ones defined by
+the, by tweaks in the tweak space. And
+
+92
+00:06:40,665 --> 00:06:43,835
+然后攻击者提交一个微调和一个X
+then the adversary basically gets to
+submit a tweak and an X. And he gets to
+
+93
+00:06:43,835 --> 00:06:48,770
+他将看到由微调T1定义的置换在点X1处的值
+see the value of the permutation defined
+by the tweak T1, evaluated at the point
+
+94
+00:06:48,770 --> 00:06:53,340
+攻击者会一次又一次地看到这些
+X1. And he gets to see this again and
+again. And again, he gets to see the value
+
+95
+00:06:53,340 --> 00:06:58,614
+他将看到由微调T2定义的置换在点X2处的值
+of the permutation defined by the tweak
+T2, evaluated at the point X2, and so on
+
+96
+00:06:58,614 --> 00:07:03,223
+等等。。那么攻击者的目标是，分辨出他是在与
+and so forth. And then his goal is to say
+whether he interacted with truly random
+
+97
+00:07:03,223 --> 00:07:07,091
+真随机置换交互，还是与伪随机置换交互。
+如果攻击者不能做到正确分辨
+permutations, or pseudo random
+permutations. And if he can't do it, we
+
+98
+00:07:07,091 --> 00:07:11,813
+我们就是这个微调分组密码是安全的。
+那么它与常规的分组密码的区别是
+say that this tweakable block cipher is
+secure. So the difference from a regular
+
+99
+00:07:11,813 --> 00:07:16,137
+在常规分组密码中，你只能与一个置换进行互动
+block cipher, is, in a regular block
+cipher, you only get to interact with one
+
+100
+00:07:16,137 --> 00:07:19,646
+那么你的目标是，分辨出你是在与一个
+permutation. And then your goal is to tell
+whether you're interacting with a
+
+101
+00:07:19,646 --> 00:07:24,474
+伪随机置换交互，还是在和一个真随机置换交互
+pseudorandom permutation or a truly random
+permutation. Here you get to interact with
+
+102
+00:07:24,474 --> 00:07:27,847
+而这里你是在和|T|个随机置换交互。你的目标是
+区分这|T|个随机置换
+T random permutations. And again your goal
+is to tell whether the T random
+
+103
+00:07:27,847 --> 00:07:32,436
+是真是伪。通常说，如果你不能区分
+permutations are truly random or
+pseudorandom. So as usual if you can't
+
+104
+00:07:32,436 --> 00:07:37,247
+如果攻击者在这两个实验中表现相同
+distinguish, if the adversary behaves the
+same in both experiments, we say that this
+
+105
+00:07:37,247 --> 00:07:43,414
+我们说这个PRP是一个安全的微调PRP。很好。
+那我们来看几个例子
+PRP is a secure tweakable PRP. Okay. Very
+good. So let's look at some examples. So
+
+106
+00:07:43,414 --> 00:07:47,645
+我们已经看了这个简单的例子。在这个简单例子中
+we already looked at, at the trivial
+example. In the trivial example, what we do,
+
+107
+00:07:47,645 --> 00:07:52,240
+我们假设密钥空间等于输入信息空间
+we just, we're gonna assume that the key
+space is equal to the input space. So this
+
+108
+00:07:52,240 --> 00:07:59,664
+这个PRP将X乘X映射到X。以AES为例子
+PRP really acts on, you know, X times X to
+X. So think of AES for example, where
+
+109
+00:07:59,664 --> 00:08:05,070
+密钥空间128位，数据空间128位，当然
+the key space is 128 bits, the data space
+is 128 bits and of course the output is
+
+110
+00:08:05,070 --> 00:08:10,540
+输出空间也是128位，那么我们定义一个微调分组密码为
+128 bits and then the way that we defined a
+tweakable block cipher again there is a
+
+111
+00:08:10,540 --> 00:08:15,360
+有一个密钥、一个微调和待加密的输入数据
+key, a tweak and data as input is
+basically we encrypt the tweak using our
+
+112
+00:08:15,360 --> 00:08:20,681
+使用微调和主密钥，然后我们使用得到的随机密钥加密数据
+master key and then we encrypt the data
+using the resulting random key. Now
+
+113
+00:08:20,681 --> 00:08:25,695
+现在大家发现，如果我们想使用这个
+微调分组密码来加密n个分组
+you realize that if we wanted to encrypt n
+blocks with this tweakable block cipher,
+
+114
+00:08:25,695 --> 00:08:30,648
+会要求2n次分组密码的计算：n次用于加密
+this would require 2n evaluations of
+the block cipher: n evaluations to encrypt
+
+115
+00:08:30,648 --> 00:08:35,057
+给定的微调，另外n次用于加密给定的数据
+the given tweaks, and then n more evaluations 
+to encrypt the actual given data.
+
+116
+00:08:35,057 --> 00:08:39,955
+那么，我想给大家看一个很好的例子，
+说明了我们实际上可以做得更好
+So, I want to show you a nice example, 
+that shows that we can actually do better.
+
+117
+00:08:39,955 --> 00:08:43,963
+这个例子叫做XTS机制。它其实是起源于
+This is called the XTS construction. 
+It's actually originally based on
+
+118
+00:08:43,963 --> 00:08:49,428
+Phil Rogaway的XEX模式。它如下工作
+a mode called XEX due to Phil Rogaway.
+And it works as follows. So suppose you
+
+119
+00:08:49,428 --> 00:08:54,018
+假设给我一个常规的定义在n位分组上的分组密码
+give me a, a regular block cipher that
+operates on n-bit blocks. So not a
+
+120
+00:08:54,018 --> 00:08:57,745
+不是微调分组密码，只是一个常规的分组密码
+tweakable block cipher, just a regular
+block cipher. We're gonna define a
+
+121
+00:08:57,745 --> 00:09:01,664
+我们来定义一个微调分组密码。这个微调分组密码
+tweakable block cipher. So again, this
+tweakable block cipher is gonna take two
+
+122
+00:09:01,664 --> 00:09:05,341
+取两个密钥作为输入，为求简便，大家待会将看到
+keys as input. The tweak space, for
+convenience, which you're gonna see in
+
+123
+00:09:05,341 --> 00:09:09,817
+我们假设这个微调空间由两个值组成
+just a minute, we're gonna assume this
+tweak space is made up of, of two values,
+
+124
+00:09:09,817 --> 00:09:15,104
+T和I。T是某个微调值，我们待会将讨论它
+T and I. T is going to be some, you know, some
+tweak value which we'll see in a minute, and I is
+
+125
+00:09:15,104 --> 00:09:19,474
+I是某个索引。然后X是n位字符串
+going to be some index. And then X is
+going to be an n-bit string which we're
+
+126
+00:09:19,474 --> 00:09:24,069
+我们将用微调分组密码加密X。那么XTS如下工作
+going to apply the tweakable block cipher
+to. So, the way XTS works is as follows.
+
+127
+00:09:24,069 --> 00:09:27,775
+首先我们加密微调T的左半部分
+The first thing we're going to do is we're
+going to encrypt the left half of the
+
+128
+00:09:27,775 --> 00:09:33,266
+使用密钥K2。我们把加密的结果记为N
+tweak, namely T, using the key K2 and we're
+going to call the result N. So now what
+
+129
+00:09:33,266 --> 00:09:37,866
+接下来我们把信息m和某个密码本函数
+we're gonna do is we're gonna XOR the
+message m with some padding function
+
+130
+00:09:37,866 --> 00:09:42,589
+在我们刚刚得到的N处的值进行异或，索引是I
+applied to this value N that we just
+derived, at the index I. And this padding
+
+131
+00:09:42,589 --> 00:09:46,982
+这个密码本函数函数极快。我们大可以忽略它的运行时间
+function is extremely fast. We can pretty
+much ignore it in the running time. The
+
+132
+00:09:46,982 --> 00:09:52,930
+接下来我们要使用密钥K2加密，然后再进行异或
+next thing we do is we're gonna encrypt
+using the key k2. And then we're going
+
+133
+00:09:52,930 --> 00:09:56,868
+使用同样的密码本。我们使用这个密码本N来进行异或
+to XOR again, using the same pad. So
+we're going to XOR again using the pad
+
+134
+00:09:56,868 --> 00:10:02,335
+应用到索引I。得到的结果就是密文了，我们记为C
+of N applied to I. And the result is going
+to be the cipher text, which we'll denote
+
+135
+00:10:02,335 --> 00:10:06,576
+好，如我所说，这个函数P非常简单
+by C. Okay, so again as I said, the
+function P is some very, very simple
+
+136
+00:10:06,576 --> 00:10:10,161
+仅仅是某些有限域上的乘法，这里我就不解释了
+function. It's just some multiplication in
+a finite field which I'm not going to
+
+137
+00:10:10,161 --> 00:10:14,195
+非常之快，运行时间取决于
+explain here. Very, very fast so the
+running time is dominated by the running
+
+138
+00:10:14,195 --> 00:10:21,614
+分组密码E的运行时间。这就是XTS。
+这个机制的好处在于
+time of the block cipher E and that's it. That's
+XTS. And the nice thing about this construction
+
+139
+00:10:21,614 --> 00:10:26,635
+如果我们想加密n+1个分组，我们只需要计算N一次
+is now if we wanted to encrypt n plus one
+blocks, all we do is we compute the value
+
+140
+00:10:26,635 --> 00:10:32,391
+然后对索引1,2,3,4，对每个分组
+N once. And then for the indices one, two,
+three, four basically we just need to
+
+141
+00:10:32,391 --> 00:10:37,574
+我们只需要计算PRP E一次。所以我们需要加密n个分组
+evaluate the PRP E once per block. So we
+would need to encrypt n blocks using the
+
+142
+00:10:37,574 --> 00:10:43,858
+使用T_1, T_2, T_3, T_4等等。我们只需要n+1次
+tweaks T,1, T,2, T,3, T,4 and so on. We
+would just need n plus one evaluations of
+
+143
+00:10:43,858 --> 00:10:47,940
+分组密码E的计算。所以这比简单机制要快出一倍
+the block cipher E. So it's twice
+as fast as the trivial construction.
+
+144
+00:10:47,940 --> 00:10:52,431
+所以我想让大家研究一会这个XTS机制
+So I want you to stare for just a minute
+at this XTS construction. So my question
+
+145
+00:10:52,431 --> 00:10:56,353
+我给大家的问题是，真的有必要在用微调前加密它吗？
+to you is, is it really necessary to
+encrypt the tweak before using it?
+
+146
+00:10:56,353 --> 00:11:00,506
+就是说，下面这个机制是安全的微调PRP吗？
+That is, that is the following construction
+a secure tweakable PRP. So you can see
+
+147
+00:11:00,506 --> 00:11:04,766
+在这个机制中，这个微调被直接使用，
+作为这个密码本函数的输入
+in this construction, this tweak is used
+directly as input to the padding function
+
+148
+00:11:04,766 --> 00:11:09,027
+再异或，我给大家的问题是，如果我们这样做
+for the XOR and my question to you is 
+if we did that, would that be a
+
+149
+00:11:09,027 --> 00:11:12,969
+这是一个安全的微调PRP吗？我再提醒一下大家，这是密钥
+secure tweakable PRP? And let me 
+remind you again that, this is the key,
+
+150
+00:11:12,969 --> 00:11:14,948
+这是微调，这是数据
+this is the tweak and this is the data.
+
+151
+00:11:17,948 --> 00:11:20,361
+我希望大家都认为这是正确答案
+I hope everybody said that this is the correct answer.
+
+152
+00:11:20,361 --> 00:11:25,908
+如果我们把数据设为P(t,1)，然后把它
+Basically, if we set the data to
+be P(t, 1), then when we XOR it with the
+
+153
+00:11:25,908 --> 00:11:30,992
+和对应的微调进行异或，对应的微调也是P(t,1)。
+所以我们得到的是0
+corresponding tweak, which is also P(t,1)
+we're gonna get here, zero. And so
+
+154
+00:11:30,992 --> 00:11:35,488
+所以我们加密的就是0，无论输出什么
+what's gonna get encrypted is actually
+zero, so whatever that comes out to be.
+
+155
+00:11:35,488 --> 00:11:40,601
+我们记输出为某值C0。那么实际输出为
+Let's say that some value, C0. And
+then the actual output is just gonna be C0
+
+156
+00:11:40,601 --> 00:11:47,655
+C0异或P(t,1)。现在我们对P(t,2)做同样的事情
+XOR P(t,1). Now when we do the same
+thing with P(t, 2), we're gonna get c0
+
+157
+00:11:47,655 --> 00:11:53,284
+我们会获得C0异或P(t,2)。然后我们把这两者异或起来
+我们就会得到P(t,1)异或P(t,2)
+XOR P(t, 2). And when we XOR these two
+things together, we just get P(t, 1) XOR P(t, 2).
+
+158
+00:11:53,284 --> 00:11:58,372
+事实上这意味着攻击者可以询问挑战者
+So the fact that this is true means
+that an attacker can simply query the
+
+159
+00:11:58,372 --> 00:12:03,663
+以这个微调和这个数据
+challenger at this tweak and this data,
+this tweak and that data. And then just
+
+160
+00:12:03,663 --> 00:12:08,110
+然后计算挑战者的两个回复的异或，然后
+比较合适的密码本函数值的异或
+compute the XOR of the two responses, and
+compare to the XOR of the appropriate
+
+161
+00:12:08,110 --> 00:12:12,010
+如果这个等式成立，我们是在与一个伪随机函数交互
+padding values. And if the equality holds,
+we're interacting with a pseudorandom
+
+162
+00:12:12,010 --> 00:12:15,429
+否则我们是在与一个真随机函数交互
+function; otherwise we're interacting with
+a, with a truly random function. So this
+
+163
+00:12:15,429 --> 00:12:20,164
+那么这就让攻击者能以优势1击败这个机制
+would allow the attacker to defeat this
+construction with advantage one. So just
+
+164
+00:12:20,164 --> 00:12:24,595
+总结一下，XTS用于硬盘加密
+to summarize the way XTS is used for disk
+encryption. What we do is we look at
+
+165
+00:12:24,595 --> 00:12:28,912
+我们看扇区号T，然后把扇区分成若干分组，
+每个分组16字节
+sector number T, and we break it into
+blocks, sixteen byte blocks. And then
+
+166
+00:12:28,912 --> 00:12:32,825
+然后1号分组使用微调T1加密，
+2号分组使用微调T2加密
+block number one gets encrypted with a
+tweak, T1. Block number two gets encrypted
+
+167
+00:12:32,825 --> 00:12:37,831
+等等。。这样每个分组都有其自己的PRP
+with a tweak, T2, and so on and so forth.
+And so every block gets its own PRP. And
+
+168
+00:12:37,831 --> 00:12:41,978
+这样整个扇区被加密了
+the whole sector, as a result, is
+encrypted, using, you know, a collection
+
+169
+00:12:41,978 --> 00:12:46,353
+使用一系列PRP。大家注意到，这是一个分组级别的
+PRP，不是扇区级别的PRP
+of PRPs. Now you notice, this is a block
+level PRP. It's not a sector level PRP.
+
+170
+00:12:46,353 --> 00:12:50,557
+事实上，并不是每个扇区都用它自己的PRP加密的
+So, in fact, it's not true that each
+sector gets encrypted with its own PRP.
+
+171
+00:12:50,557 --> 00:12:55,230
+只是每个分组是用它自己的PRP加密的
+It's just each block gets encrypted with
+its own PRP. The distinction between a
+
+172
+00:12:55,230 --> 00:12:59,037
+扇区与分组之间的差别某种意义上是人为的。
+实际上，这个XTS模式
+sector and a block is some, somewhat
+artificial, and this XTS mode actually
+
+173
+00:12:59,037 --> 00:13:04,230
+提供了扇区级的确定性的CPA安全的加密
+provides you know, deterministic CPA
+encryption at the block level, at the
+(这里少讲了一个安全secure)
+
+174
+00:13:04,230 --> 00:13:08,902
+16字节的粒度。这是目标。这个模式实际上
+16-byte level. That's the goal. And this
+mode actually is fairly popular in disk
+
+175
+00:13:08,902 --> 00:13:13,321
+在硬盘加密的产品中很是流行。我写了几个例子
+encryption products. I just wrote a couple
+of examples here that actually support
+
+176
+00:13:13,321 --> 00:13:17,960
+它们支持XTS。那么我想告诉大家，在实际中
+XTS. So I wanted you to know that this is
+in fact how disk encryption is commonly
+
+177
+00:13:17,960 --> 00:13:22,162
+硬盘加密是如何实现的。那么总结一下，
+微调加密是一个有用的概念
+done in practice. So, to summarize,
+tweakable encryption is a useful concept
+
+178
+00:13:22,162 --> 00:13:26,799
+当你需要许多从单个密钥推出的独立的PRP
+to know when you need many independent
+PRPs all derived from a single key. One
+
+179
+00:13:26,799 --> 00:13:31,436
+要记住的要点是，事实上这个简单的机制
+important thing to remember is, in fact,
+the trivial construction is not the most
+
+180
+00:13:31,436 --> 00:13:36,073
+不是最有效的。有更有效的机制，比如XTS
+efficient. There are constructions like
+XTS are actually more efficient, where you
+
+181
+00:13:36,073 --> 00:13:40,538
+你可以一个微调来重复使用加密，不同的微调
+can kind of reuse encryptions from one
+tweak to get many encryptions for many
+
+182
+00:13:40,538 --> 00:13:45,040
+可以获得许多不同的加密。所以这些是更好的方法
+different tweaks. And so those are the
+better ways to use them. Both the trivial
+
+183
+00:13:45,040 --> 00:13:49,872
+这个简单的机制和XTS机制都是所谓的窄分组机制
+construction and the XTS construction are
+what are called narrow block constructions.
+
+184
+00:13:49,872 --> 00:13:54,496
+它们为一个16字节的分组提供了微调分组密码
+Namely they provide a tweakable block
+ciphers for a sixteen byte block. But as we
+
+185
+00:13:54,496 --> 00:13:57,762
+但让我们所说，上一节我们看了EME机制
+said, we looked the, at the EME
+construction in the last segment, which
+
+186
+00:13:57,762 --> 00:14:02,884
+它提供了能处理长得多的分组的PRP。
+事实上，EME是一个微调的操作模式
+provided a PRP for larger, much larger
+blocks and in fact EME is a tweakable
+
+187
+00:14:02,884 --> 00:14:07,758
+所以，如果大家需要能处理更长的分组的PRP
+或是更长的分组的微调的PRP
+mode of operation. So, if you need PRPs for larger
+blocks or tweakable PRPs for larger
+
+188
+00:14:07,758 --> 00:14:12,608
+那么大家就使用EME。但大家注意在EME中
+blocks then you would just use EME. But you
+notice there, in EME, you had to apply the
+
+189
+00:14:12,608 --> 00:14:16,773
+每个输入分组必须应用分组密码两次，因此
+它比XTS慢一倍
+block cipher twice per input block, and
+as a result it's twice as slow as
+
+190
+00:14:16,773 --> 00:14:21,617
+因此不是很常用。关于微调加密，这些就是我想说的
+XTS, and is not very often used. So that's
+what I wanted to say about tweakable
+
+191
+00:14:21,617 --> 00:14:25,593
+下节我们讨论保格式加密
+encryption. And in the next segment we'll
+talk about format preserving encryption.

@@ -1,0 +1,794 @@
+1
+00:00:00,000 --> 00:00:03,722
+上节我们看了一个利用补齐神谕的攻击
+In the last segment, we looked at a
+padding oracle attack that completely
+
+2
+00:00:03,722 --> 00:00:08,005
+这个攻击完全破解了认证加密系统。我希望这个攻击能说服大家
+breaks an authenticated encryption system.
+I hope this attack convinces you that you
+(严格地说，是<font color="red">错误实现</font>的认证加密系统)
+
+3
+00:00:08,005 --> 00:00:10,979
+不要自己去实现认证加密
+shouldn't implement authenticated
+encryption on your own cause you might end
+
+4
+00:00:10,979 --> 00:00:15,950
+因为你有可能被补齐神谕或计时攻击等等暴露了
+up exposing yourself to a padding oracle
+attack or a timing attack or any other
+
+5
+00:00:15,959 --> 00:00:19,936
+你应当使用类似GCM等标准
+such attack. Instead you should be using
+standards like GCM or any other of the
+
+6
+00:00:19,936 --> 00:00:23,710
+或者其他认证加密模式，有很多密码学库实现了它们
+standardized authenticated encryption
+modes as implemented in many crypto
+
+7
+00:00:23,710 --> 00:00:27,712
+本节，我将为大家展示另外一个非常聪明的
+针对认证加密系统的攻击
+libraries. In this segment, I'm gonna show
+you another very clever attack on an
+
+8
+00:00:27,712 --> 00:00:31,770
+我希望在大家看了这个攻击后
+authenticated encryption system. And I
+hope after you see this attack, you'll be
+
+9
+00:00:31,770 --> 00:00:35,468
+可以完全说服大家不要自己去发明、实现认证加密系统
+completely convinced not to invent and
+implement your own authenticated
+
+10
+00:00:35,468 --> 00:00:39,526
+大家一定要使用标准机制中的一种
+encryption systems. But instead, always
+use one of the standard schemes, like GCM
+
+11
+00:00:39,526 --> 00:00:44,380
+比如GCM或其他。那么我想给大家看的这个攻击
+or others. So this particular attack that
+I want to show you is an attack on the SSH
+
+12
+00:00:44,380 --> 00:00:48,996
+是针对SSH的二元数据包协议的。那么SSH是一个
+标准的安全远程shell应用
+binary packet protocol. So SSH is a
+standard secure remote shell application
+
+13
+00:00:48,996 --> 00:00:53,679
+使用了一个客户端与服务端之间的协议
+that uses a protocol between a client
+and the server. It has a key exchange
+
+14
+00:00:53,679 --> 00:00:58,794
+它有一个密钥交换机制，一旦双方交换密钥，
+SSH使用所谓的二元数据包协议
+mechanism and once two sides exchange keys,
+SSH uses what's called the binary packet
+
+15
+00:00:58,794 --> 00:01:03,662
+来在客户端和服务端之间相互发送信息
+protocol to send messages back and forth
+between the client and the server. Now
+
+16
+00:01:03,662 --> 00:01:09,731
+SSH是这样工作的：我们说过，SSH使用"加密且MAC"
+here is how SSH works, so recall that SSH
+uses what we called encrypt-and-MAC. Okay
+
+17
+00:01:09,731 --> 00:01:13,707
+每个SSH包以一个序列号开头
+so technically what happens is every SSH
+packet begins with a sequence number, and
+
+18
+00:01:13,707 --> 00:01:18,245
+然后数据包包含了包的长度，CBC补齐的长度
+then the packet contains the packet
+length, the length of the CBC pad, the
+
+19
+00:01:18,245 --> 00:01:24,020
+然后是封装数据，接着是CBC补齐。现在这整个红色块
+actual payload follows, then the CBC pad
+follows. Now this whole red block here is
+
+20
+00:01:24,020 --> 00:01:29,867
+是用带链式IV的CBC加密的，所以这对CPA攻击也是脆弱的
+CBC encrypted also with a chained IV, so
+this is also vulnerable to the CPA attacks
+
+21
+00:01:29,867 --> 00:01:34,191
+就像我们讨论过的那样。但是整个红色数据包
+that we discussed before. But
+nevertheless, this whole red packet is
+
+22
+00:01:34,191 --> 00:01:39,033
+使用CBC加密的。然后计算整个数据包的明文的MAC
+encrypted using CBC encryption. And then
+the entire clear text packet is MAC-ed.
+
+23
+00:01:39,033 --> 00:01:43,169
+MAC以明文形式发送，和数据包一起。
+那么我希望大家记住
+And the MAC is sent in the clear, along
+with the packet. So I want you to remember
+
+24
+00:01:43,169 --> 00:01:48,837
+这个MAC是根据数据包的明文计算的，
+然后MAC是以明文形式发送的
+that the MAC is computed over plain text
+packets, and then the MAC is sent in the
+
+25
+00:01:48,837 --> 00:01:53,597
+这是我们说的"加密且MAC"。我们说过这不是一个好办法
+clear. This is what we call encrypt-and-MAC. 
+And we said that this is not a good
+
+26
+00:01:53,597 --> 00:01:58,330
+因为MAC没有私密性的要求
+way to do things, because MACs have no
+confidentiality requirements. And by sending
+
+27
+00:01:58,330 --> 00:02:03,064
+通过以明文的形式发送明文的MAC，有可能
+暴露了明文的信息
+the MAC of the clear text in the clear,
+you might be exposing information about
+
+28
+00:02:03,064 --> 00:02:06,347
+但这不是我这里想给大家看的错误
+the clear text. But this is not the
+mistake that I want to show you here. I
+
+29
+00:02:06,347 --> 00:02:09,702
+我想给大家看一个聪明得多的攻击。
+首先，我们看SSH如何解密
+want to show you a much more clever attack.
+So first, let's look at how decryption
+
+30
+00:02:09,702 --> 00:02:16,068
+首先，服务器只解密加密的数据包的
+works in SSH. So what happens is, first of
+all, the server decrypts the encrypted
+
+31
+00:02:16,068 --> 00:02:21,520
+包长度域。那么它只解密开头这几个字节
+packet length field only. So it only
+decrypts these particular first few bytes.
+
+32
+00:02:21,520 --> 00:02:26,440
+然后它从网络接着读取数据，读取的字节数
+Then it will go ahead and read from the
+network, as many bytes as specified in the
+
+33
+00:02:26,440 --> 00:02:31,000
+由数据包长度域指定。SSH使用CBC解密剩下的密文内容
+packet length field. It's gonna decrypt the
+remaining cipher text blocks using CBC
+
+34
+00:02:31,000 --> 00:02:35,740
+一旦恢复了整个SSH数据包
+decryption. Then, once it's recovered the
+entire SSH packet, it will go ahead and
+
+35
+00:02:35,740 --> 00:02:40,540
+它会接着检查明文的MAC，如果MAC无效，就报错
+check the MAC of the plain text, and
+report an error if the MAC happens to be
+
+36
+00:02:40,540 --> 00:02:45,645
+这里的问题是，数据包长度域被解密了
+invalid. Now the problem here is that the
+packet length field is decrypted and then
+
+37
+00:02:45,645 --> 00:02:50,107
+然后被直接使用，以决定数据包的长度
+used directly to determine the length of
+the packet before any authentication has
+
+38
+00:02:50,107 --> 00:02:54,780
+这是在任何认证发生前。事实上，不可能认证
+数据包长度域的MAC
+taken place. In fact, it's not possible to
+verify the MAC of the packet length field
+
+39
+00:02:54,780 --> 00:02:58,647
+因为我们还没有还原整个数据包
+because we haven't recovered the entire
+packet yet and as a result we cannot check
+
+40
+00:02:58,647 --> 00:03:04,074
+所以我们还不能检查MAC。但是，SSH协议在验证MAC之前
+就使用了数据包长度
+the MAC. But nevertheless the protocol uses
+the packet length before verifying that the MAC
+
+41
+00:03:04,074 --> 00:03:09,501
+实际上这引入了一个非常犀利的攻击
+is valid. So it turns out this introduces a
+very, very acute attack. And I'm only
+
+42
+00:03:09,501 --> 00:03:12,943
+我只描述这个攻击的一个非常简化的版本，以表达基本思想
+gonna describe a very simplified version
+of this attack, just to get the idea
+
+43
+00:03:12,943 --> 00:03:17,244
+想法如下：假设攻击者截获了一个密文分组
+across. So here's the idea. Suppose the
+attacker intercepted a particular cipher
+
+44
+00:03:17,244 --> 00:03:23,037
+即直接用AES加密的分组M
+text block, namely the direct AES
+encryption of the message block M. And now
+
+45
+00:03:23,037 --> 00:03:27,092
+现在攻击者想还原这个M。我强调一下
+he wants to recover this M. And I
+emphasize that this intercepted
+
+46
+00:03:27,092 --> 00:03:31,418
+这个截获的密文只有一个分组长，一个AES分组
+cipher text is only one block length.
+It's one AES block. So here's what the
+
+47
+00:03:31,418 --> 00:03:37,073
+攻击者这么办：向服务器发送一个数据包
+attacker is gonna do. Well, he's gonna
+send a packet to the server that starts
+
+48
+00:03:37,073 --> 00:03:41,062
+数据包的开头是正常的，以一个序列号开头
+off as normal. It's basically, starts off
+with a sequence number and then he's going
+
+49
+00:03:41,062 --> 00:03:46,304
+然后他把他截获的密文C作为第一个分组，发送给服务器
+to inject his captured cipher text as the
+first cipher text block that's sent to the
+
+50
+00:03:46,304 --> 00:03:51,237
+现在，服务器该怎么办？服务器会解密
+server. Now, what is the server going to
+do? The server is gonna decrypt the first
+
+51
+00:03:51,237 --> 00:03:57,270
+第一个AES分组的前几个字节，他会把这前几个字节
+few bytes of this first AES block and he's
+going to interpret the first few bytes as
+
+52
+00:03:57,270 --> 00:04:01,973
+解读成数据包的长度域。接下来
+the length fields of the packet. The next
+thing that's gonna happen is, the server
+
+53
+00:04:01,973 --> 00:04:06,842
+服务器将期待着这么多字节，在验证MAC之前
+is gonna expect this many bytes, before it
+checks that the MAC is valid. And so what
+
+54
+00:04:06,842 --> 00:04:12,089
+攻击者将一次只给服务器一个字节
+the attacker is gonna do, is, he's gonna
+feed the server one byte at a time. So the
+
+55
+00:04:12,089 --> 00:04:15,390
+这样服务器会一个字节、一个字节地读
+server will read one byte, and then
+another byte, and then another byte.
+
+56
+00:04:15,390 --> 00:04:20,007
+最终，服务器会读到长度域里说的那么多的字节
+Eventually, the server will read as many
+bytes as the length field specifies, at
+
+57
+00:04:20,007 --> 00:04:24,625
+他会检测MAC是否有效。当然
+which point, it will check that the MAC is
+valid. And of course, the attacker was
+
+58
+00:04:24,625 --> 00:04:29,477
+攻击者给服务器的字节都是随便弄的，因此MAC不会通过验证
+just feeding the server junk bytes. And as
+a result, the MAC is not gonna verify, and
+
+59
+00:04:29,477 --> 00:04:33,978
+服务器会发送一个MAC错误，但大家发现
+the server will send a MAC error. But you
+realize that what happened here, the
+
+60
+00:04:33,978 --> 00:04:38,362
+攻击者在数他发送给服务器多少个字节
+attacker was counting how many bytes it
+sent to the server. And so it knows
+
+61
+00:04:38,362 --> 00:04:43,097
+他能严格地知道他发送了多少个字节，
+当他接收到了服务器发来的MAC错误
+exactly how many bytes were sent at the
+time that it receives the MAC error from
+
+62
+00:04:43,097 --> 00:04:48,288
+这就告诉攻击者，密文C的前32位的解密结果
+the server. So that tells it that the
+decryption of the first 32 bits of its
+
+63
+00:04:48,288 --> 00:04:54,177
+正好等于已经发送的字节数
+cypher text C are exactly equal to the
+number of bytes that were sent before it
+
+64
+00:04:54,177 --> 00:04:57,374
+在看到MAC错误之前。那么这是一个非常聪明的攻击
+saw the MAC error. So this is a very
+clever attack. So let me say it one more
+
+65
+00:04:57,374 --> 00:05:02,556
+我再说一遍以确保清楚。攻击者有一个密文分组C
+time to make sure this is clear. So again,
+the attacker has a one block cipher text C
+
+66
+00:05:02,556 --> 00:05:07,407
+他想解密C，我们假定C解密后，得到的明文的高32位
+that it wants to decrypt and let's pretend
+that when C is decrypted the 32 most
+
+67
+00:05:07,407 --> 00:05:12,309
+是数字5。在这种情况下
+significant bits of the plain text happen
+to be the number five. In this case, what
+
+68
+00:05:12,309 --> 00:05:17,092
+攻击者会看到如下的事情。服务器会解密
+the attacker will see, is the following
+behavior. The server is gonna decrypt the
+
+69
+00:05:17,092 --> 00:05:21,815
+挑战分组C，会得到数字5，并把5当作长度域
+challenge block c and he's gonna obtain
+the number five as the length field. So,
+
+70
+00:05:21,815 --> 00:05:26,777
+那么现在，攻击者会给服务器一次一个字节
+now, the attacker is gonna feed the server
+one byte at a time and after the attacker
+
+71
+00:05:26,777 --> 00:05:31,500
+在攻击者给服务器5个字节后，服务器说：
+我刚刚还原了整个数据包
+feeds the server five bytes the server
+says, hey, I've just recovered the entire
+
+72
+00:05:31,500 --> 00:05:35,984
+让我检查MAC。MAC很可能是错的
+packet, let me check the MAC. The MAC is
+likely to be false and, then, it will
+
+73
+00:05:35,984 --> 00:05:41,156
+服务器会发送一个坏MAC的错误。那么在读了5个字节后
+send, bad MAC error. So after five bytes
+are read off the network the attacker is
+
+74
+00:05:41,156 --> 00:05:45,447
+攻击者会看到一个坏MAC的错误，然后攻击者
+就知道了解密后的分组的高32位
+gonna see a bad MAC error and then the
+attacker learns that the most significant
+
+75
+00:05:45,447 --> 00:05:51,689
+等于数字5。那么
+32 bits of the decrypted block is equal to
+the number five. So there. So, you just
+
+76
+00:05:51,689 --> 00:05:56,705
+你知道了C的高32位。那么这是一个非常重要的攻击
+learned the 32 most significant bits of
+C. So this is a very significant attack,
+
+77
+00:05:56,705 --> 00:06:01,731
+因为攻击者刚刚知道了密文分组解密后的高32位
+because the attacker just learned 32 bits
+of the decrypted cipher text block. And
+
+78
+00:06:01,731 --> 00:06:05,767
+他可以对任何他想要的密文分组实施这个攻击
+since he can apply this attack to any
+cipher text block he wants, he can
+
+79
+00:06:05,767 --> 00:06:11,410
+他可以知道一条长信息的每个密文分组的高32位
+basically learn the first 32 bits of every
+cipher text block in a very long message.
+
+80
+00:06:11,410 --> 00:06:15,542
+那么这里发生了什么？密码设计里有两个错误
+So what just happened here? Well, there
+are actually two things that were wrong in
+
+81
+00:06:15,542 --> 00:06:19,340
+第一个是，解密操作不是原子操作
+this design. The first one is the
+decryption operation is non-atomic. In
+
+82
+00:06:19,340 --> 00:06:25,206
+换句话说，解密算法不取整个数据包作为输入
+other words, the decryption algorithm
+doesn't take a whole packet as input, and
+
+83
+00:06:25,206 --> 00:06:29,903
+而返回整个明文作为输出，或者返回"拒绝"
+respond with a whole plain text as output,
+or with the word reject. Instead, the
+
+84
+00:06:29,903 --> 00:06:34,362
+解密算法部分地解密了密文
+decryption algorithm partially decrypts
+the cipher text, namely to obtain the
+
+85
+00:06:34,362 --> 00:06:39,476
+获得了长度域，然后等待指定数量的字节去还原
+length field, and then it waits to recover
+as many bytes as needed and then it
+
+86
+00:06:39,476 --> 00:06:43,924
+然后完成了加密过程。这些非原子解密操作
+completes the decryption process. So these
+nonatomic decryption operations are fairly
+
+87
+00:06:43,924 --> 00:06:48,500
+是很危险的，一般来说，需要避免使用他们。
+在这个例子里，这个非原子操作
+dangerous, and generally, they should be
+avoided. In this example, this nonatomic
+
+88
+00:06:48,500 --> 00:06:52,791
+正好破坏了认证加密
+decryption happens to break authenticated
+encryption. The other problem that
+
+89
+00:06:52,791 --> 00:06:57,105
+另一个问题在于，在正确地认证之前，就使用了长度域
+happened is that the length field was used
+before it was properly authenticated. And
+
+90
+00:06:57,105 --> 00:07:01,470
+这是另一个错误之处，不应该这么做的。
+所以加密的数据域不应该被使用
+this is another issue that should never be
+done. So the encryption field should never
+
+91
+00:07:01,470 --> 00:07:05,388
+在这个域被正确认证之前。我问大家
+be used before the field is actually
+authenticated. So let me ask you, if you
+
+92
+00:07:05,388 --> 00:07:09,449
+如果大家可以重新设计SSH，如何最小地改动这里
+had the option of redesigning SSH what is
+the minimum change that you would do to
+
+93
+00:07:09,449 --> 00:07:13,754
+可以让SSH能抵抗这种攻击？我告诉大家
+可能有多种答案
+make SSH resist this attack? And let me
+tell you that multiple answers might be
+
+94
+00:07:13,754 --> 00:07:18,259
+一个方案是，以明文形式发送一个长度域，就像TLS一样
+correct. One option is to send a length
+field in the clear, just as in the case of
+
+95
+00:07:18,259 --> 00:07:22,741
+这样，攻击者没有机会提交选择密文攻击了
+TLS. In this case, there's no opportunity
+for an attacker to submit chosen cipher
+
+96
+00:07:22,741 --> 00:07:26,998
+因为长度域不会被加密
+text attack, because, well, the length
+field is never decrypted. And so there's
+
+97
+00:07:26,998 --> 00:07:31,603
+这样攻击者无法滥用解密操作
+no decryption taking place that the attacker 
+can abuse. Replacing encrypt-and-MAC
+
+98
+00:07:31,603 --> 00:07:36,211
+采用"先加密后MAC"而非"加密且MAC"并无影响，
+因为这个攻击对于两者都可行的
+by encrypt-then-MAC doesn't have any
+impact because this attack would apply
+
+99
+00:07:36,211 --> 00:07:39,935
+问题在于，在认证前，长度域被使用了
+either way. The problem is that the length
+field is used before it's authenticated
+
+100
+00:07:39,935 --> 00:07:44,243
+另一种方式也会有这种情况。所以更好的加密模式
+and that would have to happen either way.
+So a better mode of encryption doesn't
+
+101
+00:07:44,243 --> 00:07:48,498
+并无裨益。另一种方法是单调对长度域计算MAC
+actually help. Another option is to MAC
+the length field separately so that now
+
+102
+00:07:48,498 --> 00:07:52,591
+这样服务器可以读去长度域，检查仅为长度域服务的MAC
+the server can read the length field,
+check that the MAC for just the length
+
+103
+00:07:52,591 --> 00:07:56,845
+是否有效，然后服务器就知道了接下来要读多少个字节
+field is valid, and then it would know how
+many subsequent bytes to read before
+
+104
+00:07:56,845 --> 00:08:00,916
+之后再检查整个数据包的MAC域。最后一种方案是
+checking MAC field on the entire packet.
+The last option is actually one that
+
+105
+00:08:00,916 --> 00:08:04,906
+可行的，但效率极差，可能会让服务器
+works, but is terribly inefficient, and it
+would expose the server to a denial of
+
+106
+00:08:04,906 --> 00:08:09,322
+遭受拒绝服务攻击，所以我不认为这是一个有效的答案
+service attack, so I'm not going to mark
+it as a valid answer. So the main lesson
+
+107
+00:08:09,322 --> 00:08:14,295
+需要记住的主要的教训是，不要自己去实现
+或设计自己的认证加密系统
+to remember is, don't implement or design
+your own authenticated encryption system.
+
+108
+00:08:14,295 --> 00:08:18,723
+只使用类似于GCM的密码学标准。但如果出于某些原因
+Just use the standards like GCM. But if
+for some reason, you can't use the
+
+109
+00:08:18,723 --> 00:08:22,572
+你不能使用标准，必须实现自己的认证加密系统
+standards, and you have to implement your
+own authenticated encryption system, then
+
+110
+00:08:22,572 --> 00:08:28,356
+那么请先加密后MAC。确保不犯这两节里的错误
+use encrypt-then-MAC. And make sure not
+to repeat the mistakes of the last two
+
+111
+00:08:28,356 --> 00:08:33,228
+也就是不在认证长度域之前就使用长度域
+segments, namely don't use a length field
+before the length field is authenticated.
+
+112
+00:08:33,228 --> 00:08:37,388
+更一般地，不在认证前使用任何解密的域
+And more generally, don't use any
+decrypted field before that field is
+
+113
+00:08:37,388 --> 00:08:40,991
+那么我们对认证加密的讨论完结了
+authenticated. Okay so this is the end of
+our discussion of authenticated
+
+114
+00:08:40,991 --> 00:08:44,985
+我想指出几篇关于认证加密的论文
+encryption. I wanted to point out a couple
+of papers on authenticated encryption that
+
+115
+00:08:44,985 --> 00:08:49,588
+大家可以做进一步的阅读。第一篇很犀利
+you could use as further reading. The
+first one is a very acute one on the order
+
+116
+00:08:49,588 --> 00:08:53,918
+是关于加密和认证的先后顺序的，讨论了
+是该先加密后MAC
+of encryption and authentication that talks
+about whether one should do encrypt-then-MAC
+
+117
+00:08:53,918 --> 00:08:56,796
+还是先MAC后加密，它证实了一个是正确的
+or MAC-then-encrypt and it
+shows that one is correct and one is
+
+118
+00:08:56,796 --> 00:08:59,912
+另一个是错误的。此文值得一读，文中信息量很大
+incorrect. It's a good read and there's a
+lot of information in that paper. The
+
+119
+00:08:59,912 --> 00:09:04,476
+第二篇讨论了OCB模式，OCB是一个非常有效的
+second discusses OCB mode, which is a very
+efficient way of building authenticated
+
+120
+00:09:04,476 --> 00:09:08,984
+构建认证加密的方法。特别地，这篇文章看了
+一个带关联数据的OCB的变种
+encryption. In particular, it looks at a
+variant of OCB with associated data as we
+
+121
+00:09:08,984 --> 00:09:13,548
+正如我们所讨论过的。最后三篇是关于攻击的论文
+discussed when we described OCB. The last
+three papers are attack papers. The first
+
+122
+00:09:13,548 --> 00:09:17,890
+第一篇描述了上节讨论的补齐神谕攻击
+one describes the padding oracle attack
+that we discussed in the last segment.
+
+123
+00:09:17,890 --> 00:09:23,398
+这篇描述了这节讨论的长度攻击
+This one here describes the length attack
+that we just described in this segment.
+
+124
+00:09:23,398 --> 00:09:28,838
+最后一篇描述了很多对加密机制的攻击
+And the last one describes a number of
+attacks on encryptions that just use CPA
+
+125
+00:09:28,838 --> 00:09:34,038
+其中加密机制只用了CPA安全，没有加完整性。
+最后一篇提供了很多好例子
+security without adding integrity. So this
+last paper actually provides a number of
+
+126
+00:09:34,038 --> 00:09:38,518
+解释了为什么CPA安全本身永远不应该
+good examples for why CPA security by
+itself should never, ever, ever be used
+
+127
+00:09:38,518 --> 00:09:43,116
+被用于加密。记住，大家只能使用认证加密
+for encryption. Remember the only thing
+you're allowed to use is authenticated
+
+128
+00:09:43,116 --> 00:09:47,302
+来保护私密性。如果大家只需要完整性，不需要私密性
+encryption for confidentiality. Or if all
+you need is integrity with no
+
+129
+00:09:47,302 --> 00:09:49,660
+那么用MAC就行了
+confidentiality then you just use a MAC.
+【伊卡酱 译注】

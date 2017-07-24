@@ -1,0 +1,1596 @@
+1
+00:00:00,000 --> 00:00:04,748
+本节我想为大家展示在实际中RSA是如何使用的
+In this segment I wanna show you how RSA
+is used in practice and in particular, I
+
+2
+00:00:04,748 --> 00:00:09,497
+特别地，我想告诉大家一个标准，叫做公钥密码学一号标准
+wanna tell you about a standard called a
+Public Key Cryptography standard number
+
+3
+00:00:09,497 --> 00:00:14,734
+RKCS1。那么我已经几次告诉大家，永远不要使用
+one PKCS one. So I've already told you a
+couple of times that you should never use
+
+4
+00:00:14,734 --> 00:00:19,262
+所谓的教科书RSA。大家永远不应该直接使用RSA
+what's called textbook RSA. You should
+never directly encrypt the message using
+
+5
+00:00:19,262 --> 00:00:23,962
+因为这是不安全的。大家在应用RSA函数前
+RSA because that's insecure. You always
+have to do something to the message before
+
+6
+00:00:23,962 --> 00:00:28,318
+必须始终对明文做些处理。我们上节看过了ISO的标准
+you actually apply the RSA function. We
+saw the ISO standard in the previous
+
+7
+00:00:28,318 --> 00:00:32,846
+我们生成了一个随机x，用RSA加密x
+segment where what we did is we generated
+a random x, encrypted x using RSA, and
+
+8
+00:00:32,846 --> 00:00:37,375
+然后从这个x，我们推出一个对称加密密钥。不过
+then from this x we derived a symmetric
+encryption key. But that's actually not how
+
+9
+00:00:37,375 --> 00:00:41,677
+这还不是RSA在实际中的应用。在实际中，事情不太一样
+RSA is used in practice. In practice
+things worked a little differently and
+
+10
+00:00:41,677 --> 00:00:46,150
+实际中，系统生成一个对称加密密钥
+typically what happens is the system
+generates a symmetric encryption key and
+
+11
+00:00:46,150 --> 00:00:50,508
+然后让RSA去加密这个给定的对称加密密钥
+then RSA is asked to encrypt the given
+symmetric encryption key rather than
+
+12
+00:00:50,508 --> 00:00:55,275
+而不是生成对称密钥，作为RSA加密的一部分。那么在实际中
+generating the symmetric key as part of
+RSA encryption. So in practice as I
+
+13
+00:00:55,275 --> 00:01:00,908
+如我所说，RSA系统有一个输入的对称密钥需要加密
+say, what happens the RSA system is given
+this input a symmetric encryption key to
+
+14
+00:01:00,908 --> 00:01:06,408
+例如，这个可能是一个AES密钥，128位
+encrypt for example this could be a, an AES
+key that would be like 128 bits and then
+
+15
+00:01:06,408 --> 00:01:12,040
+然后这个密钥被加密，首先我们取这128位
+the way this key is actually encrypted is
+first we take these 128 bits and we expand
+
+16
+00:01:12,040 --> 00:01:17,077
+我们把它们扩展成整个模的大小。例如，这个模是2048位
+them into the full modulo size. For
+example, this would be 2048 bits, and then
+
+17
+00:01:17,077 --> 00:01:21,678
+然后我们应用RSA函数。那么问题是，这是怎样预处理的？
+we apply the RSA function. And so the
+question is, how should this preprocessing
+
+18
+00:01:21,678 --> 00:01:26,132
+我们应该如何把给我们的128位AES密钥扩展成2048位
+be done? How should we expand the 128 bit
+AES key that was given to us into a 2048
+
+19
+00:01:26,132 --> 00:01:30,531
+然后再应用RSA呢？进一步的问题是
+bit value that can then be applied with
+RSA? And then furthermore the question is,
+
+20
+00:01:30,531 --> 00:01:35,150
+我们如何论证得到的系统是安全的呢？
+how do we argue that the resulting system
+is secure? So in all the way of doing it
+
+21
+00:01:35,150 --> 00:01:40,082
+在实际中这是广泛应用的，即所谓的PKCS1 1.5
+which is actually very widely deployed in
+practice is what's called PKCS1 version
+
+22
+00:01:40,082 --> 00:01:44,491
+公钥密码学标准，也就是PKCS的意思
+1.5, Public Key Cryptography Standard,
+that's what PKCS stands for. So I wanna
+
+23
+00:01:44,491 --> 00:01:49,307
+那么我想给大家展示这个机制是如何工作的，
+特别地，我会给大家看所谓的
+show you how this mechanism works and in
+particular, I'll show you what's called
+
+24
+00:01:49,307 --> 00:01:53,775
+PKCS1模式2。模式2表示加密，模式1表示签名
+PKCS1 Mode 2. Mode 2 denotes
+encryption, mode 1 denotes signatures so
+
+25
+00:01:53,775 --> 00:01:58,126
+那么这里我们只看加密。PKCS1工作的过程如下
+here we're gonna just focus on the
+encryption. So the way PKCS1 works is
+
+26
+00:01:58,126 --> 00:02:02,710
+你取你的明文，比如说这里是128位AES密钥
+as follows, you take your message, this
+would be the 128 bit AES key for example,
+
+27
+00:02:02,710 --> 00:02:07,392
+把它放在你要产生的值的最低128位
+and you put it as the least significant bits
+of the value that you're creating. The
+
+28
+00:02:07,392 --> 00:02:12,641
+接下来你在它后面附上16个1，即十六进制的FF
+next thing you do is you append sixteen
+bits of one to it, you know FF.
+
+29
+00:02:12,641 --> 00:02:18,009
+这是16个1。然后接下来把它附在这个随机密码本的后面
+This is sixteen bits of one. And then the
+next you do is you append the random pad
+
+30
+00:02:18,009 --> 00:02:23,104
+这个密码本中任何地方都不含FF
+that actually does not contain FF
+anywhere inside the random pad. So this
+
+31
+00:02:23,104 --> 00:02:28,072
+这个密码本类似于1900位随机数
+is basically something like on the order
+of what is it, 1900 random bits except
+
+32
+00:02:28,072 --> 00:02:33,356
+但这个随机数里面不含FF。最后在结果的最高位
+that there are on FF's inside those random
+bits and finally at the very top, you put
+
+33
+00:02:33,356 --> 00:02:38,513
+放上数02。这意味着这个明文已经被PKCS1模式2编码了
+the number 02. This indicates that this
+plain text has been encoded using PKCS1
+
+34
+00:02:38,513 --> 00:02:43,476
+那么这整个值，我们刚刚创建的整个值
+mode 2. And then this whole value here,
+this whole thing that we just created.
+
+35
+00:02:43,476 --> 00:02:48,893
+这就是一个2048位的字符串，作为RSA函数的输入
+This is just 2048 bit string is the thing
+that gets fed into the RSA function and is
+
+36
+00:02:48,893 --> 00:02:54,118
+去计算它的e次方模N，得到的就是PKCS1的密文
+raised to the power of e modulo N. And the
+resulting thing is PKCS1 ciphertext. Now
+
+37
+00:02:54,118 --> 00:02:59,471
+现在当然，解密者要求RSA函数的逆，还原这个分组
+the decrypter of course is going to invert
+the RSA function, He's gonna get back this
+
+38
+00:02:59,471 --> 00:03:03,267
+他会看最高位
+block, He's gonna look at the most
+significant bits and he's gonna say
+
+39
+00:03:03,430 --> 00:03:07,885
+发现是02，意味着这是PKCS1格式的
+there's a 02 in there that means that this
+PKCS one formatted. Since it's PKCS one
+
+40
+00:03:07,885 --> 00:03:12,123
+它会移除这些02，它会移除所有的这些随机密码本
+formatted, it's gonna remove those 02.
+It's gonna remove all the random pad up
+
+41
+00:03:12,123 --> 00:03:16,810
+直到遇见FF，然后剩下的就是最初明文
+until the FF. And then anything
+that stays beyond that is the original
+
+42
+00:03:16,810 --> 00:03:22,180
+然后用这个明文来解密密文的内容
+message which is then used you know to say
+decrypt the actual body of the ciphertext.
+
+43
+00:03:22,180 --> 00:03:28,206
+如我所说，这个机制应用极广，例如
+And as I said, this mechanism is extremely
+widely deployed, For example, it's used in
+
+44
+00:03:28,206 --> 00:03:33,088
+HTTPS中就有用。现在有趣的是，这个PKCS1 1.5
+是在上世纪80年代设计的
+HTTPS. Now interestingly, this PKCS1
+version 1.5 was designed in the late 80's.
+
+45
+00:03:33,088 --> 00:03:37,861
+当时还没有安全性证明可以论证这个机制事实上是安全的
+There was really no security proof to
+argue that this mechanism is in fact
+
+46
+00:03:37,861 --> 00:03:42,952
+事实上，这是一种很普遍的现象：在没有安全性证明的情况下
+secure. And as it turns out, it is very
+common when there is no security proof, it
+
+47
+00:03:42,952 --> 00:03:48,234
+实际上系统会被破解，这里有一个非常优雅的攻击
+turns out that actually things break and
+there's a very, very elegant attack due to
+
+48
+00:03:48,234 --> 00:03:53,071
+由Bleichenbacher在1998年提出，
+Daniel Bleichenbacher展示了如何攻击
+Bleichenbacher back in 1998, Daniel
+Bleichenbacher which shows how to attack
+
+49
+00:03:53,071 --> 00:03:58,290
+PKCS1，当他被使用在HTTPS中时。那么我们看
+这个攻击是怎样工作的
+PKCS1 when it's used for example inside of
+HTTPS. So let's see how the attack works.
+
+50
+00:03:58,290 --> 00:04:03,228
+其想法是，假设攻击者截获了一个特定密文
+So the idea is this, supposed the attacker
+intercepted a certain ciphertext so this
+
+51
+00:04:03,228 --> 00:04:07,988
+那么这是PKCS1密文，那么要点是，它是用PKCS1编码的
+is PKCS1 ciphertext so the point is
+it's encoded using PKCS1 and then the
+
+52
+00:04:07,988 --> 00:04:12,812
+然后结果作为RSA函数的输入。我们把这个密文叫做
+result is fed into the RSA function. And
+we call the ciphertext the output of the
+
+53
+00:04:12,812 --> 00:04:16,797
+RSA函数的输出。攻击者想解密密文
+RSA function. The attacker wants to
+basically decrypt the ciphertext, So let
+
+54
+00:04:16,797 --> 00:04:21,065
+让我给大家抽象地展示攻击者会怎么做。我们先简化SSL
+me show you abstractly what the attacker
+is gonna do. We're gonna just simplify SSL
+
+55
+00:04:21,065 --> 00:04:25,349
+比如说攻击者可以直接发送密文给网页服务器
+and just say that the attacker can
+basically send the ciphertext directly to
+
+56
+00:04:25,349 --> 00:04:29,421
+服务器将试图使用它的私钥去解密密文
+the web server. The web server is gonna
+try and decrypt the ciphertext using its
+
+57
+00:04:29,421 --> 00:04:33,441
+它怎么办呢？在解密之后，首先
+secret key. And then what is it gonna do?
+Well, the first thing it does after the
+
+58
+00:04:33,441 --> 00:04:37,208
+它问：密文的解密结果是否是PKCS1编码的？
+decryption, well, it's gonna ask: is the
+decryption of the ciphertext PKCS1
+
+59
+00:04:37,208 --> 00:04:41,229
+换句话说，它会看最高几位并问
+encoded? In other words, it's gonna look
+at the most significant bits and ask: is
+
+60
+00:04:41,229 --> 00:04:45,250
+最高两位是02吗？如果是，才继续正常的解密
+this 02 in the most significant positions? If
+they are, it's gonna continue properly
+
+61
+00:04:45,250 --> 00:04:49,322
+然后继续执行协议；如果这些最高位不是02
+decrypting and then continue with the
+protocol and if there is no 02 in those
+
+62
+00:04:49,322 --> 00:04:53,292
+就会声明一个错误。那么如果明文最高位是02
+positions, it's gonna announce an error.
+So if the most significant bits of the
+
+63
+00:04:53,292 --> 00:04:57,558
+就会如期执行协议
+plaintext are 02, it's gonna continue
+with the protocol as expected, if the most
+
+64
+00:04:57,558 --> 00:05:01,951
+如果最高位不是02，就会返回一个错误
+significant bits are not 02 is gonna send
+back an error message and tell the
+
+65
+00:05:01,951 --> 00:05:06,059
+告诉攻击者，你发送了一条无效的密文。
+现在令人惊奇的是
+attacker, hey, you sent in invalid
+ciphertext. Now the amazing thing is that,
+
+66
+00:05:06,059 --> 00:05:10,276
+这一点让攻击者得以测试出，给定密文的最高16位
+this lets the attacker test whether the
+sixteen most significant bits of the
+
+67
+00:05:10,276 --> 00:05:14,712
+是否为02。换句话说，攻击者可以提交
+decryption of the given ciphertext are 02
+or not. In other words, the attacker can
+
+68
+00:05:14,712 --> 00:05:19,635
+他想提交给网页服务器的任何密文，网页服务器
+submit whatever ciphertext he wants to the
+web server. The web server will invert the
+
+69
+00:05:19,635 --> 00:05:24,772
+都会求RSA函数的逆，然后告诉攻击者逆的结果是否以02开头
+RSA function and then tell the attacker
+whether the inversion started with 02 or
+
+70
+00:05:24,772 --> 00:05:30,210
+那么某种意义上，这就给了攻击者一个神谕，使得他可以测试
+not. So in some sense gives the attacker an
+oracle that lets him test whether the
+
+71
+00:05:30,210 --> 00:05:35,407
+任意密文的逆是否以02开头。实际上
+inversion of any ciphertext begins with 02
+or not. And it turns out that's actually
+
+72
+00:05:35,407 --> 00:05:39,916
+这足以完全解密攻击者想解密的任何密文
+enough to completely decrypt any
+ciphertext the attacker wants, Just add
+
+73
+00:05:39,916 --> 00:05:44,800
+一点点的信息泄漏，因为RSA的特性
+little bit of information leakage just by
+properties of RSA let the attacker
+
+74
+00:05:44,800 --> 00:05:49,860
+让攻击者完全解密一个给定密文。那么攻击者会这么干
+completely decrypt a given ciphertext.
+Also here's what the attacker is gonna do,
+
+75
+00:05:49,860 --> 00:05:54,052
+他有一个他想解密的密文
+well, he has a ciphertext that he wants to
+decrypt so what he'll do is he'll take a
+
+76
+00:05:54,052 --> 00:05:57,940
+当然他把密文直接交给网页服务器
+cyphertext and of course feed that
+directly into the web server and ask does
+
+77
+00:05:57,940 --> 00:06:01,929
+询问它是否以02开头。接下来
+it begin with the 02 or not. The next
+thing he's gonna do is he's gonna choose a
+
+78
+00:06:01,929 --> 00:06:06,480
+攻击者选择一个随机值r，他要构建一个新密文c'
+random value r and he's gonna build a new
+ciphertext c prime. Which is (r to the e)
+
+79
+00:06:06,480 --> 00:06:12,013
+也就是(r^e)c mod N。这会造成什么？
+如果我们把r带入RSA函数
+c modulo N. Now what does that do? If we
+pull the r into the RSA function, really
+
+80
+00:06:12,013 --> 00:06:17,546
+我们只是与RSA明文相乘，PKCS1封装的明文m
+what we just did is we multiply the RSA
+plaintext, you know the PKCS1 including
+
+81
+00:06:17,546 --> 00:06:23,289
+我们用r去乘它，计算整项的e次方
+in m, we multiply that by r and that,
+that whole thing gets raised to the power
+
+82
+00:06:23,289 --> 00:06:27,897
+好，那么这就是c乘(r^e)的效果
+of e. Okay. So that's the effect of
+multiplying c by (r to the e). It multiplies
+
+83
+00:06:27,897 --> 00:06:32,334
+它把r与明文相乘，r是攻击者控制的值
+the plaintext by r, a value that the
+attacker controls. And then he's gonna
+
+84
+00:06:32,334 --> 00:06:37,371
+然后攻击者会把c'发送给网页服务器，服务器的回答是肯定的
+send c prime to the web server and the web
+server is gonna say yes, this starts with
+
+85
+00:06:37,371 --> 00:06:42,132
+以02开头，或是否定的，不以02开头。那么现在
+我们可以把这个问题进行抽象
+02 or no, this doesn't start with 02. So
+now we can abstract this problem to
+
+86
+00:06:42,132 --> 00:06:47,805
+推广到更一般的情况，大家可以考虑如下情形
+something more general which you can think
+of as the following so I have this number
+
+87
+00:06:47,805 --> 00:06:53,010
+我知道这个数x，这个数是我想获得的PKCS1对m的编码
+x in my head. This is the number I'm
+trying to get The PKCS1 encoding on m. I'm
+
+88
+00:06:53,010 --> 00:06:58,483
+我考虑这个数x，然后我让你选择r
+thinking of this number x and then what I
+let you do is for r, which way r of your
+
+89
+00:06:58,483 --> 00:07:04,088
+我会告诉你r*x mod n是否以02开头
+choice I will tell you whether r times x mod n
+starts with 02 or not. And it turns out by
+
+90
+00:07:04,088 --> 00:07:09,294
+实际上通过询问足够多的这样的问题，比如问数百万次
+asking enough questions it turns out
+either by million questions of this type,
+
+91
+00:07:09,294 --> 00:07:14,962
+你就可以还原x的全部了。只通过学习r*x是否以02开头
+you can basically recover all of x. Just
+by learning whether r times x begins with 02
+
+92
+00:07:14,962 --> 00:07:20,533
+只通过问足够多这样的问题，实际上你可以还原x
+or not by asking enough questions, you can
+actually recover x. So in reality what
+
+93
+00:07:20,533 --> 00:07:24,634
+实际上这意味着攻击者可以抓取一个给定的密文
+this means is that the attacker can
+capture a given ciphertext. This maybe
+
+94
+00:07:24,634 --> 00:07:28,847
+这个可能对应一个密文，比如用户输入的信用卡号
+corresponds to a ciphertext where the user
+enters the credit card number or a
+
+95
+00:07:28,847 --> 00:07:33,226
+或密码，现在攻击者想解密密文
+password, and now the attacker wants to
+decrypt the ciphertext. What he would do
+
+96
+00:07:33,226 --> 00:07:37,272
+他会发送一百万条像这样的密文
+is he would send about a million
+ciphertext like this, the web server for
+
+97
+00:07:37,272 --> 00:07:41,928
+对每条这样的密文，网页服务器会回复这个明文是否以02开头
+each ciphertext is gonna respond whether
+the plaintext begins with 02 or not and at
+
+98
+00:07:41,928 --> 00:07:46,473
+在攻击的最后，攻击者给出密文c的解密结果
+the end of the attack, the attacker just
+blocks away with the, decryption of the
+
+99
+00:07:46,473 --> 00:07:50,727
+这对大家来说可能有点神奇
+ciphertext c. So this might seem a
+little magical to you, how are you able to
+
+100
+00:07:50,727 --> 00:07:54,896
+怎么能够只通过学习明文的最高位是否是02
+just from learning whether the most
+significant bits are 02 or not, how you're
+
+101
+00:07:54,896 --> 00:07:59,439
+就能还原整个明文呢？那么我来给大家一个简单的例子
+able to recover the entire plain text. So
+let me show you a simple example of this.
+
+102
+00:07:59,439 --> 00:08:03,822
+我叫这个例子为幼儿Bleichenbacher，只求表达
+I'll call those baby Bleichenbacher just
+to kinda get the idea across on how this
+
+103
+00:08:03,822 --> 00:08:08,098
+这个攻击的基本想法。那么设想攻击者可以发送密文c
+attack might work. So imagine that the
+attacker is able to send the ciphertext c,
+
+104
+00:08:08,098 --> 00:08:12,641
+网页服务器会用私钥解密，不过我们假设
+the web server is gonna use the secret key
+to decrypt but let's suppose that instead
+
+105
+00:08:12,641 --> 00:08:16,596
+服务器不检查开头是否是02，而是看最高位
+of checking for 02 or not, all the web
+server does is he asked is the most
+
+106
+00:08:16,596 --> 00:08:21,036
+是否为1。如果最高位是1，网页服务器会说：是
+significant bit one or not. If the most
+significant bit is one, the web server
+
+107
+00:08:21,036 --> 00:08:25,710
+如果最高位不是1，网页服务器会返回"不"
+says yes. If the most significant bit is
+not one, the web server is no. Moreover,
+
+108
+00:08:25,710 --> 00:08:30,565
+为求进一步简化，我们假设RSA的模N是2的某次幂
+to simplify things, let's assume that the
+RSA module is n is a power of two. So n =
+
+109
+00:08:30,565 --> 00:08:35,539
+即N=2^n。当然，这不是一个有效的RSA模
+two^n. Of course, this is not a valid RSA
+modulus. An RSA modulus used to be a
+
+110
+00:08:35,539 --> 00:08:40,453
+RSA模是一个两指数的乘积。但为求简便
+product of two distinct primes. But again,
+just to keep things simple, let's pretend
+
+111
+00:08:40,453 --> 00:08:45,367
+我们假定N是2的幂。那么现在大家发现
+for a second that n is actually a power of
+two. So now you realize that by sending
+
+112
+00:08:45,367 --> 00:08:49,802
+通过给网页服务器发送密文c，攻击者只是
+the ciphertext c over to the web server,
+the adversary just learn the most
+
+113
+00:08:49,802 --> 00:08:54,551
+学习明文x的最高位。服务器的行为
+significant bits of the plaintext x.
+Basically, the server's behavior completely
+
+114
+00:08:54,551 --> 00:08:59,240
+完全泄漏了最高位是什么。现在攻击者可以
+reveals what the most significant is. Now
+what the attacker can do is he can
+
+115
+00:08:59,240 --> 00:09:04,175
+把密文乘以2^e。现在乘以2^e
+multiply the ciphertext by two to the e.
+Now multiplying by two to the e has the
+
+116
+00:09:04,175 --> 00:09:09,274
+就有去乘明文x的效果，就是把x乘以2
+effect of multiplying the plaintext x. By
+two simply multiplying x by two and
+
+117
+00:09:09,274 --> 00:09:15,067
+因为我们是工作在2的n次方模下，乘以2就意味着左移
+because we're working mod two to the N,
+multiplying by two basically means shift
+
+118
+00:09:15,067 --> 00:09:20,789
+好。那么现在当我们左移时，事实上我们学到了
+left, okay. So now when we shift left in
+fact we get to learn the most significant
+
+119
+00:09:20,789 --> 00:09:26,581
+2x的最高位，也就等于学到了x的次高位，好的
+bits of 2x which is really the second most
+significant bit of x, okay. So, again the
+
+120
+00:09:26,581 --> 00:09:32,257
+2x的最高位，我们左移了x，并取模N
+most significant bit of 2x basically we
+shift x to the left. And we reduce modulo
+
+121
+00:09:32,257 --> 00:09:37,596
+那么现在，2x mod N的最高位
+n. So now, the most significant bit of 2x
+modulo n is basically the second most
+
+122
+00:09:37,596 --> 00:09:42,846
+也就是x的次高位。那么我们就学到了x的另一位内容
+significant bit of x. So now we learned
+another bit of x. And now we're gonna
+
+123
+00:09:42,846 --> 00:09:48,158
+现在我们重复这步，询问c=4^e
+repeat this again. We're gonna query a
+four to the e c, That corresponds to
+
+124
+00:09:48,158 --> 00:09:54,108
+这对应于4x的e次方。询问4x会得到
+querying of 4x to the power e. Querying of
+4x basically reveals the most significant
+
+125
+00:09:54,108 --> 00:09:59,454
+4x mod N的最高位。4对应着左移两位
+bit of 4x mod n. 4x four corresponds the
+shifting by two bits. Which mean now we
+
+126
+00:09:59,454 --> 00:10:03,641
+意味着现在我们学到了x的第三高位。当我们一次次重复这些
+get to learn the third most significant
+bit of x. And when we repeat this again,
+
+127
+00:10:03,641 --> 00:10:08,041
+对于不同的c的倍数，大家可以看出
+and again, and again for different multiples
+of c and you can see that after just a
+
+128
+00:10:08,041 --> 00:10:11,751
+经过一些询问，大约1000到2000次询问，我们就还原了x
+few queries, about a 1,000 or 2,000
+queries, we'll recover all of x. The
+
+129
+00:10:11,751 --> 00:10:15,674
+Bleichenbacher需要一百万次的原因在于
+reason Bleichenbacher needed about a
+million queries is because he wasn't
+
+130
+00:10:15,674 --> 00:10:20,020
+他不是测试一位，他是在测试最高两位是否为02
+testing for one, He was actually testing
+for 02 or not 02 and that basically means
+
+131
+00:10:20,020 --> 00:10:24,208
+这意味着他需要上百万次询问，而不是2000次
+that he needs instead of 2,000 queries he
+needs actually a million queries but
+
+132
+00:10:24,208 --> 00:10:28,729
+但那足以还原所有的明文了
+that's still enough to recover all of the
+plaintext text. Okay? So I hope this
+
+133
+00:10:28,729 --> 00:10:34,337
+那么我希望这解释了为什么这个攻击是可能的。
+为什么关于RSA逆的最高位的一点点信息
+explains why this attack is possible. Why
+just this little bit of information about
+
+134
+00:10:34,337 --> 00:10:39,359
+就足以完全解密RSA了
+the most significant bits of the RSA
+inverse is enough to completely decrypt
+
+135
+00:10:39,359 --> 00:10:46,023
+至少可以说，PKCS1在网页服务器上曾如上述所实现
+RSA. So the bottom line here is that PKCS1 as implemented in web server as up
+
+136
+00:10:46,023 --> 00:10:50,323
+直到这种攻击被发现，它变得不安全了
+until this attack was discovered was
+basically insecure because the attacker
+
+137
+00:10:50,323 --> 00:10:54,902
+因为攻击者可以解密他想要的密文，
+通过向网页服务器提交足够都的询问即可
+could essentially decrypt a ciphertext he
+wants just by issuing enough queries to
+
+138
+00:10:54,902 --> 00:11:00,215
+那么我们如何抵抗这一攻击呢？
+the web server. So how do we defend
+against this attack? Well, so the SSL
+
+139
+00:11:00,215 --> 00:11:05,004
+SSL社区想通过对代码的最小改动
+community basically wanted the minimum
+change in their code that would prevent
+
+140
+00:11:05,004 --> 00:11:09,854
+就可以阻止这种攻击。如果大家看RFC，
+他们提出的方案如下
+this attack from working and so if you
+look at the RFC, what they propose is the
+
+141
+00:11:09,854 --> 00:11:14,704
+这里有很多内容，但他们提出的大致上是说
+following. Well, there's a lot of text
+here but basically what they propose is to
+
+142
+00:11:14,704 --> 00:11:19,433
+如果在你应用RSA解密之后，你会获得一个明文
+say that if after you apply the RSA
+decryption, you get a plaintext that's not
+
+143
+00:11:19,433 --> 00:11:24,344
+它并不是PKCS1编码的。换句话说，它不是以02开头的
+PKCS1 encoded. In other words it doesn't
+start with 02. What you're supposed to do
+
+144
+00:11:24,344 --> 00:11:28,949
+你可以选取某个随机字符串r。只假定
+is basically choose some random string r.
+And just pretend that the plaintext is
+
+145
+00:11:28,949 --> 00:11:33,078
+明文是一个随机字符串r，只当什么也没发生
+just a random string r and continuous as
+nothing happened and of course the
+
+146
+00:11:33,078 --> 00:11:38,438
+当然稍后协议会失败。具体地说，如果PKCS1编码不正确
+protocol will fail later on. So to be
+concrete you see if the PKCS one encoding
+
+147
+00:11:38,438 --> 00:11:42,526
+你会说预备主密钥
+is not correct, what you would do is you
+would just say the premaster secret is
+
+148
+00:11:42,526 --> 00:11:46,873
+是这个随机字符串，或只是随机接收的，我们继续协议
+this random string or that we just picked
+up off thin air and let's continue the
+
+149
+00:11:46,873 --> 00:11:50,961
+当然建立会话会失败，因为客户端和服务端
+protocol and of course the session set up
+will fail because the client and the
+
+150
+00:11:50,961 --> 00:11:55,152
+最终达成的交换密钥不一致，这会导致会话终止
+server will end up agreeing on different
+keys and that will cause the session to
+
+151
+00:11:55,152 --> 00:11:59,447
+我们实际上不告诉攻击者明文是否以02开头
+terminate. So we actually don't tell the
+attacker whether the plaintext begins with
+
+152
+00:11:59,447 --> 00:12:05,479
+我们只是假定明文是某个随机值
+02 or not. All we do is just pretend that
+the plaintext is some random value. So
+
+153
+00:12:05,479 --> 00:12:10,096
+那么对于许多网页服务器来说，这只是一点点的代码改动
+this was a minor code change to many web
+servers and it was fairly easy to get
+
+154
+00:12:10,096 --> 00:12:14,892
+是容易布置的，事实上时至今日，大多数的网页服务器
+deployed and in fact most web servers out
+there today implement this version of
+
+155
+00:12:14,892 --> 00:12:19,329
+已经实现了这一版本的PKCS1。但是这带来了问题
+PKCS1. However, this kind of raises the
+question of whether PKCS1 should be
+
+156
+00:12:19,329 --> 00:12:23,946
+PKCS1是否应该都被改变，使得我们得以证明选择密文安全性
+changed all together so that we actually
+are able to prove chosen ciphertext
+
+157
+00:12:23,946 --> 00:12:28,322
+这让我们以一种不同的方法来进行使用RSA的加密
+security. And that brings us to a
+different way of doing encryption using
+
+158
+00:12:28,322 --> 00:12:33,391
+即所谓的优化非对称加密补齐OAEP
+RSA which is called Optimal Asymmetric
+Encryption Padding, OAEP. And in fact the
+
+159
+00:12:33,391 --> 00:12:40,092
+事实上这个PKCS标准被更新了，而PKCS版本2实际上支持OAEP
+PKCS standard was updated and PKCS1 version
+2.0 actually has support for OAEP which is
+
+160
+00:12:40,092 --> 00:12:48,871
+而OAEP是更好的使用RSA加密的方法。
+那么让我解释下OAEP是如何工作的
+a better way of doing RSA encryption. So
+let me explain how OAEP works. So OAEP is
+
+161
+00:12:48,871 --> 00:12:54,911
+那么OAEP是由Bellare和Rogaway于1994年提出的。OAEP如下工作
+due to the Bellare and Rogaway back in 1994. And
+the way OAEP works is as follows. So you
+
+162
+00:12:54,911 --> 00:13:01,334
+取你想加密的明文信息，例如128位的AES密钥
+take your message that you wanna encrypt
+this for example could be the 128 bits AES
+
+163
+00:13:01,334 --> 00:13:06,589
+然后首先在明文后面附上一小段密码本
+key. And then the first thing you do is
+you append a short pad to it. So in this
+
+164
+00:13:06,589 --> 00:13:11,249
+在这里，你在前面附上01，然后再加一组0
+case, you put a 01 in the beginning and
+then you add a whole bunch of zeroes. How
+
+165
+00:13:11,249 --> 00:13:16,026
+根据标准来定要加多少0
+many zeroes is actually depends on the
+standard but you know that's supposed like
+
+166
+00:13:16,026 --> 00:13:20,686
+假设这里有128位0。然后大家也选择一个随机值
+they're 128 zeroes in here. And then you
+also choose a random value so that this
+
+167
+00:13:20,686 --> 00:13:25,521
+使得这整个字符串与你的RSA模一样大，比如说2047位
+whole string is as big as your RSA modulus
+so let's just say this is 2047 bits. Now
+
+168
+00:13:25,521 --> 00:13:30,065
+现在在你应用RSA函数之前，首先取你选的随机数
+before you apply the RSA function, you
+first of all take the random value that
+
+169
+00:13:30,065 --> 00:13:34,491
+把它交给哈希函数，这个哈希函数产生一个值
+you chose and you feed it into the hash
+function. This hash function produces a
+
+170
+00:13:34,491 --> 00:13:38,787
+这个值与你编码的左边一样大。你把输出求异或
+value that's as big as the left hand side
+of your encoding. You XOR the outputs.
+
+171
+00:13:38,787 --> 00:13:42,768
+把得到的结果交给另一个哈希函数，我们叫它g
+You feed the result into another hash
+function which we call a g. You XOR
+
+172
+00:13:42,768 --> 00:13:46,750
+你用一个随机值去异或，最后会得到两个值
+that with a random value. And then
+finally, you get these two values that you
+
+173
+00:13:46,750 --> 00:13:51,365
+你把它们联结起来，好。你把左右相联结
+concatenate together. Okay, So, you
+concatenate either left side and the
+
+174
+00:13:51,365 --> 00:13:56,852
+得到2047位长的字符串，这也就是
+right side that gives you something that
+says is 2047 bits long and that's the thing
+
+175
+00:13:56,852 --> 00:14:03,131
+你应用RSA函数的字符串。结果就是RSA加密
+that you apply the RSA function to. And the
+result is the RSA encryption. Now there's
+
+176
+00:14:03,131 --> 00:14:07,636
+现在有一个2001年证明的理论，由藤崎英一郎、
+岡本龍明、Pointcheval和Stern提出
+a theory that was proved in 2001, due to
+Fujisaki, Okamoto, Pointcheval, and Stern,
+
+177
+00:14:07,636 --> 00:14:12,557
+证明了事实上如果你只假设RSA函数是陷门函数
+that shows that in fact if all you do is
+you, you assume that the RSA function is a
+
+178
+00:14:12,557 --> 00:14:17,062
+是一个安全的陷门函数，但事实上这个模式
+Trapdoor permutation, a secure Trapdoor
+permut ation, but in fact this mode of
+
+179
+00:14:17,062 --> 00:14:21,686
+使用RSA加密是选择密文安全的话，我们还必须假设
+encrypting using RSA is in fact chosen
+ciphertext secure but we have to
+
+180
+00:14:21,686 --> 00:14:26,607
+函数h和g是某种理想的哈希函数才行，如我所说
+assume that the functions h and g are kind
+of ideal hash functions as I said these
+
+181
+00:14:26,607 --> 00:14:31,053
+这些叫做随机神谕。我们假设h和g是随机函数
+are called random oracles. Basically, we
+assume that h and g are just random
+
+182
+00:14:31,053 --> 00:14:36,293
+从它们的定义域映射到它们的值域。当然在实际中
+functions from their domains to their
+range. In practice of course when OAEP is
+
+183
+00:14:36,293 --> 00:14:41,277
+当实现OAEP时，对于h和g，人们就使用SHA-256
+implemented, people just use SHA-256
+say for h and g. Why is this called
+
+184
+00:14:41,277 --> 00:14:45,618
+那为什么这叫做优化非对称加密补齐呢？
+为什么要说优化呢？
+Optimal Asymmetric Encryption Padding?
+Why is this o? Why does this stands for
+
+185
+00:14:45,618 --> 00:14:50,070
+原因在于，如果你看密文，会注意到
+optimal? Well, the reason is if you look
+at the ciphertext, you'll notice that the
+
+186
+00:14:50,070 --> 00:14:54,690
+其密文是尽可能短的。密文与RSA输出一样长
+ciphertext is basically as short as it can
+be. The ciphertext is exactly the length
+
+187
+00:14:54,690 --> 00:14:59,286
+没有附在密文后面的值
+of one RSA output, there are no trailing
+values that are appended to the ciphertext
+
+188
+00:14:59,286 --> 00:15:03,992
+例如ISO标准中，如果大家记得，即使你必须加密
+whereas for example, the ISO standard
+if you remember even if you had to encrypt
+
+189
+00:15:03,992 --> 00:15:08,589
+一个非常短的明文，你必须使用RSA加密x
+a very short message, what you would have
+to do is you would have to encrypt x using
+
+190
+00:15:08,589 --> 00:15:12,638
+然后在x后面附上使用对称加密系统加密的短消息
+RSA and then append to that x, the
+encryption with the short message under
+
+191
+00:15:12,638 --> 00:15:17,126
+即使你必须加密128位AES密钥
+the symmetric encryption system. So even
+if you have just to encrypt a 128 bit AES
+
+192
+00:15:17,126 --> 00:15:21,411
+根据ISO标准，你会获得一个RSA输出加上一段对称密码
+key, with the ISO standard you would
+get one RSA output plus a symmetric
+
+193
+00:15:21,411 --> 00:15:26,643
+而在OAEP中，你只获得了一个RSA输出，没有其他东西
+cipher whereas with OAEP, you just get one
+RSA output and nothing else so in that
+
+194
+00:15:26,643 --> 00:15:31,090
+那么从某种意义上，这是优化的，密文长度是优化的
+sense, it's optimal, Optimal in terms of
+the length of the ciphertext.
+
+195
+00:15:31,090 --> 00:15:35,897
+有趣的是，这个定理依赖于RSA的性质。事实上
+Interestingly, this theorem here really
+rely on properties of RSA. And in fact,
+
+196
+00:15:35,897 --> 00:15:40,644
+如果你使用一个普通的陷门置换，那么这个定理不成立
+the theorem is known to be false if
+you use a general trapdoor permutation.
+
+197
+00:15:40,644 --> 00:15:45,512
+其他的置换未必具备RSA的代数性质
+Some other permutation doesn't have the
+algebraic properties of RSA. So that left
+
+198
+00:15:45,512 --> 00:15:50,260
+剩下的问题是，如果我们有一个普通陷门置换
+this question of if we have a general
+trapdoor permutation, what is the correct
+
+199
+00:15:50,260 --> 00:15:55,127
+如何正确地使用OAEP呢？实际上，对OAEP有一个小修改
+way to do OAEP? And it turns out, there's
+a minor modification to OAEP which makes
+
+200
+00:15:55,127 --> 00:16:00,115
+可以使得结果更为一般。这是Shoup于2001年给出的结果
+the result more general. This is a result
+due to Shoup back in 2001. Just shows that
+
+201
+00:16:00,115 --> 00:16:04,729
+证明了如果给我一个普通陷门置换f，实际上
+if you give me a general trapdoor
+permutation f. It turns out if you replace
+
+202
+00:16:04,729 --> 00:16:09,546
+如果不用OAEP里的固定补齐，而是使用这个哈希函数w
+the fixed pad that's using OAEP by a hash
+function, this hash function w, which
+
+203
+00:16:09,546 --> 00:16:14,116
+它是你要加密的明文m和随机性r的哈希函数
+happens to be a hash function of the
+message m and the randomness r that
+
+204
+00:16:14,116 --> 00:16:18,996
+然后在解密时，检测这个哈希函数的值是否正确
+you're encrypting with, and then during
+decryption, you actually check that this
+
+205
+00:16:18,996 --> 00:16:23,875
+那么当你解密时，检查w(mr)
+hash function value is correct. So when
+you decrypt, you actually check the w of
+
+206
+00:16:23,875 --> 00:16:28,816
+是否与明文中这个位置的内容一致
+mr is really what's written in this
+position in the plaintext. If you do that
+
+207
+00:16:28,816 --> 00:16:33,829
+这种改进后的OAEP叫做OAEP+。事实上它是CCA安全的
+then basically this OAEP called OAEP+.
+Is in fact CCS secure, Chosen Ciphertext
+
+208
+00:16:33,829 --> 00:16:38,078
+对任意陷门置换都是选择密文安全的，不必依赖于
+Secure for any trapdoor permutation. You
+don't have to rely on a specific
+
+209
+00:16:38,078 --> 00:16:42,621
+RSA的特定性质。还有一个结果叫做简单非对称加密补齐
+properties of RSA. There's another result
+called Simple Asymmetric Encryption
+
+210
+00:16:42,621 --> 00:16:47,342
+SAEP+，就是说如果要依赖RSA的性质
+Padding, SAEP+ which basically says
+that if you are gonna rely on properties
+
+211
+00:16:47,342 --> 00:16:51,827
+那么在特殊情况下，当RSA的公钥指数等于3时
+of RSA, then in particular way with RSA
+when the public exponent is equal to
+
+212
+00:16:51,827 --> 00:16:56,429
+实际上你不需要第二阶段的加密工作
+3, it turns out you actually don't
+need the second stage of encryption. The
+
+213
+00:16:56,429 --> 00:17:01,386
+这里这个简单的补齐机制使用了函数w
+simple padding scheme here again using the
+function w is actually already enough to
+
+214
+00:17:01,386 --> 00:17:06,321
+就足以保证选择密文安全了。那么这些是OAEP的变种
+guarantee chosen ciphertext security. So
+these are variants OAEP but they're not
+
+215
+00:17:06,321 --> 00:17:11,760
+但它们并没有被实际使用。我只想提一下，
+让大家知道它们的存在
+really used. I just wanted to mention and
+to let you know they exist. These are not
+
+216
+00:17:11,760 --> 00:17:16,239
+这些没被使用，而被使用的OAEP已被标准化了
+really used mainly OAEP has been
+standardized is what's used. Although
+
+217
+00:17:16,239 --> 00:17:20,974
+尽管在实际中，RSA在公钥加密中的最一般的应用
+again in reality, the most common
+application of RSA for public encryption
+
+218
+00:17:20,974 --> 00:17:25,729
+实际上就是这个被标准化的PKCS1，在HTTPS的RFC中
+is in fact this PKCS1 that's
+standardized in the HTTPS RFC. So just to
+
+219
+00:17:25,729 --> 00:17:30,526
+为了确保大家理解清楚这个解密是如何工作的，我问大家
+make sure it is clear in your mind how
+decryption actually works, let me ask you,
+
+220
+00:17:30,526 --> 00:17:35,683
+如何解密SAEP密文ct。这里你有密文ct
+how would you decrypt an SAEP ciphertext
+ct. So here, you're given the ciphertext
+
+221
+00:17:35,863 --> 00:17:40,600
+问题是下面三种方法中，哪种是正确的密文解密？
+ct here and the question is which of these
+three methods is the correct way of
+
+222
+00:17:40,600 --> 00:17:47,177
+那么正确答案是第一个，我们来看为什么
+decrypting the ciphertext. So the correct
+answer is the first one and let's see why.
+
+223
+00:17:47,177 --> 00:17:52,181
+有了密文，我们首先需要应用RSA逆函数
+Well, given the ciphertext the first thing
+what we need to do is apply the RSA
+
+224
+00:17:52,181 --> 00:17:57,250
+作用于密文，我们会得到RSA明文
+inverse functions, the ciphertext and that
+will give us the RSA plaintext which
+
+225
+00:17:57,250 --> 00:18:02,447
+正好就是x和r。那么我们得到了这里的x和r
+happens to be in this case x and r. So we
+get this x and r here. The next thing we
+
+226
+00:18:02,447 --> 00:18:07,709
+接下来我们需要使用函数h计算r的哈希值，然后把结果与x异或
+need to do is we need to hash r using the
+function h and XOR the result with x and
+
+227
+00:18:07,709 --> 00:18:12,152
+这会给我们m和w(m,r)。最后我们需要确保
+that will give us m and wm, r. And the
+last we need to do is to make sure that
+
+228
+00:18:12,152 --> 00:18:17,213
+补齐W(m,r)是正确的，这样我们检查w是否等于W(m,r)
+the pad W(m,r) is correct so we check that
+in fact w is equal to W(m,r) and if so we
+
+229
+00:18:17,213 --> 00:18:22,711
+如果是，我们输出m；如果不是，我们输出⊥，表示密文无效
+output m and if not, we output bottom to
+say that the ciphertext is invalid and
+
+230
+00:18:22,711 --> 00:18:27,304
+因此解密算法拒绝了它。顺便说下，我想强调
+the decryption algorithm rejects it. And
+by the way I'd like to emphasize that this
+
+231
+00:18:27,304 --> 00:18:31,731
+解密中的这个补齐检查在我们看过的所有的机制中都是很重要的
+checking of the pad during decryption is
+crucial in all of the schemes that we
+
+232
+00:18:31,731 --> 00:18:36,956
+例如OAEP+和SAEP+，就是这样解密的
+just saw. So for example, in both OAEP+ and SAEP+, it's doing decryption.
+
+233
+00:18:36,956 --> 00:18:42,917
+检查补齐是否正确是很重要的
+It's very important to check that the pad
+is in fact correct so that the value of w
+
+234
+00:18:42,917 --> 00:18:48,534
+这样解密时，你在这里得到的w值就是哈希值W(m,r)
+that you get here during the encryption
+really is the hash under the capital W of
+
+235
+00:18:48,534 --> 00:18:54,152
+类似地在OAEP中，在解密时，这个检查也很重要
+m and r and similarly on OAEP, it's very
+important to check it during decryption.
+
+236
+00:18:54,152 --> 00:18:59,544
+事实上这个补齐值是个常数010000000
+In fact, the value of the pad is the
+constant 010000000. And of course if it
+
+237
+00:18:59,544 --> 00:19:04,556
+当然如果它不是01000，你就输出⊥，说密文是无效的
+happens to be not 01000 then you output
+bottom and you say the ciphertext is
+
+238
+00:19:04,556 --> 00:19:08,713
+我想指出的最后一点是，实际上实现OAEP
+invalid. The last thing I wanna point out
+is that actually implementing OAEP can be
+
+239
+00:19:08,713 --> 00:19:12,679
+可能是很困难的，我们来看为什么。
+假设你写了一个OAEP解密程序
+quite tricky and let's see why. So
+supposed you have, you write an OAEP
+
+240
+00:19:12,679 --> 00:19:17,347
+取密文为输入，首先
+decryption routine that takes the
+ciphertext as input. The first thing you
+
+241
+00:19:17,347 --> 00:19:22,330
+对密文应用RSA逆函数
+would do is you would apply the RSA
+inverse function to the ciphertext and you
+
+242
+00:19:22,330 --> 00:19:27,565
+比如说你希望得到n位值输出，2047位
+would say well, you expect to get an n bit
+value out, you know 2047 bits in the case
+
+243
+00:19:27,565 --> 00:19:32,548
+在2048位RSA模的情形下。如果你获得了某个
+of 2048 bit RSA modulus and if you get
+something that's bigger than two to the
+
+244
+00:19:32,548 --> 00:19:37,150
+比2^2047大的数，你就拒绝。我们说错误=1，然后离开
+2047, you say reject. We say error = one
+and we go to Exit. The next thing we're
+
+245
+00:19:37,150 --> 00:19:42,014
+接下来我们检查补齐是否是正确的
+gonna do is we're gonna check whether the
+pad is in fact the correct pad and again
+
+246
+00:19:42,014 --> 00:19:46,820
+如果补齐不正确，我们还是拒绝和离开
+if the pad is not the correct pad, then
+again, we're gonna reject and go to Exit.
+
+247
+00:19:46,820 --> 00:19:51,512
+这个实现的问题是，我希望大家已经猜到了
+The problem with this implementation is
+well by now I hope you kind of guessed it
+
+248
+00:19:51,512 --> 00:19:55,918
+这对于计时攻击来说是脆弱的
+is it's vulnerable to a timing attack,
+right. So essentially by leaking timing
+
+249
+00:19:55,918 --> 00:20:00,382
+通过泄漏时间信息，攻击者可以解出是什么导致了错误
+information the attacker can now figure
+out what caused the error. Was it, that
+
+250
+00:20:00,382 --> 00:20:04,674
+是RSA解密后数太大的错误
+was there an error the RSA decryption
+happened to be too big or was there an
+
+251
+00:20:04,674 --> 00:20:08,909
+还是因为补齐太大的错误？如果攻击者
+error because the pad happened to be too
+large? And if the attacker can this
+
+252
+00:20:08,909 --> 00:20:13,257
+通过计时可以区分这两种错误。那么与Bleichenbacher类似
+distinguish these two errors say by
+timing. Then it turns out similar to the
+
+253
+00:20:13,257 --> 00:20:17,889
+实际上是可能完全解密任何你选择的密文的
+Bleichenbacher attack, it's possible to
+completely decrypt any ciphertext of your
+
+254
+00:20:17,889 --> 00:20:22,408
+一丁点的信息泄漏
+choice. Just at very, very, very small
+leak of information would completely allow
+
+255
+00:20:22,408 --> 00:20:28,203
+都可以让攻击者完全解密任何他想要的密文
+the attacker to decrypt completely any
+ciphertext that he wants to. So this shows
+
+256
+00:20:28,203 --> 00:20:32,624
+这展示了，即使你正确地实现了OAEP的数学部分
+that if you, even if you implement the
+mathematics of OAEP decryption correctly,
+
+257
+00:20:32,624 --> 00:20:37,101
+你也可能会搞砸，是自己暴露于计时攻击中
+you can very easily mess up and open
+yourself up to a timing attack which would
+
+258
+00:20:37,101 --> 00:20:41,074
+这会使得你的实现是完全不安全的。通常的教训是
+make your implementation completely
+insecure. So as usual, the lesson is,
+
+259
+00:20:41,074 --> 00:20:45,215
+不要自己去实现密码学，特别是RSA、OAEP
+don't implement crypto yourself in
+particular, RSA OAEP is particularly
+
+260
+00:20:45,215 --> 00:20:49,692
+自己去实现将是非常危险的。就使用标准库即可
+dangerous to implement yourself. Just use one
+of the standard libraries for example,
+
+261
+00:20:49,692 --> 00:20:54,281
+例如OpenSSL有一个OAEP实现，当然他们做得非常小心
+OpenSSL has an OAEP implementation and of
+course what they do is very careful to
+
+262
+00:20:54,281 --> 00:20:59,038
+确保OAEP解密的运行时间总是相同的
+make sure that the running time of OAEP
+decrypt is always the same no matter what
+
+263
+00:20:59,038 --> 00:21:03,401
+无论发送什么错误。好，那么我们就说到这
+causes the error. Okay, So let's stop here
+and then in the next segment we'll talk
+
+264
+00:21:03,401 --> 00:21:07,435
+下节我们讨论RSA陷门置换的安全性
+about the security of the RSA trapdoor
+permutation.

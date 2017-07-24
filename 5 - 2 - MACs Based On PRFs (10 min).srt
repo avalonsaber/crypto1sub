@@ -1,0 +1,837 @@
+1
+00:00:00,000 --> 00:00:04,052
+现在我们知道了MAC是什么了
+我们继续构建第一类安全的MAC
+Now that we know what MACs are, let's go
+ahead and build our first secure MACs.
+
+2
+00:00:04,052 --> 00:00:08,469
+首先我想提醒大家，MAC是一对算法
+First I want to remind you that a MAC is a
+pair of algorithms. The first is a signing
+
+3
+00:00:08,469 --> 00:00:12,922
+第一个是签名算法，给定信息和密钥，会产生相应的标签
+algorithm that's given a message and a key
+will generate a corresponding tag. And the
+
+4
+00:00:12,922 --> 00:00:17,103
+第二个是验证算法，给定密钥、信息和标签
+second is verification algorithms are
+given a key, message and a tag while
+
+5
+00:00:17,103 --> 00:00:21,736
+输出0或1，结果取决于标签是否有效
+outputs zero or one depending on whether
+the tag is valid or not. And we said that
+
+6
+00:00:21,736 --> 00:00:26,313
+我们说过MAC是安全的，如果它对选择信息攻击
+是不可被存在性伪造的
+a MAC is secure if it is existentially
+unforgeable under a chosen message attack.
+
+7
+00:00:26,313 --> 00:00:30,890
+换句话说，攻击者可以实施选择信息攻击
+In other words, the attackers allow to
+mount a chosen message attack where he can
+
+8
+00:00:30,890 --> 00:00:35,298
+他提交由他选择的任意信息，并获得相应的标签
+submit arbitrary messages of his choice
+and obtain the corresponding tags for
+
+9
+00:00:35,298 --> 00:00:39,520
+然后尽管有能力生成任意的标签
+those messages, and then despite the
+ability to generate arbitrary tags. The
+
+10
+00:00:39,520 --> 00:00:43,616
+攻击者也不能产生一个新的信息-标签对
+attacker cannot create a new message-tag pair that was not given to him
+
+11
+00:00:43,616 --> 00:00:47,976
+不是选择信息攻击中所给出的信息-标签对
+上一节中我们已经看了这个定义
+during the chosen message attack. Okay so
+we've already seen this definition in the
+
+12
+00:00:47,976 --> 00:00:52,179
+现在的问题是我们如何构建MAC？
+last segment and now the question is how
+do we build secure MACs? So the first
+
+13
+00:00:52,179 --> 00:00:57,217
+我想给大家看的第一个例子是
+证明任何安全的PRF可直接
+example I want to give you is basically
+showing that any secure PRF directly gives
+
+14
+00:00:57,217 --> 00:01:01,952
+给我们一个安全的MAC。那我们看怎么来做
+us a secure MAC as well. So let's see how
+we do it. So suppose we have a pseudo
+
+15
+00:01:01,952 --> 00:01:06,808
+假设我们有一个伪随机函数PRF，这个PRF
+取输入X，输出Y
+random function so the pseudo random
+function takes and inputs X and outputs in
+
+16
+00:01:06,808 --> 00:01:12,173
+我们定义如下的MAC，我们为信息M签名
+Y. And let's define the following MAC. So
+the way we sign a message 'M' is basically
+
+17
+00:01:12,173 --> 00:01:17,182
+即为计算函数在M处的值。所以信息M的标签
+by simply evaluating the function at the
+point 'M'. So the tag for the message M is
+
+18
+00:01:17,182 --> 00:01:21,350
+就是在点M处的函数值，然后我们通过这一对来验证信息
+simply the value of the function at the
+point M and then the way we verify a
+
+19
+00:01:21,350 --> 00:01:26,006
+方法就是重新计算在信息M处的函数值
+message to that pair is by recomputing the
+value of the function at the message M and
+
+20
+00:01:26,006 --> 00:01:30,283
+检查结果是否等于给我们的标签
+如果一样，我们说"是"
+checking whether that is equal to the tag
+given to us. We say yes if so and we
+
+21
+00:01:30,283 --> 00:01:34,681
+否则我们拒绝。那么这里有图片描述
+reject otherwise. So here you have in
+pictures basically that when Alice wants
+
+22
+00:01:34,681 --> 00:01:39,023
+Alice想给Bob发一条信息，她计算标签
+通过计算PRF的值得来
+to send a message to Bob, she computes a
+tag by the value of PRF and then she
+
+23
+00:01:39,023 --> 00:01:43,252
+那么她把这个得来的标签附在信息后面
+Bob收到了这一对信息
+appends this tag to the message, Bob
+receives the corresponding tag pair, he
+
+24
+00:01:43,252 --> 00:01:47,820
+他重新计算函数值，并测试得到的标签
+recomputes the value of the function and
+tests whether the given tag is actually
+
+25
+00:01:47,820 --> 00:01:52,730
+是否等于在点M处的函数值
+那么我们看一个设计得不好的例子
+equal to the value of the function at the
+point M. So let's look at a bad example of
+
+26
+00:01:52,730 --> 00:01:57,832
+那么假设我们有一个伪随机函数
+this instruction. And so suppose that we
+have a pseudo-random function that happens
+
+27
+00:01:57,832 --> 00:02:02,873
+只输出10位，好，这是一个很好的伪随机函数
+to output only ten bits. Okay, so this is
+a fine pseudo-random function and it just
+
+28
+00:02:02,873 --> 00:02:07,668
+对于任何信息M，它只输出10位
+so happens that for any message 'M' it
+only outputs ten bits value. My question
+
+29
+00:02:07,668 --> 00:02:12,463
+我的问题是，如果我们使用这个函数F构建了一个MAC
+to you is if we use this function 'F' to
+construct a MAC, is that going to be a
+
+30
+00:02:12,463 --> 00:02:17,184
+得到的MAC是安全的吗？那么答案是否定的
+这个MAC是不安全的。特别地
+secure MAC? So the answer is no, this MAC
+is insecure. In particular because the
+
+31
+00:02:17,184 --> 00:02:21,471
+是因为标签太短。那么考虑下面这个简单例子
+tags are too short. So consider the
+following simple adversary. What the
+
+32
+00:02:21,471 --> 00:02:26,119
+攻击者选择一个任意信息M
+adversary will do is simply choose an
+arbitrary message M and just guess the
+
+33
+00:02:26,119 --> 00:02:30,768
+随便猜一个MAC的值，作为这个信息的标签
+由于这个标签只有10位
+value of the MAC for that particular
+message. Now, because the tag is only ten
+
+34
+00:02:30,768 --> 00:02:35,175
+攻击者有1除以2的10次方的机会猜中MAC
+bits long, the adversary has a chance of
+one in two to the ten in guessing the MAC
+
+35
+00:02:35,175 --> 00:02:40,004
+换句话说，攻击者猜测的优势
+correctly. In other words, the advantage
+of the guessing adversary, one distinctly
+
+36
+00:02:40,004 --> 00:02:44,351
+给定信息，猜测不同的随机标签
+攻击者将有一个
+guesses a random tag for a given message.
+That adversary is going to have an
+
+37
+00:02:44,351 --> 00:02:48,898
+对这个MAC的优势就是1除以2的10次方
+advantage against the MAC that's basically
+one over two to the ten which is one over
+
+38
+00:02:48,898 --> 00:02:52,962
+即1024分之一，当然不是可忽略的
+a thousand twenty four and that's
+definitely non negligible. So the adversary
+
+39
+00:02:52,962 --> 00:02:57,348
+那么攻击者会成功地为给定的信息伪造MAC
+basically will successfully forge the MAC
+on a given message with probability one
+
+40
+00:02:57,348 --> 00:03:01,841
+以千分之一的概率，这是不安全的
+但事实上这是唯一的会有错误的例子
+on a thousand which is insecure. However
+it turns out this is the only example that
+
+41
+00:03:01,841 --> 00:03:06,280
+仅当函数输出太小，事情才会有问题
+where things can go wrong, only when the
+output of the function is small can things
+
+42
+00:03:06,280 --> 00:03:10,536
+如果这个PRF的输出很大，我们就可以获得一个
+这个函数的安全的MAC
+go wrong. If the output of the PRF is
+large, then we get a secure MAC out of this
+
+43
+00:03:10,536 --> 00:03:14,344
+我们看一个安全性定理。假设我们有
+function. And let's state the security
+theorem here. So suppose we have a
+
+44
+00:03:14,344 --> 00:03:18,257
+一个函数F，取X中的信息为输入，输出Y中的标签
+function 'F' that takes messages in 'X'
+and outputs tags in 'Y', then the MAC
+
+45
+00:03:18,257 --> 00:03:22,588
+那么由这个PRF推出的MAC事实上是安全的。特别地
+that's derived from this PRF in fact is a
+secure MAC. In particular, if you look at
+
+46
+00:03:22,588 --> 00:03:26,804
+如果大家看这个安全性定理，会很清楚地看到
+这个误差上界，换句话说
+the security theorem here, you'll see very
+clearly the error bounds, in other words
+
+47
+00:03:26,804 --> 00:03:31,179
+由于PRF是安全的，我们知道这个量是可忽略的
+since the PRF is secure we know that this
+quantity here is negligible. And so if we
+
+48
+00:03:31,179 --> 00:03:35,395
+如果我们希望这个量是可忽略的
+这是我们想要的，我们想说
+want this quantity to be negligible, this
+is what we want, we want to say that no
+
+49
+00:03:35,395 --> 00:03:39,664
+没有攻击者可以击败MAC I_F，意味着
+我们希望这个量是可忽略的
+adversary can defeat the MAC 'I sub F',
+that implies that we want this quantity to
+
+50
+00:03:39,664 --> 00:03:43,722
+换句话说，我们希望输出空间很大
+be negligible, in other words we want the
+output space to be large. And so for
+
+51
+00:03:43,722 --> 00:03:48,096
+例如，取一个PRF，输出80位就很好了
+example, taking a PRF that outputs eighty
+bits is perfectly fine. That will generate
+
+52
+00:03:48,096 --> 00:03:52,102
+它们会产生80位MAC，因此任意攻击者的优势
+an eighty bit MAC and therefore the
+advantage of any adversary will be at most
+
+53
+00:03:52,102 --> 00:03:56,521
+最多是1除以2的80次方。那么这个定理的证明很简单
+one over two to the eighty. So now the proof
+of this theorem is really simple, so let's
+
+54
+00:03:56,521 --> 00:04:00,906
+我们来看看，事实上我们不从PRF开始
+just go ahead and do it. So in fact let's
+start by saying that suppose instead of a
+
+55
+00:04:00,906 --> 00:04:05,446
+假设我们有一个从信息空间到标签空间的真随机函数
+PRF we have a truly random function from
+the message space to the tag space so this
+
+56
+00:04:05,446 --> 00:04:10,087
+这是一个从X到Y的真随机函数
+它是从所有函数集中随机选择的
+is just a random function from X to Y
+that's chosen at random from the set of
+
+57
+00:04:10,087 --> 00:04:14,966
+我们看这个函数能否给我们一个安全的MAC
+all such functions. Now let's see if that
+function can give us a secure MAC. So what
+
+58
+00:04:14,966 --> 00:04:19,551
+那么攻击者说，我想要信息M1的标签
+the adversary says is, 'I want a tag on
+the message M1'. What he gets back is the
+
+59
+00:04:19,551 --> 00:04:24,157
+他获得了标签，即在点M1处的函数值
+tag which just happens to be the function
+evaluated at the point M1. Notice there is
+
+60
+00:04:24,157 --> 00:04:28,489
+注意这里没有密钥，因为F只是一个从X到Y的真随机函数
+no key here because F is just a truly
+random function from X to Y. And then the
+
+61
+00:04:28,489 --> 00:04:33,096
+然后攻击者从选择信息M2，他获得了M2的标签
+adversary gets to choose a message from M2
+and he obtains the tag from M2, he chooses
+
+62
+00:04:33,096 --> 00:04:37,264
+他选择M3,M4直到Mq，他获得了所有对应的标签
+M3, M4 up to MQ and he obtains all the
+corresponding tags. Now his goal is to
+
+63
+00:04:37,264 --> 00:04:41,432
+现在他的目标是产生一个信息标签对
+也就说他赢了，记得那就是
+produce a message tag pair and we say that
+he wins, remember that this is an
+
+64
+00:04:41,432 --> 00:04:45,891
+存在性伪造，换句话说，首先一定有T=F(M)
+existential forgery, in other words first
+of all T has to be equal to F of M. This
+
+65
+00:04:45,891 --> 00:04:49,968
+这意味着T是M的一个有效标签。其次
+means that 'T' is a valid tag for the
+message 'M'. And second of all, the
+
+66
+00:04:49,968 --> 00:04:54,685
+信息M必须是新的，信息M不能是M1到Mq中的任何一个
+message 'M' has to be new. So the message
+'M' had better not be one of M-one to M-Q.
+
+67
+00:04:54,685 --> 00:04:58,879
+那我们想一想这是什么意思
+But let's just think about this for a
+minute, what does this mean? So the
+
+68
+00:04:58,879 --> 00:05:03,830
+攻击者看到在点M1到Mq处这个真随机函数的值
+adversary got to see the value of a truly
+random function at the points M-one to M-Q
+
+69
+00:05:03,830 --> 00:05:08,800
+现在他要预测新点M的函数值
+and now he's suppose to predict the value
+of this function as some new point, M
+
+70
+00:05:08,800 --> 00:05:13,411
+但是对于真随机函数，在点M的函数值
+However, for a truly random function, the
+value of the function at the point M is
+
+71
+00:05:13,411 --> 00:05:18,195
+与在点M1到Mq处的值是独立的，所以攻击者能做的
+independent of its value at the points M-1
+to M-Q. So the best the adversary can do
+
+72
+00:05:18,195 --> 00:05:22,749
+最好的预测点M的函数值，就是猜
+at predicting the value of the function at
+the point M is just guess the value,
+
+73
+00:05:22,749 --> 00:05:27,302
+因为他没有任何函数F在M处的值的信息
+因此他的优势
+because he has no information about F of
+M. And as a result his advantage if he
+
+74
+00:05:27,302 --> 00:05:31,625
+如果他猜在点M处的函数值，他猜中的概率
+guesses the value of the function at the
+point M he'll guess it right with
+
+75
+00:05:31,625 --> 00:05:36,294
+是1除以|Y|。然后他产生的标签以概率1除以|Y|
+probability exactly one over Y. And then
+the tag that he produced will be correct
+
+76
+00:05:36,294 --> 00:05:40,582
+是正确的。好，攻击者没有任何信息
+with probability exactly one over Y. Okay,
+again he had no information about the
+
+77
+00:05:40,582 --> 00:05:44,801
+是关于函数在M的值，最好的办法就是猜
+value of the function of M and so the best
+he could do is guess. And if he guesses,
+
+78
+00:05:44,801 --> 00:05:49,347
+猜的话，他以1除以|Y|的概率猜对。当然
+he'll get it right with probability one
+over Y. And now of course, because the
+
+79
+00:05:49,347 --> 00:05:54,420
+因为函数F是伪随机函数，当我们
+function capital F is a pseudo random
+function, the adversary is gonna behave the
+
+80
+00:05:54,420 --> 00:05:58,565
+给攻击者真随机函数或伪随机函数
+攻击者表现是一样的
+same whether we give him the truly random
+function or the pseudo random function.
+
+81
+00:05:58,565 --> 00:06:02,659
+攻击者不能说出它们的区别
+因此，即使我们有一个伪随机函数
+The adversary can't tell the difference
+and as a result even if we use a pseudo
+
+82
+00:06:02,659 --> 00:06:06,600
+攻击者在游戏中获胜的优势最多为1除以|Y|
+random function, the adversary is gonna
+have advantages at most one over Y in
+
+83
+00:06:06,600 --> 00:06:10,774
+好，那么大家可以看到这个安全性定理
+winning the game. Okay, so you can see
+exactly the security theorem, let's go
+
+84
+00:06:10,774 --> 00:06:15,561
+我们回头看一会。这是为什么我们有这一误差项
+back there for just a second. Essentially
+this is basically why we got an error term
+
+85
+00:06:15,561 --> 00:06:20,005
+1除以|Y|，因为是猜测攻击所致，而且猜测
+是攻击者为了赢得游戏
+of one over Y because of the guessing
+attack and that's the only way that the
+
+86
+00:06:20,005 --> 00:06:24,734
+唯一能做的。那么现在我们知道任何PRF
+attacker can win the game. So now that we
+know that any secure PRF is also a secure
+
+87
+00:06:24,734 --> 00:06:29,122
+同时也是安全的MAC，我们已经知道
+我们有了第一种MAC的例子。特别地
+MAC, we already know that we have our
+first example MAC. In particular, we know
+
+88
+00:06:29,122 --> 00:06:33,680
+我们知道AES，或者我们至少相信
+AES是一个安全的PRF，因此
+that AES, or at least we believe that AES
+is a secure PRF, therefore, AES since it
+
+89
+00:06:33,680 --> 00:06:38,011
+由于AES取16字节的输入，AES的信息空间是128位
+takes sixteen byte inputs, right the
+message space for AES is 128 bits, which
+
+90
+00:06:38,011 --> 00:06:43,212
+即16字节。因此AES加密会给我们一个MAC
+is sixteen bytes. Therefore the AES cipher
+essentially gives us a MAC that can match
+
+91
+00:06:43,212 --> 00:06:48,140
+匹配严格的16字节信息。好的，这是我们的第一个MAC例子
+messages that are exactly sixteen bytes.
+Okay, so that's our first example of a
+
+92
+00:06:48,140 --> 00:06:53,257
+现在问题是，如果我们有了一个PRF
+针对像AES这样的小输入，仅16字节的
+MAC. But now the question is if we have a
+PRF for small inputs like AES that only
+
+93
+00:06:53,257 --> 00:06:58,564
+那么我们能不能为长信息也构建一个MAC呢？
+acts on sixteen bytes, can we build a MAC
+for big messages that can act on gigabytes
+
+94
+00:06:58,564 --> 00:07:02,066
+比如几个G的数据呢？有时我把这个称之为麦当劳问题
+of data? Sometimes I call this the
+McDonald's problem. Basically given a
+
+95
+00:07:02,066 --> 00:07:05,871
+给一个小的MAC，我们构建它的一个大MAC
+换句话说，给定短信息的MAC
+small MAC and we build a big MAC out of
+it. In other words, given a MAC for small
+
+96
+00:07:05,871 --> 00:07:10,234
+我们构建长信息的MAC。我们看两个这样的机制
+messages and we build a MAC for large
+messages. So we're gonna look at two
+
+97
+00:07:10,234 --> 00:07:14,835
+第一个例子叫做CBC MAC
+constructions for doing so. The first
+example is called a CBC MAC that again
+
+98
+00:07:14,835 --> 00:07:19,315
+取针对短信息的PRF为输入
+输出一个PRF，可以处理长信息
+takes PRF for small messages as input
+and produces a PRF for very large
+
+99
+00:07:19,315 --> 00:07:23,686
+作为输出。第二个我们要看的机制是HMAC
+它做到事情是一样的
+messages. As outputs. The second one we'll
+see is HMAC which does the same thing
+
+100
+00:07:23,686 --> 00:07:28,278
+取处理短输入的PRF，产生能处理长输入的PRF
+again takes a PRF for small inputs and
+generates a PRF for very large inputs. Now
+
+101
+00:07:28,278 --> 00:07:32,050
+现在这两个被用在了不同的上下文中
+the two are used in very different
+contexts. CBC-MAC is actually very
+
+102
+00:07:32,050 --> 00:07:36,315
+CBC-MAC在银行业广为应用
+例如有一个系统叫做
+commonly used in the banking industry. For
+example, there's a system called the
+
+103
+00:07:36,315 --> 00:07:40,797
+自动打扫房间ACH，银行使用这个系统来处理
+银行之间的支票
+Automatic Clearing House, ACH, which banks
+use to clear checks with one another and
+
+104
+00:07:40,797 --> 00:07:44,788
+CBC-MAC被用来确保支票的完整性
+that system, CBC-MAC, is used to ensure
+integrity of the checks as they're
+
+105
+00:07:44,788 --> 00:07:49,107
+支票是在银行之间传递的。在因特网上
+SSL、IPsec和SSH等协议
+transferred from bank to bank. On the
+Internet, protocols like SSL and IPsec and
+
+106
+00:07:49,107 --> 00:07:53,173
+都使用HMAC来保护完整性。这两个不同的MAC
+SSH, those all use HMAC for integrity. Two
+different MACs and were gonna discuss them
+
+107
+00:07:53,173 --> 00:07:57,086
+我们将在下面几节中讨论它们
+如我所说，从处理短信息的PRF出发
+in the next couple of segments. And as I
+said were also gonna start from a PRF for
+
+108
+00:07:57,086 --> 00:08:01,274
+产生能够处理几个G的信息的PRF
+small messages and produce PRF for
+messages that are gigabytes long and in
+
+109
+00:08:01,274 --> 00:08:06,043
+特别地，它们两种MAC都可以用AES作为底层密码
+particular they can both be substantiated
+with AES as the underlying cipher. So the
+
+110
+00:08:06,043 --> 00:08:10,597
+那么我最后想说的，关于这些基于PRF的MAC的
+last comment I want to make about these
+PRF based MACs is that in fact their
+
+111
+00:08:10,597 --> 00:08:15,269
+事实上它们的输出是可以被截断的
+假设我们有一个PRF，输出N位
+output can be truncated. So suppose we
+have a PRF that outputs N bit outputs. So
+
+112
+00:08:15,269 --> 00:08:19,941
+对于AES，这是一个输出128位的PRF
+again for AES this would be a PRF that
+outputs 128 bits as outputs. It's an easy
+
+113
+00:08:19,941 --> 00:08:24,909
+这是一个容易证明的引理。事实上如果你有一个
+N位PRF，如果你截断之，换句话说
+lemma to show that in fact if you have an
+N bit PRF if you truncated, in other words
+
+114
+00:08:24,909 --> 00:08:31,062
+如果你值输出前K位，结果依然是安全的PRF
+if you only output first K bits, the
+result is also a secure PRF and the
+
+115
+00:08:31,062 --> 00:08:36,529
+直观地说，如果大PRF对任意输入，都能
+输出N位随机字符串
+intuition here is if the big PRF outputs N
+bits of randomness for any inputs that you
+
+116
+00:08:36,529 --> 00:08:42,059
+那么把结果截断成T位后
+give to the PRF then certainly chopping it
+off and truncating it to T bits is still
+
+117
+00:08:42,059 --> 00:08:46,572
+看上去依然是随机的。攻击者获得更少的信息
+gonna look random. The attacker now gets
+less information so his job of
+
+118
+00:08:46,572 --> 00:08:51,657
+所以他区分随机输出的工作会更困难。换句话说
+distinguishing the outputs from random
+just became harder. In other words, if the
+
+119
+00:08:51,657 --> 00:08:56,742
+如果N位PRF是安全的，那么T(<N)位PRF，截断PRF
+N bit PRF is secure, then the T less than
+N bit PRF, the truncated PRF, would also
+
+120
+00:08:56,742 --> 00:09:01,177
+也是安全的。这是一个简单的引理，由于任何安全PRF
+be secure. So this is an easy lemma and
+since any secure PRF also gives us a
+
+121
+00:09:01,177 --> 00:09:05,993
+也能给我们一个安全的MAC，这意味着如果你给我
+一个基于PRF的MAC
+secure MAC, what this means is if you give
+me a MAC that's based on a PRF and what I
+
+122
+00:09:05,993 --> 00:09:10,686
+我可以把它截断成W位，但是，因为
+基于PRF的MAC的定理中的误差项
+can do is I can truncate it to W bits,
+however, because of the error term in the
+
+123
+00:09:10,864 --> 00:09:15,379
+我们知道截断到W位是安全的
+MAC based PRF theorem we know that
+truncating to W bits will only be secure
+
+124
+00:09:15,379 --> 00:09:19,954
+只要1除以2的|W|次方是可忽略的
+那么如果你截断PRF到只有3位
+as long as one over two to the W is
+negligible. So if you truncate the PRF to
+
+125
+00:09:19,954 --> 00:09:24,410
+那么得到的MAC就不是安全的。不过
+only three bits, the resulting MAC is not
+going to be secure. However, if you
+
+126
+00:09:24,410 --> 00:09:29,222
+如果你把它截断成80位，甚至是64位
+那么得到的MAC也是
+truncate it to say 80 bits or maybe even
+64 bits, then the resulting MAC is still
+
+127
+00:09:29,222 --> 00:09:33,974
+一个安全的MAC。好，需要记住的事情是
+gonna be a secure MAC. Okay, so the thing
+to remember here is that even though we
+
+128
+00:09:33,974 --> 00:09:39,235
+即使我们使用AES来构建更大的PRF
+最后PRF的输出将是128位
+use AES to construct larger PRFs and the
+output of these PRFs is gonna be 128 bits,
+
+129
+00:09:39,235 --> 00:09:44,115
+这并不意味着MAC自身必须产生128位标签
+it doesn't mean that the MAC itself has to
+produce 128 bit tags. We can always
+
+130
+00:09:44,115 --> 00:09:48,550
+我们总可以把结果截断成90位或80位
+因此，我们依然可以得到
+truncate the outputs to 90 bits or 80
+bits, and as a result, we would get still
+
+131
+00:09:48,550 --> 00:09:53,097
+安全的MAC，但现在输出标签有着更合理的大小
+secure MACs but now the output tag is
+gonna be more reasonable size and doesn't
+
+132
+00:09:53,097 --> 00:09:57,702
+不必是满满的128位。好，在下一节中
+have to be the full 128 bits. Okay, so in
+the next segment we're gonna look at how
+
+133
+00:09:57,702 --> 00:09:58,726
+我们看CBC-MAC的工作
+the CBC-MAC works.

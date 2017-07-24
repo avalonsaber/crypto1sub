@@ -1,0 +1,1583 @@
+1
+00:00:00,000 --> 00:00:04,616
+本节中，我们构建两个经典的MAC：CBC-MAC
+In this segment, we're going to construct
+two classic MACs, the CBC-MAC and the
+
+2
+00:00:04,616 --> 00:00:09,233
+和NMAC。在上一节中，我们说过
+如果给我一个安全的PRF
+NMAC. Recall in the last segment, we said
+that if you give me a secure PRF, then
+
+3
+00:00:09,233 --> 00:00:14,087
+那么安全的PRF可以被用来构建一个安全的MAC
+that secure PRF can actually be used to
+construct a secure MAC, simply by defining
+
+4
+00:00:14,087 --> 00:00:18,763
+定义信息M的签名为函数在点M处的值
+the signature on the message M as the
+value of the function at the point M. The
+
+5
+00:00:18,763 --> 00:00:23,203
+唯一的警告是，PRF F的输出必须要大。比如
+only caveat was that the output of the
+PRF F had to be large. For example, it
+
+6
+00:00:23,203 --> 00:00:27,947
+可以是80位或128位，可以生成一个安全MAC
+could be 80 bits or 128 bits, and that
+would generate a secure MAC. Now we also
+
+7
+00:00:27,947 --> 00:00:33,220
+我们说过，因为AES是一个安全的PRF，
+AES已经给了我们一个安全的MAC
+said that because AES is a secure PRF,
+essentially AES already gives us a secure
+
+8
+00:00:33,220 --> 00:00:37,899
+但是它只能处理16字节的信息
+MAC, except that it can only process
+sixteen byte messages. And the question
+
+9
+00:00:37,899 --> 00:00:42,889
+现在问题是，给定一个处理短信息的PRF
+比如AES可以处理16字节信息
+now is, given a PRF for short messages
+like AES for sixteen byte messages, can we
+
+10
+00:00:42,889 --> 00:00:48,005
+我们能不能构建一个PRF来处理长信息
+比如几个G的信息呢？
+construct a PRF for long messages that are
+potentially gigabytes long? And this is
+
+11
+00:00:48,005 --> 00:00:53,245
+这就是下面所述的来历。我记为X，即｛0,1｝^N
+shorthand for what's coming. I'm going to
+denote by X, the set ｛0,1｝ to the N where N
+
+12
+00:00:53,245 --> 00:00:58,485
+这里N是底层PRF的分组大小
+因为我们总是拿AES作为底层的PRF
+is the block size for the underlying PRF.
+So since we're always going to be thinking
+
+13
+00:00:58,485 --> 00:01:03,247
+你可以把N当成128位
+of AES as the underlying PRF, you can
+think of N as essentially 128 bits. So
+
+14
+00:01:03,247 --> 00:01:08,296
+第一个机制叫做加密的CBC-MAC，或简记为ECBC
+the first construction is called the
+encrypted CBC MAC, or ECBC for short.
+
+15
+00:01:08,296 --> 00:01:13,967
+加密的CBC-MAC。那么ECBC使用一个PRF
+输入集合X=｛0,1｝^N中的信息
+Encrypted CBC MAC. So ECBC uses a PRF that
+takes messages in the set X ｛0,1｝ to the N
+
+16
+00:01:13,967 --> 00:01:19,500
+输出同样的集合X中的信息。我们要构建一个PRF
+and outputs messages in the same set X.
+And what we're going to be building is a
+
+17
+00:01:19,500 --> 00:01:24,687
+取一对密钥。它去很长的信息
+PRF that basically takes pairs of keys. It
+takes very long messages, in fact
+
+18
+00:01:24,687 --> 00:01:29,667
+事实上是任意长的信息，我稍后再解释这点
+arbitrarily long messages, and I'll
+explain this in just a second and it
+
+19
+00:01:29,667 --> 00:01:34,596
+它输出｛0,1｝^N中的标签。这是我们的目标。
+那这个|X|的不大于L次方是什么意思？
+outputs also tags in ｛0,1｝ to the N. So
+that's our goal. Now what is this X to the
+
+20
+00:01:34,596 --> 00:01:39,478
+这里是说，CBC-MAC可以取最多长L个分组的信息
+less than or equal to L? The point here is
+that in fact CBC MAC can take very long
+
+21
+00:01:39,478 --> 00:01:44,118
+L可以是百万或十亿的大小
+messages up to L blocks. L could be a
+million or a billion. But it could also
+
+22
+00:01:44,118 --> 00:01:49,063
+它还可以是变化的输入信息的长度
+换句话说，|X|不大于L
+take variable length messages as inputs.
+In other words, X less than or equal to L
+
+23
+00:01:49,063 --> 00:01:53,825
+意思是我们允许输入的信息包含的分组数
+means that we allow the input to be
+messages that contain an arbitrary number
+
+24
+00:01:53,825 --> 00:01:58,709
+可以是从0到L的任一数。每个CBC可以处理
+一个分组长的信息
+of blocks between one and L. So each CBC
+can process messages that are one block
+
+25
+00:01:58,709 --> 00:02:03,349
+两个分组长的、十个分组长的、100个分组长的信息
+long, two blocks long, ten blocks long,
+100 blocks long. It's perfectly fine to
+
+26
+00:02:03,349 --> 00:02:07,826
+给可变长度的输入是完全可以的。为了讨论方便
+give it variable size inputs. But just to
+keep the discussion simple, we up our
+
+27
+00:02:07,826 --> 00:02:12,301
+我们把最大信息长度界定为L。那我们来看ECBC如何工作
+bounds the maximum length by capital L. So
+let's see how ECBC works. Well, we start
+
+28
+00:02:12,301 --> 00:02:16,886
+我们一开始取信息，把它分割成一个个的分组
+by taking our message and breaking it into
+blocks, each block is as long as a block
+
+29
+00:02:16,886 --> 00:02:21,250
+每个分组和底层函数f的分组一样长
+然后我们沿着CBC链接运行
+of the underlying function f, and then
+essentially we run through the CBC chain
+
+30
+00:02:21,250 --> 00:02:25,835
+但不输出中间值。大家注意
+except that we don't output intermediate
+values. So you notice we basically encrypt
+
+31
+00:02:25,835 --> 00:02:30,309
+我们加密第一个分组，然后把结果与第二个分组异或
+the first block and then feed the results
+into the XOR with the second block and
+
+32
+00:02:30,309 --> 00:02:34,784
+再把结果交给f，一次又一次地这样做
+then feed that into f again, and we do
+that again and again and again and finally
+
+33
+00:02:34,784 --> 00:02:39,302
+最后我们得到了一个值，叫做这个长长的链接的CBC输出
+we get a value out here. Which is called
+the CBC outputs of this long chain. And
+
+34
+00:02:39,302 --> 00:02:44,235
+那么，我想让大家注意一个事实
+那就是我们要多做一步加密
+then, I would like to point your attention
+to the fact that we do one more encryption
+
+35
+00:02:44,235 --> 00:02:48,927
+这一步使用一个独立的密钥来完成
+step. And this step is actually done using
+an independent key, K1. That's different
+
+36
+00:02:48,927 --> 00:02:53,756
+这个密钥是独立选择的，与密钥K不同
+最后的输出结果就是我们所求的标签
+and chosen independently of the key K, and
+finally the output gives us the tag. So in
+
+37
+00:02:53,756 --> 00:02:58,183
+在这种情况下，标签为N位长。
+但我们在之前一节中提过
+this case the tag would be N bits long,
+but we also mentioned in the previous
+
+38
+00:02:58,183 --> 00:03:02,956
+我们是可以截断标签的，使之长度小于N
+segment that it's fine to truncate the tag
+to less than N bits long as long as one
+
+39
+00:03:02,956 --> 00:03:07,555
+只要1除以2的长度次方是可忽略的
+现在大家看到ECBC取一对密钥作为输入
+over two to the end is negligible. So now
+you can see that ECBC takes a pair of
+
+40
+00:03:07,555 --> 00:03:11,867
+它可以处理可变长的信息
+keys as inputs, it can process
+variable length messages and it produces
+
+41
+00:03:11,867 --> 00:03:16,206
+它的输出在集合X中。大家可能想知道
+最后一步的加密是干什么的？
+an output in the set X. So you might be
+wondering what this last encryption step
+
+42
+00:03:16,206 --> 00:03:20,228
+我告诉大家，不定义最后一步加密的函数
+is for. And I'll tell you that the
+function that's defined without this last
+
+43
+00:03:20,228 --> 00:03:24,196
+叫做原CBC函数。换句话说
+encryption step is called the raw CBC
+function. In other words, if we simply
+
+44
+00:03:24,196 --> 00:03:28,377
+如果我们就在这里停止处理了，
+我们得到的输出，叫做原CBC
+stop processing over here, and we take
+that as the output, that's called raw CBC.
+
+45
+00:03:28,377 --> 00:03:32,852
+我们待会会看到，原CBC并不是一个安全的MAC
+And as we'll see in a minute, raw CBC is
+actually not a secure MAC. So this last
+
+46
+00:03:32,852 --> 00:03:37,120
+最后一步对于MAC的安全性是很重要的
+step is actually critical for making
+the MAC secure. So another class of
+
+47
+00:03:37,120 --> 00:03:41,511
+另一类构建机制，将小PRF转变成大PRF的，
+叫做NMAC
+construction for converting a small PRF
+into a large PRF is called NMAC,
+
+48
+00:03:41,511 --> 00:03:46,264
+嵌套MAC。NMAC从PRF开始，与之前一样
+for Nested MAC. Now, the NMAC starts
+from PRF that, as before, takes inputs
+
+49
+00:03:46,264 --> 00:03:50,977
+取X中的输入，输出密钥空间里的元素。记得在CBC里
+in X, but outputs elements in the key
+space. And remember that for CBC, the
+
+50
+00:03:50,977 --> 00:03:56,136
+输出一定在集合X里。这里，输出需要在密钥空间K里
+output has to be in the set X. Here, the
+output needs to be in the key space K. And
+
+51
+00:03:56,136 --> 00:04:01,167
+我们获得了这个PRF F_NMAC，它取一对密钥作为输入
+again, we basically obtain the PRF F_NMAC, which takes pairs of keys as inputs.
+
+52
+00:04:01,167 --> 00:04:06,008
+它还可以处理变长的信息，最多L个分组
+Again, can process variable length
+messages up until L blocks. And the output
+
+53
+00:04:06,008 --> 00:04:11,167
+输出是密钥空间中的一个元素
+NMAC工作的方式，开头和之前一样
+is an element in the key space. And the
+way NMAC works is kind of, starts as
+
+54
+00:04:11,167 --> 00:04:16,313
+我们取我们的信息，把它分成若干分组
+before. We take our message, and we break
+it into blocks. Each block is, again, as
+
+55
+00:04:16,313 --> 00:04:21,890
+每个分组的长度与底层PRF的分组长度一致。
+现在我们取我们的密钥
+big as the block length of the underlying
+PRF. And now we take our key and we feed
+
+56
+00:04:21,890 --> 00:04:27,171
+把我们的密钥交给函数F，信息分组
+our key as the key input into the function
+F. And the message block is given as the
+
+57
+00:04:27,171 --> 00:04:32,515
+也是作为数据输入给函数F。得到的结果
+就作为NMAC的下一个分组的密钥
+data input into the function F. What comes
+out is the key for the next block of NMAC.
+
+58
+00:04:32,515 --> 00:04:37,414
+现在我们为下一次PRF的计算，有了一个新的密钥
+So now we have a new key for the next
+evaluation of the PRF. And the data for
+
+59
+00:04:37,414 --> 00:04:42,376
+下一次计算的数据是下一个信息分组，等等
+the next evaluation is the next message
+block and so on and so forth until we
+
+60
+00:04:42,376 --> 00:04:47,707
+知道我们到达最后的输出。最后的输出
+是K中的元素，对吧？
+reach the final output. The final output
+is gonna be an element in K. Okay? And
+
+61
+00:04:47,707 --> 00:04:52,959
+与之前一样，事实上，如果我们停在这里
+我们得到的函数叫做
+just as before, in fact, if we stop here.
+The function that we obtain is called a
+
+62
+00:04:52,959 --> 00:04:57,938
+级联函数。我们待会会看到级联的更多细节
+cascade function. And we're gonna look at
+cascade in more detail in just a minute.
+
+63
+00:04:57,938 --> 00:05:02,734
+级联会输出K中的一个元素。但是，我们还会看到
+So cascade will output an element in K.
+However, that, as we'll see again, is not
+
+64
+00:05:02,734 --> 00:05:07,529
+级联不是安全的MAC。为了获得一个安全的MAC
+我们需要把这个K中的元素T
+a secure MAC. To get a secure MAC, what we
+do is we need to map this element T,
+
+65
+00:05:07,529 --> 00:05:12,679
+映射到集合X中。典型地，我们会看到
+which is in K, into the set X. And so,
+typically, as we'll see, NMAC is used
+
+66
+00:05:12,679 --> 00:05:18,495
+NMAC用到的PRF的分组长度|X|远远大于密钥长度
+with, PRFs, where the block length, X, is
+much bigger than the key length. And so
+
+67
+00:05:18,495 --> 00:05:24,239
+我们就把固定的补齐附在信息后面
+fpad是固定的补齐
+what we do is we simply append fixed pad.
+fpad is called a fixed pad that gets
+
+68
+00:05:24,239 --> 00:05:29,209
+附在这个标签T后面。然后这里的输入
+appended to this tag T. And then this
+becomes, this input here, this block here
+
+69
+00:05:29,209 --> 00:05:33,885
+这个分组成为了X中的一个元素。我们把这个分组
+交给函数，同时还注意到这里
+becomes an element of X. We feed this into
+the function, and again, notice here that
+
+70
+00:05:33,885 --> 00:05:38,334
+最后一步加密使用了一个独立的密钥
+there's an independent key that's being
+used for the last encryption step. And
+
+71
+00:05:38,334 --> 00:05:42,782
+最后一个标签是K中的一个元素，我们输出它
+then finally, the last tag is an element
+of K which we output as the output of
+
+72
+00:05:42,782 --> 00:05:47,059
+作为NMAC的输出。记住如果没有最后一步加密
+NMAC. So remember without the last
+encryption step, the function is called a
+
+73
+00:05:47,059 --> 00:05:51,393
+这个函数叫做级联。带这最后一步，
+我们会看到它对安全性来说是必须的
+cascade. With the last step as we'll see
+which is necessary for security, we
+
+74
+00:05:51,393 --> 00:05:55,884
+我们有一个PRF，输出K中的元素，可以处理
+actually get a PRF which outputs elements
+in K, and can process variable length
+
+75
+00:05:55,884 --> 00:06:00,034
+可变长信息，最多L个分组长。好，这就是NMAC
+messages that are up to L blocks long.
+Alright so that is the NMAC
+
+76
+00:06:00,034 --> 00:06:06,587
+那么我们有了两个MAC。根据AES
+我们可以构建一个大PRF
+construction. So now we have two MACs. That
+we can use to build a large PRF, from AES,
+
+77
+00:06:06,587 --> 00:06:11,023
+在我分析MAC机制的安全性之前
+basically. So before I analyze the
+security of MAC constructions, I'd like
+
+78
+00:06:11,023 --> 00:06:15,170
+我想让大家更好地理解最后一步的意义
+you to understand better what the last
+encryption step is for. So, let's start
+
+79
+00:06:15,170 --> 00:06:19,533
+那么我们从NMAC开始。我已解释了
+非常容易看出，如果我们忽略了
+with NMAC. So I explained that it
+is actually very easy to see that if we
+
+80
+00:06:19,533 --> 00:06:23,573
+最后一步加密，换句话说，如果我们使用级联函数
+omitted the last encryption step. In other
+words, if we just use the cascade
+
+81
+00:06:23,573 --> 00:06:27,936
+那么这个MAC将是完全不安全的。假如我们看
+function, then the MAC will be completely
+insecure. Okay so suppose we look at this
+
+82
+00:06:27,936 --> 00:06:32,298
+这里的MAC，换句话说，我们直接输出
+MAC to find over here. In other words, all
+we do is we output directly the cascade
+
+83
+00:06:32,298 --> 00:06:36,661
+M的级联函数结果，不做最后一步加密
+我问大家如何伪造这个MAC里的标签？
+applied to M without the last encryption
+step. So let me ask you how do you forge
+
+84
+00:06:36,661 --> 00:06:40,809
+我猜我已经把错误答案给出了
+tags in this MAC. And I guess I've kinda
+given it away that this answer isn't
+
+85
+00:06:40,809 --> 00:06:45,360
+我希望大家能看出答案是，给定一个
+correct. So I hope everybody sees that the
+answer is, that, in fact, given one chosen
+
+86
+00:06:45,360 --> 00:06:49,203
+选择信息的询问，你就可以实施一次存在性伪造了
+message query, you can mount an
+existential forgery. And the reason is,
+
+87
+00:06:49,203 --> 00:06:53,769
+我会以图表的形式为大家展示其原因
+让我先把它以符号形式写在这
+I'll show you in a second in the diagram,
+but let me write it out in symbols first.
+
+88
+00:06:53,769 --> 00:06:58,113
+原因是，如果有了级联函数在信息M处的输出
+The reason if, if you're given the output
+of the cascade function applied to a
+
+89
+00:06:58,113 --> 00:07:02,918
+我作为攻击者，就可以根据这个输出推导出
+message M. I can derive from it, me being
+the adversary, I can derive from it the
+
+90
+00:07:02,918 --> 00:07:07,541
+级联函数在信息M联结上W的值，这里W可以是任意信息
+cascade applied to the message M
+concatenated W for any message W, for any
+
+91
+00:07:07,541 --> 00:07:11,851
+首先，应当清楚这对于实施存在性伪造
+W. So first of all, it should be clear
+that this is enough to mount an
+
+92
+00:07:11,851 --> 00:07:17,287
+是足够的，因为通过询问这个信息的标签
+existential forgery because essentially by
+asking for a tag on this message I obtain
+
+93
+00:07:17,287 --> 00:07:22,472
+我获得了这个更长的信息的标签
+我就可以输出它作为我的伪造，好
+the tag on this longer message which I can
+then output as my forgery. Okay, so the
+
+94
+00:07:22,472 --> 00:07:27,720
+那么MAC是不安全的，因为给定了一个信息的MAC
+我可以产生另一个信息的MAC
+MAC is insecure because given a MAC in one
+message, I can produce the MAC in another
+
+95
+00:07:27,720 --> 00:07:32,259
+但是让我们回到之前描述的级联函数的图
+来看看为什么这是正确的
+message. But let's go back to the diagram
+describing cascade, and see why this is
+
+96
+00:07:32,259 --> 00:07:36,243
+让我们看看如果这最后一步不在的话，会发生什么
+true. And so let's see what happens if
+this last step isn't there. As an
+
+97
+00:07:36,243 --> 00:07:40,451
+作为一个攻击者，我能再加一个分组在这，记之为W
+attacker, what I can do, I can add one
+more block here, which we called W. And
+
+98
+00:07:40,451 --> 00:07:44,660
+然后我可以取级联函数的输出，也就是值T
+then, then basically, I can take the
+output of cascade, which is this value T.
+
+99
+00:07:44,660 --> 00:07:49,731
+然后应用函数F来计算T，这里我取这个T值
+And we can simply apply the function F to
+it again. So here I'll take this T value.
+
+100
+00:07:49,731 --> 00:07:54,995
+我把它带入到F里，带入我的最后一个分组W
+I'll plug it in to F. And plug my last
+block W into it and what I'll get is T
+
+101
+00:07:54,995 --> 00:08:00,520
+我会得到T'，也就是级联函数在信息M联结W的值
+prime which is, well, the evaluation of
+cascade on the message M concatenated W.
+
+102
+00:08:00,520 --> 00:08:04,661
+我可以使用我们计算的T'来进行存在性伪造
+In our calculated T prime, which I can use
+for my existential forgery. Okay, so this
+
+103
+00:08:04,661 --> 00:08:08,753
+这就证明了为什么级联的这个性质成立
+这个叫做扩展攻击
+kind of shows you why this property of
+cascade holds. This is called an extension
+
+104
+00:08:08,753 --> 00:08:12,945
+给定信息M的标签，我可以推出M的扩展信息的标签
+attack, where giving a tag of the message
+m I can deduce the tag for the extension
+
+105
+00:08:12,945 --> 00:08:16,728
+事实上对任何我选择的扩展
+of m. And in fact for any extension of my
+choice. So basically, cascade is
+
+106
+00:08:16,728 --> 00:08:20,917
+级联都是完全不安全的，如果我们不做最后一步加密的话
+completely insecure if we don't do this
+last encryption step, and the last
+
+107
+00:08:20,917 --> 00:08:25,420
+这里最后一步加密阻止了这种扩展攻击
+encryption step here basically prevents
+this type of extension attack. I can tell
+
+108
+00:08:25,420 --> 00:08:29,349
+我可以顺便告诉大家，事实上扩展攻击是
+针对级联的唯一一种攻击
+you by the way that in fact extension
+attacks are the only attacks on a cascade
+
+109
+00:08:29,349 --> 00:08:33,706
+可以说得更清楚些，但我这里就不说了
+and that could be made precise. But I'm
+not gonna do that here. The next question
+
+110
+00:08:33,706 --> 00:08:38,091
+下一个问题是，在这个ECBC机制中，我们
+为什么要有多出来的这个加密分组？
+is, why did we have the extra encryption
+block in the ECBC construction? So again,
+
+111
+00:08:38,091 --> 00:08:42,312
+让我告诉大家，如果没有这个多出来的加密分组
+ECBC将是不安全的
+let me show you that without this extra
+encryption block ECBC is insecure. So
+
+112
+00:08:42,312 --> 00:08:46,752
+我们定义一个使用原CBC的映射
+换句话说，它和CBC-MAC是一样的
+let's define a map that uses raw CBC. In
+other words, it's the same as CBC MAC, but
+
+113
+00:08:46,752 --> 00:08:51,028
+但没有最后一步加密。我们看到这个MAC也是不安全的
+without the last encryption step. And
+let's see that, that MAC is also insecure.
+
+114
+00:08:51,028 --> 00:08:55,249
+不过这个攻击比简单的扩展攻击更困难点
+Except now, the attack is a little bit
+more difficult than a simple extension
+
+115
+00:08:55,249 --> 00:08:59,360
+假设攻击者有了这个值，原CBC在特定信息M处的值
+attack. So suppose the attacker is given
+this value, the raw CBC value for a
+
+116
+00:08:59,360 --> 00:09:03,592
+现在，攻击者想扩展和计算某个信息
+particular message M. And now, the
+attacker wants to extend and compute the
+
+117
+00:09:03,592 --> 00:09:08,692
+再联结上某个字W的MAC。这是我们的W
+MAC on some message M, concatenated on
+with some word W. So here's our W well the
+
+118
+00:09:08,692 --> 00:09:13,377
+攻击者可以取这个值，试着将两者进行异或
+core attacker can take this value and try
+to XOR the two together but now you
+
+119
+00:09:13,377 --> 00:09:18,046
+大家发现他必须计算这个函数
+这里，攻击者不知道
+realize he has to evaluate the function.
+At this point. But he doesn't know what
+
+120
+00:09:18,046 --> 00:09:22,814
+这个密钥K是什么。因此，他不知道这个函数的输出
+this key K is. And as a result, he doesn't
+know what the output of the function is.
+
+121
+00:09:22,814 --> 00:09:27,112
+他不能仅根据分组W就计算出原CBC
+So he simply can't just depend on
+block W, and compute the value of
+
+122
+00:09:27,112 --> 00:09:31,763
+在N联结W处的值。不过，其实他可以计算
+raw CBC on N concatenated W. However, it
+turns out they he can actually evaluate
+
+123
+00:09:31,763 --> 00:09:36,234
+这个函数。通过选择信息攻击。我想告诉大家
+this function. By using the chosen message
+attack. And I wanna show you how to do
+
+124
+00:09:36,234 --> 00:09:40,600
+怎么去做。好，我们说过我们的目标是
+证明原CBC是不安全的
+that. Okay, so we said that basically so
+our goal is to show raw CBC is insecure.
+
+125
+00:09:40,600 --> 00:09:45,298
+我们看一个特殊的攻击，在这个攻击里
+So let's look at a particular attack. So
+in the attack, the adversary is going to
+
+126
+00:09:45,298 --> 00:09:49,810
+攻击者先请求一个特定信息M的标签
+信息M只有一个分组长
+start by requesting the tag on a
+particular message m that's a one-block
+
+127
+00:09:49,810 --> 00:09:54,755
+对一个单分组信息应用CBC意味着什么？
+message. So what does it mean to apply CBC
+to a one-block message? Well basically,
+
+128
+00:09:54,755 --> 00:09:59,701
+你只需直接应用函数f。那么你获得了这个标签
+all you do is you just apply the function
+f directly. So what you get is the tag,
+
+129
+00:09:59,701 --> 00:10:04,421
+即直接应用f在单分组信息M处的结果
+which is just the application of f
+directly to the one-block message m. Good,
+
+130
+00:10:04,421 --> 00:10:09,586
+现在攻击者有了这个值T
+现在我声称他可以定义这个信息M'
+so now the adversary has this value T. And
+now I claim that he can define this
+
+131
+00:10:09,586 --> 00:10:14,487
+包含两个分组，第一个是M
+message, M prime, which contains two
+blocks. The first block is M, the second
+
+132
+00:10:14,487 --> 00:10:19,917
+第二个是T异或M。我声称，刚刚收到的值T
+block is T XOR M. And I claim that the
+value T that he just received is a valid
+
+133
+00:10:19,917 --> 00:10:24,726
+是这两个分组的信息M'的标签。
+我们看为什么这是对的
+tag for this two block message, M Prime.
+So let's see why that's true. Well, so
+
+134
+00:10:24,726 --> 00:10:29,782
+假设我们在这个信息M'上应用原CBC
+suppose we apply the raw CBC construction
+to this message M prime. So if you plug it
+
+135
+00:10:29,782 --> 00:10:34,296
+如果你把它带入，我们看，这应该能成功。首先
+in directly what, let's see. The way it
+would work is first of all, the first
+
+136
+00:10:34,296 --> 00:10:39,213
+第一个信息M被加密处理，直接使用函数F
+message M is processed by encrypting it
+directly using the function F. Then we XOR
+
+137
+00:10:39,213 --> 00:10:44,774
+然后我们把结果和第二个分组异或，
+就是T异或M，然后我们对结果应用F
+the results with the second block
+with is T-XOR-M. And then we apply F to
+
+138
+00:10:44,774 --> 00:10:49,984
+这是原CBC的定义。关于F(k,m)我们知道什么？
+the results of that. That is the
+definition of raw CBC. Now what do we know about
+
+139
+00:10:49,984 --> 00:10:55,052
+根据定义，F(k,m)就是T。那么下一步里
+F(k,m)? F(k,m) is simply this value T by
+definition. So the next step we get is
+
+140
+00:10:55,052 --> 00:11:00,542
+我们获得T异或T异或M，但T异或T相抵消了
+essentially T-XOR-T-XOR-M. But
+this T- XOR-T simply goes away and what
+
+141
+00:11:00,542 --> 00:11:06,134
+所以我们得到的就是F(k,m)。当然就是T了
+因此T是这个两分组信息(M,T异或M)的有效MAC
+we get is F(k,m). Which is, of course, T.
+And as a result, T is a valid MAC for the
+
+142
+00:11:06,134 --> 00:11:11,505
+攻击者可以产生这个有效的标签T
+two block message, (M, T-XOR-M). So
+the adversary was able to produce this
+
+143
+00:11:11,505 --> 00:11:16,553
+而这个两分组的信息是从未被询问过的
+valid tag T for this two block message
+that he never queried. And therefore, he
+
+144
+00:11:16,553 --> 00:11:20,195
+因此，他可以破解这个MAC了。我们再看一眼这个ECBC图
+was able to break the MAC. So let's look
+at the ECBC diagram for just one more
+
+145
+00:11:20,195 --> 00:11:24,071
+我指出，如果计算MAC时，不包含最后一步加密的话
+second. And let me point out that if you
+don't include this last encryption step in
+
+146
+00:11:24,071 --> 00:11:27,806
+MAC将是不安全的
+the computation of the MAC, essentially,
+the MAC would be insecure because of the
+
+147
+00:11:27,806 --> 00:11:31,728
+因为我们刚刚看到的攻击。我要告诉大家
+有很多产品也犯了这样的错误
+attack that we just saw. And I'll tell you
+that there are many products that do this
+
+148
+00:11:31,728 --> 00:11:35,323
+事实上，有些标准也做得不对
+incorrectly. And, in fact, there are even
+standards that do this incorrectly, so
+
+149
+00:11:35,323 --> 00:11:39,012
+得到的MAC是不安全的。大家现在知道了这步是需要做的
+that the resulting MAC is insecure. You
+now know that this needs to be done, and
+
+150
+00:11:39,012 --> 00:11:43,080
+大家自己别犯这个错误了。那么
+我们看一下CBC和NMAC的
+you won't make this mistake yourself. So
+let's state the CBC and NMAC security
+
+151
+00:11:43,080 --> 00:11:47,817
+安全性定理。通常，命题是针对任意长度的信息
+theorems. And so the statement is as usual
+for any message length that we'd like to,
+
+152
+00:11:47,988 --> 00:11:52,269
+应用MAC。对任意攻击PRF的攻击者A
+apply the MAC to. Essentially for every
+PRF adversary A, there's an efficient
+
+153
+00:11:52,269 --> 00:11:56,778
+都存在一个有效的攻击者B，这些表述一般命题里都有
+adversary B and, you know, these are kind
+of the usual statements. Where, the facts
+
+154
+00:11:56,778 --> 00:12:01,458
+大家需要知道这里的误差项，两种情况的误差项很相似
+that you need to know are the error terms
+which are kind of similar in both cases.
+
+155
+00:12:01,458 --> 00:12:06,139
+顺便一提，我想指出这里对CBC的分析
+By the way, I'd like to point out that the
+analysis for CBC actually uses the fact
+
+156
+00:12:06,139 --> 00:12:10,938
+使用了F是PRP这一事实，尽管我们从来没有
+在ECBC的计算中，求F的逆
+that F is a PRP even though we never had
+to invert F during the computation of
+
+157
+00:12:10,938 --> 00:12:16,279
+如果假设F是PRP，这个分析会更好。换句话说
+ECBC, the analysis is better if you assume
+that F is actually a PRP. In other words,
+
+158
+00:12:16,279 --> 00:12:21,489
+F是可逆的，不仅仅是一个函数而已
+对于一个MAC，PRF不一定是可逆的
+it's invertible, not just a function. For
+a MAC, the PRF need not be invertible.
+
+159
+00:12:21,489 --> 00:12:26,829
+这些误差项告诉我们，这些MAC是安全的
+So what these error terms basically say
+is that these MACs are secure, as long as,
+
+160
+00:12:26,829 --> 00:12:32,330
+只要用于计算MAC的密钥使用次数不超过|X|的平方根
+也不超过K的平方根
+key is not used to MAC more than square
+root of X or square root of K messages. So
+
+161
+00:12:32,330 --> 00:12:36,714
+对于AES来说，这当然就是2的64次方了
+我想给大家一个例子
+for AES of course this would be a two to
+the 64. But I want to show you an example
+
+162
+00:12:36,714 --> 00:12:40,937
+来展示如何使用这些上界。这里我又写下了
+CBC-MAC的安全性定理
+of how you would use these bounds. So
+here, I've stated the security theorem again
+
+163
+00:12:40,937 --> 00:12:45,321
+这里的q是询问的信息数，并用一特定密钥计算MAC
+for the CBC MAC, and Q here, again, is the
+number of messages that are MACed with a
+
+164
+00:12:45,321 --> 00:12:49,598
+假设我们想确保所有的攻击者
+particular key. So suppose we wanted to
+ensure that for all adversaries that the
+
+165
+00:12:49,598 --> 00:12:53,875
+区分PRF和真随机函数的优势都小于1除以2的32次方
+adversary has an advantage of less than
+one over two to the 32 in distinguishing
+
+166
+00:12:53,875 --> 00:12:57,781
+假设这是我们的目标
+the PRF from a truly random function.
+Suppose that is our goal. Well, by the
+
+167
+00:12:57,781 --> 00:13:01,673
+根据安全性定理，这意味着我们需要确保
+security theorem, what that means is we
+need to ensure that Q squared over X is
+
+168
+00:13:01,673 --> 00:13:05,515
+q^2/|X|小于1除以2的32次方。
+我们希望这一项。。
+less than one over two to the 32, right.
+We want this term to be, well, I'm going
+
+169
+00:13:05,515 --> 00:13:09,210
+我想忽略这个2，以求简便。
+我们想确保这一项
+to ignore this two here just for
+simplicity. We want to ensure this term is
+
+170
+00:13:09,210 --> 00:13:13,201
+小于1除以2的32次方，那么这一项当然就是可忽略的
+less than one over two to the 32 and this
+term, of course, is negligible, so we can
+
+171
+00:13:13,201 --> 00:13:17,914
+这样我们就可以忽略之。这意味着
+这一项也小于1除以2的32次方
+just ignore it. This would imply that this
+term is also less than one over two to the
+
+172
+00:13:17,914 --> 00:13:22,683
+好，如果我们想确保优势小于1除以2的32次方
+32. Okay, so if we want to ensure that the
+advantage is less than one over two to the
+
+173
+00:13:22,683 --> 00:13:27,396
+我们需要确保q^2/|X|小于1除以2的32次方
+32, we need to ensure that Q squared over
+X is less than one over two to the 32. For
+
+174
+00:13:27,396 --> 00:13:31,881
+对于AES，这意味着计算了2的48次方个信息的MAC后
+AES, basically this means that after MACing
+two to the 48 messages, you have to
+
+175
+00:13:31,881 --> 00:13:35,970
+你就必须更换密钥了。否则，MAC就不安全了
+change your key. Otherwise, you won't
+achieve the security level. So you can
+
+176
+00:13:35,970 --> 00:13:40,412
+所以你只能最多计算2的48次方个信息的MAC。
+注意到如果我带入3DES的参数
+MAC, at most, two to the 48 messages. You
+notice that if I plug in triple DES, which
+
+177
+00:13:40,412 --> 00:13:44,526
+3DES分组更短，只有64位。同样的计算告诉我们
+has a much shorter block, only 64 bits.
+The same result says you now have to
+
+178
+00:13:44,526 --> 00:13:48,592
+必须每65000个信息就更换密钥
+因此这就很有问题了
+change your key every 65,000 messages. So
+this basically is quite problematic
+
+179
+00:13:48,592 --> 00:13:52,202
+而这个AES还是可以的。这是个非常大的数
+whereas this is fine. This is actually a,
+a very fairly large number. For
+
+180
+00:13:52,202 --> 00:13:56,117
+对于AES，这意味着你必须每160亿个信息更换密钥
+AES this means you have to change
+your key only every 16 billion
+
+181
+00:13:56,117 --> 00:14:00,000
+这还是非常合理的。这也是为什么
+messages which is perfectly reasonable.
+And so this is one of the reasons why AES
+
+182
+00:14:00,000 --> 00:14:03,657
+AES有比3DES更大的分组的原因之一
+有些模式依然是安全的
+has a larger block, than triple DES. Some of these modes remain
+
+183
+00:14:03,657 --> 00:14:07,410
+大家不一定要像3DES那样频繁地更换密钥
+secure and you don't have to change your
+key as often as you would with triple
+
+184
+00:14:07,410 --> 00:14:12,076
+好，我想告诉大家，事实上这些攻击不仅在
+DES. Okay, so I want to show you
+that in fact these attacks are not just in
+
+185
+00:14:12,076 --> 00:14:16,876
+安全性定理中的命题里，它们还是真实的攻击
+the statements in the security theorem, in
+fact there really are real attacks that
+
+186
+00:14:16,876 --> 00:14:21,616
+对应于这些值。现在这些MAC值确实变得不安全了
+correspond to these values. Now the MACs
+really do become insecure after you sign,
+
+187
+00:14:21,616 --> 00:14:26,474
+在你签名了|X|或|K|的平方根个信息后。
+you know, square root of X or square root
+of K messages. So I'm going to show you an
+
+188
+00:14:26,474 --> 00:14:30,688
+那么我要告诉大家一个针对PRF的攻击，
+也就是同时针对ECBC和NMAC的攻击
+attack on both PRFs so either ECBC or
+NMAC. Assuming that the underlying
+
+189
+00:14:30,688 --> 00:14:35,195
+假设底层函数是PRP，是类似AES的分组密码，我们记为F
+function is a PRP, is actually a block
+cipher like AES. Let's call F big, let's
+
+190
+00:14:35,195 --> 00:14:40,053
+我们说F可以是F_ECBC或F_NMAC
+那么F意味着这是一个针对长信息的PRF
+say that F big is either F ECBC or F NMAC.
+So F big means that it's a PRF for large
+
+191
+00:14:40,053 --> 00:14:44,293
+现在，实际上两种机制都有如下的扩展性质
+messages. Now, it turns out both
+constructions have the following extension
+
+192
+00:14:44,293 --> 00:14:49,859
+如果给我一个碰撞，发生在信息X和Y上
+property. Namely, if you give me a
+collision. On messages X and Y. Then, in
+
+193
+00:14:49,859 --> 00:14:54,669
+那么事实上，这也意味着有一个碰撞发生在
+X和Y的扩展上，换句话说
+fact, that also implies a collision on an
+extension of X and Y. In other words, if I
+
+194
+00:14:54,669 --> 00:14:59,480
+如果我把W各附在X和Y的后面，我也会在这些信息上
+获得一个碰撞。那么
+append W to both X and Y, I'll also get a
+collision on the resulting words. So it's
+
+195
+00:14:59,480 --> 00:15:04,349
+很容易说服自己，这个扩展性质是成立的
+fairly easy to convince yourself that this
+extension property holds, you do it just
+
+196
+00:15:04,349 --> 00:15:08,925
+只需盯着这张图看一会，就能想象，我给你两个信息
+by staring at the diagram for a second.
+And so imagine I give you two messages
+
+197
+00:15:08,925 --> 00:15:13,559
+它们正好在这点发生膨胀。记得我假设F是PRP
+that happen to collide at this point. Now
+remember, I assumed that F is a PRP. So
+
+198
+00:15:13,559 --> 00:15:18,018
+那么一旦固定K1，它就是一一映射的函数
+于是如果两个信息正好
+once you fix K1, it's a one to one
+function. So if the two messages happen to
+
+199
+00:15:18,018 --> 00:15:23,023
+被映射到输出的同一个值，这就意味着它们
+也正好被映射到同样的值
+map to the same value at the output. This
+means they also happen to map to the same
+
+200
+00:15:23,023 --> 00:15:27,457
+作为原CBC的输出。但如果它们在原CBC的输出中
+value at the output of the raw CBC
+function. But if they map to the same
+
+201
+00:15:27,457 --> 00:15:32,198
+被映射到同样的值，这意味着如果我加上另外一个分组
+value at the output of the raw CBC
+function, that means that if I add another
+
+202
+00:15:32,198 --> 00:15:37,584
+我们记为W。我获得了这个输出。然后我们计算
+block, let's call it a W. And I take this
+output here. Then I'm computing the same
+
+203
+00:15:37,584 --> 00:15:43,162
+这两个信息的共同的函数值。对两个信息，我都会
+在这个点得到同样的值
+value for both messages. And I'll get, for
+both messages, I'll get the same value at
+
+204
+00:15:43,162 --> 00:15:47,991
+当我用K1加密时，我会获得。。
+this point, too. And when I encrypt,
+again, with K1, I'll also get, you know,
+
+205
+00:15:47,991 --> 00:15:53,501
+这里还有个F。我会获得同样的输出，即最终输出
+so there's one more F here. I'll also get
+the same output, final output, after I've
+
+206
+00:15:53,501 --> 00:15:58,123
+在我附上分组W后。那么如果两个不同信息的
+两个值正好是一样的
+appended the block W. Okay, so if the two
+values happen to be the same for two
+
+207
+00:15:58,123 --> 00:16:02,741
+如果我附上分组W到两个信息后面，我依然能获得
+distinct messages. If I appended block W
+to both messages, I'm still gonna get the
+
+208
+00:16:02,741 --> 00:16:07,189
+同样的输出值。容易说服自己，这一点对NMAC也成立
+same value out. It's easy to convince
+yourself that the same is true for NMAC
+
+209
+00:16:07,189 --> 00:16:12,144
+这两个PRF都有这个扩展性质成立。基于此
+as well. Okay, so both of these, PRFs have
+this extension property. So based on this,
+
+210
+00:16:12,144 --> 00:16:17,347
+我们可以定义一个攻击。这是扩展性质的描述
+we can define an attack. So here's the
+extension property stated again. And the
+
+211
+00:16:17,347 --> 00:16:22,350
+攻击如下工作。假设我发出了|Y|的平方根个
+attack would work as follows. Suppose I
+issued square of Y chosen message
+
+212
+00:16:22,350 --> 00:16:27,567
+选择信息的询问。对于AES，Y是｛0,1｝^128
+queries. So, for AES, remember, the value
+of Y is basically ｛0,1｝ to the 128. So this
+
+213
+00:16:27,567 --> 00:16:33,178
+这意味着我要问2的64次方个信息的询问
+would mean that I would be asking, two to
+the 64 shows in message queries for just
+
+214
+00:16:33,178 --> 00:16:38,142
+询问输入空间中的任意信息的标签
+arbitrary messages in the input space.
+Well, what will happen is, I'll obtain,
+
+215
+00:16:38,142 --> 00:16:42,975
+我会获得2的64次方个信息-MAC对。在下一章中
+well, I'll obtain two to the 64 message
+MAC pairs. Now, we're gonna see in the
+
+216
+00:16:42,975 --> 00:16:48,126
+我们将看到，有一个叫做生日悖论的
+next module, actually, there's something
+called a birthday paradox. Some of you may
+
+217
+00:16:48,126 --> 00:16:53,150
+有人可能已经听说过了。它告诉我们
+如果我有2的128次方大小的空间里的
+have heard of it already. It basically
+says that if I have two to the 64 random
+
+218
+00:16:53,150 --> 00:16:58,046
+2的64次方个随机元素，有很大的几率
+elements of a space of size two to the
+128, there's a good chance that two of
+
+219
+00:16:58,046 --> 00:17:02,879
+其中有两个元素是相同的。
+那么我看两个不同的信息，MU和MV
+them are the same. So I'm gonna look for
+two distinct messages. MU and MV, for
+
+220
+00:17:02,879 --> 00:17:08,120
+两个的对应MAC是一样的。我说过
+which the corresponding MACs are the same.
+Okay, and as I said, by the birthday
+
+221
+00:17:08,120 --> 00:17:14,070
+根据生日悖论，这些极有可能存在。
+一旦我有了它们
+paradox, these are very likely to exist.
+Once I have that, now I've basically found
+
+222
+00:17:14,070 --> 00:17:19,947
+我就发现了MU和MV，它们有着同样的MAC
+因此，我可以用任一字W来扩展MU
+MU and MV to have the same MAC. And as a
+result, what I can do is, I can extend MU
+
+223
+00:17:19,947 --> 00:17:25,810
+然后询问MU联结W后的标签
+with an arbitrary word W, and ask for the
+tag for the word MU concatenated W. But
+
+224
+00:17:25,810 --> 00:17:31,631
+但因为MU和MV有着同样的输出
+because MU and MV happen to have the same
+output, I know that MU concatenated W has
+
+225
+00:17:31,631 --> 00:17:37,312
+MU||W与MV||W的输出也是相同的。
+所有现在我获得了MU||W的输出
+the same output as MV concatenated W. So
+now that I've obtained the output for MU
+
+226
+00:17:37,312 --> 00:17:42,953
+也就是获得了MV||W的输出
+concatenated W, I also have the output for
+MV concatenated W. And therefore I have
+
+227
+00:17:42,953 --> 00:17:47,564
+因此，我获得了我的伪造方法。现在T也是
+一个信息MV||W的伪造
+obtained my forgery. Okay, so now T is
+also a forgery for the message MV
+
+228
+00:17:47,564 --> 00:17:52,695
+而这个信息我们之前从没问过
+因此，这是一个有效的可能伪造
+concatenated W which I've never asked
+before. And therefore, this is as valid as
+
+229
+00:17:52,695 --> 00:17:57,890
+好，这是一个犀利的攻击，最保守的说
+a potential forgery. Okay, so this is kind
+of an acute attack and the bottom line
+
+230
+00:18:00,520 --> 00:18:03,151
+事实上经过|Y|的平方根个询问后，我可以伪造一个MAC
+here is that in fact after square root of
+Y queries, I am able to forge a MAC with
+
+231
+00:18:03,151 --> 00:18:07,605
+以很高的概率成功。好，那么|Y|的平方根意味着什么？
+fairly good probability. Okay, so what
+does square root of Y mean? If we go back
+
+232
+00:18:07,605 --> 00:18:12,055
+如果我们回到安全性定理，这意味着对于ECBC，
+经过|X|的平方根个信息
+to the security theorems, this means that
+basically for ECBC after square root of X
+
+233
+00:18:12,055 --> 00:18:16,129
+或是对于NMAC，经过|K|的平方根个信息，
+计算过这么多信息的MAC后
+or for NMAC after square root of K,
+messages have been MACed, the MAC becomes
+
+234
+00:18:16,129 --> 00:18:20,365
+MAC将变得不安全了，攻击者可以为新信息找到新的MAC
+insecure and the attacker can actually
+find new MACs for messages for which he
+
+235
+00:18:20,365 --> 00:18:24,707
+而这些新信息的MAC攻击者之前从未听过
+这是一个犀利的攻击
+was never given a MAC for. So again, this
+is an acute attack that shows the bounds
+
+236
+00:18:24,707 --> 00:18:29,507
+证实了定理的上界是真实的
+因此这个例子中推出的上界
+of the theorem really are real. And as a
+result these bounds that derived in this
+
+237
+00:18:29,507 --> 00:18:34,688
+是真实的，大家不应当使用单个密钥计算超过
+example are real and you should never use
+a single key to MAC more than, say, two
+
+238
+00:18:34,688 --> 00:18:39,398
+2的48次方个信息，使用基于AES的CBC。
+总结一下，我们已经看了两个例子
+to 48 messages with AES based CBC. So to
+conclude, I'll just mention that we've
+
+239
+00:18:39,398 --> 00:18:44,705
+ECBC和NMAC。ECBC事实上是非常常见的MAC
+seen two examples. We saw ECBC and NMAC.
+ECBC is in fact, a very commonly used MAC
+
+240
+00:18:44,705 --> 00:18:49,481
+根据AES构建的，例如802.11i使用AES的ECBC
+来保护数据完整性
+that's built from AES. 802.11i, for example,
+uses ECBC with AES for integrity.
+
+241
+00:18:49,481 --> 00:18:54,921
+有一个NIST标准叫做CMAC，我们下一节讨论它
+There's also a NIST standard called CMAC,
+that we'll talk in the next segment, that
+
+242
+00:18:54,921 --> 00:19:00,095
+它也是基于ECBC MAC的。而NMAC不常与分组密码
+also is based on the ECBC MAC. NMAC with
+contrast is not typically used with a
+
+243
+00:19:00,095 --> 00:19:05,270
+配合使用，主要原因是在NMAC机制里
+block cipher. And the main reason is, you know
+that in the NMAC construction,
+
+244
+00:19:05,270 --> 00:19:10,766
+各个分组的密钥会变化。这意味着整个AES密钥扩展
+the key changes from block to block. That
+means that the whole AES key expansion has
+
+245
+00:19:10,766 --> 00:19:15,710
+对每个分组都必须重新计算，而在这里AES并不是能
+to be computed and recomputed on every
+block. And AES is not designed to perform
+
+246
+00:19:15,710 --> 00:19:20,777
+表现很好，当密钥快速变化时。
+当你使用NMAC时
+well when he changes key very rapidly. And
+so, typically, when you use NMAC, you use
+
+247
+00:19:20,777 --> 00:19:25,446
+可以使用更善于处理各个分支上变化密钥的分组密码
+block ciphers that are better at changing
+their keys on every block. And as a
+
+248
+00:19:25,446 --> 00:19:29,489
+因此NMAC一般不用AES。事实上
+result, NMAC typically is not used with
+AES. But in fact, NMAC is a basis of a
+
+249
+00:19:29,489 --> 00:19:33,688
+NMAC是一个非常流行的MAC叫HMAC的基础
+我们稍后将看到HMAC
+very popular MAC called HMAC, which we're
+also gonna look at next. And you'll see
+
+250
+00:19:33,688 --> 00:19:37,835
+大家会清楚地看到，NMAC在HMAC的底层工作
+very clearly, the NMAC underlying the HMAC construction. Okay, so that's the end
+
+251
+00:19:37,835 --> 00:19:41,309
+本节完结，下节我们讨论MAC的更多内容
+of this segment, and we'll talk about more
+MACs in the next segment.

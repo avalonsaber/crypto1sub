@@ -1,0 +1,925 @@
+1
+00:00:00,000 --> 00:00:03,760
+现在我们要看一个非常通用的机制，
+叫做Merkle-Damgard机制
+So now we're gonna look at a very general
+paradigm called the Merkle-Damgard
+
+2
+00:00:03,760 --> 00:00:07,668
+用于组建抗碰撞的哈希函数
+paradigm, that's used for constructing
+collision-resistant hash functions. Before
+
+3
+00:00:07,668 --> 00:00:11,526
+在这之前，我先提示一下我们的目标
+we do that, let me just remind you what
+our goals are. So as usual we say that H
+
+4
+00:00:11,526 --> 00:00:15,483
+通常我们说H是个哈希函数，
+将大的信息空间映射到小的标签空间
+is a hash function that maps some large
+message space into a small tag space. And
+
+5
+00:00:15,483 --> 00:00:19,195
+我们说哈希函数的一个碰撞是一对不同的信息
+we say that a collision for a hash
+function is basically a pair of distinct
+
+6
+00:00:19,195 --> 00:00:23,053
+它们正好被哈希函数映射到同样的值
+messages that happen to map to the same
+value under this hash function. And our
+
+7
+00:00:23,053 --> 00:00:27,205
+我们的目标是构建抗碰撞的哈希函数
+goal is to build collision-resistant hash
+functions namely functions where it's hard
+
+8
+00:00:27,205 --> 00:00:30,974
+对这些函数，即使找一个碰撞也是困难的。
+尽管我们知道有很多碰撞存在
+to find even a single collision. Even
+though we know many collisions exist. No
+
+9
+00:00:30,974 --> 00:00:35,090
+没有有效的算法可以输出哪怕一个碰撞。
+那么我们要构建这些哈希函数
+efficient algorithm can even output a
+single collision. So we're gonna construct
+
+10
+00:00:35,090 --> 00:00:38,948
+我们分两步构造这些抗碰撞的哈希函数
+these hash functions, these collision
+resistant hash functions, in two steps.
+
+11
+00:00:38,948 --> 00:00:43,064
+第一步，就是我们本节要讲的
+The first step, which we're gonna do in
+this segment, is to show that if you give
+
+12
+00:00:43,064 --> 00:00:47,437
+如果给我一个处理短信息的抗碰撞哈希函数，我们可以扩展它
+me a collision resistant hash function for
+short messages, we can extend it and build
+
+13
+00:00:47,437 --> 00:00:51,427
+来构建一个处理长得多的信息的抗碰撞的哈希函数
+a collision resistant hash function for
+much, much, much longer messages. In the
+
+14
+00:00:51,427 --> 00:00:54,946
+在下一节，我们将构建处理短信息的
+next segment, we'll actually build
+collision-resistant HASH functions for
+
+15
+00:00:54,946 --> 00:00:59,219
+抗碰撞的哈希函数。那我们看这个机制
+short messages. Okay so let's look at the
+construction. The construction is actually
+
+16
+00:00:59,219 --> 00:01:02,924
+这个机制很通用，事实上所有的抗碰撞的哈希函数
+very general and in fact all
+collision-resistant hash functions follow
+
+17
+00:01:02,924 --> 00:01:06,891
+都遵循这个机制。这是一个非常优雅的机制
+this paradigm. It's actually a very
+elegant paradigm and let me show you how
+
+18
+00:01:06,891 --> 00:01:10,545
+我告诉大家它的工作过程。这里我们有函数H
+it works. So here we have our function H
+which we're gonna assume is a
+
+19
+00:01:10,545 --> 00:01:14,869
+我们假设H是抗碰撞的哈希函数，可以处理短输入
+collision-resistant hash function for
+small sized inputs. So the way we're gonna
+
+20
+00:01:14,869 --> 00:01:19,565
+我们使用这个小函数h，h有时叫做压缩函数
+use this little function h, this h is
+sometimes called a compression function,
+
+21
+00:01:19,565 --> 00:01:24,319
+我们将取长信息M，把它分成若干分组
+is we're gonna take a big message M and
+break this message in to blocks. And then
+
+22
+00:01:24,319 --> 00:01:28,991
+然后我们使用一个固定值叫做IV。这里IV永远是固定的
+we use a fixed value called the IV. Here
+is the case the IV is fixed forever. And
+
+23
+00:01:28,991 --> 00:01:33,496
+它内嵌在代码和标准里，只是一个固定的ID
+it's basically embedded in the code and in
+the standards, it's just a fixed ID that's
+
+24
+00:01:33,496 --> 00:01:37,788
+是函数的一部分。然后我们对第一个信息分组
+part of the fin-nation of the function.
+And then what we do is we apply the small
+
+25
+00:01:37,788 --> 00:01:41,709
+应用小的压缩函数H，一并使用这个ID
+compression function H to the first
+message block along with this ID. What
+
+26
+00:01:41,709 --> 00:01:45,948
+得到的叫做链接变量，将被交给下一压缩函数
+comes out of that is what's called a
+chaining variable that's gonna be fed into
+
+27
+00:01:45,948 --> 00:01:50,028
+来压缩下一分组，一并使用前一链接变量
+the next compression function which
+compresses the next block along with the
+
+28
+00:01:50,028 --> 00:01:54,320
+输出下一链接变量
+previous chaining variable and out comes
+the next chaining variable, and the next
+
+29
+00:01:54,320 --> 00:01:58,772
+然后下个信息分组被压缩，等等。。
+直到我们到达最后分组
+message block is compresses, and so on and
+so forth until we reach the final message
+
+30
+00:01:58,772 --> 00:02:03,087
+在最后分组上，我们要做一个特别的事情
+block. And then the final message block,
+the one special thing that we do, is that
+
+31
+00:02:03,087 --> 00:02:07,246
+我们必须这个补齐分组PB(补齐分组之意)附在信息后面
+we must append this padding block, this
+PB, which stands for padding block (and
+
+32
+00:02:07,246 --> 00:02:11,567
+我稍后解释这个补齐分组。但在我附上补齐分组之后
+I'll explain what the padding block is in
+just a second). But after we append the
+
+33
+00:02:11,567 --> 00:02:16,104
+我们还是要压缩最后的链接变量与最后的分组
+padding block we again compress the last
+chaining variable with the last message
+
+34
+00:02:16,104 --> 00:02:20,124
+得到的输出就是实际哈希函数的输出
+block, and the output of that is the
+actual output of the hash function. So
+
+35
+00:02:20,124 --> 00:02:25,232
+总结一下，用符号表示，我们有这个压缩函数
+just to summarize, in symbols, we have
+this compression function that elements in
+
+36
+00:02:25,232 --> 00:02:29,468
+在T中取元素。这与哈希函数正好相反
+T. This is the opposite of the hash
+function. Plus message blocks, this x
+
+37
+00:02:29,468 --> 00:02:34,169
+加上信息分组，这个X对应信息分组，输出下一链接变量
+corresponds to message blocks, and outputs
+the next chaining variables. So as I said,
+
+38
+00:02:34,169 --> 00:02:38,982
+如我所说，这就是压缩函数的工作。然后根据这个压缩函数
+this is what the compression functions do.
+And then from this compression function
+
+39
+00:02:38,982 --> 00:02:43,625
+我们可以构建一个长输入的哈希函数
+we're able to build a hash function for
+large inputs, namely inputs is the space x
+
+40
+00:02:43,625 --> 00:02:48,099
+输入是空间X的L次方，表示至多L个X的分组。
+当然这些长度可变
+to some power of l namely up to l blocks
+of x. And of course these are variable
+
+41
+00:02:48,099 --> 00:02:52,686
+这样我们可以有不同的信息长度
+lengths so we could have different length
+messages that are being given input to
+
+42
+00:02:52,686 --> 00:02:57,193
+它们给函数h输入，得到的是标签空间中的标签
+this function h and what comes out of it
+is basically a tag in tag space. So the
+
+43
+00:02:57,193 --> 00:03:01,456
+唯一剩下的需要定义的是补齐分组
+only thing left to define is the padding
+block. So the padding block is actually
+
+44
+00:03:01,456 --> 00:03:05,719
+补齐分组非常重要，我们待会将看到
+very important as we're gonna see in just
+a minute. What it is, is basically, well
+
+45
+00:03:05,719 --> 00:03:10,089
+这是序列1000，为实际明文分组的结尾
+it's a sequence of 1000 that denotes the
+end of the actual message block. And then
+
+46
+00:03:10,089 --> 00:03:14,460
+这个分组最重要的部分是我们对信息长度进行的编码
+the most important part of the message
+block is that we encode the message length
+
+47
+00:03:14,460 --> 00:03:18,879
+在这个补齐分组里。信息长度域固定为64位
+In this padding block. And the message
+length field is basically fixed to be 64
+
+48
+00:03:18,879 --> 00:03:23,186
+所以在所有的SHA哈希函数中
+bits. So in all the SHA hash
+functions, so in all the SHA hash
+
+49
+00:03:23,186 --> 00:03:27,828
+最大的信息长度为2的64次方减一
+functions the maximum message length is
+two to the sixty four minus one so in fact
+
+50
+00:03:27,828 --> 00:03:32,247
+事实上信息长度应当适应于64位分组。
+2的64次方减一位的信息长度的上界
+the message length fits into a 64 bit
+block. An upper bound of two to the sixty
+
+51
+00:03:32,247 --> 00:03:36,778
+对应我们能释放的信息来说足够长了
+four minus one bit on the message length
+is actually sufficiently long to handle
+
+52
+00:03:36,778 --> 00:03:41,071
+好，这是补齐分组
+all of the messages we're gonna throw at
+it. Okay, so that's the padding block, and
+
+53
+00:03:41,071 --> 00:03:45,130
+当然，问题来了：如果最后一个分组
+of course the question is: what do we do
+if the last block really is a multiple of
+
+54
+00:03:45,130 --> 00:03:49,190
+是压缩函数分组长度的倍数，我们怎么办？
+我们该如何补齐分组？
+the compression function of block length?
+Where are we gonna fit the padding block?
+
+55
+00:03:49,190 --> 00:03:53,380
+通常，答案是如果在最后分组中没有空间
+And the answer, as usual, is basically if
+there's no space for the padding block in
+
+56
+00:03:53,380 --> 00:03:58,003
+留给补齐分组时，那么我们就必须加另外一个假分组
+the last block of the message, then we're
+gonna have to ass another dummy block and
+
+57
+00:03:58,003 --> 00:04:02,561
+把补齐分组放在那里。当然以正确的方式写1000..
+stick the padding block in there. And of
+course put the one zero, zero, zero in the
+
+58
+00:04:02,561 --> 00:04:07,062
+有一点非常重要，那就是
+right place. Okay so the point is that
+it's very, very important that the padding
+
+59
+00:04:07,062 --> 00:04:11,507
+补齐分组包含信息长度，我们待会将会看到
+block contains the message length as we'll
+see in just a minute. So this is the
+
+60
+00:04:11,676 --> 00:04:16,065
+那么这就是Merkle-Damgard机制，最后一点技术内容
+Merkle-Damgard construction, the last
+piece of terminology I'll say is that we
+
+61
+00:04:16,065 --> 00:04:20,285
+是我们有这些链接变量。那么H0是初始值，
+H1,H2,H3直到H4
+have these chaining variables. So H0 is
+the initial value. H1, H2, H3, up to H4
+
+62
+00:04:20,285 --> 00:04:24,881
+H4是哈希函数的最终输出。如我所说
+which is the actual final output of this
+hash function. So as I said, all standard
+
+63
+00:04:24,881 --> 00:04:29,443
+所有的标准哈希函数都遵循着这个机制，
+由一个压缩函数，构建抗碰撞的哈希函数
+hash functions follow this paradigm for
+constructing a collision resistant hash
+
+64
+00:04:29,443 --> 00:04:33,966
+这个机制如此流行的原因是
+function from a compression function. The
+reason that this paradigm is so popular is
+
+65
+00:04:33,966 --> 00:04:37,673
+因为下面这个定理告诉我们
+because of the following theorem, which
+says basically that if the little
+
+66
+00:04:37,673 --> 00:04:41,373
+如果小的压缩函数是抗碰撞的
+compression function is collision
+resistant, then the big Merkle-Damgard
+
+67
+00:04:41,380 --> 00:04:45,493
+那么大的Merkle-Damgard哈希函数也是抗碰撞的
+hash function is also collision resistant.
+So, in other words, if we're going to build
+
+68
+00:04:45,493 --> 00:04:49,607
+换句话说，如果我们要为长输入构建抗碰撞的哈希函数
+collision resistant functions for large inputs, all
+we have to do is just build compression
+
+69
+00:04:49,607 --> 00:04:53,771
+我们只需构建一个抗碰撞的压缩函数。
+那么我们来证明这个定理
+functions that are collision resistant. So
+let's prove this theorem. It's a elegant
+
+70
+00:04:53,771 --> 00:04:57,732
+这个证明很优雅，且不难。我们证它的逆否命题
+proof and it's not too difficult. So the
+way we're gonna prove it is using the
+
+71
+00:04:57,732 --> 00:05:01,794
+也就是，如果你能找到这个大哈希函数的一个碰撞
+contrapositive, that is, if you can find
+me a collision on the big hash function
+
+72
+00:05:01,794 --> 00:05:06,107
+那么我们可以推出这个小压缩函数的一个碰撞
+then we're gonna deduce a collision on the
+little compression function. Therefore, if
+
+73
+00:05:06,107 --> 00:05:10,460
+因此，如果h是抗碰撞的，那么H也是
+little h is a collision resistant, so will
+be the big H. So suppose you give me a
+
+74
+00:05:10,460 --> 00:05:15,085
+假设给我一个大压缩函数的碰撞，即两个不同的信息M和M'
+collision on the big compression function,
+namely two distinct messages M and M',
+
+75
+00:05:15,085 --> 00:05:19,492
+它们正好被哈希到同一个输出，我们将使用M和M'
+that happen to hash to the same output,
+we're going to use M and M' to build
+
+76
+00:05:19,492 --> 00:05:23,854
+来构建这个小压缩函数的一个碰撞
+a collision on the little compression
+function. So the first thing is we
+
+77
+00:05:23,854 --> 00:05:28,645
+首先我们必须记住Merkle-Damgard机制的过程
+have to remember how the Merkle-Damgard
+construction works and, in particular,
+
+78
+00:05:28,645 --> 00:05:33,872
+特别地，当我们哈希M和M'，给链接变量起一些名字
+let's assign names to the chain variables
+when we hash M versus when we hash M'.
+
+79
+00:05:33,872 --> 00:05:38,787
+当我们计算信息M的哈希值时，会得到这些链接变量
+So here are the chain variables that come up
+when we hash the message M, so H0 is the
+
+80
+00:05:38,787 --> 00:05:43,952
+那么H0是固定的IV，开启整个过程，H1是
+fixed IV that starts the whole process, H1
+would be the result of hashing the first
+
+81
+00:05:43,952 --> 00:05:48,932
+用IV计算第一个分组的哈希结果，等等。。
+直到H_t+1是最后一个链接变量
+message block with the IV, and so on and
+so forth, until H sub t+1 is the
+
+82
+00:05:48,932 --> 00:05:53,945
+也是Merkle-Damgard链的最后输出
+final chain variable, which is the final
+output of the Merkle-Damgard chain. And
+
+83
+00:05:53,945 --> 00:05:59,401
+类似地对于M'，我们定义H0'为第一个链接变量
+then similarly for M', let's define H0'
+to be the first chaining variable, H1'
+
+84
+00:05:59,401 --> 00:06:04,668
+H1'是第一个分组M'的压缩结果，等等。。
+to be the result after compressing
+the first message block of M', and so
+
+85
+00:06:04,668 --> 00:06:09,997
+直到我们获得H'_r+1，即信息M'的最后哈希值
+on and so forth, up until we get to H'
+of r+1, which is the final hash of
+
+86
+00:06:09,997 --> 00:06:14,820
+现在大家注意信息M和M'的长度
+the message M'. Now you notice the
+length of the messages M and M'
+
+87
+00:06:14,820 --> 00:06:20,654
+不一定是一样的。特别地，M的长度为t，M'的长度为r
+don't have to be the same. In particular, M
+has length t, whereas M' has length r.
+
+88
+00:06:20,654 --> 00:06:24,876
+因为发生了碰撞，我们知道这两个值是一样的
+Now because the collision occurred, we
+know that these two values here are the
+
+89
+00:06:24,876 --> 00:06:29,067
+H(M)=H(M')。换句话说，最后的链接变量
+same. H(M) is equal to H(M'). In
+other words, the last chaining variables
+
+90
+00:06:29,067 --> 00:06:33,416
+等于另外一个的。现在我们仔细看
+are actually equal to one another. So now
+let's look carefully how H t+1 and
+
+91
+00:06:33,416 --> 00:06:37,389
+H_t+1和H'_r+1是如何计算的
+H' r+1 were calculated. Well
+H t+1 is calculated as the
+
+92
+00:06:37,389 --> 00:06:41,780
+H_t+1是由压缩函数应用到之前的链接变量
+compression function applied to the
+previous chaining variable along with the
+
+93
+00:06:41,780 --> 00:06:46,002
+并使用M的最后分组得到的，包括补齐分组
+last message block of M, including the
+padding block. You'll notice here I'm
+
+94
+00:06:46,002 --> 00:06:50,618
+大家注意，我这里假设补齐分组可以放在M的最后分组里
+assuming that the padding block fits with
+the last message block of M even if the
+
+95
+00:06:50,618 --> 00:06:55,121
+即使最后的补齐分组在它自己的分组里，
+也没有任何的区别
+last padding block is in its own block,
+it's not going to make any difference. So
+
+96
+00:06:55,121 --> 00:06:59,512
+为了简便，我们假设补齐分组在M的最后分组里
+for simplicity, let's assume that the
+padding block fits with the last message
+
+97
+00:06:59,512 --> 00:07:03,960
+那么，通过计算最后分组的哈希，要用到补齐分组
+block with capital M. So, by hashing the
+last message block with a padding block
+
+98
+00:07:03,960 --> 00:07:08,547
+和最后的链接变量，我们获得了H_t+1
+and the last chaining variable, we obtain
+H t+1 and, similarly, the same thing
+
+99
+00:07:08,547 --> 00:07:12,922
+类似地也可以对M'做同样的事情。通过
+计算最后的信息分组和最后的链接变量的哈希
+happens with M'. By hashing the last
+message block, the last chaining variable,
+
+100
+00:07:12,922 --> 00:07:17,350
+我们获得了H'_r+1。我们知道，由于这两个值相等
+we obtain H' r+1. And we know
+that, since these two values are equal, all
+
+101
+00:07:17,350 --> 00:07:21,778
+突然间我们有了一个候选的压缩函数的碰撞
+of a sudden we have a candidate collision
+for the compression function. Here, let me
+
+102
+00:07:21,778 --> 00:07:26,099
+这里我们圈出这个候选的碰撞，这是一部分，这是另一部分
+circle the candidate collision, this is one
+part of it and this is the other part of
+
+103
+00:07:26,099 --> 00:07:30,072
+那么我们有了两个参数之间的一个等式
+it. Okay, so we have an equality
+between two arguments given to the
+
+104
+00:07:30,072 --> 00:07:34,405
+这两个参数交给压缩函数，正好产生了同样的输出值
+compression function that happen to
+produce the same value. The only way we
+
+105
+00:07:34,405 --> 00:07:38,853
+我们唯一的不获得任何碰撞的方法是，
+如果参数正好是一样的
+would not get a collision is if the
+arguments happen to be the same. In other
+
+106
+00:07:38,853 --> 00:07:43,533
+换句话说，这里我们看到，如果压缩函数的参数不同
+words, what we're seeing here is if the
+arguments to the compression function are
+
+107
+00:07:43,533 --> 00:07:47,750
+那么我们就获得了h的一个碰撞。我们写得更精确些
+distinct, then we get a collision for
+little h. So let's write it out more
+
+108
+00:07:47,750 --> 00:07:55,220
+如果H_t不等于H'_r，或Mt不等于M'r
+precisely: so if H t is not equal to H' r,
+or Mt is not equal to M' r,
+
+109
+00:07:55,220 --> 00:08:02,784
+或者补齐分组不同，那么我们得到了压缩函数h的一个碰撞
+or the padding blocks are distinct, then
+we have a collision for the compression
+
+110
+00:08:02,784 --> 00:08:08,415
+我们就完成任务了，收工。我们还不能收工的情况是
+function h and we're done, we're done and we can stop. So, the only way we need to continue is if
+
+111
+00:08:08,415 --> 00:08:12,653
+这个三个'或'的条件不成立。三个'或'不成立是什么意思？
+this three-way disjunction doesn't hold.
+So what does it mean that this disjunction
+
+112
+00:08:12,653 --> 00:08:16,998
+我们需要继续工作的唯一情况是
+doesn't hold? Well, so the only reason we
+need to continue is if the second-to-last
+
+113
+00:08:16,998 --> 00:08:21,183
+当两个倒数第二个链接变量相等，且
+两个信息的最后分组也相等，且
+chaining variables are equal, the last
+blocks of the messages are equal and the
+
+114
+00:08:21,183 --> 00:08:25,605
+两个信息的补齐分组也相等才行。那么
+两个补齐分组相等意味着什么？
+two padding blocks are equal. So what does
+it mean that the two padding blocks are
+
+115
+00:08:25,605 --> 00:08:29,961
+记得信息长度被编码在补齐分组里的
+equal? Remember that the message lengths
+were encoded in the padding block. So, in
+
+116
+00:08:29,961 --> 00:08:34,371
+特别地，这意味着M的长度和M'的长度一致
+particular, this means that the length of M
+and the length of M' is the same,
+
+117
+00:08:34,371 --> 00:08:38,782
+即t=r。那么从现在开始，我可以假设t=r了
+namely the t is equal to r. So from now on
+I can assume t is equal to r. Whenever I
+
+118
+00:08:38,782 --> 00:08:43,972
+我写r，相当于是t。但现在我们可以
+wrote r, I'm just gonna write t. But now we
+can apply exactly the same argument to the
+
+119
+00:08:43,972 --> 00:08:48,773
+对倒数第二个链接变量应用同样的参数。
+换句话说，Ht是如何计算的？
+second to last chaining variables. In
+other words, how was H t computed? Well
+
+120
+00:08:48,773 --> 00:08:53,703
+Ht是计算前一个链接变量H_t-1的哈希得到的
+H t is computed by hashing the previous
+chaining variable, namely H t-1,
+
+121
+00:08:53,703 --> 00:08:58,929
+用倒数第二个信息分组。类似地，H't也被计算出来
+with the second to last message block. And
+similarly, H' t was computed, you
+
+122
+00:08:58,929 --> 00:09:05,128
+大家注意我把r替换成t，那么H't是由前一链接变量
+notice I replaced r by t, so H' t was
+computed by hashing the previous chaining
+
+123
+00:09:05,128 --> 00:09:10,804
+用M'的倒数第二个信息分组计算哈希得到
+variable along with the second to last
+message block of M'. And because
+
+124
+00:09:10,804 --> 00:09:16,704
+因为这两个值相等，现在我们获得了另一个
+候选的压缩函数的碰撞
+these two are equal, now we get another
+candidate collision for the compression
+
+125
+00:09:16,704 --> 00:09:23,030
+换句话说，如果H_t-1不等于H'_t-1
+function. In other words, if H t-1 is not
+equal to H' t-1, or M t-1 is not equal to
+
+126
+00:09:23,030 --> 00:09:29,985
+或M_t-1不等于M'_t-1，那么我们有一个h的碰撞，收工
+M' t-1, then basically we
+have a collision for h, and we can stop,
+
+127
+00:09:29,985 --> 00:09:36,710
+现在，我们需要继续的唯一情况是这个条件不成立
+we're done. So now, the only case when we
+need to continue is if this condition over
+
+128
+00:09:36,710 --> 00:09:44,464
+那么我们假设H_t-1等于H'_t-1
+here doesn't hold, namely, so let's suppose
+that H t-1 is equal to H' t-1
+
+129
+00:09:44,464 --> 00:09:50,600
+我们已经知道，Mt等于M't
+and we already know that, let's
+see, so M t is equal to M' t and
+
+130
+00:09:50,600 --> 00:09:56,060
+且M_t-1等于M'_t-1。假设这两个条件
+M t-1 is equal to M' t-1.
+Suppose it so happens that these two
+
+131
+00:09:56,270 --> 00:10:02,010
+正好都成立，大家可以看到，现在我们可以继续迭代
+conditions hold, well, you can see that now
+we can continue to iterate. In other
+
+132
+00:10:02,010 --> 00:10:07,750
+换句话说，我们现在可以给H_t-1和H'_t-1应用同样的参数
+words, we can now apply exactly the same
+argument to H t-1 and H' t-1
+
+133
+00:10:07,750 --> 00:10:12,566
+那么一次又一次地迭代，我们可以迭代到
+and so iterating this again and
+again, we can iterate all the way to the
+
+134
+00:10:12,566 --> 00:10:17,450
+信息的开始。迭代到信息的开始
+beginning of the message. Iterate to the
+beginning of the message, and one of two
+
+135
+00:10:17,450 --> 00:10:22,252
+下面两者之一一定成立：我们要不找到压缩函数的碰撞
+things must hold, either we find the
+collision for the compression function
+
+136
+00:10:25,257 --> 00:10:28,262
+要不M和M'的所有分组都相同
+or it so happens that all the message blocks
+of M and M' are the same. In other
+
+137
+00:10:28,262 --> 00:10:34,089
+换句话说，对所有的i，Mi等于M'i。这意味着
+words, for all i, M i is equal to M' i.
+But this means, because the messages, we'd
+
+138
+00:10:34,089 --> 00:10:39,941
+我们已经证明了两个信息的长度相同，这意味着M=M'
+reprove the messages are the same length,
+this means that M is actually equal to M'.
+
+139
+00:10:39,941 --> 00:10:44,469
+然而，这与给我的是个碰撞的前提相矛盾
+But then, this contradicts the fact
+that you gave me a collision to begin
+
+140
+00:10:44,469 --> 00:10:48,849
+换句话说，这里的前提不能发生
+with, so, in other words, this condition
+over here, can't actually happen because
+
+141
+00:10:48,849 --> 00:10:53,342
+因为它与M和M'是这个大Merkle-Damgard
+函数H的碰撞的事实相矛盾
+it contradicts the fact that M and M'
+are actually a collision for the big
+
+142
+00:10:53,342 --> 00:10:58,059
+因此，这意味着我们必须为这个压缩函数
+Merkle-Damgard function H. And, as
+a result, this means that we have to find a
+
+143
+00:10:58,059 --> 00:11:02,664
+找到一个碰撞。我们从信息的最后开始工作
+collision for the compression function, so
+that, as we work our way from the end of
+
+144
+00:11:02,664 --> 00:11:07,269
+一路算到信息开头，在某处我们一定可以找到h的碰撞
+the message, all the way to the beginning,
+at some point we must find the collision
+
+145
+00:11:07,269 --> 00:11:11,492
+这就完成了我们的证明
+for little h. Okay, so this basically
+completes the proof of the theorems, I can
+
+146
+00:11:11,492 --> 00:11:15,738
+我可以在这里写个"证毕"了，这就是证明
+put a little Q.E.D block here, so basically
+what this proof is, that if the little
+(Q.E.D = quod erat demonstrandum 拉丁文)
+
+147
+00:11:15,738 --> 00:11:19,553
+如果压缩函数h是抗碰撞的
+compression function h is collision
+resistant, then the big Merkle-Damgard
+
+148
+00:11:19,553 --> 00:11:24,013
+则大Merkle-Damgard函数H也必须是抗碰撞的
+function H must also be collision
+resistant. So, again, the reason why people
+
+149
+00:11:24,013 --> 00:11:28,366
+人们之所以喜欢这个机制，是因为这个定理
+展示了如何构建大的哈希函数
+like this construction is it shows that
+to construct big hash functions,
+
+150
+00:11:28,366 --> 00:11:32,611
+只要能构建短输入的压缩函数就足够了
+it suffices to construct just compression
+functions for small inputs, and we're
+
+151
+00:11:32,611 --> 00:11:34,439
+我们下一节看如何构建压缩函数
+gonna do that in the next segment.

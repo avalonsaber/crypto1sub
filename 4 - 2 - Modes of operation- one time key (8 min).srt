@@ -1,0 +1,645 @@
+1
+00:00:00,000 --> 00:00:03,831
+作为第一个例子，我们看一个非常简单的
+使用分组密码加密的方法
+So as our first example let's look at a
+very simple way of using a block cipher
+
+2
+00:00:03,831 --> 00:00:07,905
+特别地，我们将看到如何使用一次性密钥的分组密码
+for encryption. In particular we'll see
+how to use a block cipher with a one time
+
+3
+00:00:07,905 --> 00:00:12,108
+那么在本节，我们将使用分组密码来加密
+key. So in this segment we're just gonna
+use the block cipher to encrypt using keys
+
+4
+00:00:12,108 --> 00:00:15,907
+并使用一次性的密钥。换句话说
+所有的攻击者能看到的都是密文
+that are used one time. In other words,
+all the adversary gets to see is one ciphertext,
+
+5
+00:00:15,907 --> 00:00:19,600
+它的目标是破坏密文的语义安全
+and its goal is to break semantic
+security of that ciphertext. Now, in the
+
+6
+00:00:19,600 --> 00:00:23,339
+在下一节里，我们要面对更有趣的分组密码的应用
+next segment, we're going to turn into
+more, interesting applications of block
+
+7
+00:00:23,339 --> 00:00:26,939
+我们要看，如何用多次使用的密钥
+ciphers and we're going to see how to
+encrypt using keys that are used many,
+
+8
+00:00:26,939 --> 00:00:30,538
+加密大量的信息。那么在我们开始前，我想说
+many times to encrypt many messages. So
+before we start, I want to mention that
+
+9
+00:00:30,538 --> 00:00:34,464
+使用分组密码时有一经典错误
+there's like a classic mistake in using a
+block cipher. Unfortunately, there are some
+
+10
+00:00:34,464 --> 00:00:38,251
+很不幸，有一些产品犯了这个错误
+因此被完全破解了
+products that actually work this way, and
+they are badly broken, so I want to make
+
+11
+00:00:38,251 --> 00:00:42,130
+所以我想确保大家不要再犯这个错误
+sure that none of you guys actually make
+this mistake. So this mode of operation is
+
+12
+00:00:42,130 --> 00:00:46,003
+这个操作模式叫做电子密码本，如下工作：
+called an electronic code book. And it
+works as follows: it's the first thing
+
+13
+00:00:48,211 --> 00:00:50,420
+它是使用分组密码加密时，第一个产生的想法
+that comes to mind when you want to use a
+block cipher for encryption. What we do is
+
+14
+00:00:50,420 --> 00:00:54,568
+去我们的明文信息，将其分成若干分组
+每个分组大小与密码分组大小一样
+we take our message, we break it into
+blocks, each block as big as the block's
+
+15
+00:00:54,568 --> 00:00:58,931
+在AES中，我们会把我们的明文信息分成
+cipher block. So in the case of AES, we
+would be breaking our message into sixteen
+
+16
+00:00:58,931 --> 00:01:03,099
+16个字节一个分组。然后我们将每个分组单独加密
+byte blocks. And then we encrypt each
+block separately. So this mode is often
+
+17
+00:01:03,099 --> 00:01:06,993
+所以这种模式经常叫做电子密码本
+很不幸，这是极不安全的
+called electronic codebook. And,
+unfortunately, it's terribly insecure
+
+18
+00:01:06,993 --> 00:01:11,460
+因为大家发现，如果两个分组一样
+比如这里，这两个分组正好一样
+because you realize if two blocks are
+equal, for example here, these two blocks
+
+19
+00:01:11,460 --> 00:01:16,099
+那么它们的密文一定也是一样的
+happen to be equal, then necessarily the
+resulting ciphertext is also going to be equal.
+
+20
+00:01:16,099 --> 00:01:20,279
+所以攻击者只看密文，即使他不知道
+So an attacker who looks at the
+ciphertext, even though he might not know
+
+21
+00:01:20,279 --> 00:01:24,590
+明文是写得是什么，我们知道这两个分组是一样的
+what's actually written in these blocks,
+we'll know that these two blocks are
+
+22
+00:01:24,590 --> 00:01:28,523
+因此，攻击者可以学到关于明文的一些信息
+equal. And as a result, he learned
+something about the plaintext that he
+
+23
+00:01:28,523 --> 00:01:33,002
+而这是不应该的。如果你对这个抽象还不清楚
+shouldn't have learned. And if this isn't
+clear enough for you abstractly, the best
+
+24
+00:01:33,002 --> 00:01:37,590
+最好的解释方法是用图像，就是这个家伙
+to explain this is using a picture. And so
+here's this guy here that, you know, has
+
+25
+00:01:37,590 --> 00:01:42,361
+有着深黑色头发。当我们加密时
+this really dark black hair. And when we
+encrypt. This image, this bitmap image
+
+26
+00:01:42,361 --> 00:01:47,056
+使用电子密码本加密这个位图图像
+大家可以看到他的头发，包含了很多1
+using the electronic code book mode. You
+see that his hair, that contains lots of
+
+27
+00:01:47,056 --> 00:01:50,932
+总是使用同一种加密，所以它的轮廓
+ones. Basically always gets encrypted the
+same way, so that his silhouette,
+
+28
+00:01:50,932 --> 00:01:54,935
+是完全可见的，即使是在密文数据里
+actually, is completely visible, even in
+the encrypted data. Okay, so this is a
+
+29
+00:01:54,935 --> 00:01:59,149
+这时一个很好的例子，显示了电子密码本
+nice example of how the electronic code
+book mode can actually leak information
+
+30
+00:01:59,149 --> 00:02:03,311
+会泄漏给攻击者一些明文信息
+about the plaintext that could tell
+something to the attacker. So the question
+
+31
+00:02:03,311 --> 00:02:07,367
+那么问题是如何正确地使用分组密码来加密长明文
+is, how to correctly use block ciphers to
+encrypt long messages. And so, I just
+
+32
+00:02:07,367 --> 00:02:11,159
+我想简单提醒一下大家我们的目的
+want to briefly remind you of the notion
+we're trying to achieve, which is
+
+33
+00:02:11,159 --> 00:02:15,268
+即为使用一次性密钥的语义安全
+basically semantic security using a one
+time key. So the adversary outputs two
+
+34
+00:02:15,268 --> 00:02:18,969
+攻击者输出两个明文m0和m1，他获得m0的加密结果
+messages, m0 and m1, and then he gets
+either the encryption of m0 or the
+
+35
+00:02:18,969 --> 00:02:22,777
+或是m1的加密结果，这是两个不同的实验
+encryption of m1, these are two different
+experiments. And then our goal is to say
+
+36
+00:02:22,777 --> 00:02:26,256
+我们的目标是让攻击者无法区分这两个实验
+that the adversary can't distinguish
+between these two experiments. So you
+
+37
+00:02:26,256 --> 00:02:30,283
+你无法区分m0的加密和m1的加密
+can't distinguish the encryption of m0
+from the encryption of m1. And the reason
+
+38
+00:02:30,283 --> 00:02:34,619
+我们之所以叫它一次性密钥的安全，是因为
+这个密钥只使用一次，只加密一个明文
+we call this security for a one time key
+is that the key is only used to encrypt a
+
+39
+00:02:34,619 --> 00:02:38,485
+因此，攻击者只能看到一个用这个密钥加密的密文
+single message. And as a result, the
+adversary will ever only see one ciphertext
+
+40
+00:02:38,485 --> 00:02:42,716
+好，那么首先我们想证明
+encrypted using this key. Okay, so
+the first thing we want to show is that in
+
+41
+00:02:42,716 --> 00:02:46,269
+事实上刚才的电子密码本
+fact the mode we just looked at,
+electronic code book, in fact, is not
+
+42
+00:02:46,269 --> 00:02:50,500
+不是语义安全的。这是正确的，只要
+加密的内容超过一个分组
+semantically secure. And this is true as
+long as you're encrypting more than one
+
+43
+00:02:50,500 --> 00:02:54,575
+这是一个例子。假设我们用分组密码加密了两个分组
+block. So here's an example. Suppose we
+encrypt two blocks using a block cipher.
+
+44
+00:02:54,575 --> 00:02:58,702
+我告诉大家，事实上电子密码本是不安全的
+Let me show you that in fact electronic
+code book will not be secure. So here's
+
+45
+00:02:58,702 --> 00:03:03,525
+这么做：我们是攻击者，输出两个明文m0和m1
+what we would do. So we're the adversary.
+So we would output two messages, m0 and
+
+46
+00:03:03,525 --> 00:03:07,806
+在其中一个明文里，所有分组不同
+而在另一明文里，所有分组相同
+m1, where, in one message, the blocks are
+distinct, and in the other message, the
+
+47
+00:03:07,806 --> 00:03:12,203
+这两个分组相等
+blocks are the same. The two blocks are
+equal to one another. Well, so what is the
+
+48
+00:03:12,203 --> 00:03:16,270
+挑战者怎么办？他要加密m0或m1
+challenger gonna do? The challenger's
+going to encrypt either m0 or m1.
+
+49
+00:03:16,270 --> 00:03:20,228
+两种情况我们都得到两个分组
+那么密文包含了两个分组
+Either way we are gonna get two blocks
+back. So the ciphertext actually contains two
+
+50
+00:03:20,228 --> 00:03:23,886
+第一个分组是单词"Hello"的加密
+blocks. The first block is going to be an
+encryption of the word "Hello" and the
+
+51
+00:03:23,886 --> 00:03:27,695
+第二个分组是"Hello"或"World"的加密
+second block is gonna be either an
+encryption of the word "Hello" or the word
+
+52
+00:03:27,695 --> 00:03:31,854
+如果这两个密文分组一样，那么攻击者知道
+"World". And if the two ciphertext blocks
+are the same then the adversary knows that
+
+53
+00:03:31,854 --> 00:03:35,963
+他收到的是信息"Hello Hello"的加密
+he received an encryption of the message
+"Hello Hello" and as a difference he knows
+
+54
+00:03:35,963 --> 00:03:39,851
+如果不一样，他知道他收到的是
+"Hello World"的加密，好吧？
+that he received encryption of the
+message "Hello World". Okay? So, he just
+
+55
+00:03:39,851 --> 00:03:44,311
+所以，攻击者遵循一个简单的策略
+大家想一想，可以算出他的优势是多少
+follows a simple strategy here. And if you
+think about it for a second, you'll see
+
+56
+00:03:44,311 --> 00:03:48,300
+那么，优势是多少？
+what his advantage is. So, what is the
+advantage? Well, this adversary when he
+
+57
+00:03:48,300 --> 00:03:52,003
+这个攻击者总是输出0，当他接收到m1的加密
+received an encryption of the message
+m1 he will always output 0.
+
+58
+00:03:52,003 --> 00:03:55,573
+他总是输出1，当他接收到m0的加密
+and when he receives an encryption of
+the message m0 it will always output 1.
+
+59
+00:03:55,573 --> 00:03:58,603
+因此优势为1
+And because of that the advantage,
+basically, is 1, which means that the
+
+60
+00:03:58,603 --> 00:04:02,492
+意味着这个加密机制是不安全的
+这再次说明了
+scheme is not secure, which again shows you
+the electronic code book is not
+
+61
+00:04:02,492 --> 00:04:07,195
+电子密码本不是语义安全的，永远不应
+被用来加密长于一个分组的信息
+semantically secure and should never ever
+be used to encrypt messages that are more
+
+62
+00:04:07,195 --> 00:04:12,293
+那么，我们该怎么办？这有个简单例子
+than one block long. So, what should we
+do? Well, so here's a simple example. What
+
+63
+00:04:12,293 --> 00:04:15,813
+我们可以使用一个确定的计数器模式
+we could do is we could use what's called
+a deterministic counter mode. So in a
+
+64
+00:04:15,813 --> 00:04:19,287
+在确定的计数器模式下，我们由分组密码
+构建一个流密码
+deterministic counter mode, basically we
+build a stream cipher out of the block
+
+65
+00:04:19,287 --> 00:04:24,608
+假设我们有一个PRF f。我说PRF时
+大家应该可以想到AES
+cipher. So suppose we have a PRF, F. So
+again you should think of AES when I say
+
+66
+00:04:24,608 --> 00:04:29,143
+AES是一个安全的PRF
+that. So AES is also a secure PRF. And
+what we'll do is, basically, we'll evaluate
+
+67
+00:04:29,143 --> 00:04:35,539
+我们计算AES在点0处的值，在点1处的值
+在点2，一直到点L
+AES at the point zero, at the point one,
+at the point two, up to the point L. This
+
+68
+00:04:35,539 --> 00:04:40,766
+这会产生一个伪随机密码本
+我会把它和所有明文分组进行异或
+will generate a pseudo random pad. And I
+will XOR that with all the message
+
+69
+00:04:40,766 --> 00:04:45,102
+得到密文作为结果
+blocks and recover the ciphertext as a
+result. Okay, so really this is just a
+
+70
+00:04:45,102 --> 00:04:49,561
+这其实是一个由PRF构造的流密码
+像AES和3DES，是个简单的加密方法
+stream cipher that's built out of a PRF,
+like AES and triple DES, and it's a simple
+
+71
+00:04:49,561 --> 00:04:53,630
+我想很快地为大家证明这个安全定理
+way to do encryption. I wanted to just
+very quickly show you the security
+
+72
+00:04:53,630 --> 00:04:58,368
+事实上，我们已经在讨论使用PRG的流密码时
+看到过这个安全定理
+theorem. In fact, we've already seen the
+security theorem when it applied to stream
+
+73
+00:04:58,368 --> 00:05:02,939
+我不打算把它重复一遍
+ciphers using pseudo-random generators, so
+I'm not going to repeat this again. I'll
+
+74
+00:05:02,939 --> 00:05:07,343
+我只提醒大家，对每个试图攻击
+确定的计数器模式的攻击者A
+just remind you that essentially for every
+adversary A that's trying to attack
+
+75
+00:05:07,343 --> 00:05:11,746
+我们证明存在一个试图攻击PRF的攻击者B
+deterministic counter mode, we prove that
+there's an adversary B that's trying to
+
+76
+00:05:11,913 --> 00:05:16,510
+由于这个量是可忽略的，因为PRF是安全的
+attack the PRF. And since this quantity is
+negligible, because the PRF is secure, we
+
+77
+00:05:16,510 --> 00:05:20,720
+我们得到这个量也是可忽略的
+obtain that this quantity is negligible.
+And therefore, the adversary has
+
+78
+00:05:20,720 --> 00:05:24,818
+因此，这个攻击者对确定的计数器模式
+只有一个可忽略的优势
+negligible advantage in defeating
+deterministic counter mode. And the
+
+79
+00:05:24,818 --> 00:05:29,028
+这个证明用图像表示很简单
+proof in pictures is a really simple
+proof. So I'll just show it to you one
+
+80
+00:05:29,028 --> 00:05:33,013
+为求完整，我只为大家再证一次
+more time for completeness. So basically,
+what we want to show is, when the
+
+81
+00:05:33,013 --> 00:05:37,448
+当攻击者有明文m0的加密时
+这是m0的加密密文
+adversary's given the encryption of the
+message m0, here, this is the encryption
+
+82
+00:05:37,448 --> 00:05:41,602
+m0异或计数器的PRF值
+of the message, m0. m0 XOR counter
+applied to the PRF, versus in giving the
+
+83
+00:05:41,602 --> 00:05:45,680
+或者是m1的加密。我们想证明这两个分布
+encryption of the message, m1. We wanna
+argue these two distributions are
+
+84
+00:05:45,680 --> 00:05:50,183
+是计算上不可区分的。那么基本证明方法是
+computationally indistinguishable. So the
+way we do that is basically we say, well
+
+85
+00:05:50,183 --> 00:05:54,734
+上面这个分布，如果是真随机函数，不是PRF
+the top distribution, if instead of a PRF,
+we use a truly random function, namely
+
+86
+00:05:54,734 --> 00:05:59,362
+这里f是一个真随机函数，那么由于PRF的性质
+here f is a truly random function, then
+the adversary, because of the property of
+
+87
+00:05:59,362 --> 00:06:03,931
+攻击者不能区分两个实验
+the PRF, the adversary cannot distinguish
+these two experiments, right. A PRF is
+
+88
+00:06:03,931 --> 00:06:08,617
+一个PRF无法和一个真随机函数相区分
+indistinguishable from a truly random
+function, therefore when we replace the PRF
+
+89
+00:06:08,617 --> 00:06:13,244
+所以当我们用右边的真随机函数替换左边的PRF时
+on the left with a truly random function
+on the right, the adversary is going to
+
+90
+00:06:13,244 --> 00:06:17,601
+攻击者的行为将是一样的
+你无法区分这两个分布
+behave the same. Basically you can't
+distinguish these two distributions. But
+
+91
+00:06:17,601 --> 00:06:22,067
+但现在因为f是一个真随机函数
+这个密码本是真的一次性密码本
+now because F is a truly random function,
+the pad here is a truly one time pad, and
+
+92
+00:06:22,067 --> 00:06:26,642
+因此攻击者无法区分m0的加密和m1的加密
+therefore no adversary can distinguish an
+encryption of m0 from an encryption of m1
+
+93
+00:06:26,642 --> 00:06:30,836
+在一次性密码本下。因此这两个分布是一样的
+under the one time pad. So, again, these
+two distributions are the same. In fact,
+
+94
+00:06:30,836 --> 00:06:35,139
+事实上，这里有一个等式。这两个分布
+here there's an actual equality. These two
+distributions literally are the same
+
+95
+00:06:35,139 --> 00:06:39,659
+就是一样的分布。类似地，当我们从一个真随机函数
+distribution. And similarly again when we
+go back from a truly random function here
+
+96
+00:06:39,659 --> 00:06:43,799
+回到一个PRF时，因为PRF是安全的，攻击者无法区分
+to a PRF, because the PRF is secure, the
+adversary can't distinguish these two
+
+97
+00:06:43,799 --> 00:06:48,063
+下面左、右这两个分布
+bottom distributions, the left from the
+right. And so by following these three
+
+98
+00:06:48,063 --> 00:06:52,655
+根据这三个等式，我们证明了这些
+我们希望证明相等的东西
+equalities, basically we have proven that
+the things we wanted to prove equal are
+
+99
+00:06:52,655 --> 00:06:56,340
+实际上是计算不可区分的
+actually computationally
+indistinguishable. Okay, so that's a very
+
+100
+00:06:56,340 --> 00:07:00,874
+这是一个非常简单的证明，确定的计数器模式
+事实上是安全的
+simply proof to show that deterministic
+counter mode is in fact secure and it's
+
+101
+00:07:00,874 --> 00:07:05,409
+这个证明和我们之前证明流密码的语义安全是一样的
+basically the same proof as we had when we
+proved that a stream cipher gives us
+
+102
+00:07:05,409 --> 00:07:09,874
+好，本节完结。下节我们讨论
+semantic security. Okay. So that completes
+this segment and in the next segment we'll
+
+103
+00:07:09,874 --> 00:07:13,737
+让我们能够使用一个密钥加密多个信息的模式
+talk about modes that enable us to use a
+key to encrypt multiple messages.

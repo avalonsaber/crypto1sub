@@ -1,0 +1,790 @@
+1
+00:00:00,000 --> 00:00:03,762
+本节我们看看另外一种
+In this segment we're gonna look at
+another method to achieve chosen plain
+
+2
+00:00:03,762 --> 00:00:08,105
+获取选择明文攻击安全的方法，
+比CBC要更好一些，叫做随机计数器模式
+text security that's actually superior to
+CBC. And this method is called randomized
+
+3
+00:00:08,105 --> 00:00:13,474
+与CBC不同，随机计数器模式使用安全的PRF
+counter mode. Unlike CBC. Randomized
+counter mode uses a secure PRF. It doesn't
+
+4
+00:00:13,474 --> 00:00:18,022
+它不使用分组密码，对于计数器模式而言
+使用PRF是足够的
+need a block cypher. It's enough for
+counter mode to just use a PRF because
+
+5
+00:00:18,022 --> 00:00:22,934
+因为我们从不求这个函数F的逆
+我们设F为一个安全的PRF
+we're never going to be inverting this
+function F. So we're going to let F be the
+
+6
+00:00:22,934 --> 00:00:27,664
+它定义在N字节的分组上。如果我们使用AES，N将是128
+secure PRF and it acts on N byte blocks.
+Again if we use AES, N will be 128. And
+
+7
+00:00:27,664 --> 00:00:32,758
+加密算法以计数器模式工作，开始时
+the way the encryption algorithm works in
+counter mode is it starts off by choosing
+
+8
+00:00:32,758 --> 00:00:37,670
+选择一个随机IV，对于AES是128位的随机IV
+a random IV, that's 128 bits random IV in
+the case of AES, and the essentially we
+
+9
+00:00:37,670 --> 00:00:44,002
+然后我们开始计数。从这个随机IV开始
+大家注意第一个加密是IV的
+start counting. From this random IV, so
+you notice the first encryption is of IV
+
+10
+00:00:44,002 --> 00:00:49,489
+然后是IV+1，一直到IV+L。所以我们生成了这个
+随机密码本。我们将结果和明文信息异或
+then IV+1 up to IV+L. So we generate this
+random pad. We XOR the result with the
+
+11
+00:00:49,489 --> 00:00:53,432
+得到密文。通常，大家注意
+message, and that gives us the cipher
+text. And, as usual, you notice that the
+
+12
+00:00:53,432 --> 00:00:57,744
+这里的IV被包含在密文里了，这样一来
+IV here is included along with the cipher
+text. So that, in fact, the cipher text is
+
+13
+00:00:57,744 --> 00:01:02,082
+事实上密文要比明文稍微长一点
+a little longer than the original plain
+text. And the point, of course, is that,
+
+14
+00:01:02,267 --> 00:01:07,260
+当然加密算法对每条明文信息都选择一个新的IV
+encryption algorithm chooses a new IV for
+every message. And so even if I encrypt
+
+15
+00:01:07,260 --> 00:01:11,821
+因此即使我加密同样的明文信息两次
+我也会得到不同的两个密文
+the same message twice, I'm gonna get
+different resulting cipher texts. One
+
+16
+00:01:11,821 --> 00:01:16,198
+需要注意一点，这个模式是完全可并行的
+这点与CBC不像
+thing to notice that this mode is
+completely parallelizable, unlike CBC. CBC
+
+17
+00:01:16,198 --> 00:01:20,863
+CBC是串行的。换句话说，在加密第5个分组前
+was sequential. In other words, you
+couldn't encrypt block #5 until you've
+
+18
+00:01:20,863 --> 00:01:26,183
+你必须先加密第1到第4个分组
+这样硬件公司让多个AES引擎
+encrypted blocks #1 to 4, so
+hardware companies who might have multiple
+
+19
+00:01:26,183 --> 00:01:31,173
+并行工作，却并不适用于使用CBC加密
+AES engines working in parallel cannot
+actually use those AES engines when using
+
+20
+00:01:31,173 --> 00:01:36,227
+因为CBC先天就是串行的。所以即使
+你可能有两个、三个或四个AES引擎
+CBC because CBCs inherently sequential. So
+even though you might have two or three of
+
+21
+00:01:36,227 --> 00:01:40,865
+用CBC时你可能只能使用一个AES引擎
+four AES engines, you could only use one
+of them when doing CBC encryption. With
+
+22
+00:01:40,865 --> 00:01:45,622
+用计数器模式时，一切都是完全可并行的
+如果你有三个AES加密引擎
+counter mode, everything is completely
+parallelizable. If you have three AES engines
+
+23
+00:01:45,622 --> 00:01:50,557
+工作速度会是原来的三倍
+这就是计数器模式优美的地方
+encryption basically will work three times
+as fast. So that's the beauty of counter
+
+24
+00:01:50,557 --> 00:01:54,720
+计数器模式还有一种基于新鲜值的计数器模式
+mode. And counter mode also has a
+corresponding nonce based counter mode.
+
+25
+00:01:54,720 --> 00:01:59,306
+IV不是真随机的，而是一个新鲜值
+Where the IV is not truly random, but
+rather, is just a nonce which could
+
+26
+00:01:59,306 --> 00:02:03,716
+新鲜值可以是计数器。实现基于新鲜值的计数器模式
+be a counter. And the way you would
+implement nonce based counter mode, is you
+
+27
+00:02:03,716 --> 00:02:08,830
+你可以取AES的128位分组
+然后把它分成两部分
+would take the 128 bits block that used in
+AES. And then you would split it in two.
+
+28
+00:02:08,830 --> 00:02:14,202
+使用左边64位作为新鲜值
+这样计数器的范围就是
+You would use the left 64 bits as the
+nonce, so the counter say would count from
+
+29
+00:02:14,202 --> 00:02:19,501
+从0到2的64次方。这是新鲜值部分
+zero to 2 to the 64. And then, that will
+be the nonce part of it. And then once you
+
+30
+00:02:19,501 --> 00:02:24,341
+一旦你指定了新鲜值，低64位用于在
+specify the nonce, the lower order, 64
+bits, would be doing the counting inside
+
+31
+00:02:24,341 --> 00:02:28,931
+计数器加密模式的内部计数
+好，新鲜值在左
+of the counter modes encryption. Okay, so
+nonce goes on the left, and the
+
+32
+00:02:28,931 --> 00:02:33,580
+计数器加密模式的计数器在右
+counter mode encryption counter goes on
+the right. And it's perfectly fine if this
+
+33
+00:02:33,580 --> 00:02:38,002
+如果这个新鲜值不可预测，那也很好
+唯一的限制是你最多可以
+nonce is unpredictable. The only
+restriction is that you encrypt at most
+
+34
+00:02:38,002 --> 00:02:42,708
+加密2的64次方个分组，使用一个新鲜值
+危险之处在于
+2 to the 64 blocks using one particular
+nonce. The danger is that you don't
+
+35
+00:02:42,708 --> 00:02:47,073
+我们不想让计数器重置到0
+如果是那样的话，你会有两个分组
+want this counter to reset to zero so
+that, then, you will have two blocks. Say,
+
+36
+00:02:47,073 --> 00:02:51,495
+这个和这个，它们使用同一密钥和一次性密码本加密的
+this guy, this guy, and this guy that are
+encrypted using the same one time pad.
+
+37
+00:02:51,495 --> 00:02:55,623
+这个和这个。我们快速地看这个安全性定理
+Namely this one and this one. So let's
+quickly state the security theorem for a
+
+38
+00:02:55,623 --> 00:02:59,425
+关于随机计数器模式的。现在大家应该对
+这类定理很习惯了
+randomized counter mode. By now you should
+be used to these kind of theorems.
+
+39
+00:02:59,425 --> 00:03:03,790
+我们有一个安全的PRF，最后我们得到一个加密机制
+Basically we are given a secure PRF. What
+we end up with is an encryption scheme.
+
+40
+00:03:03,790 --> 00:03:08,458
+我们称之为E_CTR，CTR是计数器模式的意思
+E_CTR在选择明文攻击下是语义安全的
+We'll call it E sub CTR, E sub counter
+mode, which is semantically secure under a
+
+41
+00:03:08,458 --> 00:03:12,830
+他加密L个分组长的明文信息
+chosen plain text attack. It encrypts
+messages that are L blocks long, and
+
+42
+00:03:12,830 --> 00:03:17,557
+产生L+1个分组的密文，因为IV必须被
+produces cipher text that are L+1 blocks
+long because the IV has to be included in
+
+43
+00:03:17,557 --> 00:03:22,245
+包含在密文中。这是针对随机计数器模式的
+the cipher text. This is for randomized
+counter mode. And the error bounds
+
+44
+00:03:22,245 --> 00:03:26,674
+这是误差范围。基本上和CBC的误差范围一样
+are stated over here. It's basically the
+same bounds as in the case of CBC
+
+45
+00:03:26,674 --> 00:03:31,342
+通常，我们能证明这一项是可忽略的
+因为PRF F是安全的
+encryption. As usual, we argue that this
+term is negligible because the PRF F is
+
+46
+00:03:31,342 --> 00:03:36,250
+我们可以推出这一项是可忽略的
+secure and we would like to deduce from
+that, that this term is negligible so that
+
+47
+00:03:36,250 --> 00:03:41,098
+这样E_CTR是安全的。不幸的是，我们有这里的误差项
+E_CTR is secure. Unfortunately we have this
+error term here and so we have to make
+
+48
+00:03:41,098 --> 00:03:45,946
+我们必须确保这一误差项也必须是可忽略的
+这样我们必须确保(q^2)L小于分组大小
+sure this error term is negligible. And
+for that we have to make sure Q squared L
+
+49
+00:03:45,946 --> 00:03:50,374
+记住q是使用一个密钥加密的明文数
+is less than the size of a block. And
+remember, Q is the number of messages
+
+50
+00:03:50,374 --> 00:03:55,467
+L是这些明文的最大长度
+encrypted under a particular key. And L is
+the maximum length of those messages. Now
+
+51
+00:03:55,467 --> 00:04:00,740
+有趣的是，在CBC下，我们有q^2L^2小于|X|
+interestingly in the case of CBC we have Q
+squared L squared has to be less than x.
+
+52
+00:04:00,740 --> 00:04:04,557
+而我们的计数器模式要好一些，换句话说
+Which is actually worse than we have for
+counter modes. In other words, counter
+
+53
+00:04:04,557 --> 00:04:08,728
+计数器模式实际上可以比CBC加密更多的分组
+modes can actually be used for more
+blocks than CBC could. Let's see a quick
+
+54
+00:04:08,728 --> 00:04:13,545
+让我们看一个简单例子。这里是
+计数器模式的误差项
+example of that. So here is, again, the
+error term for counter mode, and remember
+
+55
+00:04:13,545 --> 00:04:18,177
+记住q是用同一密钥加密的明文数
+L是明文分组数
+Q is again the number of messages
+encrypted with a key, and L is the length
+
+56
+00:04:18,177 --> 00:04:23,056
+和之前CBC的情况一样，假设我们希望
+of those messages. And as before, just as
+in the case of CBC, suppose we want the
+
+57
+00:04:23,056 --> 00:04:28,059
+攻击者的优势最多为1除以2的32次方
+adversary's advantage to be at most, one
+over 2 to the 32. That basically requires
+
+58
+00:04:28,059 --> 00:04:33,000
+要求q^2 L除以|X|小于1除以2的32次方
+that this Q-squared, L over X be less than
+1 over 2 to the 32. So for AES what
+
+59
+00:04:33,000 --> 00:04:37,783
+对于AES，如果带入|X|=2^128
+happens is, if you plug in the values X is
+2 to 128, 128 bit blocks. So Q times
+
+60
+00:04:37,783 --> 00:04:42,187
+那么q乘以L的平方根应当小于2的48次方
+square root of L should be less than 2
+to the 48. This is basically the bound you
+
+61
+00:04:42,187 --> 00:04:46,485
+这是带入2的128次方后得到的误差上界
+get from plugging in 2 to the 128 into
+this bound here. And as a result, you can
+
+62
+00:04:46,485 --> 00:04:51,123
+因此，大家可以看到，如果加密的每条明文
+都是2的32次方个分组
+see if you're encrypting messages that are
+each, 2 to the 32 blocks. Then after 2
+
+63
+00:04:51,123 --> 00:04:55,435
+那么在加密了2的32次方个这样的明文后
+就必须更换密钥了
+to the 32 such messages you have to
+replace your secret key, otherwise
+
+64
+00:04:55,435 --> 00:05:00,424
+否则随机计数器模式就不再是CPA安全的了
+这意味着我们可以加密
+randomized counter mode is no longer CPA
+secure. So this means we could encrypt a
+
+65
+00:05:00,424 --> 00:05:05,413
+一共2的64次方个AES分组，使用一个密钥
+total of 2 to the 64 AES blocks using a
+single secret key. Remember, for CBC the
+
+66
+00:05:05,413 --> 00:05:10,402
+记住，对于CBC来说，这个值是2的48次方个分组
+所以事实上因为计数器模式
+corresponding value was 2 to the 48
+blocks so in fact because counter mode has
+
+67
+00:05:10,402 --> 00:05:15,453
+具有更好的安全参数，我们可以使用同样的密钥
+a better security parameterization in fact
+we can use the same key to encrypt more
+
+68
+00:05:15,453 --> 00:05:19,860
+使用计数器模式加密比使用CBC更多的明文
+blocks with counter mode than we could
+with CBC. So I wanted to do a quick
+
+69
+00:05:19,860 --> 00:05:24,378
+那么我想简单比较一下计数器模式和CBC
+从各个方面证明
+comparison of counter mode and CBC. And
+argue that in every single aspect, counter
+
+70
+00:05:24,378 --> 00:05:28,338
+计数器模式优于CBC。这也是为什么大多数的
+mode is superior to CBC. And that's
+actually why most modern encryption
+
+71
+00:05:28,338 --> 00:05:32,800
+现代加密机制都开始转向计数器模式了，放弃CBC了
+schemes actually are starting to migrate
+to counter mode, and abandoned CBC. Even
+
+72
+00:05:32,800 --> 00:05:37,030
+即使CBC依然广为应用
+那么我们来看这个比较
+though CBC is still quite widely used. So
+let's look at the comparison. First of
+
+73
+00:05:37,030 --> 00:05:41,250
+首先，记得CBC必须使用分组密码
+因为如果你看解密电路
+all, recall that CBC actually had to use a
+block cypher because if you look at the
+
+74
+00:05:41,250 --> 00:05:45,522
+解密电路其实是逆向地运行分组密码
+decryption circuit, the decryption circuit
+actually ran the block cypher in reverse.
+
+75
+00:05:45,522 --> 00:05:49,537
+它其实是在运用分组密码的解密功能
+It was actually using the decryption
+capabilities of the block cypher. Whereas
+
+76
+00:05:49,537 --> 00:05:53,243
+在计数器模式里，我们只使用PRF
+我们从来不使用分组密码的解密功能
+in counter mode, we only use a PRF. We
+never ever, ever use the decryption
+
+77
+00:05:53,243 --> 00:05:57,257
+我们只使用正向的加密功能
+capabilities of the block cypher. We only
+use it in the forward direction, only
+
+78
+00:05:57,257 --> 00:06:01,478
+正因为这点，计数器模式更为一般
+encrypt with it. Because of this, counter
+mode is actually more general and you can
+
+79
+00:06:01,478 --> 00:06:05,390
+你能使用像Salsa一样的原型，例如Salsa20
+如果你还记得，它是PRF
+use primitives like Salsa, for example,
+Salsa20, if you remember, as a PRF.
+
+80
+00:06:05,390 --> 00:06:09,688
+但不是PRP。所以计数器模式可以用Salsa
+但CBC不能用。本质上
+But is not a PRP. So counter mode can
+Salsa but CBC cannot. And in essence,
+
+81
+00:06:09,688 --> 00:06:14,045
+计数器模式要比CBC更为一般化
+我们说了，计数器模式
+counter mode is more general than CBC.
+Counter mode, as we said, is actually
+
+82
+00:06:14,045 --> 00:06:18,991
+是可并行的，而CBC是一个非常串行化的过程
+我们说了计数器模式更安全一些
+parallel, whereas CBC is a very sequential
+process. We said that counter mode is more
+
+83
+00:06:18,991 --> 00:06:23,467
+计数器模式的安全上界、误差项比CBC好
+secure. The security bounds, the error
+terms are better for counter mode than
+
+84
+00:06:23,467 --> 00:06:28,001
+因此，在计数器模式中，你可以
+使用一个密钥去加密比CBC
+they are for CBC. And as a result, you can
+use a key to encrypt more blocks in
+
+85
+00:06:28,001 --> 00:06:32,829
+更多的明文分组。另外一点是，记得在CBC中
+counter mode than you could with CBC. The
+other issue is, remember in CBC we talked
+
+86
+00:06:32,829 --> 00:06:37,657
+我们讨论过假的补齐分组，如果你的明文信息
+长度正好是分组长度的倍数的话
+about the dummy padding block. If you had
+a message that's a multiple of the block
+
+87
+00:06:37,657 --> 00:06:42,993
+在CBC中我们说过，这时是必须加一个假的补齐分组的
+而在计数器模式下
+length. In CBC we said that we had to add
+a dummy block whereas in counter mode this
+
+88
+00:06:42,993 --> 00:06:47,403
+这不是必须的。尽管我曾想提到
+wasn't necessary. Although, I did want
+to mention that there is a variation of
+
+89
+00:06:47,403 --> 00:06:51,782
+有一个CBC变种叫做CBC密文偷窃
+可以用来避免产生假的分组
+CBC called CBC with ciphertext stealing, that
+actually avoids the dummy block issue. So
+
+90
+00:06:51,782 --> 00:06:55,739
+所以对于标准的CBC，我们其实需要一个假的分组
+for standardized CBC, we actually need a
+dummy block. But in fact there is a
+
+91
+00:06:55,739 --> 00:06:59,854
+但事实上有一种对CBC的修改可以不需要
+这么一个假的分组，就像计数器模式一样
+modification to CBC that doesn't need a
+dummy block. Just like counter mode.
+
+92
+00:06:59,854 --> 00:07:04,021
+最后，假设大家加密一个一字节的信息流
+Finally, suppose you're encrypting just a
+stream of one byte messages, and using
+
+93
+00:07:04,021 --> 00:07:08,136
+使用隐藏的新鲜值进行新鲜值加密
+nonce encryption with an implicit
+nonce. So, the nonce is not
+
+94
+00:07:08,136 --> 00:07:12,723
+因此新鲜值不包含在密文里。这种情况下
+每个一字节的信息都必须
+included in the cipher text. In this case,
+every single one byte message would have
+
+95
+00:07:12,723 --> 00:07:17,511
+被扩展成16字节的分组，然后才能加密
+to be expanded into a sixteen byte block
+and then encrypted, and the result would
+
+96
+00:07:17,511 --> 00:07:22,121
+结果是16字节分组。所有如果你有比如
+100个一字节的信息组成的流
+be a sixteen byte block. So if you have,
+like, a stream of 100 one byte messages,
+
+97
+00:07:22,121 --> 00:07:26,850
+每一个信息都被扩成16字节的分组
+each one separately would have to become a
+sixteen byte block. And you'll end up
+
+98
+00:07:26,850 --> 00:07:31,916
+你最终得到的是一连串16字节的密文流
+密文长度被扩张成了原来的16倍
+with a stream of 16 byte cipher texts. So
+you get a 16x expansion on the length of
+
+99
+00:07:31,916 --> 00:07:36,556
+与原来的密文相比。而在计数器模式里
+the cipher text, compared to the length of
+the plain text. In counter mode, of
+
+100
+00:07:36,556 --> 00:07:41,257
+这当然不是问题。你可以加密一字节信息
+course, this is not a problem. You would
+just encrypt each one byte message by
+
+101
+00:07:41,257 --> 00:07:46,253
+通过与计数器模式产生的流的第一个字节进行异或
+XORing with the first bytes of the stream
+that's generated in the counter mode. So
+
+102
+00:07:46,253 --> 00:07:50,868
+所以每个密文都将是一个字节的，和明文一样
+every cipher text would just be one byte,
+just like the corresponding plain text.
+
+103
+00:07:50,868 --> 00:07:55,657
+使用计数器模式，无需扩张
+那么大家看到，本质上
+And so no expansion at all, using counter
+mode. So you see that essentially, every
+
+104
+00:07:55,657 --> 00:08:00,100
+从各个方面讲，计数器模式都完爆CBC
+single aspect counter mode dominates CBC.
+And that's why it's actually the
+
+105
+00:08:00,100 --> 00:08:05,179
+这就是为什么现在我们推荐计数器模式。好
+关于选择明文攻击安全的讨论先告一段落
+recommended mode to be using today. Okay,
+so this concludes our discussion of chosen
+
+106
+00:08:05,179 --> 00:08:09,465
+我想简单总结一下
+plaintext security. I wanted to just
+quickly summarize and remind you that
+
+107
+00:08:09,465 --> 00:08:14,329
+提醒大家我们将使用分组密码的
+这些PRP和PRF的抽象概念
+we're going to be using these PRP and PRF
+abstractions of block ciphers.
+
+108
+00:08:14,329 --> 00:08:18,673
+这实际上是使用分组密码的正确方式
+This is actually the correct way of
+thinking of block ciphers and so we'll
+
+109
+00:08:18,673 --> 00:08:22,900
+我们总是把它们当成伪随机置换
+always think of them as either
+pseudorandom permutations or pseudorandom
+
+110
+00:08:22,900 --> 00:08:27,192
+或伪随机函数。然后我想再提醒一下大家
+目前我们有了两种安全的观念
+functions. And then I wanted to remind you
+again that, so far, we saw two notions of
+
+111
+00:08:27,192 --> 00:08:31,163
+两个都是只针对窃听攻击提供的安全性
+security. Both only provide security
+against eavesdropping. They don't provide
+
+112
+00:08:31,163 --> 00:08:35,392
+它们不提供对篡改密文的安全性
+security against tampering with the cipher
+text. One was used when the key is only
+
+113
+00:08:35,392 --> 00:08:39,414
+一个只能用于加密单个密文
+另一个只能用于密钥被用来加密
+used to encrypt a single message. The
+other one was used when the key was used
+
+114
+00:08:39,414 --> 00:08:43,539
+多个明文信息时。如我们所说
+因为两个安全都不是
+to encrypt multiple messages. And as we
+said, because neither one is designed to
+
+115
+00:08:43,539 --> 00:08:47,588
+为密文篡改而设计的，都不提供数据完整性保护
+defend against tampering, neither one
+provides data integrity. And we're going
+
+116
+00:08:47,588 --> 00:08:51,689
+我们将会看到，这是一个实实在在的问题
+因此，事实上在下一节
+to see this as a real problem. And as a
+result, in fact, I'm going to say in the
+
+117
+00:08:51,689 --> 00:08:55,686
+我将谈到，这些模式其实永远都不能被使用了
+next segment that these modes actually
+should never, ever be used. You should
+
+118
+00:08:55,686 --> 00:08:59,998
+大家必须加上完整性机制后，才能使用它们
+only be using these modes in addition to
+an integrity mechanism, which is our next
+
+119
+00:08:59,998 --> 00:09:03,731
+完整性机制是我们的下一话题
+目前我们看了使用一个密钥一次
+topic. Okay, so, so far we've seen
+basically for using a, the key once, you
+
+120
+00:09:03,731 --> 00:09:07,714
+大家可以使用流密码或确定的计数器模式
+can use stream ciphers or you can use
+deterministic counter mode. If you're
+
+121
+00:09:07,714 --> 00:09:12,397
+如果大家要使用同一密钥多次，可以使用
+随机CBC或随机计数器模式
+gonna use the key many times you could use
+randomize CBC or randomize counter mode
+
+122
+00:09:12,397 --> 00:09:16,918
+我们将讨论如何提供完整性和私密性
+and we're gonna talk about how to provide
+integrity and confidentiality. Once we
+
+123
+00:09:16,918 --> 00:09:20,013
+一旦讲了完整性，即下一章的内容
+cover the topic of integrity, which is our
+next module.
+【伊卡酱 译注】

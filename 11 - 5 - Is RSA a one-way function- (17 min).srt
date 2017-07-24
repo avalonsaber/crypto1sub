@@ -1,0 +1,1362 @@
+1
+00:00:00,152 --> 00:00:01,703
+我要问的下一个问题是
+The next question, we're going to ask:
+
+2
+00:00:01,703 --> 00:00:03,638
+RSA真的是一个单向函数吗？
+is RSA really an one-way function?
+
+3
+00:00:03,638 --> 00:00:05,788
+换句话说，在不知道陷门的情况下
+In other words, is it really hard to
+
+4
+00:00:05,788 --> 00:00:08,104
+求RSA的逆真的有这么难吗？
+invert RSA without knowing the trapdoor?
+
+5
+00:00:09,012 --> 00:00:11,998
+如果一个攻击者想求RSA函数的逆
+So, if an attacker wanted to invert the RSA function,
+
+6
+00:00:11,998 --> 00:00:15,001
+攻击者有公钥
+well, what the attacker has, is basically the public key,
+
+7
+00:00:15,001 --> 00:00:19,054
+即(N,e)。现在他有x^e
+namely he has N and e. And now, he is given x to the e
+
+8
+00:00:19,054 --> 00:00:23,293
+他的目标是还原x。好，问题是
+and his goal is to recover x. OK, so the question really is:
+
+9
+00:00:23,293 --> 00:00:26,131
+有了x^e mod N，还原x的难度有多大？
+given x to the e modulo N, how hard is it to
+
+10
+00:00:26,131 --> 00:00:28,933
+我们真正问的是
+recover x? So, what we're really asking is,
+
+11
+00:00:28,933 --> 00:00:33,113
+计算合数模的e次方根有多难？
+how hard is it to compute e'th roots modulo a composite?
+
+12
+00:00:34,178 --> 00:00:38,544
+如果这个问题实际上很难，那么RSA事实上就是一个单向函数
+If this problem turns out to be hard, then RSA is in fact an one-way function.
+
+13
+00:00:38,544 --> 00:00:39,968
+如果这个问题实际上是容易的
+If this problem turns out to be easy, which
+
+14
+00:00:39,968 --> 00:00:44,564
+当然我们不相信它是容易的，那么RSA就会被破解了
+of course we don't believe it's easy, then RSA would actually be broken.
+
+15
+00:00:44,564 --> 00:00:46,832
+实际上这个问题的目前的最好算法
+So, it turns out the best algorithm for this problem
+
+16
+00:00:46,832 --> 00:00:49,563
+需要我们首先分解模N
+requires us to first factor the modulus N.
+
+17
+00:00:50,050 --> 00:00:52,236
+然后，一旦我们分解了模，上周我们已经看过了
+And then, once we factored the modulus, we have already
+
+18
+00:00:52,236 --> 00:00:55,892
+容易计算模p的e次方根
+seen last week, that it's easy to compute the e'th root modulo p,
+
+19
+00:00:55,892 --> 00:00:58,483
+容易计算模q的e次方根
+it's easy to compute the e'th root modulo q.
+
+20
+00:00:58,483 --> 00:01:02,107
+然后有了这些e次方根，实际上容易把它们组合起来
+And, then given both those e'th roots, it's actually easy to combine them together,
+
+21
+00:01:02,107 --> 00:01:04,699
+使用所谓了中国剩余定理
+using what's called the Chinese remainder theorem
+
+22
+00:01:04,699 --> 00:01:07,667
+既可以还原模N的e次方根
+and actually recover the e'th root modulo N.
+
+23
+00:01:07,667 --> 00:01:09,946
+我们一旦能够分解模
+So, once we are able to factor the modulus,
+
+24
+00:01:09,946 --> 00:01:12,848
+计算模N的e次方根就会很容易
+computing e'th roots modulo N becomes easy.
+
+25
+00:01:12,848 --> 00:01:14,636
+但是分解模，就目前来看
+But, factoring the modulus, as far as
+
+26
+00:01:14,636 --> 00:01:16,761
+是一个非常困难的问题
+we know, is a very, very difficult problem.
+
+27
+00:01:16,761 --> 00:01:19,865
+但是一个自然的问题是，为了计算模N的e次方根
+But a natural question is, is it true that in
+
+28
+00:01:19,865 --> 00:01:22,568
+我们真的一定要分解模N吗？
+order to compute e'th roots modulo N, we have to
+
+29
+00:01:22,568 --> 00:01:25,707
+就目前我们所知道的
+factor the modulus N? As far as we know, the
+
+30
+00:01:25,707 --> 00:01:27,369
+最好的计算模N的e次方根的算法
+best algorithm for computing e'th roots
+
+31
+00:01:27,369 --> 00:01:30,002
+是需要将N因子分解的
+modulo N requires factorization of N.
+
+32
+00:01:30,002 --> 00:01:31,626
+但谁知道呢，也许就有一条捷径呢
+But, who knows, maybe there is a short cut
+
+33
+00:01:31,626 --> 00:01:33,771
+可以让我们计算模N的e次方根
+that allows us to compute e'th roots modulo N,
+
+34
+00:01:33,771 --> 00:01:36,704
+而不用分解模
+without factoring the modulus. To show that
+
+35
+00:01:36,704 --> 00:01:38,808
+为了证明这是不可能的，我们必须证明一个规约
+that's not possible, we have to show a reduction.
+
+36
+00:01:38,808 --> 00:01:40,314
+就是说我们必须证明
+That is, we have to show that,
+
+37
+00:01:40,314 --> 00:01:42,001
+如果我给大家一个有效算法
+if I give you an efficient algorithm for
+
+38
+00:01:42,001 --> 00:01:43,872
+可以计算模N的e次方根
+computing e'th roots modulo N, that
+
+39
+00:01:43,872 --> 00:01:48,132
+这个算法也可以被改造成一个计算因子分解的算法
+efficient algorithm can be turned into a factoring algorithm.
+
+40
+00:01:48,132 --> 00:01:51,015
+这叫做一个规约。即有一个计算模N的e次方根的算法
+So, this is called a reduction. Namely, given an algorithm for
+
+41
+00:01:51,015 --> 00:01:53,137
+我们就能获得一个分解合数的算法了
+e'th roots modulo N, we obtain a factoring algorithm.
+
+42
+00:01:53,137 --> 00:01:57,314
+这会证明任何人都不能计算模N的e次方根
+That would show that one cannot compute e'th roots modulo N
+
+43
+00:01:57,314 --> 00:02:00,101
+以比分解模更快的速度
+faster than factoring the modulus.
+
+44
+00:02:00,101 --> 00:02:02,285
+如果我们有这么一个结果，这就会证明
+If we had such a result, it would show that
+
+45
+00:02:02,285 --> 00:02:05,716
+破解RSA实际上与分解大合数一样难
+actually breaking RSA, in fact is as hard as factoring.
+
+46
+00:02:05,716 --> 00:02:08,110
+但很不幸，目前这个证明我们还不知道
+But, unfortunately, this is not really known at the moment.
+
+47
+00:02:08,110 --> 00:02:11,969
+事实上这是公钥密码学里最古老的问题之一
+In fact, this is one of the oldest problems in public key crypto.
+
+48
+00:02:11,969 --> 00:02:14,415
+那么，我只给大家一个具体的例子
+So, just let me give you a concrete example.
+
+49
+00:02:14,415 --> 00:02:18,523
+假设我给你一个算法，可以计算模N的立方根
+Suppose, I give you an algorithm that will compute cube roots modulo N.
+
+50
+00:02:19,037 --> 00:02:23,693
+对任意Z_N中的x，这个算法会计算出x的模N立方根
+So, for any x in ZN, the algorithm will compute the cube root of x modulo N.
+
+51
+00:02:23,693 --> 00:02:25,971
+我的问题是，你能证明，使用这样一个算法
+My question is, can you show that using
+
+52
+00:02:25,971 --> 00:02:29,066
+你能分解模N吗？
+such an algorithm you can factor the modulus N?
+
+53
+00:02:29,066 --> 00:02:31,239
+即使整个证明我们还不知道
+And, even that is not known. What is known,
+
+54
+00:02:31,239 --> 00:02:33,920
+我会告诉你，我们知道的是，例如e=2时
+I'll tell you, is for example that for e equals 2,
+
+55
+00:02:34,375 --> 00:02:37,711
+如果我给你一个计算模N平方根的算法
+that is if I give you an algorithm for computing square roots modulo N,
+
+56
+00:02:37,711 --> 00:02:40,696
+那么事实上，这就蕴涵着分解模的算法
+then in fact, that does imply factoring the modulus.
+
+57
+00:02:40,696 --> 00:02:44,699
+那么，计算平方根事实上与分解模一样困难
+So, computing square roots is in fact as hard as factoring the modulus.
+
+58
+00:02:44,712 --> 00:02:47,779
+很不幸，如果你回想RSA的定义
+Unfortunately, if you think back to the definition of RSA,
+
+59
+00:02:47,779 --> 00:02:52,913
+要求ed = 1 mod φ(N)
+that required that e times d be 1 modulo phi(N).
+
+60
+00:02:52,913 --> 00:02:58,612
+这意味着，e与模φ(N)必须是互质的
+What that means is, that e necessarily needs to be relatively prime to phi(N).
+
+61
+00:02:58,612 --> 00:03:03,128
+这里第一个方程是说，e是模φ(N)可逆的
+Right, this, what the first equation says is that e is invertible modulo phi(N).
+
+62
+00:03:03,128 --> 00:03:06,125
+但是，如果e是φ(N)可逆的，这必将意味着
+But, if e is invertible modulo phi(N), necessarily that means that
+
+63
+00:03:06,125 --> 00:03:09,107
+e必须与φ(N)互质
+e must be relatively prime to phi(N).
+
+64
+00:03:09,107 --> 00:03:13,927
+但是如果大家记得，φ(N)=(p-1)(q-1)
+But, phi(N), if you remember, that is equal to p minus 1 times q minus 1.
+
+65
+00:03:13,927 --> 00:03:19,377
+由于p和q都是大质数，p-1和q-1总是偶数
+And, since p and q are both large primes,  p - 1 times q - 1 is always even.
+
+66
+00:03:19,377 --> 00:03:25,503
+因此gcd(2,φ(N))=2
+And, as a result,  the GCD of 2 and phi(N) is equal to 2,
+
+67
+00:03:25,503 --> 00:03:28,221
+因为φ(N)是偶数，因此
+because phi(N) is even. And therefore, the public
+
+68
+00:03:28,221 --> 00:03:30,863
+公钥指数2与φ(N)不互质
+exponent 2 is not relatively prime to phi(N).
+
+69
+00:03:30,863 --> 00:03:33,174
+这意味着，即使我们有了一个从计算平方根
+Which means that, even though we have a reduction
+
+70
+00:03:33,174 --> 00:03:35,263
+到因子分解的规约
+from taking square roots to factoring,
+
+71
+00:03:35,263 --> 00:03:38,758
+e=2也不能被拿来当作RSA指数
+e equals 2 cannot be used as an RSA exponent.
+(容易看出，偶数都不能成为RSA指数)
+
+72
+00:03:38,758 --> 00:03:43,643
+那么真正合法的最小的RSA指数等于3
+So, really the smallest RSA exponent that is legal is in fact e equals 3.
+
+73
+00:03:43,643 --> 00:03:46,911
+但是等于3，问题就是计算立方根
+But, for e equal 3, the question of whether computing cube roots
+
+74
+00:03:46,911 --> 00:03:48,976
+与因子分解一样难，这是个开放问题
+is as hard as factoring, is an open problem.
+
+75
+00:03:48,976 --> 00:03:50,978
+这个问题很有趣，值得想想
+It's actually a lot of fun to think about this question.
+
+76
+00:03:50,978 --> 00:03:53,444
+那么我鼓励大家简单想想这个问题
+So, I would encourage you to think about it just a little bit.
+
+77
+00:03:53,444 --> 00:03:58,352
+就是说，如果我给你一个有效算法，来计算模N的立方根
+That is, if I give you an efficient algorithm for computing cube roots modulo N,
+
+78
+00:03:58,352 --> 00:04:02,111
+你能使用这个算法来分解模N吗？
+can you use that algorithm to actually factor the modulus N?
+
+79
+00:04:02,111 --> 00:04:05,301
+我会告诉大家，有一些证据说明
+I will tell you that there is a little bit of evidence to say
+
+80
+00:04:05,301 --> 00:04:09,402
+这样的规约可能并不存在，但这只是一个很弱的证据
+that a reduction like that, actually doesn't exist, but it is very, very weak evidence.
+
+81
+00:04:09,402 --> 00:04:11,366
+这个证据是说
+What this evidence says is basically, if you
+
+82
+00:04:11,366 --> 00:04:13,500
+如果你给我一个非常特别的形式的规约
+give me a reduction of a very particular form.
+
+83
+00:04:13,500 --> 00:04:16,070
+换句话说，如果你的规约是代数的
+In other words, if your reduction is what's called algebraic,
+
+84
+00:04:16,070 --> 00:04:18,509
+我这里先不解释它的意义
+I am not going to explain what that means here.
+
+85
+00:04:18,509 --> 00:04:23,087
+如果有一个立方根神谕，你可以给我一个算法
+That is, if given a cube root oracle, you could actually show me an algorithm
+
+86
+00:04:23,087 --> 00:04:26,055
+可以计算因子分解。这个规约本身
+that would then factor. That reduction, by itself,
+
+87
+00:04:26,055 --> 00:04:28,554
+就会蕴涵着因子分解的算法
+would actually imply a factoring algorithm.
+
+88
+00:04:28,554 --> 00:04:31,084
+这就是说，如果因子分解是困难的
+Okay so, that would say that if factoring is hard,
+
+89
+00:04:31,084 --> 00:04:33,637
+那么规约根本就不存在
+a reduction actually doesn't exist.
+
+90
+00:04:33,637 --> 00:04:35,537
+但是，如我所说，这是非常弱的证据
+But, as I say this is very weak evidence.
+
+91
+00:04:35,537 --> 00:04:37,617
+因为，需要规约是代数的
+Because, who is to say that the reduction needs to be algebraic.
+
+92
+00:04:37,617 --> 00:04:39,725
+也许会有其他类型的规约
+Maybe, there are some other types of reductions that
+
+93
+00:04:39,725 --> 00:04:42,857
+比如我们没有考虑过的类型
+we haven't really considered. So, I would
+
+94
+00:04:42,857 --> 00:04:44,339
+那么我会鼓励大家去略微考虑一下这个问题
+encourage you to think a little bit about this
+
+95
+00:04:44,339 --> 00:04:46,235
+这是很有趣的
+question. It's actually quite interesting.
+
+96
+00:04:46,235 --> 00:04:50,087
+如何使用一个立方根算法来分解模？
+How would you use a cube root algorithm to factor the modulus?
+
+97
+00:04:51,308 --> 00:04:54,143
+但是如我所说，我们目前只知道RSA是一个单向函数
+But as I said, as far as we know, RSA is a one way function.
+
+98
+00:04:54,143 --> 00:05:00,274
+事实上破解RSA，计算e次方根，都要求因子分解模
+In fact, breaking RSA, computing e'th roots that is, actually requires factoring the modulus.
+
+99
+00:05:00,274 --> 00:05:02,918
+我们都相信那是正确的，这就是目前的研究现状
+We all believe that's true, and that's the state of the art.
+
+100
+00:05:02,918 --> 00:05:07,637
+但是，现在有很多研究工作，试图提高RSA的性能
+But, now there has been a lot of work on trying to improve the performance of RSA.
+
+101
+00:05:07,637 --> 00:05:12,041
+提高RSA加密的性能，或是RSA解密的性能
+Either, RSA encryption or improve the performance of RSA decryption.
+
+102
+00:05:12,041 --> 00:05:14,901
+实际上，这个研究方向开始时人们走了很多弯路
+And it turns out, there has been a number of false starts in this direction.
+
+103
+00:05:14,901 --> 00:05:18,796
+我想展示给大家这个非常好的例子，作为警示
+So I want to show you, this wonderful example as a warning.
+
+104
+00:05:18,796 --> 00:05:23,232
+这是一个试图提高RSA性能的错误例子
+So basically, this is an example of how not to improve the perfomance of RSA.
+
+105
+00:05:23,232 --> 00:05:26,772
+设想如果我想加速RSA解密
+So, you might think that if I wanted to speed up RSA decryption,
+
+106
+00:05:26,772 --> 00:05:28,578
+记得解密是通过计算
+remember decryption is done by raising the
+
+107
+00:05:28,578 --> 00:05:30,895
+密文的d次方。大家记得
+ciphertext to the power of d. And, you remember
+
+108
+00:05:30,895 --> 00:05:34,265
+指数算法的运行时间
+that the exponentiation algorithm ran in linear
+
+109
+00:05:34,265 --> 00:05:37,767
+与d的长度大小成线性关系，与log(d)成线性
+time in the size of d. Linear time in log of d.
+
+110
+00:05:37,767 --> 00:05:39,762
+那么大家可以回想一下，如果我想
+So, you might think to yourself, well if I wanted
+
+111
+00:05:39,762 --> 00:05:43,522
+加速RSA解密，我为什么不使用一个小d呢？
+to speed up RSA decryption, why don't I just use a small d.
+
+112
+00:05:43,522 --> 00:05:48,265
+比如说，使用一个解密指数，大约是2的128次方
+I'll say, I'll say a decryption exponent that's on the order of 2 to the 128.
+
+113
+00:05:48,419 --> 00:05:52,350
+那么这已经够大了，穷举d实际上是不可能的
+So it's clearly big enough so that exhaustive search against d is not possible.
+
+114
+00:05:52,350 --> 00:05:57,418
+但正常情况下，解密指数d约与模一般大，比如说2000位
+But normally, the decryption exponent d would be as big as the modulus, say 2000 bits.
+
+115
+00:05:57,418 --> 00:06:04,669
+通过使用仅为128位的d，我可以提高RSA解密速度20倍
+By using d that's only 128 bits, I basically speed up RSA decryption by a factor of 20.
+
+116
+00:06:04,669 --> 00:06:07,533
+我从2000位降到100位
+Right, I went down from 2000 bits to 100 bits.
+
+117
+00:06:07,533 --> 00:06:10,915
+那么计算指数的速度会快20倍
+So, exponentiation would run 20 times as fast.
+
+118
+00:06:10,915 --> 00:06:15,440
+实际上这是一个糟糕的点子。
+非常糟糕的点子，根据接下来的思路来看
+It turns out this is a terrible idea. Terrible, terrible idea, in the following sense.
+
+119
+00:06:15,440 --> 00:06:18,638
+Michael Wiener有一个攻击，证明了事实上
+There is an attack by Michael Wiener that shows that, in fact,
+
+120
+00:06:18,638 --> 00:06:23,425
+一旦私钥指数d小于模的4次方
+as soon as the private exponent d is less than the fourth root of the modulus.
+
+121
+00:06:23,425 --> 00:06:27,526
+我们看，如果模大约是2048位
+Let's see, if the modulus is around 2048 bits
+
+122
+00:06:27,526 --> 00:06:34,581
+这意味着如果d小于2的512次方，那么RSA是完全不安全的
+that means that if d is less that 2 to the 512, then RSA is completely, completely insecure.
+
+123
+00:06:34,581 --> 00:06:37,509
+而且这是最坏的一种不安全
+And, this is, it's insecure in the worst possible way.
+
+124
+00:06:37,509 --> 00:06:43,129
+即给定一个公钥e，你可以很快还原出私钥d
+Namely, just given a public key and an e, you can very quickly recover the private key d.
+
+125
+00:06:44,227 --> 00:06:48,493
+所以有传言说：这个攻击可以针对最多512位
+Well, so some folks said: well this attack works up to 512 bits.
+
+126
+00:06:48,493 --> 00:06:52,378
+那么为什么我们不让这个模，比如说530位
+So, why don′t we make the modulus, say, you know 530 bits.
+
+127
+00:06:52,378 --> 00:06:54,234
+那么这个攻击就不能用了
+Then, this attack actually wouldn't apply.
+
+128
+00:06:54,234 --> 00:06:57,545
+但是我们依然可以让RSA解密加速4倍
+But still, we get to speed up RSA decryption by a factor of 4,
+
+129
+00:06:57,545 --> 00:07:01,997
+因为我们把指数从2000位降到比如说530位
+because we shrunk the exponent from 2000 bits to, say, 530 bits.
+
+130
+00:07:01,997 --> 00:07:03,978
+实际上，即使这是不安全的。事实上
+Well it turns out, even that is not secure. In fact,
+
+131
+00:07:03,978 --> 00:07:06,243
+Wiener的攻击有一个扩展
+there is an extension to Wiener's attack, that's actually much
+
+132
+00:07:06,243 --> 00:07:08,176
+复杂得多的扩展，证实了
+more complicated, that shows that if d
+
+133
+00:07:08,176 --> 00:07:13,233
+如果d小于N^0.292，那么RSA也是不安全的
+is less than N to the 0.292, then also RSA is insecure.
+
+134
+00:07:13,233 --> 00:07:16,674
+事实上，这个猜想是说，这对最多N^0.5来说是正确的
+And in fact, the conjecture that this is true up to N to the 0.5.
+
+135
+00:07:16,674 --> 00:07:21,975
+即使d大约为N^0.4999，RSA依然是不安全的
+So even if d is like N to the 0.4999, RSA should still be insecure,
+
+136
+00:07:21,975 --> 00:07:25,780
+尽管这是个开放问题，也是一个极好的开放问题
+although this is an open problem. It's again, a wonderful open problem,
+
+137
+00:07:25,780 --> 00:07:28,394
+这个问题已经14年未解决了
+It's been open for like, what is it, 14 years now.
+
+138
+00:07:28,394 --> 00:07:31,556
+没人可以超过这个0.292
+And, nobody can progress beyond this 0.292.
+
+139
+00:07:31,556 --> 00:07:34,327
+这有点奇怪
+Somehow, it seems kind of strange, why would 0.292
+
+140
+00:07:34,327 --> 00:07:38,217
+为什么0.292会是正确答案，没人能超过0.292呢？
+be the right answer and yet no one can go beyond 0.292.
+
+141
+00:07:38,802 --> 00:07:41,671
+那么为了准确，当我说RSA是不安全时
+So, just to be precise, when I say that RSA is insecure,
+
+142
+00:07:41,671 --> 00:07:45,218
+我的意思是，有了公钥(N,e)
+what I mean is just given the public key N and e,
+
+143
+00:07:45,218 --> 00:07:48,077
+你的目标是还原私钥d
+your goal is to recover the secret key d.
+
+144
+00:07:49,102 --> 00:07:52,257
+如果你好奇0.292是怎么来的
+If you are curious where 0.292 comes from,
+
+145
+00:07:52,257 --> 00:07:56,312
+我会告诉你，它实际上是1-1/√2
+I'll tell you that what it is, it's basically 1 minus 1 over square root of 2.
+
+146
+00:07:56,312 --> 00:07:58,503
+为什么这会是问题的正确答案呢？
+Now how could this possibly be the right answer to this problem?
+
+147
+00:07:58,503 --> 00:08:01,296
+如果答案是N^0.5，会更自然得多
+It's much more natural that the answer is N to the 0.5.
+
+148
+00:08:01,296 --> 00:08:04,340
+但这依然是一个开放问题。如果你想思考一下
+But this is still an open problem. Again if you want to think about that,
+
+149
+00:08:04,340 --> 00:08:06,163
+这是一个很有趣的问题，值得研究
+it's kind of a fun problem to work on.
+
+150
+00:08:06,163 --> 00:08:10,101
+这里的教训是，任何人都不应该在d上强加任何结构
+So the lesson in this is that one should not enforce any structure on d
+
+151
+00:08:10,101 --> 00:08:12,475
+以期提高RSA性能，事实上
+for improving the performance of RSA, and in fact
+
+152
+00:08:12,475 --> 00:08:15,276
+现在有很多这样的结果，证实了
+now there's a slew of results like this that show
+
+153
+00:08:15,276 --> 00:08:19,714
+任何像这样的试图提高RSA性能的技巧
+that basically, any kind of tricks like this to try and improve RSA's performance
+
+154
+00:08:19,714 --> 00:08:24,285
+最后都会带来灾难。这不是正确的提高RSA性能的方法
+is going to end up in disaster. So this is not the right way to improve RSA's performance.
+
+155
+00:08:24,285 --> 00:08:27,987
+我本不想讲解Wiener攻击的细节
+Initially I wasn't going to cover the details of Wiener's attack.
+
+156
+00:08:27,987 --> 00:08:31,582
+但是根据课堂上的讨论情况，我觉得有人很想看这些细节
+But given the discussions in the class, I think some of you would enjoy seeing the details.
+
+157
+00:08:31,582 --> 00:08:35,229
+它涉及的只是操作一些不等式
+All it involves is just manipulating some inequalities.
+
+158
+00:08:35,229 --> 00:08:37,743
+如果你对这个很不舒服，大可跳过这一张幻灯片
+If you're not comfortable with that, feel free to skip over this slide,
+
+159
+00:08:37,743 --> 00:08:40,979
+尽管我想有很多人很想看这些细节
+although I think many of you would actually enjoy seeing the details.
+
+160
+00:08:40,979 --> 00:08:43,365
+那么我提醒大家，在Wiener的攻击里
+So let me remind you in Wiener's attack basically
+
+161
+00:08:43,365 --> 00:08:46,893
+我们有模和RSA指数：(N,e)
+we're given the modulus and the RSA exponent N and e,
+
+162
+00:08:46,893 --> 00:08:50,513
+我们的目标是还原d，私钥指数d
+and our goal is to recover d, the private exponent d,
+
+163
+00:08:50,513 --> 00:08:54,171
+我们只知道d是小于N的四次方根的
+and all we know is that d is basically less than the fourth root of N.
+
+164
+00:08:54,171 --> 00:08:57,711
+事实上我将假设d小于N的四次方根再除以3
+In fact, I'm going to assume that d is less than the fourth root of N divided by 3.
+
+165
+00:08:57,711 --> 00:09:02,373
+这个3不重要，但这里主要起作用的项是，d小于N的4次方根
+This 3 doesn't really matter, but the dominating term here is that d is less than the 4th root of N.
+
+166
+00:09:02,373 --> 00:09:05,944
+我们来看怎么办。首先记得
+So let's see how to do it. So first of all, recall that
+
+167
+00:09:05,944 --> 00:09:09,144
+因为e和d是RSA的公钥和私钥指数
+because e and d are RSA public and private exponents,
+
+168
+00:09:09,144 --> 00:09:14,145
+我们知道ed = 1 mod φ(N)。这是什么意思？
+we know that e times d is 1 modulo phi(N). Well what does that mean?
+
+169
+00:09:14,145 --> 00:09:22,248
+这意味着，存在某个整数k，满足ed = kφ(N)+1
+That means that there exists some integer k such that e times d is equal to k times phi(N) plus 1.
+
+170
+00:09:22,248 --> 00:09:26,280
+这也就是ed = 1 mod φ(N)的含义
+Basically that's what it means for e times d to be 1 modulo phi(N).
+
+171
+00:09:26,280 --> 00:09:29,832
+也就是某个整数乘以φ(N)再加1
+Basically some integer multiple of phi(N) plus 1.
+
+172
+00:09:29,832 --> 00:09:32,592
+那么现在我们盯着这个等式看一会
+So now let's stare at this equation a little bit.
+
+173
+00:09:32,592 --> 00:09:35,826
+事实上这个等式是这个攻击的关键所在
+And in fact this equation is the key equation in the attack.
+
+174
+00:09:35,826 --> 00:09:40,352
+首先我们将两边同时除以d*φ(N)
+And what we're going to do is first of all divide both sides by d times phi(N).
+
+175
+00:09:40,352 --> 00:09:43,703
+事实上我把这项移到左边
+And in fact I'm going to move this term here to the left.
+
+176
+00:09:43,703 --> 00:09:47,453
+在我两边同除以d*φ(N)后，得到
+So after I divide by d times phi(N), what I get is that
+
+177
+00:09:47,453 --> 00:09:58,500
+e/φ(N)-k/d=1/(d*φ(N))
+e divided by phi(N) minus k divided by d is equal to 1 over d times phi(N).
+
+178
+00:09:59,469 --> 00:10:02,902
+那么我只是除以d*φ(N)
+Okay, so all I did is I just divided by d times phi(N)
+
+179
+00:10:02,902 --> 00:10:05,850
+然后把k*φ(N)这一项移到等式左边
+and I moved the k times phi(N) term to the left-hand side.
+
+180
+00:10:05,850 --> 00:10:09,119
+现在为了说的清楚点，我要加上绝对值
+Now, just for the heck of it I'm going to add absolute values here.
+
+181
+00:10:09,119 --> 00:10:13,484
+这一步待会会有用，但是它们当然不会改变等性
+These will become useful in just a minute, but of course they don't change this equality at all.
+
+182
+00:10:13,484 --> 00:10:20,184
+现在φ(N)当然几乎等于N，φ(N)与N非常接近，我们之前说过
+Now, phi(N) of course is almost N; phi(N) is very, very close to N, as we said earlier.
+
+183
+00:10:20,184 --> 00:10:23,371
+现在我需要它们，对于这个分式
+And all I'm going to need then for this fraction is just to say that
+
+184
+00:10:23,371 --> 00:10:26,639
+我说它小于1/√N，它比1/√N小得多
+it's less than 1 over square root of N. It's actually much, much smaller
+
+185
+00:10:26,639 --> 00:10:30,571
+因为1/φ(N)是在1/N数量级的
+than 1 over square root of N, it's actually on the order of 1 over N or even more than that,
+
+186
+00:10:30,571 --> 00:10:35,638
+但为了我们的目的，我只需要这个分式小于1/√N
+but for our purposes all we need is that this fraction is less than 1 over square root of N.
+
+187
+00:10:35,638 --> 00:10:37,939
+现在我们盯着这个分式看一会
+Now let's stare at this fraction for just a minute.
+
+188
+00:10:37,939 --> 00:10:44,506
+大家发现左边的分式我们并不知道
+You realize that this fraction on the left here is a fraction that we don't actually know.
+
+189
+00:10:44,506 --> 00:10:49,039
+我们知道e，但我们不知道φ(N)，因此我们不知道e/φ(N)
+We know e, but we don't know phi(N), and as a result we don't know e over phi(N).
+
+190
+00:10:49,039 --> 00:10:53,631
+但我们对e/φ(N)有一个良好的估计
+But we have a good approximation to e over phi(N). Namely we know that phi(N)
+
+191
+00:10:53,631 --> 00:10:59,238
+现在我们知道φ(N)与N非常近。因此e/φ(N)与e/N很近
+is very close to N. Therefore e over phi(N) is very close to e over N.
+
+192
+00:10:59,238 --> 00:11:03,436
+那么我们对左边的e/N有了一个很好的估计
+So we have a good approximation to this left-hand side fraction, namely e over N.
+
+193
+00:11:03,436 --> 00:11:06,028
+我们想要的是右边的分式
+What we really want is the right-hand side fraction,
+
+194
+00:11:06,028 --> 00:11:07,649
+因为一旦我们有了右边的分式
+because once we get the right-hand side fraction,
+
+195
+00:11:07,649 --> 00:11:12,960
+它涉及d，那么我们就可以还原d了
+basically that's going to involve d, and then we'll be able to recover d. Okay, so let's see
+
+196
+00:11:12,960 --> 00:11:19,041
+我们看，如果我们把e/φ(N)换成e/N，看看我们会获得何种错误
+if we replace e over phi(N) by e over N, let's see what kind of error we're going to get.
+
+197
+00:11:19,041 --> 00:11:22,514
+分析一下，我们首先提醒自己
+So to analyze that, what we'll do is first of all remind ourselves
+
+198
+00:11:22,514 --> 00:11:26,204
+φ(N)实际上是N-p-q+1
+that phi(N) is basically N - p - q + 1,
+
+199
+00:11:26,204 --> 00:11:30,804
+意味着N-φ(N)=p+q-1<p+q
+which means that N minus phi(N) is going to be less than p + q.
+
+200
+00:11:30,804 --> 00:11:34,752
+更精确地，我应该写p+q+1，但大家知道
+Actually I should, to be precise I should really write p + q + 1, but you know,
+
+201
+00:11:34,752 --> 00:11:37,838
+没人关系这个1，它不会有任何影响
+who cares about this 1, it's not, it doesn't really affect anything.
+
+202
+00:11:37,838 --> 00:11:40,238
+为了简单，我要忽略它
+So I'm just going to ignore it for simplicity.
+
+203
+00:11:40,238 --> 00:11:45,508
+好，那么N-φ(N)<p+q，p和q大约是N长度的一半
+Okay, so N - phi(N) is less than p + q. Both p and q are roughly half the length of N,
+
+204
+00:11:45,508 --> 00:11:48,918
+大家知道，它们是N的平方根的数量级
+so you know, they're both kind of on the order of square root of N,
+
+205
+00:11:48,918 --> 00:11:53,876
+所以我们说p+q<3√N
+so basically p + q we'll say is less than 3 times square root of N.
+
+206
+00:11:53,876 --> 00:11:56,844
+好，我们待会使用这个不等式
+Okay, so we're going to use this inequality in just a minute.
+
+207
+00:11:56,844 --> 00:12:00,243
+但现在我们开始使用这个关于d的事实
+But now we're going to start using the fact that we know something about d,
+
+208
+00:12:00,243 --> 00:12:02,958
+即d是小的，如果我们看这个不等式
+namely that d is small. So if we look at this inequality here,
+
+209
+00:12:02,958 --> 00:12:05,543
+d是小于N的四次方根除以3
+d is less than the fourth root of N divided by 3.
+
+210
+00:12:05,543 --> 00:12:08,596
+容易看出如果我们两边平方
+It's actually fairly easy to see that if I square both sides
+
+211
+00:12:08,596 --> 00:12:12,118
+稍微做点操作，就不难看出
+and I just manipulate things a little bit, it's [not] difficult to see that
+
+212
+00:12:12,118 --> 00:12:15,510
+这直接能导出下面的关系
+this directly implies the following relation,
+
+213
+00:12:15,510 --> 00:12:24,263
+(1/2d^2)-1/√N>3/√N
+basically 1 over 2 d squared minus 1 over square root of N is greater than 3 over square root of N.
+
+214
+00:12:24,263 --> 00:12:28,542
+如我所说，这是由两边平方得来的
+As I said, this basically follows by squaring both sides, then taking the
+
+215
+00:12:28,542 --> 00:12:33,334
+平方后再取倒数，然后我猜一边还要乘以0.5
+inverse of both sides, and then I guess multiplying one side by a half.
+
+216
+00:12:33,334 --> 00:12:37,906
+好，那么大家可以很容易推出这个关系，
+我们待会要用这个关系
+Okay, so you can easily derive this relation, and we'll need this relation in just a minute.
+
+217
+00:12:37,906 --> 00:12:40,166
+现在我们看，我们要界定
+So now let's see, what we'd like to do is bound
+
+218
+00:12:40,166 --> 00:12:45,059
+e/N与k/d之间的距离，我们知道什么？
+the difference of e over N and k over d. Well what do we know?
+
+219
+00:12:45,059 --> 00:12:47,872
+根据三角不等式，我们知道这个
+By the triangular inequality, we know that this is equal to
+
+220
+00:12:47,872 --> 00:12:52,122
+不大于|e/N-e/φ(N)|
+the distance between e over N and e over phi(N) plus
+
+221
+00:12:52,122 --> 00:12:56,566
+加上|e/φ(N)-k/d|
+the distance from e over phi(N) to k over d.
+
+222
+00:12:56,566 --> 00:13:01,813
+这就是三角不等式，是绝对值的一个性质
+This is just what's called a triangular inequality; this is just a property of absolute values.
+
+223
+00:13:01,813 --> 00:13:04,705
+现在我们知道如何界定这个绝对值
+Now this absolute value here, we already know how to bound.
+
+224
+00:13:04,705 --> 00:13:07,116
+想一下，这是我们刚刚推出来的界
+If you think about it it's basically the bound that we've already derived.
+
+225
+00:13:07,116 --> 00:13:11,977
+那么我们知道这个绝对值是小于1/√N
+So we know that this absolute value here is basically less than 1 over square root of N.
+
+226
+00:13:11,977 --> 00:13:17,737
+现在关于这个绝对值，我们知道什么？e/N-e/φ(N)是什么？
+Now what do we know about this absolute value here? What is e over N minus e over phi(N)?
+
+227
+00:13:17,737 --> 00:13:20,486
+我们计算公分母，看看我们能得到什么
+Well let's do common denominators and see what we get.
+
+228
+00:13:20,486 --> 00:13:25,236
+公分母是N乘以φ(N)
+So the common denominator is going to be N times phi(N),
+
+229
+00:13:25,236 --> 00:13:31,253
+这里的分组将是e*(φ(N)-N)
+and the numerator in this case is going to be e times phi(N) minus N.
+
+230
+00:13:31,253 --> 00:13:35,760
+从这个等式，我们知道它小于3√N
+Which we know from this expression here is less than 3 times square root of N.
+
+231
+00:13:35,760 --> 00:13:40,842
+这个分子将是e*(3)
+So really what this numerator is going to be is e times 3 square root of N.
+
+232
+00:13:40,842 --> 00:13:44,327
+分子将小于e(3√N)
+The numerator is going to be less than e times 3 square root of N.
+
+233
+00:13:44,327 --> 00:13:51,246
+那么我知道，e<φ(N)，于是e/φ(N)<1
+So now I know that e is less than phi(N), so I know that e over phi(N) is less than 1.
+
+234
+00:13:51,246 --> 00:13:57,313
+换句话说，如果我擦去e和φ(N)，只会让这个分式变大
+In other words, if I erase e and I erase phi(N) I've only made the fraction larger.
+
+235
+00:13:57,313 --> 00:14:00,016
+那么这个最初的绝对值现在将是
+Okay, so this initial absolute value is now going to be
+
+236
+00:14:00,016 --> 00:14:03,655
+小于(3√N)/N
+smaller than 3 square root of N over N, which is simply,
+
+237
+00:14:03,655 --> 00:14:09,237
+(3√N)/N也就是3/√N
+3 square root of N over N is simply 3 over square root of N.
+
+238
+00:14:09,237 --> 00:14:11,270
+但是关于3/√N，我们知道什么？
+Okay, but what do we know about 3 over square root of N?
+
+239
+00:14:11,270 --> 00:14:17,706
+我们知道它小于1/(2d^2)-1/√N
+We know that it's less than 1 over 2 d squared minus 1 over square root of N.
+
+240
+00:14:17,706 --> 00:14:20,473
+好，我们的推导结束了
+Okay, so that's the end of our derivation.
+
+241
+00:14:20,473 --> 00:14:26,439
+那么现在第一个绝对值是小于1/(2d^2)-1/√N
+So now we know that the first absolute value is less than 1 over 2 d squared minus square root of N.
+
+242
+00:14:26,439 --> 00:14:29,509
+第二个绝对值小于1/√N
+The second absolute value is less than 1 over square root of N.
+
+243
+00:14:29,509 --> 00:14:34,369
+因此它们的和是小于1/(2d^2)的
+And therefore their sum is less than 1 over 2 d squared.
+
+244
+00:14:34,369 --> 00:14:36,576
+我想让大家盯着这个表达式看
+And this is the expression that I want you to stare at.
+
+245
+00:14:36,576 --> 00:14:42,951
+那么这里，让我把它给圈出来。我来把这部分和这部分圈出来
+So here, let me circle it a little bit. So let me circle this part and this part.
+
+246
+00:14:43,582 --> 00:14:46,445
+现在，我们盯着这个分式看一会
+Now, so let's stare a little bit at this fraction here.
+
+247
+00:14:46,445 --> 00:14:51,444
+我们看到，首先与前面一样，现在我们知道了e/N的值
+And what we see is first of all, as before, now we know the value of e over N,
+
+248
+00:14:51,444 --> 00:14:54,825
+我们想知道k/d的值
+and what we'd like to find out is the value k over d.
+
+249
+00:14:54,825 --> 00:14:56,862
+关于这个分式k/d，我们知道什么？
+But what do we know about this fraction k over d?
+
+250
+00:14:56,862 --> 00:15:00,715
+我们知道这两个分式的差非常小
+We know somehow that the difference of these two fractions is really small;
+
+251
+00:15:00,715 --> 00:15:05,385
+它小于1/(2d^2)。现在实际上这个很少发生
+it's less than 1 over 2 d squared. Now this turns out to happen very infrequently,
+
+252
+00:15:05,385 --> 00:15:10,588
+k/d如此好地逼近e/N
+that k over d approximates e over N so well that
+
+253
+00:15:10,588 --> 00:15:15,307
+以至于两者之间的差比k/d的分母平方还小
+the difference between the two is less than the square of the denominator of k over d.
+
+254
+00:15:15,307 --> 00:15:17,324
+这个实际上不是经常发生
+It turns out that that can't happen very often.
+
+255
+00:15:17,324 --> 00:15:22,338
+实际上很少有具有k/d形式的分式，能够如此好地逼近另一分式
+It turns out that there are very few fractions of the form k over d that approximate another fraction
+
+256
+00:15:22,338 --> 00:15:26,422
+以至于它们的差小于1/(2d^2)
+so well that their difference is less than 1 over 2 d squared.
+
+257
+00:15:26,422 --> 00:15:30,308
+事实上，这样的分式最多也只有log(N)那么多
+And in fact the number of such fractions is going to be at most logarithmic in N.
+
+258
+00:15:30,308 --> 00:15:33,953
+现在有一个连分式算法，这是一个著名的连分式算法
+So now there's a continued fraction algorithm. It's a very famous fraction
+
+259
+00:15:33,953 --> 00:15:38,877
+它会从分式e/N开始
+that basically what it will do is, from the fraction e over N,
+
+260
+00:15:38,877 --> 00:15:42,977
+他会还原log(N)个可能的k/d的值
+it will recover log(N) possible candidates for k over d.
+
+261
+00:15:42,977 --> 00:15:47,148
+我们只需要一个一个地去试，知道我们找到正确的k/d
+So we just try them all one by one until we find the correct k over d.
+
+262
+00:15:47,148 --> 00:15:51,645
+然后就结束了，因为我们知道了
+And then we're done. We're done, because we know that,
+
+263
+00:15:51,645 --> 00:15:55,376
+ed = 1 mod k，因此d与k互质
+well e times d is 1 mod k, therefore d is relatively prime to k,
+
+264
+00:15:55,376 --> 00:16:00,852
+那么如果我们用一个有理分式来表示k/d，也就是分子除以分母
+so if we just represent k over d as a rational fraction, you know, numerator by denominator,
+
+265
+00:16:00,852 --> 00:16:05,271
+分母一定是d，那么我们就还原了
+the denominator must be d. And so we've just recovered, you know,
+
+266
+00:16:05,271 --> 00:16:10,355
+我们已经试了所有可能的log(N)个分式，它们很好地逼近了e/N
+we've tried all possible log(N) fractions that approximate e over N so well
+
+267
+00:16:10,355 --> 00:16:13,688
+使得它们的差小于1/(2d^2)
+that the difference is less than 1 over 2 d squared.
+
+268
+00:16:13,688 --> 00:16:19,338
+然后我们只看所有这些分式的分母，其中一个分母必定是d
+And then we just look at the denominator of all those fractions, and one of those denominators must be d.
+
+269
+00:16:19,338 --> 00:16:22,841
+那么我们讲完了。我们已经还原了私钥
+And then we're done; we've just recovered the private key.
+
+270
+00:16:22,841 --> 00:16:26,341
+这是一个很犀利的攻击，它展示了
+So this is a pretty acute attack. And it shows basically how,
+
+271
+00:16:26,341 --> 00:16:31,267
+如果私钥太小，小于N的四次方根的话
+if the private exponent is small, smaller than the fourth root of N,
+
+272
+00:16:31,267 --> 00:16:35,354
+那么我们可以轻松地完全还原d。那我就讲到这
+then we can recover d completely, quite easily. Okay, so I'll stop here.

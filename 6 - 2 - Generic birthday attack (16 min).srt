@@ -1,0 +1,1164 @@
+1
+00:00:02,094 --> 00:00:04,189
+接下来我想为大家展示针对抗碰撞哈希函数的通用攻击
+The next thing I want to do is show you
+the general attack on collision resistant
+
+2
+00:00:04,189 --> 00:00:08,020
+如果大家还记得我们讨论分组密码时
+hash functions. If you remember when we
+talked about block cyphers. We saw a
+
+3
+00:00:08,020 --> 00:00:12,209
+我们看了一个针对分组密码的通用攻击，
+我们叫它穷举攻击
+general attack on block cyphers which we
+called exhaustive search. And that attack
+
+4
+00:00:12,209 --> 00:00:16,041
+穷举攻击迫使分组密码的密钥大小是128位或更多
+forced the key size for a block cypher to
+be 128 bits or more. Similarly on
+
+5
+00:00:16,041 --> 00:00:20,128
+类似地对于抗碰撞，也有一个通用的攻击，叫做生日攻击
+collision resistance there is a general
+attack called the birthday attack which
+
+6
+00:00:20,128 --> 00:00:24,317
+也迫使抗碰撞的哈希函数的输出必须多于
+forces the output of collision resistant
+hash functions to be more than a certain
+
+7
+00:00:24,317 --> 00:00:28,506
+某个下界。我来告诉大家这个攻击，
+我们会看到这些下界
+bound. So let me show you the attack and
+we will see what those bounds come out to
+
+8
+00:00:28,506 --> 00:00:32,822
+这是可以对任意抗碰撞的哈希函数使用的通用攻击
+be. So here's the general attack that can
+work on arbitrary collision resistant hash
+
+9
+00:00:32,822 --> 00:00:36,933
+这里我们有抗碰撞的哈希函数
+functions. So here we have our collision
+resistant hash functions, supposedly, but
+
+10
+00:00:36,933 --> 00:00:40,890
+假设它输出N位。换句话说，它的输出空间大小
+let's suppose that it outputs N bit values.
+In other words, the output space is
+
+11
+00:00:40,890 --> 00:00:44,641
+大约是2的N次方。现在，信息空间
+roughly of size two to the N. Now, the
+message space is gonna be much, much
+
+12
+00:00:44,641 --> 00:00:48,650
+要远远大于N位。我们说待哈希的信息
+larger than N bits. Let's just say that
+the messages that are being hashed are
+
+13
+00:00:48,650 --> 00:00:53,070
+可能有一百个N位长。我想给大家看一个算法
+say, you know, a hundred times N bits. I
+wanna show you an algorithm that can find
+
+14
+00:00:53,070 --> 00:00:57,849
+可以找到这个函数H的碰撞，用大约2的N/2次方的时间
+the collision for this hash function H in
+time roughly two to the N over two. Okay,
+
+15
+00:00:57,849 --> 00:01:02,205
+用时大约是输出空间大小的平方根
+so roughly the square root of the size of
+the output space. So here's how the
+
+16
+00:01:02,205 --> 00:01:06,730
+这个算法如下工作：我们从信息空间里随机选择
+algorithms gonna work: what we'll do is
+we'll choose random two to the N over two
+
+17
+00:01:06,730 --> 00:01:10,974
+2的N/2次方个信息，即M1,M2...M_2^N/2
+messages in our message space that's
+called an M-one to M-two to the N over
+
+18
+00:01:10,974 --> 00:01:15,219
+现在因为信息本身远远大于N位
+two. Now because the messages themselves
+are much bigger than N bits, they're
+
+19
+00:01:15,219 --> 00:01:19,576
+它们有上百个N位，很有可能这些信息是不相同的
+hundred times N bits, it's very likely
+that all these messages are distinct. So
+
+20
+00:01:19,576 --> 00:01:24,156
+它们互不相同的概率很大。但对每一条选中的信息
+they'll be distinct with high probability.
+But for each one of these messages we're
+
+21
+00:01:24,156 --> 00:01:28,723
+我们应用哈希函数，获得标签T_i
+gonna apply the hash function and obtain
+the tag T sub I. So this is of course the
+
+22
+00:01:28,723 --> 00:01:33,372
+当然这个T_i是N位字符串。现在我们在T_i中
+T sub I's are N-bit long strings. And now
+we're gonna look for a collision among the
+
+23
+00:01:33,372 --> 00:01:37,791
+寻找一个碰撞。换句话说，我们找一个i和j
+T sub I's. In other words, we're gonna
+find an I and a J such that T sub I equals
+
+24
+00:01:37,791 --> 00:01:42,528
+满足T_i=T_j，一旦我们找到了，就等于是发现了碰撞
+to T sub J. And once we've done that we've
+basically found the collision because, as
+
+25
+00:01:42,528 --> 00:01:47,037
+因为如前所述，以很高的概率，M_i不等于M_j
+we said, with very high probability, M-I
+is not equal to M-J. But the hash of M-I
+
+26
+00:01:47,037 --> 00:01:51,774
+但M_i的哈希值等于M_j的哈希值。因此，
+我们找到了函数H的碰撞
+is equal to the hash of M-J and therefore
+we found the collision on the function H.
+
+27
+00:01:51,774 --> 00:01:56,112
+现在如果我们找遍了这2的N/2次方个T_i
+Now if it so happens that we looked
+through all the two to the N over two T
+
+28
+00:01:56,112 --> 00:02:00,849
+却没有找到碰撞，我们回到第一步
+sub I's and we don't find the collision,
+we go back to step one and try another set
+
+29
+00:02:00,849 --> 00:02:05,167
+尝试另一组2的N/2次方个信息。问题是，这个攻击效果如何？
+of two to the N over two messages. So the
+question is how well will this work, in
+
+30
+00:02:05,167 --> 00:02:09,301
+换句话说，我们需要迭代这个过程多少次
+other words how many times do we have to
+iterate this process until we actually
+
+31
+00:02:09,301 --> 00:02:13,486
+直到发现碰撞？我想告诉大家事实上
+find the collision? And I wanna show you
+that in fact the number of iterations is
+
+32
+00:02:13,486 --> 00:02:17,827
+迭代次数是个非常小的数，意味着这个算法可以找到碰撞
+gonna be very, very small which means that
+this algorithm will find the collision in
+
+33
+00:02:17,827 --> 00:02:22,215
+以大约正比于2的N/2次方的时间。为了分析这种攻击
+time that's roughly proportional two to
+the N over two. So to analyze this type of
+
+34
+00:02:22,215 --> 00:02:26,853
+我必须告诉大家一点关于生日悖论的知识
+attack, I have to tell you a little bit
+about the birthday paradox. I imagine some
+
+35
+00:02:26,853 --> 00:02:30,862
+我想一些人已经听说过生日悖论了
+of you have already heard about the
+birthday paradox. Here stated as a
+
+36
+00:02:30,862 --> 00:02:35,213
+这里写成定理的形式，我想给大家证明之，
+因为每个人都应该一辈子至少见过一次
+theorem, and I wanna prove it to you
+because everybody should see a proof of
+
+37
+00:02:35,213 --> 00:02:39,679
+生日悖论的证明。那么这就是证明
+the birthday paradox at least once in
+their lives. So here it is, so imagine we
+
+38
+00:02:39,679 --> 00:02:44,322
+设想我们有N个随机变量R1,R2,...,R_N，取值范围
+在从1到B的区间里
+have N random variables R-one to R-N in
+the interval one to B. And the only thing
+
+39
+00:02:44,322 --> 00:02:48,462
+我的唯一的假设是，这N个随机变量是相互独立的
+I'm gonna assume about them is that
+they're actually independent of one
+
+40
+00:02:48,462 --> 00:02:52,948
+这N个样本R1,...,R_N在这个区间里相互独立是很重要的
+another. That's crucial that these N
+samples R-one to R-N in this interval are
+
+41
+00:02:52,948 --> 00:02:57,606
+而且它们还是同分布的
+independent of one another. And they also
+happen to be distributed identically. So
+
+42
+00:02:57,606 --> 00:03:02,149
+例如，它们可能都是在从1到B的区间里均匀分布的
+for example, they might all be uniform in
+the interval one to B, but again these
+
+43
+00:03:02,149 --> 00:03:06,806
+但它们还是独立的均匀分布的变量。但如果我们
+would be independently uniform variables.
+Now it so happens that if we set N to B
+
+44
+00:03:06,806 --> 00:03:11,637
+把N设置为B的平方根大小，换句话说，如果我们
+从区间1到B内取样约B的平方根次
+about the square root of B, in other words
+if we sample roughly the square root of B
+
+45
+00:03:11,637 --> 00:03:16,646
+精确地说，是1.2乘以B的平方根次
+samples from the interval one to B, And to
+be precise, it's one point two times the
+
+46
+00:03:16,646 --> 00:03:21,501
+那么样本中有两个是一样的概率
+square root of B. Then the probability
+that two of those samples will be the same
+
+47
+00:03:21,501 --> 00:03:25,576
+至少是1/2。事实上均匀分布
+is at least a half. Okay, then it turns
+out in fact the uniform distribution is
+
+48
+00:03:25,576 --> 00:03:29,557
+是生日悖论中的最坏情况。换句话说
+the worst case for the birthday paradox.
+In other words, if the distribution from
+
+49
+00:03:29,557 --> 00:03:33,340
+如果Ri取样的分布不是均匀的，事实上
+which the R-I's are sampled from is
+non-uniform, that in fact fewer than one
+
+50
+00:03:33,340 --> 00:03:36,724
+需要的取样次数要少于1.2乘以B的平方根
+point two times the square root of B
+samples are needed. The uniform
+
+51
+00:03:36,724 --> 00:03:40,357
+均匀分布是最坏的情况。那么我们证明均匀分布的情况
+distribution is the worst case. So we're
+gonna prove this for the uniform
+
+52
+00:03:40,357 --> 00:03:44,288
+也就能证明其他分布的情况
+distribution and that basically also
+proves it for all other distributions. But
+
+53
+00:03:44,288 --> 00:03:48,320
+但我们这里给大家的证明只对均匀分布成立
+the proof that I wanna show you here will
+hold just for the uniform distribution.
+
+54
+00:03:48,320 --> 00:03:53,260
+我们来进行这个并不困难的证明
+Okay, so let's do the proof that's
+actually not difficult at all. So we're
+
+55
+00:03:53,260 --> 00:03:58,810
+我们要求，存在一对i和j，i不等于j
+asking what is the probability that there
+exists an I that is not equal to J such
+
+56
+00:03:58,810 --> 00:04:04,089
+满足Ri等于Rj的概率。我们求互斥事件的概率，
+就是说我们所求概率为1减去
+that RI is equal to RJ. Well, let's negate
+that so it's basically one minus the
+
+57
+00:04:04,089 --> 00:04:09,638
+对所有i不等于j都有Ri不等于Rj的概率
+probability that for all I not equal to J
+we have that RI is not equal to RJ. This
+
+58
+00:04:09,638 --> 00:04:15,133
+这意味着我们选择的N个样本里没有发生碰撞
+basically means that no collision occurred
+among the N samples that we chose. Well
+
+59
+00:04:15,133 --> 00:04:19,330
+我们试着更精确地把这个写下来
+let's try to write this out more
+precisely. Well we're gonna write this as
+
+60
+00:04:19,330 --> 00:04:23,924
+我们写成1减去某个数的形式。现在当我们选择
+R1时，这是我们第一次选择
+one minus. And now when we choose R-one,
+basically it's the first one we choose so
+
+61
+00:04:23,924 --> 00:04:28,462
+所以是不会发生任何碰撞的。但现在当我们取R2时
+it's not gonna collide with anything. But
+now let's look at what happens when we
+
+62
+00:04:28,462 --> 00:04:32,829
+我问大家，R2不与R1碰撞的概率是多少？
+choose R-two, when we choose R-two, let me
+ask you, what is the probability that
+
+63
+00:04:32,829 --> 00:04:38,390
+R1已经占了一个位置，所以有B-1个剩余位置
+R-two does not collide with R-one? Well,
+R-one takes one slot so there are B minus
+
+64
+00:04:38,390 --> 00:04:44,027
+如果R2落在这B-1个剩余位置中，将不会与R1碰撞
+one slots that if R-two falls into it's
+not gonna collide with R-one. So in other
+
+65
+00:04:44,027 --> 00:04:49,665
+换句话说，R2不与R1碰撞的概率是
+words the probability that R-two does not
+collide with R-one is B minus one slot
+
+66
+00:04:49,665 --> 00:04:54,604
+(B-1)/B。类似地，当我们选择R3时
+divided by all B possible slots.
+Similarly, when we pick R-three, what is
+
+67
+00:04:54,604 --> 00:05:00,057
+R3不与R1或R2碰撞的概率是多少？
+the probability that R-three does not
+collide with either R-one or R-two? Again,
+
+68
+00:05:00,057 --> 00:05:05,425
+同样的，R1和R2占了两个位置，所以有B-2个剩余位置
+R-one and R-two take up two slots. And so
+there are B minus two slots that remain
+
+69
+00:05:05,425 --> 00:05:10,860
+如果R3落在B-2个剩余位置中的任何一个
+for R-three if it falls into either one of
+those B minus two slots it's not gonna
+
+70
+00:05:10,860 --> 00:05:16,409
+将不会与R1或R2发生碰撞。我想大家已看出这个模式了
+collide with either R-one or R-two. So I
+imagine you see the pattern now, so R-four
+
+71
+00:05:16,409 --> 00:05:21,838
+R4不与R1,R2,R3碰撞的概率是(B-3)/B
+it's probability of not colliding with
+R-one, R-two, or R-three is B minus three
+
+72
+00:05:21,838 --> 00:05:26,786
+等等。。直到我们获得了最后的R_N
+over B. And so on and so forth until we
+get to the very last R-N and the
+
+73
+00:05:26,786 --> 00:05:32,215
+R_N不与之前所有Ri碰撞的概率是多少？
+probability that R-N does not collide with
+the previous R-I's, well, there are N
+
+74
+00:05:32,215 --> 00:05:37,644
+有N-1个位置已经被前面的Ri占了。
+如果R_N落在了剩下的B-N+1个位置中
+minus one slots taken up by the previous
+R-I's. So, if R-N falls into any of the
+
+75
+00:05:37,644 --> 00:05:42,561
+它将不会和任何前面的R1到R_N-1发生碰撞
+remaining B minus N plus one slots, it's
+not gonna collide with any of the previous
+
+76
+00:05:42,561 --> 00:05:46,798
+现在大家注意到，我可以把这些概率乘起来的原因
+R-one to R-N minus one. Now you notice
+that the reason I was able to multiply all
+
+77
+00:05:46,798 --> 00:05:51,192
+正是因为这些Ri是相互独立的
+these probabilities is exactly because the
+R-I's are all independent of one another.
+
+78
+00:05:51,192 --> 00:05:55,567
+对于这步来说独立性很重要。这些Ri是相互独立的
+So it's crucial for the step. That the
+R-I's are independent. So let me rewrite
+
+79
+00:05:55,567 --> 00:06:00,559
+让我把这个表达式稍微重写一下。我把它写成
+1减去i从1到N-1，1-i/B的乘积
+this expression a little bit. Let me write
+it as one minus the product of I goes to N
+
+80
+00:06:00,559 --> 00:06:05,533
+我只是把它写成了一个大乘积的形式
+minus one of one minus I over B. Okay. All
+I did is I just rewrote this as a big
+
+81
+00:06:05,533 --> 00:06:10,264
+而不是逐项写出。现在我将使用
+product as opposed to writing the terms
+individually. So now I'm gonna use the
+
+82
+00:06:10,264 --> 00:06:15,358
+标准不等式，告诉我们对任何正X
+standard inequality that says that for any
+positive X, one minus X is less than E to
+
+83
+00:06:15,358 --> 00:06:20,271
+1-X小于e^-X。这是容易看出的，因为e^-X
+the minus X. And that's actually easy to
+see because E to the minus X, if you look
+
+84
+00:06:20,271 --> 00:06:25,123
+如果你看它的泰勒展开，是1减去X加上X的平方
+除以2，再减去。。等等
+at its Taylor expansion, is one minus X
+plus X squared over two minus and so on
+
+85
+00:06:25,123 --> 00:06:29,915
+你可以看到我们忽略了泰勒展开的高次项
+and so forth. And so you can see that
+we're basically ignoring this latter part
+
+86
+00:06:29,915 --> 00:06:34,970
+高次项正好是正的，因此
+of the Taylor expansion, which happens to
+be positive and as a result the left side
+
+87
+00:06:34,970 --> 00:06:39,644
+左边比右边小。我们带入这个不等式
+is gonna be smaller than the right-hand
+side. Okay, so let's plug this inequality
+
+88
+00:06:39,644 --> 00:06:44,716
+得到什么呢？我们得到这个概率大于1减去
+in, and what do we get? We get that this
+is greater than one minus the product of I
+
+89
+00:06:44,716 --> 00:06:49,988
+i从1到N-1，e^-i/B的乘积
+goes from one to N minus one of E to the
+minus I over B okay, simply plugged in X
+
+90
+00:06:49,988 --> 00:06:54,980
+各项带入X=i/B即可。接下来
+equals I over B for each one of those
+terms. And the next thing about
+
+91
+00:06:54,980 --> 00:07:00,985
+指数值相乘只需将指数相加。因此
+exponentials is that we multiply them, the
+exponents add. As a result this is simply
+
+92
+00:07:00,985 --> 00:07:06,773
+这是1减去e的某个次方，这里我把1/B
+equal to one minus E to the power of, here
+let me take the one over B out of the
+
+93
+00:07:06,773 --> 00:07:12,455
+从括号里提取了出来，指数变成了i从1到N-1，各项之和
+parentheses, sum of I goes from one to N
+minus one of I. Okay. So, all I did was I
+
+94
+00:07:12,455 --> 00:07:17,594
+我把-1/B从括号里提取出来，只剩下
+took the minus one over B out of the
+parentheses and we're left with simple sum
+
+95
+00:07:17,594 --> 00:07:22,423
+从1到N-1的简单求和了。1到N-1的整数和
+of one to N minus one. And so the sum of
+the integers from 1 to N minus one is
+
+96
+00:07:22,423 --> 00:07:27,624
+是N乘以N-1除以2，有上界N平方除以2
+simply N times N minus one over two which
+it can bound by N squared over two. And so
+
+97
+00:07:27,624 --> 00:07:32,638
+所以我这里最终得到的是1减去e^(-N^2/B)
+really what I get at the end here is one
+minus E to the power of minus N squared
+
+98
+00:07:32,638 --> 00:07:38,448
+好，我这里用N平方除以2来表示这个求和
+over two B. Okay, I literally downed it to
+sum here by N squared over two. Okay, very
+
+99
+00:07:38,448 --> 00:07:44,226
+很好。那么现在对于N平方除以2B，我们能做什么？
+good. So now what do we do about N squared
+over two B? Well, we can derive exactly
+
+100
+00:07:44,226 --> 00:07:49,860
+我们可以从这里的关系精确地推出N平方除以2B是什么
+what N squared over two B is from the
+relationship here. So if you think about
+
+101
+00:07:49,860 --> 00:07:55,493
+如果考虑N平方除以2是1.2的平方除以2
+it, let's look at N squared over two.
+Well, N squared over two is 1.2 squared
+
+102
+00:07:55,493 --> 00:08:01,127
+1.2的平方是1.44，除以2是0.72
+over two. 1.2 squared is 1.44 divided by
+two is .72 times the square root of B
+
+103
+00:08:01,127 --> 00:08:08,629
+0.72乘以B的平方根的平方，也就是B。好
+N平方除以2是0.72B，因此
+squared which is B. Okay so N squared over
+two is .72B, and as a result, N squared
+
+104
+00:08:08,629 --> 00:08:16,042
+N平方除以2B就是0.72。这样我们获得了1-e^-0.72
+over 2B is just .72. So we get 1-E, which
+is a power of minus 0.72. Well so now you
+
+105
+00:08:16,042 --> 00:08:20,457
+现在使用计算器，可以算出答案是0.53
+just plug this in to your calculator and
+you get 0.53, which as far as I know, is
+
+106
+00:08:20,457 --> 00:08:24,871
+目前我知道，0.53总是大于F的。这就证明了生日悖论
+always bigger than F. So this proves the
+Birthday Paradox and you notice that it
+
+107
+00:08:24,871 --> 00:08:29,285
+大家注意到样本的相互独立性的重要性了
+was crucial to a string that the samples
+are independent of one another, we only
+
+108
+00:08:29,285 --> 00:08:33,810
+我们只证明了均匀分布的情况。不过我说过
+proved that for the uniform distribution.
+But as I said it is actually fairly easy
+
+109
+00:08:33,810 --> 00:08:38,390
+实际上容易证明，任何不是均匀分布的分布
+to argue now that any distribution that is
+away from the uniform distribution will
+
+110
+00:08:38,390 --> 00:08:42,977
+都会以一个更低的下界满足该性质。如果你有
+1.2乘以B的平方根个样本
+satisfy this with even a lower balance. So
+if you have 1.2 squared of B, the theorem
+
+111
+00:08:42,977 --> 00:08:47,245
+这个定理对非均匀分布也当然成立
+will certainly hold for non-uniform
+distributions. The reason it is called a
+
+112
+00:08:47,245 --> 00:08:51,846
+它之所以被称为悖论，是因为平方根函数增长缓慢
+paradox is because it is very paradoxical
+that the square root function grows very
+
+113
+00:08:51,846 --> 00:08:56,336
+与人的直觉相悖。特别地，如果你试图把这个
+应用到生日上
+slowly. In particular if you try to apply
+this to birth dates, so let's assume that
+
+114
+00:08:56,336 --> 00:09:00,771
+我们假设一间房间里有很多人，假设他们的生日
+we have a number of people in a room, and
+let's assume that their birth dates are
+
+115
+00:09:00,771 --> 00:09:05,454
+互相独立，而且是365天均匀分布的
+independent of one another and are uniform
+in their interval one through 365. Then
+
+116
+00:09:05,454 --> 00:09:12,418
+那么生日悖论告诉我们，我们需要约1.2乘以365的平方根
+what the Birthday Paradox says is that we
+need roughly 1.2 times the square root of
+
+117
+00:09:12,418 --> 00:09:17,098
+我想也就是约23人，在一个房间里
+365. Which i believe is something like 23,
+which says we need roughly 23 people in a
+
+118
+00:09:17,098 --> 00:09:21,502
+以概率1/2，其中有两人有着相同的生日
+room, and then with probability one half,
+two of them will actually have the same
+
+119
+00:09:21,502 --> 00:09:25,686
+它被称为悖论的原因，是因为对人来说
+birth date. The reason it is called a
+paradox is because the number 23 seems
+
+120
+00:09:25,686 --> 00:09:30,035
+23似乎是很小的，根据这个定理，我们证明了
+really small to people, and yet by this
+theorem we just proved, with probability
+
+121
+00:09:30,035 --> 00:09:34,109
+以1/2的概率，23人中会有两人的生日相同
+one half, there will be two people with
+the same birth date. By the way the
+
+122
+00:09:34,109 --> 00:09:38,292
+顺便一说，这个事实成立的直观解释是：
+因为碰撞实际上
+intuition for why this fact is true is
+because really what the collision is
+
+123
+00:09:38,292 --> 00:09:42,861
+是要看所有可能的配对。如果你有
+counting is it is looking at all possible
+pairs of people. And if you have a square
+
+124
+00:09:42,861 --> 00:09:47,627
+B的平方根个人，那么就有了B^2的平方根个配对
+root of B people, then there are square
+root of B squared pairs. Roughly, which is
+
+125
+00:09:47,627 --> 00:09:52,248
+大约就是B个配对，因此很有可能每个配对
+roughly B pairs total and so it's very
+likely that each pair collides probability
+
+126
+00:09:52,248 --> 00:09:56,870
+以1/B的概率碰撞，如果你有B个配对，就很有可能
+其中有一个配对发生了碰撞
+one over B and if you have B pairs, it's
+likely that one of the pairs will collide.
+
+127
+00:09:56,870 --> 00:10:01,312
+希望这能给出这个平方根的直观解释
+So hopefully this gives the intuition for
+where the square root comes from. It's
+
+128
+00:10:01,312 --> 00:10:05,924
+这是基于一个事实，如果房间里有N个人
+basically from the fact that if you have N
+people in the room, there are N squared
+
+129
+00:10:05,924 --> 00:10:10,423
+就有N平方个可能的配对。我应该顺便一说，
+即使生日悖论经常被用到生日上
+possible pairs. I should say by the way
+that even though the Birthday Paradox is
+
+130
+00:10:10,423 --> 00:10:14,923
+生日实际上却根本不是均匀分布的
+often applied to birth dates, birth dates
+are actually not uniform at all. If you
+
+131
+00:10:14,923 --> 00:10:19,309
+如果你看实际中人们的生日，可以看到
+actually look at the birth dates of
+people, you see that there is a very clear
+
+132
+00:10:19,309 --> 00:10:23,696
+九月的生日有明显的不均匀，而且出于某些奇葩原因
+bias towards being born in September, and
+for me bazaar reason there is also a
+
+133
+00:10:23,696 --> 00:10:27,984
+星期二出生的也有不均匀。所以当我们对生日
+biased towards being born on a Tuesday.
+And so when we apply the birthday paradox
+
+134
+00:10:27,984 --> 00:10:31,975
+应用生日悖论时，事实上下界还要比
+1.2乘以B的平方根更低些
+to birthdays, in fact the actual bound is
+going to be smaller than one point two
+
+135
+00:10:31,975 --> 00:10:36,164
+因为我们说过，对于不均匀的分布来说
+square root of B because we said that for
+non even form distributions you need even
+
+136
+00:10:36,164 --> 00:10:40,230
+在碰撞前，你需要更少的样本。我给大家看
+fewer samples before you get a collision.
+So let me show you how to graph the
+
+137
+00:10:40,230 --> 00:10:44,494
+生日悖论的图表。它的表现很有趣
+Birthday Paradox, its quite interesting
+how it behaves. So here set B to be a
+
+138
+00:10:44,494 --> 00:10:49,039
+这里B设置为一百万，换句话说，我们从1到一百万中
+均匀随机地选取样本
+million, in other words we are picking
+random uniform samples in the range one to
+
+139
+00:10:49,039 --> 00:10:53,472
+这里X轴是我们选取的样本数
+a million. And the X axis here, is the
+number of samples that we are picking, and
+
+140
+00:10:53,472 --> 00:10:58,073
+Y轴是我们选取的样本中发生碰撞的概率
+the Y axis, is the probability that we get
+a collision among those N samples. So we
+
+141
+00:10:58,073 --> 00:11:02,170
+我们看到，1/2概率发生在1.2乘以B的平方根附近
+see that the probability of one half
+happens around 1.2 square root of B.
+
+142
+00:11:02,170 --> 00:11:06,486
+约1200，即1.2倍的B的平方根。大家看到
+Roughly twelve hundreds, 1.2 square root
+of B. And you see that if we look at
+
+143
+00:11:06,486 --> 00:11:10,689
+如果我们就看B的平方根，碰撞概率约0.4
+exactly the square root of B, the
+probability of a collisions is around .4
+
+144
+00:11:10,689 --> 00:11:14,835
+或0.41.大家注意到这个概率很快地逼近1
+or .41. And you notice that the
+probability goes up to one extremely fast.
+
+145
+00:11:14,835 --> 00:11:19,209
+例如，在大约2倍的B的平方根处
+For example, already at roughly two square
+root of B, but the probability of a
+
+146
+00:11:19,209 --> 00:11:23,355
+碰撞概率已经达到90%。类似的，当我们看
+低于B的平方根的部分时
+collision is already 90%. Similarly, when
+we go bellow square root of B, the
+
+147
+00:11:23,355 --> 00:11:27,632
+碰撞概率以非常快的速度减到0
+probability of a collision very, very
+quickly drops to zero. Okay, so there is
+
+148
+00:11:27,632 --> 00:11:32,199
+在B的平方根处，有一个阈值效应
+kind of a threshold phenomena around
+square root of B, where the probability of
+
+149
+00:11:32,199 --> 00:11:36,767
+在B的平方根之上，碰撞概率很快逼近1；
+在B的平方根之下，碰撞概率很快逼近0
+a collision goes to one very quickly,
+above square root of B drops to zero very
+
+150
+00:11:36,767 --> 00:11:41,507
+现在我们可以分析攻击算法了
+quickly below square root of B. So now we
+can analyze the attack algorithms, so let
+
+151
+00:11:41,507 --> 00:11:45,843
+我提醒一下大家，这里我们选择区间中的两个数
+me remind you, here we chose, two to the
+interval two random elements in the
+
+152
+00:11:45,843 --> 00:11:51,089
+信息空间中的两个随机元素，我们求它们的哈希值。
+我们从这个信息空间的一个随机分布开始
+message space, we hashed them. And so we
+started off with a random distribution in
+
+153
+00:11:51,089 --> 00:11:56,306
+在我们求它们的哈希值后，我们最终得到了某个分布
+the message space, after we hashed them, we
+end up with some distribution, this
+
+154
+00:11:56,306 --> 00:12:01,523
+这个标签上的分布可能不是均匀的，我们不在乎
+distribution over tags might not be
+uniform, but we don't care, the point is
+
+155
+00:12:01,523 --> 00:12:07,289
+关键是所有这些标签T1,T2,...,T_N/2，是互相独立的
+that all these tags T1 to T2 to the N over
+two, are independent of one another. If we
+
+156
+00:12:07,289 --> 00:12:11,941
+如果我们选择2的N/2次方或1.2的N/2次方个标签
+choose two to the N over two or 1.2 to
+the N over two, tags, the probability that
+
+157
+00:12:11,941 --> 00:12:16,285
+存在碰撞的概率大约是1/2。那么我问大家
+the collision will exist is roughly one
+half. So let me ask you then, in that
+
+158
+00:12:16,285 --> 00:12:21,028
+这时，我们必须迭代这个算法多少次
+case, how many times do we have to iterate
+this algorithm before we actually find a
+
+159
+00:12:21,028 --> 00:12:25,688
+直到发现一个碰撞呢？由于每轮迭代会以1/2的概率
+collision? Well then since each iteration
+is going to find a collision with
+
+160
+00:12:25,688 --> 00:12:30,202
+找到碰撞，我们平均需要迭代两次
+probability one half, we have to iterate
+about two times in expectation. And as a
+
+161
+00:12:30,202 --> 00:12:34,547
+因此这个算法的运行时间是2的N/2次方
+result the running time of this algorithm
+is basically two to the N over two
+
+162
+00:12:34,547 --> 00:12:39,251
+乘以哈希函数的计算时间。也要注意，这个算法
+evaluations of the hash function. Okay so
+notice also this algorithm takes a lot of
+
+163
+00:12:39,251 --> 00:12:43,652
+需要大量的空间，但我们先忽略空间的问题
+space but we're gonna ignore the space
+issue and we're just gonna focus on the
+
+164
+00:12:43,652 --> 00:12:47,831
+仅关注运行时间。这个方法很不错
+running time. Okay so this is kinda cool,
+this says that if your hash
+
+165
+00:12:47,831 --> 00:12:52,400
+如果你的哈希函数输出N位，总是存在一个攻击算法
+function outputs N-bits outputs
+there will always be an attack algorithm
+
+166
+00:12:52,400 --> 00:12:56,634
+用2的N/2次方的时间发现碰撞。比如，如果我们输出128位
+that runs in time two to the N over two.
+So for example if we output 128 bit
+
+167
+00:12:56,634 --> 00:13:01,655
+在2的64次方的时间里，可以找到一个碰撞
+outputs. Then a collision could be found in
+time two to the sixty four, which is not considered
+
+168
+00:13:01,655 --> 00:13:05,989
+这将不是充分安全的。好，这就是为什么抗碰撞的哈希函数
+sufficiently secure. Okay, this is why
+collision resistant hash functions,
+
+169
+00:13:05,989 --> 00:13:10,564
+通常不输出128位。我给大家看一些例子
+generally are not going to output 128
+bits. So let me show you some examples.
+
+170
+00:13:10,564 --> 00:13:15,019
+第一批三个联邦标准：SHA-1，SHA-256和SHA-512
+The first three are actually federal
+standards, SHA-1, SHA-256, and SHA-512
+
+171
+00:13:15,019 --> 00:13:19,834
+第四个是来自AES的设计者们的，叫做Whirlpool
+and the fourth one is an example from
+the designers of AES, called Whirlpool,
+
+172
+00:13:19,834 --> 00:13:24,650
+你能看到SHA-1输出160位，因此一个通用攻击
+and so you can see SHA-1 outputs 160
+bits and as a result there is a generic
+
+173
+00:13:24,650 --> 00:13:28,835
+运行时间为2的80次方，SHA-256输出256位
+attack on it that runs on
+time two to the eighty. SHA-256 outputs 256
+
+174
+00:13:28,835 --> 00:13:33,496
+通用攻击运行时间为2的128次方，等等
+bits so the generic attack will run
+in time two to the 128 and so on and so
+
+175
+00:13:33,496 --> 00:13:37,887
+我也把这些算法的速度列在这里了。大家注意到
+forth. I also listed the speed of these
+algorithms and you notice that the bigger
+
+176
+00:13:37,887 --> 00:13:41,790
+分组越大，算法越慢
+the block size actually the slower the
+algorithm is. So there's a
+
+177
+00:13:41,790 --> 00:13:46,127
+有一个性能上的亏损，但安全性上有很多好处
+performance penalty but nevertheless
+there's quite a bit of benefit in terms of
+
+178
+00:13:46,127 --> 00:13:50,213
+大家注意SHA函数是灰色的
+security. Now you notice the SHA
+function is actually greyed out. The
+
+179
+00:13:50,213 --> 00:13:53,970
+尽管没有人发现SHA-1的碰撞
+SHA function although nobody has
+found collisions for SHA-1 yet
+
+180
+00:13:53,970 --> 00:13:58,133
+在新项目里，编程项目里
+It is still recommended that in a new
+project, and hopefully programing projects
+
+181
+00:13:58,133 --> 00:14:02,088
+不推荐使用SHA-1。可以使用SHA-256
+in this class, you don't use SHA-1,
+instead you use SHA-256. In particular
+
+182
+00:14:02,088 --> 00:14:06,459
+特别地，SHA-1有一个理论上的碰撞发现算法
+there is actually a theoretical collision
+finder on SHA-1 that works in time two
+(2的51次方的攻击被原作者收回了，目前最好的是2^61)
+
+183
+00:14:06,459 --> 00:14:10,727
+需要2的51次方的时间。所以某人发现一个
+SHA-1的碰撞几乎只是时间问题
+to the 51. So it is probably just a matter
+of time until someone finds a collision
+
+184
+00:14:10,727 --> 00:14:14,994
+所以这些都不能用了。目前的建议是
+for SHA-1, and just kills altogether,
+but the current advice is that SHA-1 is
+
+185
+00:14:14,994 --> 00:14:19,261
+SHA-1依然算一个抗碰撞的哈希函数，
+因为还没有人能找到碰撞
+still a collision resistant hash function
+because nobody has found collisions for
+
+186
+00:14:19,261 --> 00:14:23,164
+但是几乎只是时间问题，可能几个月，或几年
+it, but it is probably just a matter of
+time, just a few months, or few years,
+
+187
+00:14:23,164 --> 00:14:27,397
+直到一个碰撞被发现。这个结果告诉我们，
+新的产品和项目不应再用SHA-1
+until a collision is found. It is a result
+a new product and new projects SHA-1
+
+188
+00:14:27,397 --> 00:14:31,199
+应该只用SHA-256
+should not be used and only use
+SHA-256 or if you wanna be even
+
+189
+00:14:31,199 --> 00:14:34,546
+如果你想更谨慎点，可以使用SHA-512
+more cautious then use SHA-512. So this is the end of this
+
+190
+00:14:34,546 --> 00:14:37,322
+本节完结，现在我们看如何构建抗碰撞的哈希
+segment, and now we are going to turn
+building collision resistant hash
