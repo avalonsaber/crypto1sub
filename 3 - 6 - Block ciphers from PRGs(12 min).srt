@@ -1,948 +1,948 @@
 1
 00:00:00,000 --> 00:00:04,388
-±¾½ÚÎÒÃÇÑĞ¾¿ÊÇ·ñ¿ÉÒÔ´Ó¸ü¼òµ¥µÄÔ­ĞÍ
+æœ¬èŠ‚æˆ‘ä»¬ç ”ç©¶æ˜¯å¦å¯ä»¥ä»æ›´ç®€å•çš„åŸå‹
 In this segment we ask whether we can
 build block ciphers from simpler
 
 2
 00:00:04,388 --> 00:00:09,456
-±ÈÈçÎ±Ëæ»úÊı·¢ÉúÆ÷£¬À´¹¹½¨·Ö×éÃÜÂë
-´ğ°¸ÊÇ¿Ï¶¨µÄ¡£Ò»¿ªÊ¼
+æ¯”å¦‚ä¼ªéšæœºæ•°å‘ç”Ÿå™¨ï¼Œæ¥æ„å»ºåˆ†ç»„å¯†ç 
+ç­”æ¡ˆæ˜¯è‚¯å®šçš„ã€‚ä¸€å¼€å§‹
 primitives like pseudo random generators.
 The answer is yes. So to begin with, let's
 
 3
 00:00:09,456 --> 00:00:14,215
-ÎÒÃÇÑĞ¾¿ÊÇ·ñ¿ÉÒÔ´ÓÎ±Ëæ»úÊı·¢ÉúÆ÷
-¹¹½¨Î±Ëæ»úº¯Êı
+æˆ‘ä»¬ç ”ç©¶æ˜¯å¦å¯ä»¥ä»ä¼ªéšæœºæ•°å‘ç”Ÿå™¨
+æ„å»ºä¼ªéšæœºå‡½æ•°
 ask whether we can build pseudo random
 functions as opposed to pseudo random
 
 4
 00:00:14,215 --> 00:00:18,789
-¶ø²»ÊÇÎ±Ëæ»úÖÃ»»¡£ÎÒÃÇÄÜ·ñÓÉPRG¹¹½¨PRF£¿
+è€Œä¸æ˜¯ä¼ªéšæœºç½®æ¢ã€‚æˆ‘ä»¬èƒ½å¦ç”±PRGæ„å»ºPRFï¼Ÿ
 permutations from a pseudo random
 generator. Can we build a PRF from a PRG?
 
 5
 00:00:18,789 --> 00:00:23,873
-¾¡¹ÜÎÒÃÇµÄ×îÖÕÄ¿±êÊÇ¹¹½¨Ò»¸ö·Ö×éÃÜÂë
-±¾ÖÊÉÏÊÇ¸öPRP
+å°½ç®¡æˆ‘ä»¬çš„æœ€ç»ˆç›®æ ‡æ˜¯æ„å»ºä¸€ä¸ªåˆ†ç»„å¯†ç 
+æœ¬è´¨ä¸Šæ˜¯ä¸ªPRP
 Our ultimate goal though is to build a
 block cipher which is a PRP. And we'll get
 
 6
 00:00:23,873 --> 00:00:29,130
-ÎÒÃÇ×îºó»áÊµÏÖÖ®¡£ºÃ£¬ÏÖÔÚÎÒÃÇ¹¹½¨Ò»¸öPRF
-ÎÒÃÇ´ÓPRG¿ªÊ¼
+æˆ‘ä»¬æœ€åä¼šå®ç°ä¹‹ã€‚å¥½ï¼Œç°åœ¨æˆ‘ä»¬æ„å»ºä¸€ä¸ªPRF
+æˆ‘ä»¬ä»PRGå¼€å§‹
 to that at the end. Okay, for now we build
 a PRF. So let's start with a PRG that
 
 7
 00:00:29,130 --> 00:00:34,590
-PRGÓĞÁ½¸öÊäÈë£¬ÖÖ×Ó¾ÍÊÇÃÜÔ¿¿Õ¼äKÀïµÄÔªËØ
+è¿™ä¸ªPRGè¾“å‡ºé•¿åº¦æ˜¯è¾“å…¥é•¿åº¦çš„ä¸¤å€ï¼Œå…¶ç§å­å°±æ˜¯å¯†é’¥ç©ºé—´Ké‡Œçš„å…ƒç´ 
 doubles its inputs so the seeds for the
 PRG is an element in K and the output is
 
 8
 00:00:34,590 --> 00:00:39,420
-Êä³öÊµ¼ÊÉÏÊÇKÀïµÄÁ½¸öÔªËØ
-ÕâÀïÎÒÃÇÓĞ·¢ÉúÆ÷µÄ»úÖÆ
+è¾“å‡ºå®é™…ä¸Šæ˜¯Ké‡Œçš„ä¸¤ä¸ªå…ƒç´ 
+è¿™é‡Œæˆ‘ä»¬æœ‰å‘ç”Ÿå™¨çš„æœºåˆ¶
 actually two elements in K. So here we
 have a schematic of the generator, that
 
 9
 00:00:39,420 --> 00:00:44,296
-È¡ÊäÈëÎªCºÍK£¬È»ºóÊä³öÁ½¸öKÖĞÔªËØ
+å–è¾“å…¥ä¸ºCå’ŒKï¼Œç„¶åè¾“å‡ºä¸¤ä¸ªKä¸­å…ƒç´ 
 basically takes his input of C and K, and
 outputs two elements, in K as its output.
 
 10
 00:00:44,296 --> 00:00:48,992
-Õâ¸ö°²È«µÄÒâÒåÊÇÊ²Ã´£¿
+è¿™ä¸ªå®‰å…¨çš„æ„ä¹‰æ˜¯ä»€ä¹ˆï¼Ÿ
 And now what does it mean for this purity
 to be secure, recall this means that
 
 11
 00:00:48,992 --> 00:00:52,965
-¼ÇµÃÆäÒâÒåÊÇÊä³öÓëÒ»¸öK^2ÖĞµÄËæ»úÔªËØ
+è®°å¾—å…¶æ„ä¹‰æ˜¯è¾“å‡ºä¸ä¸€ä¸ªK^2ä¸­çš„éšæœºå…ƒç´ 
 essentially the output is
 indistinguishable from a random element
 
 12
 00:00:52,965 --> 00:00:58,355
-²»¿ÉÇø·Ö¡£ÆäÊµ¸ù¾İPRG£¬ÊÇ·Ç³£ÈİÒ×¶¨Òå
+ä¸å¯åŒºåˆ†ã€‚å…¶å®æ ¹æ®PRGï¼Œæ˜¯éå¸¸å®¹æ˜“å®šä¹‰
 inside of K squared. Now it turns out that
 it's very easy to define basically what's
 
 13
 00:00:58,355 --> 00:01:03,455
-PRFÖĞµÄÒ»Î»µÄ¡£PRFÖĞµÄÒ»Î»
+PRFä¸­çš„ä¸€ä½çš„ã€‚PRFä¸­çš„ä¸€ä½
 called a one bit PRF from this PRG. So
 what's a one bit PRF is basically a PRF
 
 14
 00:01:03,455 --> 00:01:08,360
-¾ÍÊÇËµPRFµÄ¶¨ÒåÓòÖ»ÓĞÒ»Î»¡£ºÃ
-Õâ¸öPRFÖ»È¡Ò»Î»×÷ÎªÊäÈë
+å°±æ˜¯è¯´PRFçš„å®šä¹‰åŸŸåªæœ‰ä¸€ä½ã€‚å¥½
+è¿™ä¸ªPRFåªå–ä¸€ä½ä½œä¸ºè¾“å…¥
 who's domain is only one bit. Okay, so
 it's a PRF that just takes one bit as
 
 15
 00:01:08,360 --> 00:01:13,461
-ºÃ£¬ÎÒÃÇËµ£¬Èç¹ûÊäÈëÎ»XÊÇ0
+å¥½ï¼Œæˆ‘ä»¬è¯´ï¼Œå¦‚æœè¾“å…¥ä½Xæ˜¯0
 input. Okay, and the way we'll do it is
 we'll say is if the input bit X is zero
 
 16
 00:01:13,461 --> 00:01:18,627
-ÎÒ»áÓÃ×ó±ßµÄÊä³ö£»Èç¹ûÊäÈëÎ»XÊÇ1
+æˆ‘ä¼šç”¨å·¦è¾¹çš„è¾“å‡ºï¼›å¦‚æœè¾“å…¥ä½Xæ˜¯1
 I'll put the left output and if the input
 bit X is one then I'll put the right
 
 17
 00:01:18,627 --> 00:01:23,678
-ÎÒ»áÓÃÓÒ±ßµÄPRFÊä³ö¡£ºÃ£¬ÎÒÃÇĞ´³É·ûºÅµÄĞÎÊ½
+æˆ‘ä¼šç”¨å³è¾¹çš„PRFè¾“å‡ºã€‚å¥½ï¼Œæˆ‘ä»¬å†™æˆç¬¦å·çš„å½¢å¼
 output of the PRF. Okay, in symbols we
 basically have what we wrote here. Now it
 
 18
 00:01:23,678 --> 00:01:28,523
-ÏÖÔÚºÜÖ±½ÓµØ¾Í¿´³É£¬ÊÂÊµÉÏÈç¹ûGÊÇ¸ö°²È«PRG
+ç°åœ¨å¾ˆç›´æ¥åœ°å°±çœ‹æˆï¼Œäº‹å®ä¸Šå¦‚æœGæ˜¯ä¸ªå®‰å…¨PRG
 is straightforward to show, that in fact G
 is a secure PRG, then this one bit PRF is
 
 19
 00:01:28,523 --> 00:01:32,901
-ÄÇÃ´Õâ¸öÒ»Î»PRFÒ²ÊÇ°²È«µÄ¡£´ó¼ÒÏëÒ»Ïë
+é‚£ä¹ˆè¿™ä¸ªä¸€ä½PRFä¹Ÿæ˜¯å®‰å…¨çš„ã€‚å¤§å®¶æƒ³ä¸€æƒ³
 in fact a secure PRF. If you think about
 it for a second, this really is
 
 20
 00:01:32,901 --> 00:01:37,571
-ÕâÆäÊµÊÇ·Ï»°£¬°ÑÍ¬ÑùµÄÊÂÇéËµÁËÁ½±é
+è¿™å…¶å®æ˜¯åºŸè¯ï¼ŒæŠŠåŒæ ·çš„äº‹æƒ…è¯´äº†ä¸¤é
 tautology. Its really just stating the
 same thing twice. So I will leave it for
 
 21
 00:01:37,571 --> 00:01:42,241
-ÎÒÁô¸ø´ó¼ÒË¼¿¼£¬Ëµ·ş×Ô¼º
+æˆ‘ç•™ç»™å¤§å®¶æ€è€ƒï¼Œè¯´æœè‡ªå·±
 you to think about this briefly and see
 and convince yourself that in fact this
 
 22
 00:01:42,241 --> 00:01:46,853
-Õâ¸ö¶¨ÀíÊÇÕıÈ·µÄ¡£ÕæÕıµÄÎÊÌâÊÇ
-ÎÒÃÇÄÜ·ñ¹¹½¨Ò»¸öPRF
+è¿™ä¸ªå®šç†æ˜¯æ­£ç¡®çš„ã€‚çœŸæ­£çš„é—®é¢˜æ˜¯
+æˆ‘ä»¬èƒ½å¦æ„å»ºä¸€ä¸ªPRF
 theorem is true. The real question is
 whether we can build a PRF, that actually
 
 23
 00:01:46,853 --> 00:01:51,756
-ËüµÄ¶¨ÒåÓò±ÈÒ»Î»¶à¡£ÀíÏëÇé¿öÏÂ£¬
-ÎÒÃÇÈÃ¶¨ÒåÓòÎª128Î»
+å®ƒçš„å®šä¹‰åŸŸæ¯”ä¸€ä½å¤šã€‚ç†æƒ³æƒ…å†µä¸‹ï¼Œ
+æˆ‘ä»¬è®©å®šä¹‰åŸŸä¸º128ä½
 has a domain that is bigger than one bit.
 Ideally we would like the domain to be 128
 
 24
 00:01:51,756 --> 00:01:56,425
-¾ÍÏñAESÒ»Ñù¡£ÄÇÃ´ÎÊÌâÊÇÎÒÃÇÄÜ·ñ
+å°±åƒAESä¸€æ ·ã€‚é‚£ä¹ˆé—®é¢˜æ˜¯æˆ‘ä»¬èƒ½å¦
 bits, just say as AES has. So
 the question is can we build 128 bit PRF
 
 25
 00:01:56,425 --> 00:02:01,197
-ÓÉÒ»¸öÎ±Ëæ»úÊı·¢ÉúÆ÷£¬¹¹½¨Ò»¸ö128Î»PRF£¿
-ÎÒÃÇÀ´¿´ÄÜ²»ÄÜÈ¡µÃ½øÕ¹
+ç”±ä¸€ä¸ªä¼ªéšæœºæ•°å‘ç”Ÿå™¨ï¼Œæ„å»ºä¸€ä¸ª128ä½PRFï¼Ÿ
+æˆ‘ä»¬æ¥çœ‹èƒ½ä¸èƒ½å–å¾—è¿›å±•
 from a pseudo random generator. Well so
 let's see if we can make progress. So the
 
 26
 00:02:01,197 --> 00:02:05,970
-ÄÇÃ´ÎÒÃÇÒª×öµÄµÚÒ»¼şÊÂÊÇ£¬´ÓÒ»¸öPRG³ö·¢
+é‚£ä¹ˆæˆ‘ä»¬è¦åšçš„ç¬¬ä¸€ä»¶äº‹æ˜¯ï¼Œä»ä¸€ä¸ªPRGå‡ºå‘
 first thing we're gonna do is we're gonna
 say, well again, let's start with a PRG
 
 27
 00:02:05,970 --> 00:02:10,863
-ÊäÈë³¤¶È·­±¶£¬ÎÒÃÇ¿´ÄÜ·ñ¹¹ÔìÒ»¸öPRG½ÓÊÜËÄ±¶ÊäÈë
+è¿™ä¸ªPRGå°†è¾“å…¥é•¿åº¦ç¿»å€ï¼Œæˆ‘ä»¬çœ‹èƒ½å¦æ„é€ ä¸€ä¸ªPRGæ¥å—å››å€è¾“å…¥
 that doubles its input, let's see if we can
 build a PRG that quadruples its inputs.
 
 28
 00:02:10,863 --> 00:02:15,797
-ºÃ°É£¿Ëü´ÓKÓ³Éäµ½K^4£¬¶ø²»ÊÇKµ½K^2£¬ºÃ
+å¥½å§ï¼Ÿå®ƒä»Kæ˜ å°„åˆ°K^4ï¼Œè€Œä¸æ˜¯Kåˆ°K^2ï¼Œå¥½
 Okay? So it goes from K to K to the fourth
 instead of K to K squared. Okay, so let's
 
 29
 00:02:15,797 --> 00:02:20,809
-ÄÇÃ´ÎÒÃÇÀ´¿´ÔõÃ´×öµÄ¡£ÎÒÃÇ´ÓÒ»¸ö³õÊ¼µÄPRG¿ªÊ¼
+é‚£ä¹ˆæˆ‘ä»¬æ¥çœ‹æ€ä¹ˆåšçš„ã€‚æˆ‘ä»¬ä»ä¸€ä¸ªåˆå§‹çš„PRGå¼€å§‹
 see how to do this. So here we start with
 our original PRG that just doubles its
 
 30
 00:02:20,809 --> 00:02:25,884
-À©³äËüµÄÊäÈë£¬¼Ç×¡ÕâÊÇ¸öPRG
+æ‰©å……å®ƒçš„è¾“å…¥ï¼Œè®°ä½è¿™æ˜¯ä¸ªPRG
 inputs, now remember that the fact that
 this is a PRG means that the output of the
 
 31
 00:02:25,884 --> 00:02:30,771
-ÒâÎ¶×ÅËüµÄÊä³öºÍKÖĞµÄÁ½¸öËæ»úÖµ²»¿ÉÇø·Ö
+æ„å‘³ç€å®ƒçš„è¾“å‡ºå’ŒKä¸­çš„ä¸¤ä¸ªéšæœºå€¼ä¸å¯åŒºåˆ†
 PRG is indistinguishable from two random
 values in K. Well, if the output looks
 
 32
 00:02:30,771 --> 00:02:35,847
-Èç¹ûÊä³öºÍKÖĞµÄÁ½¸öËæ»úÖµ¿´ÉÏÈ¥ºÜÏñ
-ÎÒÃÇ¿ÉÒÔ¶ÔÕâÁ½¸öÊä³öÔÙ´ÎÊ¹ÓÃ·¢ÉúÆ÷
+å¦‚æœè¾“å‡ºå’ŒKä¸­çš„ä¸¤ä¸ªéšæœºå€¼çœ‹ä¸Šå»å¾ˆåƒ
+æˆ‘ä»¬å¯ä»¥å¯¹è¿™ä¸¤ä¸ªè¾“å‡ºå†æ¬¡ä½¿ç”¨å‘ç”Ÿå™¨
 like two random values in K, we can simply
 apply the generator again to those two
 
 33
 00:02:35,847 --> 00:02:40,358
-ÄÇÃ´ÎÒÃÇËµ£¬¶Ô×ó±ßµÄÊä³öÓ¦ÓÃÒ»´Î·¢ÉúÆ÷
+é‚£ä¹ˆæˆ‘ä»¬è¯´ï¼Œå¯¹å·¦è¾¹çš„è¾“å‡ºåº”ç”¨ä¸€æ¬¡å‘ç”Ÿå™¨
 outputs. So let's say we apply the
 generator once to the left output, and
 
 34
 00:02:40,358 --> 00:02:45,342
-¶ÔÓÒ±ßÒ²Ó¦ÓÃÒ»´Î¡£ÎÒÃÇ³ÆÕâËÄÔª×éµÄÊä³ö
+å¯¹å³è¾¹ä¹Ÿåº”ç”¨ä¸€æ¬¡ã€‚æˆ‘ä»¬ç§°è¿™å››å…ƒç»„çš„è¾“å‡º
 once to the rights outputs. And we are
 going to call the output of that, this
 
 35
 00:02:45,342 --> 00:02:50,448
-ÎªG1K¡£ÎÒĞ´ÏÂÕâ¸ö·¢ÉúÆ÷Éú³ÉµÄ·ûºÅ
+ä¸ºG1Kã€‚æˆ‘å†™ä¸‹è¿™ä¸ªå‘ç”Ÿå™¨ç”Ÿæˆçš„ç¬¦å·
 quadruple of elements, we are, are going
 to call that G1K. And I wrote down in
 
 36
 00:02:50,448 --> 00:02:55,554
-µ«´ó¼Ò¿ÉÒÔ´ÓÕâ·ùÍ¼Àï¿´µ½
+ä½†å¤§å®¶å¯ä»¥ä»è¿™å¹…å›¾é‡Œçœ‹åˆ°
 symbols what this generator does, but you
 can see basically from this figure,
 
 37
 00:02:55,554 --> 00:03:00,862
-·¢ÉúÆ÷µ½µ××öÁËÊ²Ã´¡£ÏÖÔÚÎÒÃÇÓĞÒ»¸ö
-´ÓKµ½K^4µÄ·¢ÉúÆ÷
+å‘ç”Ÿå™¨åˆ°åº•åšäº†ä»€ä¹ˆã€‚ç°åœ¨æˆ‘ä»¬æœ‰ä¸€ä¸ª
+ä»Kåˆ°K^4çš„å‘ç”Ÿå™¨
 exactly how the generator works. So now
 that we have a generator from K to K to
 
 38
 00:03:00,862 --> 00:03:06,170
-ÎÒÃÇÓĞÁËÒ»¸öÁ½Î»µÄPRF
+æˆ‘ä»¬æœ‰äº†ä¸€ä¸ªä¸¤ä½çš„PRF
 the fourth, We actually get a two bit PRF.
 Namely, what we will do is, we will say,
 
 39
 00:03:06,170 --> 00:03:11,410
-¸ø¶¨Á½Î»£¬00,01,10»ò11£¬»áÈ·¶¨
+ç»™å®šä¸¤ä½ï¼Œ00,01,10æˆ–11ï¼Œä¼šç¡®å®š
 given two bits, 00, 01, 10 or 11, will
 imply output the appropriate block that
 
 40
 00:03:11,410 --> 00:03:16,070
-G1KÊä³öµÄºÏÊÊµÄ·Ö×é¡£ºÃ£¬ÏÖÔÚÎÒÃÇÓĞÁË
-Ò»¸öÓĞ4ÖÖ¿ÉÄÜÊäÈëµÄPRF
+G1Kè¾“å‡ºçš„åˆé€‚çš„åˆ†ç»„ã€‚å¥½ï¼Œç°åœ¨æˆ‘ä»¬æœ‰äº†
+ä¸€ä¸ªæœ‰4ç§å¯èƒ½è¾“å…¥çš„PRF
 the output of G1K. Okay, so now we can
 basically have a PRF that takes four
 
 41
 00:03:16,070 --> 00:03:21,061
-¶ø²»ÊÇÏñÇ°ÃæÄÇÑù£¬Ö»ÓĞÁ½ÖÖ¿ÉÄÜÊäÈëÁË
+è€Œä¸æ˜¯åƒå‰é¢é‚£æ ·ï¼Œåªæœ‰ä¸¤ç§å¯èƒ½è¾“å…¥äº†
 possible inputs as opposed to just two
 possible inputs as before. So the question
 
 42
 00:03:21,061 --> 00:03:26,113
-ÄÇÃ´ÎÊÌâÊÇÎªÊ²Ã´Õâ¸öG1ÊÇ°²È«µÄ£¿
-ÎªÊ²Ã´ÕâÊÇ¸ö°²È«µÄPRG£¿
+é‚£ä¹ˆé—®é¢˜æ˜¯ä¸ºä»€ä¹ˆè¿™ä¸ªG1æ˜¯å®‰å…¨çš„ï¼Ÿ
+ä¸ºä»€ä¹ˆè¿™æ˜¯ä¸ªå®‰å…¨çš„PRGï¼Ÿ
 you should be asking me is why is this G1
 case secure? Why is it a secure PRG? That
 
 43
 00:03:26,113 --> 00:03:30,611
-ÄÇ¾ÍÊÇÎªÊ²Ã´Õâ¸öËÄÔª×éÊä³öÓë
-Ëæ»úĞòÁĞ²»¿É±»Çø·Ö
+é‚£å°±æ˜¯ä¸ºä»€ä¹ˆè¿™ä¸ªå››å…ƒç»„è¾“å‡ºä¸
+éšæœºåºåˆ—ä¸å¯è¢«åŒºåˆ†
 is why is this quadruple of outputs
 indistinguishable from random. And so
 
 44
 00:03:30,611 --> 00:03:35,664
-ÎÒÃÇÀ´¿ìËÙÖ¤Ã÷Ò»ÏÂ£¬ÒÔÍ¼µÄĞÎÊ½
+æˆ‘ä»¬æ¥å¿«é€Ÿè¯æ˜ä¸€ä¸‹ï¼Œä»¥å›¾çš„å½¢å¼
 let's do a quick proof of this, we'll just
 do a simple proof by pictures. So here's
 
 45
 00:03:35,664 --> 00:03:40,408
-ÕâÊÇÎÒÃÇµÄ·¢ÉúÆ÷£¬ÎÒÃÇÊÔÍ¼Ö¤Ã÷Æä°²È«ĞÔ
+è¿™æ˜¯æˆ‘ä»¬çš„å‘ç”Ÿå™¨ï¼Œæˆ‘ä»¬è¯•å›¾è¯æ˜å…¶å®‰å…¨æ€§
 our generator that we want to prove is
 secure. And what that means is that we
 
 46
 00:03:40,408 --> 00:03:45,399
-ÕâÒâÎ¶×ÅÎÒÃÇÏëÖ¤Ã÷Õâ¸ö·Ö²¼ÊÇÓë
+è¿™æ„å‘³ç€æˆ‘ä»¬æƒ³è¯æ˜è¿™ä¸ªåˆ†å¸ƒæ˜¯ä¸
 want to argue that this distribution is
 indistinguishable from a random four-tuple
 
 47
 00:03:45,399 --> 00:03:49,292
-K^4ÖĞµÄËæ»úËÄÔª×é²»¿ÉÇø·Ö¡£ºÃ
-ÎÒÃÇµÄÄ¿±êÊÇÖ¤Ã÷
+K^4ä¸­çš„éšæœºå››å…ƒç»„ä¸å¯åŒºåˆ†ã€‚å¥½
+æˆ‘ä»¬çš„ç›®æ ‡æ˜¯è¯æ˜
 in K to the fourth. Okay so our goal is to
 prove that these two are
 
 48
 00:03:49,292 --> 00:03:53,887
-ÕâÁ½¸öÊÇ²»¿ÉÇø·ÖµÄ¡£ºÃ£¬Ò»²½Ò»²½À´
+è¿™ä¸¤ä¸ªæ˜¯ä¸å¯åŒºåˆ†çš„ã€‚å¥½ï¼Œä¸€æ­¥ä¸€æ­¥æ¥
 indistinguishable. Well let's do it one
 step at a time. We know that the generator
 
 49
 00:03:53,887 --> 00:03:58,028
-ÎÒÃÇÖªµÀÕâ¸ö·¢ÉúÆ÷ÊÇ°²È«µÄ£¬Òò´ËµÚÒ»²ãµÄÊä³ö
+æˆ‘ä»¬çŸ¥é“è¿™ä¸ªå‘ç”Ÿå™¨æ˜¯å®‰å…¨çš„ï¼Œå› æ­¤ç¬¬ä¸€å±‚çš„è¾“å‡º
 is a secure generator, therefore in fact
 the output of the first level is
 
 50
 00:03:58,028 --> 00:04:02,453
-ÓëËæ»ú²»¿ÉÇø·Ö¡£»»¾ä»°Ëµ£¬Èç¹ûÎÒÃÇÓÃ
+ä¸éšæœºä¸å¯åŒºåˆ†ã€‚æ¢å¥è¯è¯´ï¼Œå¦‚æœæˆ‘ä»¬ç”¨
 indistinguishable from random. In other
 words, if we replace the first level by
 
 51
 00:04:02,453 --> 00:04:06,991
-ÕæËæ»ú×Ö·û´®À´Ìæ»»µÚÒ»²ã£¬ÕâÁ½¸öÊÇ´Ó
-ÃÜÔ¿¿Õ¼äÀïËæ»úÑ¡È¡µÄ
+çœŸéšæœºå­—ç¬¦ä¸²æ¥æ›¿æ¢ç¬¬ä¸€å±‚ï¼Œè¿™ä¸¤ä¸ªæ˜¯ä»
+å¯†é’¥ç©ºé—´é‡Œéšæœºé€‰å–çš„
 truly random strings, these two are truly
 random picked in the key space, then no
 
 52
 00:04:10,267 --> 00:04:11,359
-ÄÇÃ´Ã»ÓĞÓĞĞ§µÄ¹¥»÷¿ÉÒÔÇø·ÖÕâÁ½¸ö·Ö²¼
+é‚£ä¹ˆæ²¡æœ‰æœ‰æ•ˆçš„æ”»å‡»å¯ä»¥åŒºåˆ†è¿™ä¸¤ä¸ªåˆ†å¸ƒ
 efficient adversary should be able to
 distinguish these two distributions. In
 
 53
 00:04:11,359 --> 00:04:15,954
-ÊÂÊµÉÏ£¬Èç¹û´ó¼Ò¿ÉÒÔÇø·ÖÕâÁ½¸ö·Ö²¼
+äº‹å®ä¸Šï¼Œå¦‚æœå¤§å®¶å¯ä»¥åŒºåˆ†è¿™ä¸¤ä¸ªåˆ†å¸ƒ
 fact, if you could distinguish these two
 distributions, it's easy to show that you
 
 54
 00:04:15,954 --> 00:04:20,768
-ÈİÒ×Ö¤Ã÷´ó¼Ò¿ÉÒÔÆÆ½â×î³õµÄPRG¡£ºÃ
-´ó¼Ò¿´µÃ³öÎÒÃÇ½øĞĞÌæ»»µÄÔ­Òò
+å®¹æ˜“è¯æ˜å¤§å®¶å¯ä»¥ç ´è§£æœ€åˆçš„PRGã€‚å¥½
+å¤§å®¶çœ‹å¾—å‡ºæˆ‘ä»¬è¿›è¡Œæ›¿æ¢çš„åŸå› 
 would break the original PRG. Okay, but
 essentially you see that the reason we can
 
 55
 00:04:20,768 --> 00:04:25,581
-ÎÒÃÇÖ®ËùÒÔ¿ÉÒÔÓÃÕæËæ»úÖµÀ´Ìæ»»GµÄÊä³ö
+æˆ‘ä»¬ä¹‹æ‰€ä»¥å¯ä»¥ç”¨çœŸéšæœºå€¼æ¥æ›¿æ¢Gçš„è¾“å‡º
 do this replacement, we can replace the
 output of G, with truly random values, is
 
 56
 00:04:25,581 --> 00:04:30,578
-ÊÇÒòÎªPRGµÄ¶¨ÒåËùÖÂ£¬PRGµÄÊä³ö
+æ˜¯å› ä¸ºPRGçš„å®šä¹‰æ‰€è‡´ï¼ŒPRGçš„è¾“å‡º
 exactly because of the definition of the
 PRG, which says the output of the PRG is
 
 57
 00:04:30,578 --> 00:04:35,391
-ºÍËæ»ú²»¿ÉÇø·Ö¡£ËùÒÔÎÒÃÇÒ²¿ÉÒÔ°ÑËæ»úÊı·ÅÔÚÄÇ
+å’Œéšæœºä¸å¯åŒºåˆ†ã€‚æ‰€ä»¥æˆ‘ä»¬ä¹Ÿå¯ä»¥æŠŠéšæœºæ•°æ”¾åœ¨é‚£
 indistinguishable from random, so we might
 as well just put random there, and no
 
 58
 00:04:35,391 --> 00:04:40,265
-Ã»ÓĞÓĞĞ§µÄ¹¥»÷¿ÉÒÔÇø·ÖÕâÁ½¸ö·Ö²¼
+æ²¡æœ‰æœ‰æ•ˆçš„æ”»å‡»å¯ä»¥åŒºåˆ†è¿™ä¸¤ä¸ªåˆ†å¸ƒ
 efficient adversary can distinguish the
 resulting two distributions. Okay, so far
 
 59
 00:04:40,265 --> 00:04:45,018
-Ä¿Ç°¶¼»¹²»´í£¬ÏÖÔÚÎÒÃÇÒª¶Ô×ó±ß×öÍ¬ÑùµÄÊÂÇé
+ç›®å‰éƒ½è¿˜ä¸é”™ï¼Œç°åœ¨æˆ‘ä»¬è¦å¯¹å·¦è¾¹åšåŒæ ·çš„äº‹æƒ…
 so good, but now we can do the same thing
 again to the left hand side. In other
 
 60
 00:04:45,018 --> 00:04:49,710
-»»¾ä»°Ëµ£¬ÎÒÃÇ¿ÉÒÔÓÃÕæËæ»úÌæ»»ÕâÁ½¸öÎ±Ëæ»úÊä³ö
+æ¢å¥è¯è¯´ï¼Œæˆ‘ä»¬å¯ä»¥ç”¨çœŸéšæœºæ›¿æ¢è¿™ä¸¤ä¸ªä¼ªéšæœºè¾“å‡º
 words, we can replace these two pseudo
 random outputs, by truly random outputs.
 
 61
 00:04:49,710 --> 00:04:53,925
-»¹ÊÇÒòÎª·¢ÉúÆ÷GÊÇ°²È«µÄ£¬Ã»ÓĞÓĞĞ§µÄ¹¥»÷
+è¿˜æ˜¯å› ä¸ºå‘ç”Ÿå™¨Gæ˜¯å®‰å…¨çš„ï¼Œæ²¡æœ‰æœ‰æ•ˆçš„æ”»å‡»
 And again because the generator G is
 secure, no efficient adversary can tell
 
 62
 00:04:54,091 --> 00:04:57,807
-¿ÉÒÔÇø·ÖÕâÁ½¸ö·Ö²¼¡£µ«²»Í¬µÄÊÇ
+å¯ä»¥åŒºåˆ†è¿™ä¸¤ä¸ªåˆ†å¸ƒã€‚ä½†ä¸åŒçš„æ˜¯
 the difference between these two
 distributions. But differently, if an
 
 63
 00:04:57,807 --> 00:05:02,077
-Èç¹ûÒ»¸ö¹¥»÷Õß¿ÉÒÔÇø·ÖÕâÁ½¸ö·Ö²¼
+å¦‚æœä¸€ä¸ªæ”»å‡»è€…å¯ä»¥åŒºåˆ†è¿™ä¸¤ä¸ªåˆ†å¸ƒ
 adversary can distinguish these two
 distributions, then we would also give an
 
 64
 00:05:02,077 --> 00:05:06,707
-ÎÒÃÇÒ²¿ÉÒÔ¸ø³öÒ»¸ö¶Ô·¢ÉúÆ÷GµÄ¹¥»÷
-×îºó£¬ÎÒÃÇ×îºóÔÙ×öÒ»´Î
+æˆ‘ä»¬ä¹Ÿå¯ä»¥ç»™å‡ºä¸€ä¸ªå¯¹å‘ç”Ÿå™¨Gçš„æ”»å‡»
+æœ€åï¼Œæˆ‘ä»¬æœ€åå†åšä¸€æ¬¡
 attack on the generator G. And now finally
 we're gonna do this one last time. We're
 
 65
 00:05:06,707 --> 00:05:11,280
-ÎÒÃÇÓÃÕæËæ»ú¶ÔÌæ»»µôÕâÒ»Î±Ëæ»ú¶Ô
+æˆ‘ä»¬ç”¨çœŸéšæœºå¯¹æ›¿æ¢æ‰è¿™ä¸€ä¼ªéšæœºå¯¹
 gonna replace this pseudo random pair by a
 truly random pair, and lo and behold we
 
 66
 00:05:11,280 --> 00:05:15,672
-ÏÖÔÚÎÒÃÇ»ñµÃÁËÎÒÃÇÏëÒªµÄ·Ö²¼
+ç°åœ¨æˆ‘ä»¬è·å¾—äº†æˆ‘ä»¬æƒ³è¦çš„åˆ†å¸ƒ
 get the actual distribution that we were
 shooting for, we would get a distribution
 
 67
 00:05:15,672 --> 00:05:19,851
-ÎÒÃÇ»ñµÃÁËÒ»¸öÓÉ4¸ö¶ÀÁ¢·Ö×é¹¹³ÉµÄ·Ö²¼
+æˆ‘ä»¬è·å¾—äº†ä¸€ä¸ªç”±4ä¸ªç‹¬ç«‹åˆ†ç»„æ„æˆçš„åˆ†å¸ƒ
 that is really made of four independent
 blocks. And so now we have proved this
 
 68
 00:05:19,851 --> 00:05:23,279
-ÎÒÃÇÒÑ¾­Ö¤Ã÷ÁËÕâ¸ö×ª»»£¬ÕâÁ½ÊÇ²»¿ÉÇø·ÖµÄ
+æˆ‘ä»¬å·²ç»è¯æ˜äº†è¿™ä¸ªè½¬æ¢ï¼Œè¿™ä¸¤æ˜¯ä¸å¯åŒºåˆ†çš„
 transition basically that these two
 indistinguishable, these two
 
 69
 00:05:23,279 --> 00:05:27,243
-ÕâÁ½ÊÇ²»¿ÉÇø·ÖµÄ£¬ÕâÁ½ÊÇ²»¿ÉÇø·ÖµÄ
+è¿™ä¸¤æ˜¯ä¸å¯åŒºåˆ†çš„ï¼Œè¿™ä¸¤æ˜¯ä¸å¯åŒºåˆ†çš„
 indistinguishable, and these two
 indistinguishable, and therefore these two
 
 70
 00:05:27,243 --> 00:05:31,475
-Òò´ËÕâÁ½ÊÇ²»¿ÉÇø·ÖµÄ£¬¼ÇÎªÎÒÃÇÏëÖ¤Ã÷µÄ
+å› æ­¤è¿™ä¸¤æ˜¯ä¸å¯åŒºåˆ†çš„ï¼Œè®°ä¸ºæˆ‘ä»¬æƒ³è¯æ˜çš„
 are indistinguishable, which is what we
 wanted to prove. Okay so this is kind of
 
 71
 00:05:31,475 --> 00:05:35,760
-ÕâÊÇÖ¤Ã÷µÄ´óÖÂÏë·¨£¬ÑÏ¸ñÖ¤Ã÷Ö®²¢²»ÄÑ
+è¿™æ˜¯è¯æ˜çš„å¤§è‡´æƒ³æ³•ï¼Œä¸¥æ ¼è¯æ˜ä¹‹å¹¶ä¸éš¾
 the high level idea for the proof, it is
 not too difficult to make this rigorous,
 
 72
 00:05:35,760 --> 00:05:39,792
-²»¹ıÎÒÖ»Ïë¸æËß´ó¼ÒÖ¤Ã÷µÄÖ±¹ÛÏë·¨
+ä¸è¿‡æˆ‘åªæƒ³å‘Šè¯‰å¤§å®¶è¯æ˜çš„ç›´è§‚æƒ³æ³•
 but I just wanted to show you kinda
 intuition for how the proof works. Well,
 
 73
 00:05:39,792 --> 00:05:44,363
-Èç¹ûÎÒÃÇ¿ÉÒÔÀ©ÕÅ·¢ÉúÆ÷µÄÊä³ö
+å¦‚æœæˆ‘ä»¬å¯ä»¥æ‰©å¼ å‘ç”Ÿå™¨çš„è¾“å‡º
 if we were able to extend the generators
 outputs once, there's nothing preventing
 
 74
 00:05:44,363 --> 00:05:48,822
-ÎÒÃÇµ±È»¿ÉÒÔÔÙ×öÒ»´Î£¬ÓÚÊÇ¾ÍÓĞÒ»·¢ÉúÆ÷G1
+æˆ‘ä»¬å½“ç„¶å¯ä»¥å†åšä¸€æ¬¡ï¼Œäºæ˜¯å°±æœ‰ä¸€å‘ç”Ÿå™¨G1
 us from doing it again so here is a
 generator G1 that outputs four elements in
 
 75
 00:05:48,822 --> 00:05:53,337
-Êä³öÃÜÔ¿¿Õ¼äÀïµÄËÄ¸öÔªËØ¡£¼Ç×¡ÕâÀïµÄÊä³ö
+è¾“å‡ºå¯†é’¥ç©ºé—´é‡Œçš„å››ä¸ªå…ƒç´ ã€‚è®°ä½è¿™é‡Œçš„è¾“å‡º
 the key space. And remember the output
 here is indistinguishable from our random
 
 76
 00:05:53,337 --> 00:05:57,909
-ÓëËæ»úËÄÔª×é²»¿ÉÇø·Ö£¬¼´ÎªËùÖ¤
-ÎÒÃÇÍêÈ«¿ÉÒÔÔÙ´ÎÓ¦ÓÃÕâ¸ö·¢ÉúÆ÷
+ä¸éšæœºå››å…ƒç»„ä¸å¯åŒºåˆ†ï¼Œå³ä¸ºæ‰€è¯
+æˆ‘ä»¬å®Œå…¨å¯ä»¥å†æ¬¡åº”ç”¨è¿™ä¸ªå‘ç”Ÿå™¨
 four tuple, that's what we just proved.
 And so there's nothing preventing us from
 
 77
 00:05:57,909 --> 00:06:02,480
-ËùÒÔÎÒÃÇ»áÄÃ×ÅÕâ¸ö·¢ÉúÆ÷£¬Ó¦ÓÃÓÚ
+æ‰€ä»¥æˆ‘ä»¬ä¼šæ‹¿ç€è¿™ä¸ªå‘ç”Ÿå™¨ï¼Œåº”ç”¨äº
 applying the generator again. So we'll
 take the generator apply it to this random
 
 78
 00:06:02,480 --> 00:06:07,221
-Õâ¸ö¿´ÆğÀ´ÏñÊÇËæ»úµÄ¶«Î÷¡£ÎÒÃÇÓ¦¸Ã¿ÉÒÔ»ñµÃ
-Õâ¸ö¿´ÆğÀ´ÏñÊÇËæ»úµÄ¶«Î÷
+è¿™ä¸ªçœ‹èµ·æ¥åƒæ˜¯éšæœºçš„ä¸œè¥¿ã€‚æˆ‘ä»¬åº”è¯¥å¯ä»¥è·å¾—
+è¿™ä¸ªçœ‹èµ·æ¥åƒæ˜¯éšæœºçš„ä¸œè¥¿
 looking thing and we should be able to get
 this random looking thing. This pair over
 
 79
 00:06:07,221 --> 00:06:11,511
-Õâ¶Ô¿´ÆğÀ´ÏñÊÇËæ»úµÄ¡£ÎÒÃÇ¿ÉÒÔ×öÍ¬ÑùµÄÊÂÇé
+è¿™å¯¹çœ‹èµ·æ¥åƒæ˜¯éšæœºçš„ã€‚æˆ‘ä»¬å¯ä»¥åšåŒæ ·çš„äº‹æƒ…
 here that's random looking. And we can do
 the same thing again, and again, and
 
 80
 00:06:11,511 --> 00:06:16,405
-Ò»´ÎÓÖÒ»´Î¡£ÏÖÔÚÎÒÃÇÒ²ÒÑ¾­¹¹½¨ÁËÒ»¸öĞÂµÄ·¢ÉúÆ÷
-¿ÉÒÔÊä³öK^8ÀïµÄÔªËØ
+ä¸€æ¬¡åˆä¸€æ¬¡ã€‚ç°åœ¨æˆ‘ä»¬ä¹Ÿå·²ç»æ„å»ºäº†ä¸€ä¸ªæ–°çš„å‘ç”Ÿå™¨
+å¯ä»¥è¾“å‡ºK^8é‡Œçš„å…ƒç´ 
 again. And now basically we've built a new
 generator that outputs elements in K to
 
 81
 00:06:16,405 --> 00:06:21,261
-¶ø²»ÊÇK^4ÀïµÄÔªËØ£¬ÆäÖ¤Ã÷
+è€Œä¸æ˜¯K^4é‡Œçš„å…ƒç´ ï¼Œå…¶è¯æ˜
 the eighth, as opposed to K to the fourth.
 And again the proof of security is very
 
 82
 00:06:21,261 --> 00:06:26,056
-Ò²ÓëÎÒ¸Õ¸Õ¸ø´ó¼ÒµÄ·Ç³£Ò»ÖÂ
+ä¹Ÿä¸æˆ‘åˆšåˆšç»™å¤§å®¶çš„éå¸¸ä¸€è‡´
 much the same as the one I just showed you
 essentially you gradually change the
 
 83
 00:06:26,056 --> 00:06:30,612
-°ÑÊä³ö±ä³ÉÕæËæ»ú¡£ËùÒÔÎÒÃÇ°ÑÕâ×ª±ä³ÉÕæËæ»ú
+æŠŠè¾“å‡ºå˜æˆçœŸéšæœºã€‚æ‰€ä»¥æˆ‘ä»¬æŠŠè¿™è½¬å˜æˆçœŸéšæœº
 outputs into truly random outputs. So we
 would change this to a truly random
 
 84
 00:06:30,612 --> 00:06:35,168
-È»ºóÕâÀï£¬È»ºóÄÇÀï£¬È»ºóÕâÀï£¬È»ºóÄÇÀï£¬µÈµÈ
+ç„¶åè¿™é‡Œï¼Œç„¶åé‚£é‡Œï¼Œç„¶åè¿™é‡Œï¼Œç„¶åé‚£é‡Œï¼Œç­‰ç­‰
 output, then this, then that, then this,
 then that and so on and so forth. Until
 
 85
 00:06:35,168 --> 00:06:39,724
-×îÖÕÎÒÃÇ»ñµÃÁËÕæËæ»úµÄ×Ö·û´®
+æœ€ç»ˆæˆ‘ä»¬è·å¾—äº†çœŸéšæœºçš„å­—ç¬¦ä¸²
 finally we get something that's truly
 random and therefore the original two
 
 86
 00:06:39,724 --> 00:06:44,396
-ËùÒÔÎÒÃÇ¿ªÊ¼ÓÃG2KµÄÁ½¸ö·Ö²¼
-ÓëÕæËæ»ú²»¿ÉÇø·Ö¡£ºÃµÄ
+æ‰€ä»¥æˆ‘ä»¬å¼€å§‹ç”¨G2Kçš„ä¸¤ä¸ªåˆ†å¸ƒ
+ä¸çœŸéšæœºä¸å¯åŒºåˆ†ã€‚å¥½çš„
 distributions we started with G2K and
 truly random are indistinguishable. Okay,
 
 87
 00:06:44,396 --> 00:06:49,325
-Ä¿Ç°»¹²»´í¡£ÏÖÔÚÎÒÃÇÓĞÒ»¸ö·¢ÉúÆ÷£¬Êä³öK^8ÖĞÔªËØ
+ç›®å‰è¿˜ä¸é”™ã€‚ç°åœ¨æˆ‘ä»¬æœ‰ä¸€ä¸ªå‘ç”Ÿå™¨ï¼Œè¾“å‡ºK^8ä¸­å…ƒç´ 
 so far so good. So now we have a generator
 that outputs elements in K to the eighth.
 
 88
 00:06:49,325 --> 00:06:54,016
-Èç¹ûÎÒÃÇ»ñµÃÁË3Î»PRF£¬»»¾ä»°Ëµ
+å¦‚æœæˆ‘ä»¬è·å¾—äº†3ä½PRFï¼Œæ¢å¥è¯è¯´
 Now if we do that basically we get a three
 bit PRF. In other words, at zero, zero,
 
 89
 00:06:54,016 --> 00:06:58,884
-ÔÚ000´¦£¬Õâ¸öPRF»áÊä³öÕâ¸ö·Ö×é£¬µÈµÈ
+åœ¨000å¤„ï¼Œè¿™ä¸ªPRFä¼šè¾“å‡ºè¿™ä¸ªåˆ†ç»„ï¼Œç­‰ç­‰
 zero this PRF would output this block, and
 so on and so forth until one, one, one it
 
 90
 00:06:58,884 --> 00:07:03,163
-Ö±µ½111Ëü»áÊä³öÕâ¸ö·Ö×é¡£ÏÖÔÚ£¬ÓĞÈ¤µÄÊÇ
+ç›´åˆ°111å®ƒä¼šè¾“å‡ºè¿™ä¸ªåˆ†ç»„ã€‚ç°åœ¨ï¼Œæœ‰è¶£çš„æ˜¯
 would output this block. Now the
 interesting thing is that in fact this PRF
 
 91
 00:07:03,163 --> 00:07:07,695
-ÊÂÊµÉÏÕâ¸öPRFÊÇÈİÒ×¼ÆËãµÄ¡£ÀıÈç
-¼ÙÉèÎÒÃÇÏë¼ÆËãPRFÔÚ101´¦µÄÖµ
+äº‹å®ä¸Šè¿™ä¸ªPRFæ˜¯å®¹æ˜“è®¡ç®—çš„ã€‚ä¾‹å¦‚
+å‡è®¾æˆ‘ä»¬æƒ³è®¡ç®—PRFåœ¨101å¤„çš„å€¼
 is easy to compute. For example, suppose
 we wanted to compute the PRF at the point
 
 92
 00:07:07,695 --> 00:07:11,948
-ºÃ£¬ÕâÊÇ¸ö3Î»PRF¡£ºÃ£¬101
+å¥½ï¼Œè¿™æ˜¯ä¸ª3ä½PRFã€‚å¥½ï¼Œ101
 one zero one. Okay, it's a three bit PRF.
 Okay so one zero one. How would we do
 
 93
 00:07:11,948 --> 00:07:16,536
-ÎÒÃÇ¸ÃÔõÃ´°ì£¿ÎÒÃÇ´ÓÕâ¸ö³õÊ¼ÃÜÔ¿K¿ªÊ¼
+æˆ‘ä»¬è¯¥æ€ä¹ˆåŠï¼Ÿæˆ‘ä»¬ä»è¿™ä¸ªåˆå§‹å¯†é’¥Kå¼€å§‹
 that? Well basically we would start from
 the original key K. And now we would apply
 
 94
 00:07:16,536 --> 00:07:20,620
-ÏÖÔÚÎÒÃÇÓ¦ÓÃ·¢ÉúÆ÷G£¬µ«ÎÒÃÇÖ»¹ØĞÄGÊä³öµÄÓÒ±ß
+ç°åœ¨æˆ‘ä»¬åº”ç”¨å‘ç”Ÿå™¨Gï¼Œä½†æˆ‘ä»¬åªå…³å¿ƒGè¾“å‡ºçš„å³è¾¹
 the generator G but we would only pay
 attention to the right output of G,
 
 95
 00:07:20,620 --> 00:07:25,040
-ÒòÎªµÚÒ»Î»ÊÇ1¡£È»ºóÎÒÃÇÔÙ´ÎÓ¦ÓÃ·¢ÉúÆ÷
+å› ä¸ºç¬¬ä¸€ä½æ˜¯1ã€‚ç„¶åæˆ‘ä»¬å†æ¬¡åº”ç”¨å‘ç”Ÿå™¨
 because the first bit is one. And then we
 will apply the generator again, but we
 
 96
 00:07:25,040 --> 00:07:29,516
-µ«ÎÒÃÇÖ»¹Ø×¢·¢ÉúÆ÷Êä³öµÄ×ó±ß
+ä½†æˆ‘ä»¬åªå…³æ³¨å‘ç”Ÿå™¨è¾“å‡ºçš„å·¦è¾¹
 would only pay attention to the left of
 the output of the generator because the
 
 97
 00:07:29,516 --> 00:07:33,864
-ÒòÎªµÚ¶şÎ»ÊÇ0¡£È»ºóÎÒÃÇÔÙ´ÎÓ¦ÓÃÕâ¸ö·¢ÉúÆ÷
+å› ä¸ºç¬¬äºŒä½æ˜¯0ã€‚ç„¶åæˆ‘ä»¬å†æ¬¡åº”ç”¨è¿™ä¸ªå‘ç”Ÿå™¨
 second bit is zero. And then we would
 apply the generator again and only pay
 
 98
 00:07:33,864 --> 00:07:38,588
-Ö»¹Ø×¢ÓÒ±ß£¬ÒòÎªµÚÈıÎ»ÊÇ1
+åªå…³æ³¨å³è¾¹ï¼Œå› ä¸ºç¬¬ä¸‰ä½æ˜¯1
 attention to the right outputs because the
 third bit is one and that would be the
 
 99
 00:07:38,588 --> 00:07:43,140
-ÄÇÒ²ÊÇ×îÖÕÊä³ö¡£ºÃ£¬´ó¼Ò¿ÉÒÔ¿´µ½
-Õâ¾ÍÊÇ101µÄÇé¿ö
+é‚£ä¹Ÿæ˜¯æœ€ç»ˆè¾“å‡ºã€‚å¥½ï¼Œå¤§å®¶å¯ä»¥çœ‹åˆ°
+è¿™å°±æ˜¯101çš„æƒ…å†µ
 final output. Right, so you can see that,
 that lead us to 101, and in fact because
 
 100
 00:07:43,140 --> 00:07:47,461
-ÊÂÊµÉÏÒòÎªÕû¸ö·¢ÉúÆ÷ÊÇÎ±Ëæ»úµÄ
+äº‹å®ä¸Šå› ä¸ºæ•´ä¸ªå‘ç”Ÿå™¨æ˜¯ä¼ªéšæœºçš„
 the entire generator is pseudo
 random, we know that, in particular that,
 
 101
 00:07:47,461 --> 00:07:52,796
-ÎÒÃÇÖªµÀÕâÀïµÄÊä³öÒ²ÊÇÎ±Ëæ»úµÄ¡£ºÃ
-Õâ¾Í¸øÁËÎÒÃÇÒ»¸ö3Î»PRF
+æˆ‘ä»¬çŸ¥é“è¿™é‡Œçš„è¾“å‡ºä¹Ÿæ˜¯ä¼ªéšæœºçš„ã€‚å¥½
+è¿™å°±ç»™äº†æˆ‘ä»¬ä¸€ä¸ª3ä½PRF
 this output here is pseudo random. Okay,
 so this gives us a three bit PRF. Well, if
 
 102
 00:07:52,796 --> 00:07:58,632
-Èç¹ûËü¹¤×÷3´Î£¬ËüÒ²ÍêÈ«¿ÉÒÔ¹¤×÷N´Î
+å¦‚æœå®ƒå·¥ä½œ3æ¬¡ï¼Œå®ƒä¹Ÿå®Œå…¨å¯ä»¥å·¥ä½œNæ¬¡
 it worked three times, there's no reason
 why it can't work N times. And so if we
 
 103
 00:07:58,632 --> 00:08:03,501
-Èç¹ûÎÒÃÇ·´¸´Ó¦ÓÃÕâ¸ö×ª»»
-ÎÒÃÇ¾Í¿ÉÒÔµ½´ïGGMPRF
+å¦‚æœæˆ‘ä»¬åå¤åº”ç”¨è¿™ä¸ªè½¬æ¢
+æˆ‘ä»¬å°±å¯ä»¥åˆ°è¾¾GGMPRF
 apply this transformation again and again,
 we arrive at what's called a GGMPRF. GGM
 
 104
 00:08:03,501 --> 00:08:07,956
-GGMÊÇÖ¸Goldreich, GoldwasserºÍMicali
+GGMæ˜¯æŒ‡Goldreich, Goldwasserå’ŒMicali
 stands for Goldreich, Goldwasser and
 Micali these are the inventors of
 
 105
 00:08:07,956 --> 00:08:12,528
-ËûÃÇÊÇÕâ¸öPRFµÄ·¢Ã÷Õß¡£Õâ¸öPRFÈçÏÂ¹¤×÷
+ä»–ä»¬æ˜¯è¿™ä¸ªPRFçš„å‘æ˜è€…ã€‚è¿™ä¸ªPRFå¦‚ä¸‹å·¥ä½œ
 this PRF and the way it works is as
 follows. So we start off with a generator
 
 106
 00:08:12,528 --> 00:08:17,279
-ÎÒÃÇ´Ó½«·¢ÉúÆ÷Êä³öÀ©³äÒ»±¶¿ªÊ¼
-ÎÒÃÇÒª¹¹½¨Ò»¸öPRF£¬Æä¶¨ÒåÓòºÜ´ó
+æˆ‘ä»¬ä»ä¸€ä¸ªè¾“å‡ºé•¿åº¦æ˜¯è¾“å…¥é•¿åº¦ä¸¤å€çš„PRGå‡ºå‘
+æˆ‘ä»¬æ¥æ„å»ºä¸€ä¸ªPRFï¼Œå…¶å®šä¹‰åŸŸå¾ˆå¤§
 just doubles its outputs, and now we're
 able to build a PRF that acts on a large
 
 107
 00:08:17,279 --> 00:08:22,236
-Îª£û0,1£ı^N¡£N¿ÉÒÔÊÇ128ÉõÖÁ¸ü´ó
+ä¸ºï½›0,1ï½^Nã€‚Nå¯ä»¥æ˜¯128ç”šè‡³æ›´å¤§
 domain mainly a domain of size zero one to
 the N, where N could be as big as 128 or even
 
 108
 00:08:22,236 --> 00:08:26,897
-ÎÒÃÇ¿´£¬¼ÙÉèÎÒÃÇÓĞ£û0,1£ı^NÀïµÄÊäÈë
+æˆ‘ä»¬çœ‹ï¼Œå‡è®¾æˆ‘ä»¬æœ‰ï½›0,1ï½^Né‡Œçš„è¾“å…¥
 more. So let's see, suppose we're given an
 input in 01 to the N, let me show you how
 
 109
 00:08:26,897 --> 00:08:31,274
-ÎÒÀ´Õ¹Ê¾ÈçºÎ¼ÆËãÕâ¸öPRF¡£ÏÖÔÚ´ó¼ÒÓĞ¸öºÃÏë·¨
+æˆ‘æ¥å±•ç¤ºå¦‚ä½•è®¡ç®—è¿™ä¸ªPRFã€‚ç°åœ¨å¤§å®¶æœ‰ä¸ªå¥½æƒ³æ³•
 to evaluate the PRF. Well by now you
 should actually have a good idea for how
 
 110
 00:08:31,274 --> 00:08:35,480
-´Ó×î³õµÄÃÜÔ¿¿ªÊ¼
+ä»æœ€åˆçš„å¯†é’¥å¼€å§‹
 to do it. Essentially we start from the
 original key and then we apply the
 
 111
 00:08:35,480 --> 00:08:40,255
-Ó¦ÓÃ·¢ÉúÆ÷¸ù¾İX0Î»À´Ñ¡Ôñ×ó±ß»òÓÒ±ß
+åº”ç”¨å‘ç”Ÿå™¨æ ¹æ®X0ä½æ¥é€‰æ‹©å·¦è¾¹æˆ–å³è¾¹
 generator and we take either the left or
 the right side depending on the bit X0 and
 
 112
 00:08:40,255 --> 00:08:44,746
-È»ºóÎÒÃÇµÃµ½ÁËÏÂÒ»ÃÜÔ¿K1
-ÎÒÃÇÔÙ´ÎÓ¦ÓÃ·¢ÉúÆ÷
+ç„¶åæˆ‘ä»¬å¾—åˆ°äº†ä¸‹ä¸€å¯†é’¥K1
+æˆ‘ä»¬å†æ¬¡åº”ç”¨å‘ç”Ÿå™¨
 then we arrive at the next key, K1. And
 then we apply the generator again and we
 
 113
 00:08:44,746 --> 00:08:49,444
-¸ù¾İX1Î»À´Ñ¡Ôñ×ó±ß»òÓÒ±ß£¬µÃµ½ÏÂÒ»¸öÃÜÔ¿
+æ ¹æ®X1ä½æ¥é€‰æ‹©å·¦è¾¹æˆ–å³è¾¹ï¼Œå¾—åˆ°ä¸‹ä¸€ä¸ªå¯†é’¥
 take the left or the right side depending
 on X1 and we arrive at the next key. And
 
 114
 00:08:49,444 --> 00:08:54,730
-È»ºóÎÒÃÇ·´¸´ÕâÑù²Ù×÷£¬Ö±µ½µÃµ½Êä³ö
+ç„¶åæˆ‘ä»¬åå¤è¿™æ ·æ“ä½œï¼Œç›´åˆ°å¾—åˆ°è¾“å‡º
 then we do this again and again, until
 finally we are arrive at the output. So we
 
 115
 00:08:54,730 --> 00:08:59,818
-ÎÒÃÇÒÑ¾­´¦ÀíÁËËùÓĞÎ»£¬µÃµ½ÁËº¯ÊıµÄÊä³ö
+æˆ‘ä»¬å·²ç»å¤„ç†äº†æ‰€æœ‰ä½ï¼Œå¾—åˆ°äº†å‡½æ•°çš„è¾“å‡º
 have processed all end bits, and we arrive
 at the output of this function. And
 
 116
 00:08:59,818 --> 00:09:05,170
-ÓÃÖ®Ç°Í¬ÑùµÄ·½·¨£¬ÎÒÃÇ¿ÉÒÔÖ¤Ã÷Æä°²È«ĞÔ
+ç”¨ä¹‹å‰åŒæ ·çš„æ–¹æ³•ï¼Œæˆ‘ä»¬å¯ä»¥è¯æ˜å…¶å®‰å…¨æ€§
 basically we can prove security again
 pretty much along the same lines as we did
 
 117
 00:09:05,170 --> 00:09:10,324
-ÎÒÃÇ¿ÉÒÔÖ¤Ã÷Èç¹ûGÊÇ¸ö°²È«µÄPRG
+æˆ‘ä»¬å¯ä»¥è¯æ˜å¦‚æœGæ˜¯ä¸ªå®‰å…¨çš„PRG
 before, and we can show that if G is a
 secure PRG, then in fact we get a secure
 
 118
 00:09:10,324 --> 00:09:14,917
-ÊÂÊµÉÏÎÒÃÇ¿ÉÒÔ»ñµÃÒ»¸ö°²È«µÄPRF
-¶¨ÒåÔÚ£û0,1£ı^NÉÏµÄ£¬Ò»¸ö·Ç³£´óµÄ¶¨ÒåÓò
+äº‹å®ä¸Šæˆ‘ä»¬å¯ä»¥è·å¾—ä¸€ä¸ªå®‰å…¨çš„PRF
+å®šä¹‰åœ¨ï½›0,1ï½^Nä¸Šçš„ï¼Œä¸€ä¸ªéå¸¸å¤§çš„å®šä¹‰åŸŸ
 PRF, on 01 to the N, on a very large
 domain. So that's fantastic. Now we have
 
 119
 00:09:14,917 --> 00:09:19,064
-ºÜÉñÆæ¡£ÏÖÔÚÎÒÃÇÓĞÒ»¸ö¿ÉÖ¤Êµ°²È«µÄPRF
+å¾ˆç¥å¥‡ã€‚ç°åœ¨æˆ‘ä»¬æœ‰ä¸€ä¸ªå¯è¯å®å®‰å…¨çš„PRF
 we have essential, we have a PRF that's
 provably secure, assuming that the
 
 120
 00:09:19,064 --> 00:09:23,495
-ÒÔ°²È«µÄ·¢ÉúÆ÷ÎªÇ°Ìá¡£Õâ¸ö·¢ÉúÆ÷
+ä»¥å®‰å…¨çš„å‘ç”Ÿå™¨ä¸ºå‰æã€‚è¿™ä¸ªå‘ç”Ÿå™¨
 underlying generator is secure, and the
 generator is supposedly much easier to
 
 121
 00:09:23,495 --> 00:09:28,153
-±ÈÒ»¸öÊµ¼ÊµÄPRF¸üÈİÒ×¹¹Ôì¡£ÊÂÊµÉÏ
-Ëû¿ÉÒÔ¹¤×÷µÄ·Ö×é¿ÉÒÔÊÇºÜ´ó
+æ¯”ä¸€ä¸ªå®é™…çš„PRFæ›´å®¹æ˜“æ„é€ ã€‚äº‹å®ä¸Š
+ä»–å¯ä»¥å·¥ä½œçš„åˆ†ç»„å¯ä»¥æ˜¯å¾ˆå¤§
 build than an actual PRF. And in fact it
 works on blocks that can be very large, in
 
 122
 00:09:28,153 --> 00:09:33,296
-ÌØ±ğµØ£¬£û0,1£ı^128£¬ÕâÊÇÎÒÃÇÏëÒªµÄ
+ç‰¹åˆ«åœ°ï¼Œï½›0,1ï½^128ï¼Œè¿™æ˜¯æˆ‘ä»¬æƒ³è¦çš„
 particular, 01 to the 128th, which is what
 we needed. So you might ask well why isn't
 
 123
 00:09:33,296 --> 00:09:39,122
-´ó¼Ò¿ÉÄÜ»áÎÊ£¬ÎªÊ²Ã´Õâ¸öÔÚÊµ¼ÊÖĞÃ»ÓĞ±»ÓÃµ½£¿
-Ô­ÒòÊÇ£¬ËüµÄËÙ¶ÈºÜÂı
+å¤§å®¶å¯èƒ½ä¼šé—®ï¼Œä¸ºä»€ä¹ˆè¿™ä¸ªåœ¨å®é™…ä¸­æ²¡æœ‰è¢«ç”¨åˆ°ï¼Ÿ
+åŸå› æ˜¯ï¼Œå®ƒçš„é€Ÿåº¦å¾ˆæ…¢
 this thing being used in practice? And the
 reason is, that it's actually fairly slow.
 
 124
 00:09:39,122 --> 00:09:44,597
-ÉèÏëÒ»ÏÂ£¬ÎÒÃÇÊ¹ÓÃSalsa·¢ÉúÆ÷
+è®¾æƒ³ä¸€ä¸‹ï¼Œæˆ‘ä»¬ä½¿ç”¨Salsaå‘ç”Ÿå™¨
 So imagine we plug in as a generator we
 plug in the Salsa generator. So now to
 
 125
 00:09:44,597 --> 00:09:50,142
-ÏÖÔÚÀ´¼ÆËãÕâ¸öPRFÔÚÄ³¸ö128Î»ÊäÈëµÄÖµ
-ÎÒÃÇ±ØĞëÔËĞĞSalsa·¢ÉúÆ÷128´Î
+ç°åœ¨æ¥è®¡ç®—è¿™ä¸ªPRFåœ¨æŸä¸ª128ä½è¾“å…¥çš„å€¼
+æˆ‘ä»¬å¿…é¡»è¿è¡ŒSalsaå‘ç”Ÿå™¨128æ¬¡
 evaluate this PRF at a 128 bit inputs, we
 would basically have to run the Salsa
 
 126
 00:09:50,142 --> 00:09:55,617
-Ò»´ÎÖ»¶ÔÓ¦Ò»Î»ÊäÈë¡£È»ºóÎÒÃÇ»ñµÃÁË
+ä¸€æ¬¡åªå¯¹åº”ä¸€ä½è¾“å…¥ã€‚ç„¶åæˆ‘ä»¬è·å¾—äº†
 generator 128 times. One time per bit of
 the input. But then we would get a PRF
 
 127
 00:09:55,617 --> 00:10:01,513
-Ò»¸öPRF£¬ÆäÔËĞĞÊ±¼äÈ´ÊÇÔ­°æSalsaµÄ128±¶
+ä¸€ä¸ªPRFï¼Œå…¶è¿è¡Œæ—¶é—´å´æ˜¯åŸç‰ˆSalsaçš„128å€
 that's 128 times slower than the original
 Salsa. And that's much, much, much slower
 
 128
 00:10:01,513 --> 00:10:06,227
-Õâ±ÈAESÂıÌ«¶àÌ«¶à¡£AESÊÇÒ»¸öÆô·¢ĞÔµÄPRF
-µ«ËüÎÒÃÇÕâµÄÒª¿ìºÜ¶à
+è¿™æ¯”AESæ…¢å¤ªå¤šå¤ªå¤šã€‚AESæ˜¯ä¸€ä¸ªå¯å‘æ€§ï¼ˆæœªç»è¯å®ï¼‰çš„PRF
+ä½†å®ƒæˆ‘ä»¬è¿™çš„è¦å¿«å¾ˆå¤š
 than AES. AES is a heuristic PRF. But
 nevertheless it's much faster then what we
 
 129
 00:10:06,227 --> 00:10:10,585
-¾¡¹ÜÕâ¸ö¹¹ÔìºÜÓÅÑÅ
+å°½ç®¡è¿™ä¸ªæ„é€ å¾ˆä¼˜é›…
 just got here. And so even though this is
 a very elegant construction, it's not used
 
 130
 00:10:10,585 --> 00:10:14,522
-Êµ¼Ê¹¹ÔìÎ±Ëæ»úº¯ÊıÊ±È´²»ÊµÓÃ
+å®é™…æ„é€ ä¼ªéšæœºå‡½æ•°æ—¶å´ä¸å®ç”¨
 in practice to build pseudo random
 functions although in a week we will be
 
 131
 00:10:14,522 --> 00:10:18,915
-ËäÈ»±¾ÖÜÎÒÃÇ»¹ÓĞÊ¹ÓÃÕâ¸ö¹¹Ôì
-À´¹¹½¨Ò»¸öĞÅÏ¢ÍêÕûĞÔµÄ»úÖÆ
+è™½ç„¶æœ¬å‘¨æˆ‘ä»¬è¿˜è¦ä½¿ç”¨è¿™ä¸ªæ„é€ 
+æ¥æ„å»ºä¸€ä¸ªä¿¡æ¯å®Œæ•´æ€§çš„æœºåˆ¶
 using this type of construction to build a
 message integrity mechanism. So the last
 
 132
 00:10:18,915 --> 00:10:23,183
-×îºóÒ»²½£¬ÏÖÔÚÎÒÃÇ¹¹½¨ÁËÒ»¸öPRF
+æœ€åä¸€æ­¥ï¼Œç°åœ¨æˆ‘ä»¬æ„å»ºäº†ä¸€ä¸ªPRF
 step, is basically now that we've built a
 PRF, the questions is whether we can
 
 133
 00:10:23,183 --> 00:10:27,729
-ÎÊÌâÊÇÎÒÃÇÄÜ·ñ¹¹½¨·Ö×éÃÜÂë¡£»»¾ä»°Ëµ
+é—®é¢˜æ˜¯æˆ‘ä»¬èƒ½å¦æ„å»ºåˆ†ç»„å¯†ç ã€‚æ¢å¥è¯è¯´
 actually build the block cypher. In other
 words, can we actually build a secure PRP
 
 134
 00:10:27,729 --> 00:10:32,054
-ÎÒÃÇÄÜ·ñ´ÓÒ»¸ö°²È«µÄPRG¹¹½¨Ò»¸ö°²È«µÄPRPÄØ£¿
-¶Ô²»¿ÉÄæµÄ£¬ÎÒÃÇÒÑ¾­½â¾ö
+æˆ‘ä»¬èƒ½å¦ä»ä¸€ä¸ªå®‰å…¨çš„PRGæ„å»ºä¸€ä¸ªå®‰å…¨çš„PRPå‘¢ï¼Ÿ
+æˆ‘ä»¬ç›®å‰æ‰€åšçš„éƒ½æ˜¯ä¸å¯é€†çš„æƒ…å†µ
 from a secure PRG. Everything we've done
 so far is not reversible. Again if you
 
 135
 00:10:32,054 --> 00:10:36,600
-Èç¹û´ó¼Ò¿´ÕâÀïµÄ¹¹Ôì£¬¸ø¶¨×îºóÊä³ö
-ÎÒÃÇÊÇ²»ÄÜ½âÃÜµÄ
+å¦‚æœå¤§å®¶çœ‹è¿™é‡Œçš„æ„é€ ï¼Œç»™å®šæœ€åè¾“å‡º
+æˆ‘ä»¬æ˜¯ä¸èƒ½è§£å¯†çš„
 look at this construction here, we can't
 decrypt basically given the final outputs.
 
 136
 00:10:36,600 --> 00:10:40,535
-²»¿ÉÄÜ»ØÈ¥£¬ÖÁÉÙÎÒÃÇ²»ÖªµÀÔõÃ´»ØÈ¥
+ä¸å¯èƒ½å›å»ï¼Œè‡³å°‘æˆ‘ä»¬ä¸çŸ¥é“æ€ä¹ˆå›å»
 It is not possible to go back or at least
 we don't know how to go back the, the
 
 137
 00:10:40,535 --> 00:10:44,520
-»Øµ½×î³õµÄÊäÈë¡£ËùÒÔÏÖÔÚÎÊÌâÊÇ
+å›åˆ°æœ€åˆçš„è¾“å…¥ã€‚æ‰€ä»¥ç°åœ¨é—®é¢˜æ˜¯
 original inputs. So now the question of
 interest is so can we actually solve the
 
 138
 00:10:44,520 --> 00:10:48,654
-ÎÒÃÇÄÜ²»ÄÜ½â¾ö×î³õµÄÎÊÌâ£¿ÎÒÃÇÄÜ·ñ
-¸ù¾İ°²È«PRG¹¹½¨Ò»¸ö·Ö×éÃÜÂë£¿
+æˆ‘ä»¬èƒ½ä¸èƒ½è§£å†³æœ€åˆçš„é—®é¢˜ï¼Ÿæˆ‘ä»¬èƒ½å¦
+æ ¹æ®å®‰å…¨PRGæ„å»ºä¸€ä¸ªåˆ†ç»„å¯†ç ï¼Ÿ
 problem we wanted solve initially? Mainly,
 can we actually build a block cipher from
 
 139
 00:10:48,654 --> 00:10:53,540
-ÄÇÃ´´ó¼ÒÏëÒ»Ïë£¬¼ÇÏÂ´ğ°¸
+é‚£ä¹ˆå¤§å®¶æƒ³ä¸€æƒ³ï¼Œè®°ä¸‹ç­”æ¡ˆ
 a secure PRG? So I'll let you think about
 this for a second, and mark the answer. So
 
 140
 00:10:53,540 --> 00:10:57,718
-µ±È»ÎÒÏ£Íû´ó¼ÒµÄ´ğ°¸ÊÇ¿Ï¶¨µÄ
+å½“ç„¶æˆ‘å¸Œæœ›å¤§å®¶çš„ç­”æ¡ˆæ˜¯è‚¯å®šçš„
 of course I hope everyone said the answer
 is yes and you already have all the
 
 141
 00:10:57,718 --> 00:11:01,896
-´ó¼ÒÒÑ¾­ÍòÊÂ¾ã±¸ÁË¡£ÌØ±ğµØ
-´ó¼ÒÒÑ¾­ÖªµÀÁËÈçºÎ´ÓÒ»¸öÎ±Ëæ»úÊı·¢ÉúÆ÷
+å¤§å®¶å·²ç»ä¸‡äº‹ä¿±å¤‡äº†ã€‚ç‰¹åˆ«åœ°
+å¤§å®¶å·²ç»çŸ¥é“äº†å¦‚ä½•ä»ä¸€ä¸ªä¼ªéšæœºæ•°å‘ç”Ÿå™¨
 ingredients to do it. In particular, you
 already know how to build a PRF from a
 
 142
 00:11:01,896 --> 00:11:06,395
-¹¹½¨Ò»¸öPRF¡£ÎÒÃÇËµÁËÒ»µ©ÓĞÁËPRF
+æ„å»ºä¸€ä¸ªPRFã€‚æˆ‘ä»¬è¯´äº†ä¸€æ—¦æœ‰äº†PRF
 pseudo random generator. And we said that
 once we have a PRF we can plug it into the
 
 143
 00:11:06,395 --> 00:11:10,573
-ÎÒÃÇ¿ÉÒÔÊ¹ÓÃLuby-Rackoff¹¹Ôì·¨
-¼ÇµÃÊÇÒ»¸öÈı»ØºÏµÄFeistelÍøÂç
+æˆ‘ä»¬å¯ä»¥ä½¿ç”¨Luby-Rackoffæ„é€ æ³•
+è®°å¾—æ˜¯ä¸€ä¸ªä¸‰å›åˆçš„Feistelç½‘ç»œ
 Luby-Rackoff construction, which if you
 remember, is just a three-round Feistel.
 
 144
 00:11:10,573 --> 00:11:14,750
-ÎÒÃÇËµÁËÈç¹û´ó¼ÒÓĞÁË°²È«µÄPRF
-¾Í¿ÉÒÔÀûÓÃÈı»ØºÏFeistel
+æˆ‘ä»¬è¯´äº†å¦‚æœå¤§å®¶æœ‰äº†å®‰å…¨çš„PRF
+å°±å¯ä»¥åˆ©ç”¨ä¸‰å›åˆFeistel
 So we said that if you plug a secure PRF
 into a three-round Feistel, you get a
 
 145
 00:11:14,750 --> 00:11:19,044
-¾Í¿ÉÒÔµÃµ½Ò»¸ö°²È«µÄPRP¡£ËùÒÔ
-½«Á½Õß½áºÏÆğÀ´£¬ÎÒÃÇ¾ÍÄÜ´ÓÒ»¸öÎ±Ëæ»úÊı·¢ÉúÆ÷
+å°±å¯ä»¥å¾—åˆ°ä¸€ä¸ªå®‰å…¨çš„PRPã€‚æ‰€ä»¥
+å°†ä¸¤è€…ç»“åˆèµ·æ¥ï¼Œæˆ‘ä»¬å°±èƒ½ä»ä¸€ä¸ªä¼ªéšæœºæ•°å‘ç”Ÿå™¨
 secure PRP. So combining these two
 together, basically gives us a secure PRP
 
 146
 00:11:19,044 --> 00:11:23,328
-µÃµ½Ò»¸ö°²È«µÄPRP£¬Ëü¿É±»Ö¤Ã÷ÊÇ°²È«µÄ
+å¾—åˆ°ä¸€ä¸ªå®‰å…¨çš„PRPï¼Œå®ƒå¯è¢«è¯æ˜æ˜¯å®‰å…¨çš„
 from a pseudo random generator. And this
 is provably secure as long as the
 
 147
 00:11:23,328 --> 00:11:28,075
-Ö»ÒªÖ§³ÖËüµÄ·¢ÉúÆ÷ÊÇ°²È«µÄ¡£ÄÇÃ´Õâ¸ö
-½á¹ûºÜÃÀ£¬µ«ºÜ²»ĞÒ
+åªè¦æ”¯æŒå®ƒçš„å‘ç”Ÿå™¨æ˜¯å®‰å…¨çš„ã€‚é‚£ä¹ˆè¿™ä¸ª
+ç»“æœå¾ˆç¾ï¼Œä½†å¾ˆä¸å¹¸
 underlying generator is secure. So it's a
 beautiful result but unfortunately again
 
 148
 00:11:28,075 --> 00:11:32,475
-ËüÒ²²»ÊµÓÃ£¬ÒòÎªËü±ÈÀàËÆÓÚAESµÄ
-Æô·¢ĞÔ¹¹ÔìÒªÂıºÜ¶à
+å®ƒä¹Ÿä¸å®ç”¨ï¼Œå› ä¸ºå®ƒæ¯”ç±»ä¼¼äºAESçš„
+å¯å‘æ€§æ„é€ è¦æ…¢å¾ˆå¤š
 it's not used in practice because it's
 considerably slower than heuristics
 
 149
 00:11:32,475 --> 00:11:36,725
-ºÃ£¬±¾ÕÂÍê½á
+å¥½ï¼Œæœ¬ç« å®Œç»“
 constructions like AES. Okay so
 this completes our module on constructing
 
 150
 00:11:36,725 --> 00:11:40,456
-ÎÒÃÇ¹¹ÔìÁËÎ±Ëæ»úÖÃ»»ºÍº¯Êı
+æˆ‘ä»¬æ„é€ äº†ä¼ªéšæœºç½®æ¢å’Œå‡½æ•°
 pseudo random permutations, and pseudo
 random functions. And then in the next
 
 151
 00:11:40,456 --> 00:11:44,287
-ÏÂÒ»ÕÂÖĞÎÒÃÇÌÖÂÛÔÚÕı³£¼ÓÃÜÖĞÈçºÎÊ¹ÓÃËüÃÇ
+ä¸‹ä¸€ç« ä¸­æˆ‘ä»¬è®¨è®ºåœ¨æ­£å¸¸åŠ å¯†ä¸­å¦‚ä½•ä½¿ç”¨å®ƒä»¬
 module we're gonna talk about how to use
 these things to do proper encryption.
